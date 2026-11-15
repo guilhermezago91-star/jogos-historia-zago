@@ -1,0 +1,1458 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>São Vicente, 1548</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+/* Layout: tela cheia 3D; interface em painéis de "madeira escura e azulejo" (anil sobre jacarandá), com açúcar e urucum como destaques */
+:root{
+  --ink:#15130f; --ink-2:#221d17; --anil:#3f6fa6; --anil-lt:#9cc0e6; --acucar:#efe4c8; --mascavo:#d9a557; --urucum:#c4472c; --mata:#86a35a; --water:#6fb0cf;
+  --f-display:"IM Fell English", "Palatino Linotype", Georgia, serif;
+  --f-body:"Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%;overflow:hidden;margin:0}
+body{background:var(--ink);color:var(--acucar);font-family:var(--f-body);font-size:21px;line-height:1.4;user-select:none;-webkit-user-select:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 58%,rgba(10,20,25,.32) 100%)}
+.panel{background:rgba(21,19,15,.9);border:2px solid var(--anil);border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.45)}
+.tile{height:12px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Cpath d='M0 6Q6 0 12 6T24 6' fill='none' stroke='%233f6fa6' stroke-width='1.4'/%3E%3Ccircle cx='12' cy='6' r='2' fill='%239cc0e6'/%3E%3Ccircle cx='0' cy='6' r='1.2' fill='%233f6fa6'/%3E%3Ccircle cx='24' cy='6' r='1.2' fill='%233f6fa6'/%3E%3C/svg%3E") repeat-x;margin:-2px -2px 8px;opacity:.95;border-bottom:1px solid rgba(63,111,166,.5)}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0}
+b,strong{color:var(--mascavo)}
+button{font:700 21px var(--f-body);color:var(--ink);background:var(--mascavo);border:0;border-radius:4px;padding:12px 18px;cursor:pointer;min-height:48px}
+button:hover{background:#e8bb72}
+button:focus-visible{outline:3px solid var(--acucar);outline-offset:2px}
+button.ghost{background:transparent;color:var(--acucar);border:2px solid var(--anil)}
+button.ghost:hover{background:rgba(63,111,166,.25)}
+button:disabled{opacity:.45;cursor:default}
+#hud,#card,#dlg,#map{box-sizing:border-box}
+#failure{position:fixed;inset:0;z-index:30;display:grid;place-items:center;overflow:auto;background:rgba(21,19,15,.97);padding:20px}
+#failure .box{width:min(580px,100%);padding:22px;font-size:21px}
+#failure h2{font-size:32px;color:var(--mascavo);margin-bottom:10px}
+#failure p{margin:0 0 16px}
+/* Saída de emergência: nunca deixar uma cena bloquear a exploração. */
+#resumeBtn{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;font-size:17px;min-height:44px;padding:8px 12px;background:var(--acucar);color:var(--ink);box-shadow:0 3px 16px #0008}
+@media (pointer:coarse){#resumeBtn{bottom:calc(16px + env(safe-area-inset-bottom,0px));right:12px;max-width:48vw}}
+#dlg .btns button{min-width:0;overflow-wrap:anywhere}
+
+#hud{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));width:min(420px,calc(100vw - 220px));padding:10px 14px;z-index:5}
+#hud .lbl{font-size:17px;letter-spacing:.12em;text-transform:uppercase;color:var(--anil-lt);font-weight:700}
+#tasks{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:4px;font-size:20px}
+#tasks li{display:flex;gap:8px;align-items:baseline;opacity:.55}
+#tasks li::before{content:"○";color:var(--anil-lt);flex:none}
+#tasks li.now{opacity:1;font-weight:700}
+#tasks li.done{opacity:.7;text-decoration:line-through}
+#tasks li.done::before{content:"●";color:var(--mata)}
+#purse{margin-top:8px;font-size:19px;border-top:1px solid rgba(63,111,166,.6);padding-top:6px;font-variant-numeric:tabular-nums}
+#date{font-size:17px;opacity:.85;margin-top:2px;font-style:italic}
+#voiceBtn{margin-top:6px;width:100%;min-height:40px;padding:4px 10px;font-size:17px}
+#jumpBtn{margin-top:8px;width:100%;min-height:44px;padding:6px 10px;font-size:19px}
+#jump{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;max-height:46vh;overflow:auto}
+#jump button{min-height:44px;padding:6px 8px;font-size:18px;text-align:left;line-height:1.15}
+#jump .jmsg{grid-column:1/-1;font-size:14px;opacity:.85}
+#map{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:max(12px,env(safe-area-inset-right,0px));width:200px;height:200px;padding:0}
+.minbtn{position:absolute;top:6px;right:6px;width:34px;height:34px;min-height:0;padding:0;font-size:22px;line-height:1;border-radius:4px;background:rgba(21,19,15,.6);color:var(--acucar);border:1.5px solid var(--anil);z-index:2}
+.minbtn:hover{background:rgba(63,111,166,.35)}
+#hud.min{width:auto;padding-right:52px}
+#hud.min #tasks,#hud.min #purse,#hud.min #jumpBtn,#hud.min #jump,#hud.min #date,#hud.min #voiceBtn{display:none}
+#hud .minbtn{width:40px;height:40px;font-size:24px}
+#card .sub,#card h3,#dlg .role,#dlg .who{padding-right:44px}
+#card .minbtn,#dlg .minbtn{top:18px;right:10px;width:42px;height:42px;font-size:26px}
+#card.min #cardText{display:none}
+#card.min h3{cursor:pointer}
+#dlg.min .txt{display:none}
+#mapBtn{position:fixed;top:calc(18px + env(safe-area-inset-top,0px));right:max(18px,calc(env(safe-area-inset-right,0px) + 18px));z-index:3}
+#mapBtn.off{width:auto;padding:0 12px;font-size:16px;font-weight:700;height:38px}
+
+#card{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(900px,calc(100vw - 32px));max-height:58vh;overflow:auto;padding:0 18px 16px;z-index:6}
+#card h3{font-size:36px;color:var(--mascavo)}
+#card .sub{font-size:17px;letter-spacing:.1em;text-transform:uppercase;opacity:.78;margin-bottom:6px;color:var(--anil-lt)}
+#card p{margin:8px 0 0;font-size:25px;line-height:1.35}
+.pg{font-size:16px;opacity:.6;text-align:right;margin-top:4px;font-variant-numeric:tabular-nums}
+.ill{display:flex;align-items:center;gap:18px;margin:8px 0 4px}
+.ill svg{flex:none;width:150px;height:150px}
+.ill small{font-size:22px;line-height:1.3}
+.hoje{background:rgba(111,176,207,.15);border-left:6px solid var(--water);padding:10px 14px;border-radius:4px}
+.hoje::before{content:"E hoje? ";font-weight:800;color:var(--water)}
+.src{font-size:19px!important;opacity:.85;border-left:3px solid var(--mascavo);padding-left:10px}
+button.spk{flex:none!important;min-width:56px;padding:8px 12px}
+#cardBtns{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+#cardBtns:empty{display:none}
+
+#dlg{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(1000px,calc(100vw - 32px));max-height:70vh;overflow:auto;padding:0 20px 16px;z-index:6}
+#dlg .who{font-family:var(--f-display);font-size:38px;color:var(--mascavo)}
+#dlg .role{font-size:17px;letter-spacing:.1em;text-transform:uppercase;opacity:.78;color:var(--anil-lt)}
+#dlg .txt{font-size:26px;line-height:1.35;margin:8px 0 12px}
+#dlg .txt p{margin:0 0 8px}
+#dlg .btns{display:flex;flex-wrap:wrap;gap:10px}
+#dlg .btns button{flex:1 1 260px;font-size:23px;min-height:56px}
+.fb{margin-top:10px;padding:12px 14px;border-radius:4px;font-size:25px}
+.fb.ok{background:rgba(134,163,90,.22);border-left:4px solid var(--mata)}
+.fb.no{background:rgba(196,71,44,.22);border-left:4px solid var(--urucum)}
+
+#joy{position:fixed;left:max(24px,calc(env(safe-area-inset-left,0px) + 24px));bottom:calc(24px + env(safe-area-inset-bottom,0px));width:130px;height:130px;border-radius:50%;border:2px solid rgba(156,192,230,.7);background:rgba(21,19,15,.35);touch-action:none}
+#knob{position:absolute;left:40px;top:40px;width:50px;height:50px;border-radius:50%;background:rgba(217,165,87,.9)}
+
+#start{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,rgba(34,29,23,.7),rgba(21,19,15,.95));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px;overflow:auto}
+#start .box{max-width:880px;width:100%;box-sizing:border-box;padding:0 24px 22px}
+#start .eyebrow{font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--anil-lt);font-weight:700}
+#start h1{font-size:clamp(40px,7.5vw,74px);line-height:1;color:var(--acucar);margin:6px 0 12px}
+#start h1 span{color:var(--mascavo);font-style:italic}
+#start h2{font-size:clamp(28px,4.5vw,42px);color:var(--acucar);margin:6px 0 12px}
+#start p{font-size:25px;margin:0 0 12px}
+#start ol,#start ul{margin:6px 0 14px;padding-left:28px;font-size:23px}
+#start li{margin-bottom:3px}
+#start .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;align-items:center}
+#start .dots{margin-left:auto;font-size:15px;opacity:.7;font-variant-numeric:tabular-nums}
+kbd{font:700 15px var(--f-body);background:var(--ink-2);border:1px solid var(--anil);border-radius:3px;padding:1px 6px;color:var(--acucar)}
+@media (max-width:600px){#map{width:110px;height:110px}#hud{width:calc(100vw - 150px);padding:8px 10px}#tasks{font-size:13px}#tasks li:not(.now):not(.done){display:none}#card p,#dlg .txt{font-size:17px}#card h3{font-size:26px}#dlg .who{font-size:28px}#purse{font-size:14px}}
+@media (pointer:fine){#joy{display:none}}
+@media (min-width:1180px){#card{left:auto;right:max(16px,env(safe-area-inset-right,0px));transform:none;width:min(780px,calc(100vw - 480px))}}
+/* Reserva espaço para o controle de movimento nas telas de toque. */
+@media (pointer:coarse){
+  #joy{z-index:9}
+  #card{bottom:calc(175px + env(safe-area-inset-bottom,0px));max-height:min(48dvh,calc(100dvh - 210px))}
+  #dlg{bottom:calc(12px + env(safe-area-inset-bottom,0px));max-height:calc(100dvh - 125px)}
+  #hud{max-height:calc(100dvh - 155px);overflow-y:auto}
+}
+@media (max-width:600px){
+  #card,#dlg{padding-inline:12px}
+  #card .ill{gap:8px;align-items:flex-start}
+  #card .ill svg{width:95px;height:95px}
+  #card .ill small{font-size:16px}
+  #cardBtns button,#dBtns button{font-size:18px}
+}
+@media (max-height:440px) and (pointer:coarse){
+  #card{max-height:calc(100dvh - 195px)}
+  #dlg{max-height:calc(100dvh - 50px)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head><body>
+
+<canvas id="c" tabindex="-1" aria-label="Cena 3D da vila de São Vicente em 1548"></canvas>
+<div id="vig"></div>
+<div id="hud" class="panel" hidden>
+  <button class="minbtn" id="hudMin" aria-label="Minimizar o quadro de tarefas" aria-expanded="true">–</button>
+  <div class="lbl">O dia de Pedro</div>
+  <div id="date">Maio de 1548 · Ilha de São Vicente</div>
+  <ul id="tasks"></ul>
+  <div id="purse"></div>
+  <button id="voiceBtn" class="ghost" aria-pressed="false">🔊 Vozes: desligadas</button>
+  <button id="jumpBtn" class="ghost" aria-expanded="false" aria-controls="jump">Atalhos: ir para… ▾</button>
+  <div id="jump" hidden></div>
+</div>
+<canvas id="map" class="panel" width="340" height="340" hidden></canvas>
+<button class="minbtn" id="mapBtn" aria-label="Esconder o mapa" hidden>–</button>
+<div id="card" class="panel" hidden><div class="tile"></div><button class="minbtn" id="cardMin" aria-label="Minimizar o texto do lugar" aria-expanded="true">–</button><div class="sub" id="cardSub"></div><h3 id="cardTitle"></h3><div id="cardText"></div><div id="cardBtns"></div></div>
+<div id="dlg" class="panel" hidden><div class="tile"></div><button class="minbtn" id="dlgMin" aria-label="Minimizar o texto da cena" aria-expanded="true">–</button><div class="role" id="dRole"></div><div class="who" id="dWho"></div><div class="txt" id="dTxt"></div><div class="btns" id="dBtns"></div></div>
+<div id="joy" hidden><div id="knob"></div></div>
+<div id="start"><div class="box panel"><div class="tile"></div><div id="intro"></div></div></div>
+<button id="resumeBtn" class="ghost" hidden aria-label="Sair da conversa e voltar ao jogo">Voltar ao jogo ↩</button>
+<div id="failure" role="alert" aria-live="assertive" hidden><div class="box panel"><h2>Não foi possível executar o jogo</h2><p id="failureText"></p><button id="failureRetry">Tentar novamente</button></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+function showFailure(msg){$('failureText').textContent=msg;$('failure').hidden=false;}
+$('failureRetry').onclick=()=>location.reload();
+if(typeof THREE==='undefined'){
+  showFailure('A biblioteca gráfica não foi carregada. Confira sua conexão com a internet e tente novamente.');
+  return;
+}
+const canvas=$('c');
+const LOW_GRAPHICS=matchMedia('(pointer:coarse)').matches||Math.min(innerWidth,innerHeight)<600;
+let renderer;
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:!LOW_GRAPHICS});}
+catch(e){console.error(e);showFailure('Este navegador não conseguiu iniciar o WebGL. Ative a aceleração gráfica ou use outro navegador.');return;}
+renderer.setPixelRatio(Math.min(LOW_GRAPHICS?1:1.5,window.devicePixelRatio||1));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+const scene=new THREE.Scene();
+scene.fog=new THREE.Fog(0xcfdcd8,110,430);
+const camera=new THREE.PerspectiveCamera(60,1,0.1,1000);
+let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+
+// ---------- céu ----------
+const skyU={top:{value:new THREE.Color(0x4f8fc8)},bot:{value:new THREE.Color(0xe3ece8)}};
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(700,32,16),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,fog:false,uniforms:skyU,
+  vertexShader:'varying vec3 vp;void main(){vp=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+  fragmentShader:'uniform vec3 top;uniform vec3 bot;varying vec3 vp;void main(){float h=clamp(normalize(vp).y*1.6,0.0,1.0);gl_FragColor=vec4(mix(bot,top,h),1.0);}'})));
+{ const cm=new THREE.MeshStandardMaterial({color:0xffffff,emissive:0x8c8c8c,transparent:true,opacity:.9,fog:false});
+  const cg=new THREE.IcosahedronGeometry(1,2);
+  for(let i=0;i<16;i++){const cl=new THREE.Group(),a=i/16*Math.PI*2+rnd()*.3,r=260+rnd()*140;
+    for(let j=0;j<6;j++){const m=new THREE.Mesh(cg,cm);m.position.set((j-2.5)*9+rnd()*4,rnd()*5,rnd()*6);m.scale.set(11+rnd()*7,6+rnd()*4,8);cl.add(m);}
+    cl.position.set(Math.cos(a)*r,100+rnd()*60,Math.sin(a)*r);cl.lookAt(0,cl.position.y,0);scene.add(cl);}
+}
+const hemi=new THREE.HemisphereLight(0xdcecf4,0x6f7a48,0.66);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xfff0d6,1.3);
+sun.castShadow=true;sun.shadow.mapSize.set(LOW_GRAPHICS?1024:2048,LOW_GRAPHICS?1024:2048);
+Object.assign(sun.shadow.camera,{left:-60,right:60,top:60,bottom:-60,near:1,far:300});
+sun.shadow.bias=-0.0004;sun.shadow.normalBias=.03;scene.add(sun,sun.target);
+let dusk=0,duskT=0;
+
+// ---------- relevo ----------
+function plateau(x,z,cx,cz,r,h,flat){const d=Math.hypot(x-cx,z-cz)/r;if(d>=1)return 0;let s=d<=flat?1:(1-d)/(1-flat);s=s*s*(3-2*s);return h*s;}
+const SHORE=z=>40+4*Math.sin(z*.04)+2.5*Math.cos(z*.09);
+function H(x,z){
+  let y=.6+.25*Math.sin(x*.05)*Math.cos(z*.06);
+  const s=SHORE(z);if(x>s)y-=(x-s)*.14;
+  y+=plateau(x,z,-85,-125,60,38,.15)+plateau(x,z,40,-118,45,28,.1)+plateau(x,z,-150,60,70,26,0)+plateau(x,z,-60,150,60,20,0);
+  y+=plateau(x,z,210,-30,110,58,0)+plateau(x,z,170,170,80,34,0);
+  if(x<-170)y+=Math.min(170,(-170-x)*.95)*(.8+.2*Math.sin(z*.021)+.1*Math.cos(z*.055));
+  return Math.max(-4,y);
+}
+function segDist(px,pz,a,b){const vx=b[0]-a[0],vz=b[1]-a[1];let t=((px-a[0])*vx+(pz-a[1])*vz)/(vx*vx+vz*vz);t=Math.max(0,Math.min(1,t));return Math.hypot(px-a[0]-vx*t,pz-a[1]-vz*t);}
+const ROADS=[[[-74,6],[-34,0]],[[-34,0],[40,0]],[[0,-36],[0,44]],[[0,-36],[-12,-42]],[[-12,-42],[-22,-62]],[[-22,-62],[-66,-62]],[[0,-36],[12,-40]]];
+function roadD(x,z){let m=1e9;for(const r of ROADS)m=Math.min(m,segDist(x,z,r[0],r[1]));return m;}
+const VILA={x0:-30,x1:33,z0:-30,z1:30};
+const inVila=(x,z)=>x>VILA.x0&&x<VILA.x1&&z>VILA.z0&&z<VILA.z1;
+const CANA={x0:-48,x1:-14,z0:-55,z1:-37};
+const inCana=(x,z)=>x>CANA.x0&&x<CANA.x1&&z>CANA.z0&&z<CANA.z1;
+const ALDEIA={x:-80,z:6};
+const ROCA={x0:-100,x1:-64,z0:34,z1:58};
+const inRoca=(x,z)=>x>ROCA.x0&&x<ROCA.x1&&z>ROCA.z0&&z<ROCA.z1;
+const PIER={x0:37,x1:58,z0:-1.7,z1:1.7,y:1.15};
+const onPier=(x,z)=>x>PIER.x0&&x<PIER.x1&&z>PIER.z0&&z<PIER.z1;
+const GY=(x,z)=>onPier(x,z)?Math.max(H(x,z),PIER.y):H(x,z);
+{
+  const cv=document.createElement('canvas');cv.width=cv.height=256;const c=cv.getContext('2d');
+  c.fillStyle='#fff';c.fillRect(0,0,256,256);
+  for(let i=0;i<9000;i++){const v=195+Math.random()*60|0;c.fillStyle=`rgb(${v},${v},${v-8})`;c.fillRect(Math.random()*256,Math.random()*256,1+Math.random()*2,1+Math.random()*2);}
+  const tex=new THREE.CanvasTexture(cv);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(150,150);
+  const g=new THREE.PlaneGeometry(720,720,230,230);g.rotateX(-Math.PI/2);g.translate(-20,0,0);
+  const p=g.attributes.position,col=new Float32Array(p.count*3);
+  for(let i=0;i<p.count;i++){
+    const x=p.getX(i),z=p.getZ(i),y=H(x,z);p.setY(i,y);
+    const n=(Math.sin(x*.9)*Math.cos(z*.7)+Math.sin(x*.23+z*.31))*.025;
+    const s=SHORE(z);
+    let k=[.40+n,.53+n,.27+n];
+    if(Math.sin(x*.07+z*.05)+Math.cos(z*.11-x*.04)>1.1)k=[.34+n,.48+n,.24+n];
+    if(y>6)k=[.24+n,.40+n,.2+n];
+    if(x>s-7&&y<1.6)k=[.85+n,.79+n,.62+n];
+    if(y<.05)k=[.62,.6,.48];
+    if(inVila(x,z))k=[.58+n,.5+n,.37+n];
+    if(inCana(x,z))k=[.46+n,.37+n,.24+n];
+    if(inRoca(x,z))k=[.52+n,.39+n,.26+n];
+    if(Math.hypot(x-ALDEIA.x,z-ALDEIA.z)<16)k=[.62+n,.5+n,.37+n];
+    if(x>-74&&x<-16&&z>-92&&z<-60)k=[.55+n,.46+n,.33+n];
+    if(roadD(x,z)<2.3&&y>.1)k=[.66,.48,.34];
+    col.set(k,i*3);
+  }
+  g.setAttribute('color',new THREE.BufferAttribute(col,3));g.computeVertexNormals();
+  const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,map:tex,roughness:1,metalness:0}));m.receiveShadow=true;scene.add(m);
+}
+const SEA_M=new THREE.MeshStandardMaterial({color:0x2e7391,roughness:.3,metalness:.05,transparent:true,opacity:.92,emissive:0x0c2a36,emissiveIntensity:.4});
+{const sea=new THREE.Mesh(new THREE.PlaneGeometry(2400,2400),SEA_M);sea.rotation.x=-Math.PI/2;sea.position.y=0;scene.add(sea);}
+
+// ---------- materiais ----------
+function texCanvas(sz,draw,rx=1,ry=1){const cv=document.createElement('canvas');cv.width=cv.height=sz;draw(cv.getContext('2d'),sz);const t=new THREE.CanvasTexture(cv);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=4;return t;}
+const strawTex=texCanvas(128,(c,s)=>{c.fillStyle='#b4975a';c.fillRect(0,0,s,s);for(let i=0;i<500;i++){const v=140+Math.random()*90|0;c.strokeStyle=`rgba(${v},${v-25|0},${v-80|0},.7)`;c.lineWidth=1+Math.random();const x=Math.random()*s,y=Math.random()*s;c.beginPath();c.moveTo(x,y);c.lineTo(x+(Math.random()-.5)*6,y+14+Math.random()*12);c.stroke();}},3,3);
+const taipaTex=texCanvas(128,(c,s)=>{c.fillStyle='#fff';c.fillRect(0,0,s,s);for(let i=0;i<1600;i++){const v=205+Math.random()*50|0;c.fillStyle=`rgb(${v},${v-4},${v-14})`;c.fillRect(Math.random()*s,Math.random()*s,2+Math.random()*4,1+Math.random()*3);}
+  c.strokeStyle='rgba(120,90,60,.15)';for(let i=0;i<10;i++){c.beginPath();c.moveTo(Math.random()*s,Math.random()*s);c.lineTo(Math.random()*s,Math.random()*s);c.stroke();}},2,2);
+const telhaTex=texCanvas(128,(c,s)=>{c.fillStyle='#9b4f33';c.fillRect(0,0,s,s);for(let y=0;y<s;y+=16)for(let x=0;x<s;x+=16){const v=Math.random()*30|0;c.fillStyle=`rgb(${150+v},${78+v/2|0},${50+v/3|0})`;c.beginPath();c.ellipse(x+8,y+8,7,9,0,0,7);c.fill();c.strokeStyle='rgba(60,25,15,.5)';c.stroke();}},3,3);
+const M={
+  taipa:new THREE.MeshStandardMaterial({color:0xece6d6,map:taipaTex,roughness:.95}),
+  taipaOc:new THREE.MeshStandardMaterial({color:0xcfae7f,map:taipaTex,roughness:.95}),
+  barro:new THREE.MeshStandardMaterial({color:0xa9764c,map:taipaTex,roughness:.95}),
+  palha:new THREE.MeshStandardMaterial({color:0xffffff,map:strawTex,roughness:1,side:THREE.DoubleSide}),
+  telha:new THREE.MeshStandardMaterial({color:0xffffff,map:telhaTex,roughness:.9,side:THREE.DoubleSide}),
+  wood:new THREE.MeshStandardMaterial({color:0x6e4b2f,roughness:.9}),
+  woodDk:new THREE.MeshStandardMaterial({color:0x3e2a1b,roughness:.9}),
+  woodLt:new THREE.MeshStandardMaterial({color:0x9a7650,roughness:.9}),
+  stone:new THREE.MeshStandardMaterial({color:0x9a958a,roughness:.95}),
+  iron:new THREE.MeshStandardMaterial({color:0x2c2c2e,roughness:.6,metalness:.6}),
+  copper:new THREE.MeshStandardMaterial({color:0xb5673c,roughness:.45,metalness:.7}),
+  clay:new THREE.MeshStandardMaterial({color:0xb06c43,roughness:.85}),
+  dark:new THREE.MeshStandardMaterial({color:0x1d1712,roughness:1}),
+  leaf:new THREE.MeshStandardMaterial({color:0xffffff,roughness:.85,vertexColors:false}),
+  cana:new THREE.MeshStandardMaterial({color:0x8fae4a,roughness:.8,side:THREE.DoubleSide}),
+  mand:new THREE.MeshStandardMaterial({color:0x4f7f34,roughness:.85}),
+  sugarW:new THREE.MeshStandardMaterial({color:0xf3eee0,roughness:.9}),
+  sugarB:new THREE.MeshStandardMaterial({color:0xa86f36,roughness:.9}),
+  water:new THREE.MeshStandardMaterial({color:0x5aa2c4,roughness:.25,emissive:0x1b4a5e,emissiveIntensity:.5}),
+  fire:new THREE.MeshBasicMaterial({color:0xffa040}),
+  red:new THREE.MeshStandardMaterial({color:0xb02a1e,roughness:.7}),
+  sail:new THREE.MeshStandardMaterial({color:0xf0e6cf,roughness:.9,side:THREE.DoubleSide}),
+  rope:new THREE.MeshStandardMaterial({color:0xc9b48a,roughness:1}),
+};
+const colliders=[],occluders=[];
+function add(mesh,parent=scene){mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);
+  const gm=mesh.geometry;if(gm&&gm.type==='BoxGeometry'){const q=gm.parameters;if(Math.max(q.width,q.height,q.depth)>3.5&&Math.min(q.width,q.depth)>.4)occluders.push(mesh);}
+  return mesh;}
+function box(w,h,d,mat,x,y,z,parent){const m=add(new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat),parent);m.position.set(x,y,z);return m;}
+function cyl(rt,rb,h,mat,x,y,z,parent,seg=10){const m=add(new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),mat),parent);m.position.set(x,y,z);return m;}
+function mesh(geo,mat,x,y,z,parent,s=1){const m=add(new THREE.Mesh(geo,mat),parent);m.position.set(x,y,z);m.scale.setScalar(s);return m;}
+function groupAt(x,z,rot,yOff=0){const g=new THREE.Group();g.position.set(x,H(x,z)+yOff,z);g.rotation.y=rot;scene.add(g);return g;}
+function addCollider(x,z,w,d,rot=0){colliders.push({x,z,hw:w/2,hd:d/2,rot});}
+// telhado de duas águas: cumeeira ao longo do eixo x local
+function gableGeo(len,w,h){const s=new THREE.Shape();s.moveTo(-w/2,0);s.lineTo(w/2,0);s.lineTo(0,h);s.closePath();
+  const g=new THREE.ExtrudeGeometry(s,{depth:len,bevelEnabled:false});g.translate(0,0,-len/2);g.rotateY(Math.PI/2);
+  const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*.25,uv.getY(i)*.25);return g;}
+function hipGeo(w,d,h){const g=new THREE.ConeGeometry(Math.SQRT1_2,1,4,1,true);g.rotateY(Math.PI/4);g.translate(0,.5,0);g.scale(w,h,d);return g;}
+
+// casa de taipa: frente para +z local
+function house(x,z,rot,w,d,h,roof,wall){
+  const g=groupAt(x,z,rot,-.15);
+  box(w,h,d,wall||M.taipa,0,h/2,0,g);
+  box(w+.3,.35,d+.3,M.barro,0,.17,0,g);
+  box(1.1,2.1,.12,M.woodDk,-w*.18,1.05,d/2+.02,g);
+  box(.8,.8,.1,M.woodDk,w*.22,1.7,d/2+.02,g);
+  if(w>6)box(.8,.8,.1,M.woodDk,-w*.38,1.7,d/2+.02,g);
+  if(roof==='telha')mesh(gableGeo(w+.9,d+1.3,d*.42),M.telha,0,h,0,g);
+  else{const r=mesh(gableGeo(w+1.2,d+1.8,d*.6),M.palha,0,h-.05,0,g);}
+  addCollider(x,z,w,d,rot);return g;
+}
+// galpão aberto (pilares + telhado)
+function shed(x,z,rot,w,d,h,roofMat,back=true){
+  const g=groupAt(x,z,rot,-.1);
+  for(const sx of[-1,0,1])for(const sz of[-1,1]){if(sx===0&&w<7)continue;cyl(.14,.16,h,M.wood,sx*(w/2-.2),h/2,sz*(d/2-.2),g,7);}
+  if(back)box(w,1.3,.25,M.taipaOc,0,.65,-d/2+.15,g);
+  mesh(gableGeo(w+1,d+1.4,d*.45),roofMat,0,h,0,g);
+  return g;
+}
+
+// ---------- árvores e plantas (instanciadas) ----------
+function mergeGeos(list){const pos=[],nor=[];list.forEach(([g,m])=>{const q=g.index?g.toNonIndexed():g.clone();q.applyMatrix4(m);
+  pos.push(q.attributes.position.array);nor.push(q.attributes.normal.array);});
+  const cat=a=>{let n=0;a.forEach(x=>n+=x.length);const r=new Float32Array(n);let k=0;a.forEach(x=>{r.set(x,k);k+=x.length;});return r;};
+  const out=new THREE.BufferGeometry();out.setAttribute('position',new THREE.BufferAttribute(cat(pos),3));out.setAttribute('normal',new THREE.BufferAttribute(cat(nor),3));return out;}
+function bumpy(g,amp,f){const q=g.attributes.position;for(let i=0;i<q.count;i++){const x=q.getX(i),y=q.getY(i),z=q.getZ(i);
+  const n=1+amp*(Math.sin(x*f+y*1.3)*Math.cos(z*f*1.1-x*.7)+.5*Math.sin(y*f*2.1+z*1.9));q.setXYZ(i,x*n,y*n,z*n);}g.computeVertexNormals();return g;}
+const _m4=(x,y,z,sx,sy,sz,rx=0,rz=0,ry=0)=>new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(rx,ry,rz)),new THREE.Vector3(sx,sy,sz));
+const TREE_CROWN=mergeGeos([[bumpy(new THREE.IcosahedronGeometry(1,1),.18,2.7),_m4(0,5.2,0,2.6,1.6,2.4)],[bumpy(new THREE.IcosahedronGeometry(1,1),.2,3.1),_m4(1.5,4.4,.6,1.6,1.2,1.5)],[bumpy(new THREE.IcosahedronGeometry(1,1),.2,2.9),_m4(-1.4,4.6,-.5,1.7,1.2,1.6)]]);
+const TREE_TRUNK=mergeGeos([[new THREE.CylinderGeometry(.18,.32,4.6,6),_m4(0,2.3,0,1,1,1)]]);
+const PALM_TRUNK=(()=>{const L=[];let x=0,y=0;for(let i=0;i<6;i++){const a=.05+i*.035;L.push([new THREE.CylinderGeometry(.17-i*.01,.2-i*.01,1.5,6),_m4(x+Math.sin(a)*.75,y+.75,0,1,1,1,0,-a)]);x+=Math.sin(a)*1.5;y+=Math.cos(a)*1.5;}return{g:mergeGeos(L),top:[x,y]};})();
+const PALM_FROND=(()=>{const L=[];const[tx,ty]=PALM_TRUNK.top;for(let i=0;i<9;i++){const a=i/9*Math.PI*2;
+  const fr=new THREE.BoxGeometry(3.2,.04,.7);fr.translate(1.6,0,0);const m=new THREE.Matrix4().makeRotationY(a).multiply(new THREE.Matrix4().makeRotationZ(-.35-(i%3)*.12));m.setPosition(tx,ty,0);L.push([fr,m]);}return mergeGeos(L);})();
+const CANA_GEO=(()=>{const L=[];for(let i=0;i<6;i++){const a=i/6*Math.PI*2,r=.18,h=2.4+(i%3)*.3,lx=Math.cos(a)*r,lz=Math.sin(a)*r;
+  L.push([new THREE.CylinderGeometry(.035,.045,h,5),_m4(lx,h/2,lz,1,1,1,Math.sin(a)*.08,Math.cos(a)*.08)]);
+  for(let k=0;k<2;k++){const lf=new THREE.BoxGeometry(1.3,.015,.07);lf.translate(.65,0,0);const m=new THREE.Matrix4().makeRotationY(a+k*2.1).multiply(new THREE.Matrix4().makeRotationZ(-.25));m.setPosition(lx,h-.2-k*.6,lz);L.push([lf,m]);}}
+  return mergeGeos(L);})();
+const MAND_GEO=mergeGeos([[new THREE.CylinderGeometry(.03,.04,1.2,4),_m4(0,.6,0,1,1,1)],[bumpy(new THREE.IcosahedronGeometry(.45,0),.2,4),_m4(0,1.3,0,1,.6,1)],[bumpy(new THREE.IcosahedronGeometry(.35,0),.2,4),_m4(.3,1.0,.2,1,.6,1)]]);
+function instanced(geo,mat,list,shadow=true,colors){const im=new THREE.InstancedMesh(geo,mat,list.length);const m=new THREE.Matrix4();
+  list.forEach((t,i)=>{m.compose(new THREE.Vector3(t.x,t.y,t.z),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,t.r||0,t.tilt||0)),new THREE.Vector3(t.s,t.sy||t.s,t.s));im.setMatrixAt(i,m);if(colors)im.setColorAt(i,colors[i]);});
+  im.castShadow=shadow;im.receiveShadow=true;scene.add(im);return im;}
+const ENG={x0:-74,x1:-16,z0:-92,z1:-60};
+const inEng=(x,z)=>x>ENG.x0&&x<ENG.x1&&z>ENG.z0&&z<ENG.z1;
+function freeGround(x,z,m=4){return !(x>VILA.x0-m&&x<VILA.x1+m&&z>VILA.z0-m&&z<VILA.z1+m)&&!inCana(x,z)&&!(x>CANA.x0-3&&x<CANA.x1+3&&z>CANA.z0-3&&z<CANA.z1+3)&&!inEng(x,z)&&!(x>ENG.x0-4&&x<ENG.x1+4&&z>ENG.z0-4&&z<ENG.z1+4)
+  &&Math.hypot(x-ALDEIA.x,z-ALDEIA.z)>24&&!(x>ROCA.x0-3&&x<ROCA.x1+3&&z>ROCA.z0-3&&z<ROCA.z1+3)&&roadD(x,z)>4&&x<SHORE(z)-5&&H(x,z)>.3&&Math.hypot(x-12,z-42)>7;}
+{ const trees=[],cols=[];const greens=[0x2f5a26,0x3c6b2c,0x46782f,0x2a4f22,0x52833a,0x5d7f34];
+  for(let i=0;i<5200&&trees.length<1500;i++){const x=-240+rnd()*360,z=-220+rnd()*420;if(!freeGround(x,z))continue;
+    const y=H(x,z);const dens=y>4?.9:(Math.hypot(x,z)<90?.32:.55);if(rnd()>dens)continue;
+    trees.push({x,y:y-.2,z,s:.8+rnd()*.7,sy:.8+rnd()*.9,r:rnd()*6});cols.push(new THREE.Color(greens[i%greens.length]));}
+  instanced(TREE_TRUNK,M.woodDk,trees,true);instanced(TREE_CROWN,M.leaf,trees,true,cols);
+  const palms=[];for(let i=0;i<1500&&palms.length<130;i++){const z=-150+rnd()*300;const x=SHORE(z)-6-rnd()*20;const near=rnd()<.3;const px=near?-40+rnd()*90:x,pz=near?-60+rnd()*110:z;
+    if(near&&(inVila(px,pz)||inCana(px,pz)||inEng(px,pz)||roadD(px,pz)<3||px>SHORE(pz)-4))continue;if(!near&&roadD(px,pz)<3)continue;palms.push({x:px,y:H(px,pz)-.1,z:pz,s:1+rnd()*.5,r:rnd()*6});}
+  [[-6,-26],[24,26],[-26,24],[30,-16],[-24,-24],[-62,-4],[-90,22],[-64,22],[-96,-6]].forEach(([x,z])=>palms.push({x,y:H(x,z),z,s:1.2,r:rnd()*6}));
+  instanced(PALM_TRUNK.g,M.woodLt,palms);instanced(PALM_FROND,new THREE.MeshStandardMaterial({color:0x4f8a34,roughness:.8,side:THREE.DoubleSide}),palms);
+  const cana=[];for(let x=CANA.x0+1;x<CANA.x1;x+=1.35)for(let z=CANA.z0+1;z<CANA.z1;z+=1.35){if(x>-44&&x<-30&&z>-49&&z<-39)continue;
+    cana.push({x:x+(rnd()-.5)*.5,y:H(x,z),z:z+(rnd()-.5)*.5,s:.9+rnd()*.3,r:rnd()*6});}
+  const canaC=cana.map(()=>new THREE.Color().setHSL(.2+rnd()*.05,.45,.38+rnd()*.12));
+  instanced(CANA_GEO,new THREE.MeshStandardMaterial({color:0xffffff,roughness:.8,side:THREE.DoubleSide}),cana,true,canaC);
+  const mand=[];for(let x=ROCA.x0+1;x<ROCA.x1;x+=1.6)for(let z=ROCA.z0+1;z<ROCA.z1;z+=1.6)mand.push({x:x+(rnd()-.5)*.6,y:H(x,z),z:z+(rnd()-.5)*.6,s:.8+rnd()*.5,r:rnd()*6});
+  instanced(MAND_GEO,M.mand,mand,false);
+}
+
+// ---------- riacho e canal de madeira (calha) ----------
+const STREAM=[[-64,-122],[-66,-98],[-70,-80],[-73,-66],[-82,-50],[-104,-34],[-132,-22]];
+{ const pos=[],idx=[];STREAM.forEach(([x,z],i)=>{const a=STREAM[Math.max(0,i-1)],b=STREAM[Math.min(STREAM.length-1,i+1)];let dx=b[0]-a[0],dz=b[1]-a[1];const l=Math.hypot(dx,dz);dx/=l;dz/=l;
+    const w=1.3,y=H(x,z)+.12;pos.push(x-dz*w,y,z+dx*w,x+dz*w,y,z-dx*w);if(i)idx.push((i-1)*2,(i-1)*2+1,i*2,(i-1)*2+1,i*2+1,i*2);});
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();
+  const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:0x5aa2c4,roughness:.25,emissive:0x1b4a5e,emissiveIntensity:.5,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2}));scene.add(m);}
+
+// ---------- tranqueira (paliçada) ----------
+{ const post=mergeGeos([[new THREE.CylinderGeometry(.16,.18,3.1,6),_m4(0,1.55,0,1,1,1)],[new THREE.ConeGeometry(.16,.5,6),_m4(0,3.35,0,1,1,1)]]);
+  const L=[];const C=[[VILA.x0,VILA.z0],[VILA.x1,VILA.z0],[VILA.x1,VILA.z1],[VILA.x0,VILA.z1]];
+  for(let s=0;s<4;s++){const a=C[s],b=C[(s+1)%4];const len=Math.hypot(b[0]-a[0],b[1]-a[1]);const mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2;
+    const gap1=[mx-(b[0]-a[0])/len*4.5,mz-(b[1]-a[1])/len*4.5],gap2=[mx+(b[0]-a[0])/len*4.5,mz+(b[1]-a[1])/len*4.5];
+    colliders.push({seg:[a[0],a[1],gap1[0],gap1[1]],r:.25},{seg:[gap2[0],gap2[1],b[0],b[1]],r:.25});
+    for(let t=0;t<=len;t+=.4){const x=a[0]+(b[0]-a[0])*t/len,z=a[1]+(b[1]-a[1])*t/len;if(Math.hypot(x-mx,z-mz)<4.5)continue;L.push({x,y:H(x,z)-.2,z,s:1,sy:.9+rnd()*.2,r:rnd()*6,tilt:(rnd()-.5)*.06});}
+    // portão: dois postes altos e uma trave
+    for(const gp of[gap1,gap2])cyl(.22,.25,4.4,M.woodDk,gp[0],H(gp[0],gp[1])+2,gp[1],scene,7);
+    const tr=box(9.2,.3,.3,M.woodDk,mx,H(mx,mz)+4.1,mz);tr.rotation.y=-Math.atan2(b[1]-a[1],b[0]-a[0]);}
+  instanced(post,M.wood,L);
+}
+// baluarte com berços (canto nordeste)
+{ const bx=29,bz=-26,g=groupAt(bx,bz,-.6);
+  box(6.5,1.4,6.5,M.taipaOc,0,.7,0,g);box(6.9,.25,6.9,M.wood,0,1.48,0,g);
+  for(let i=0;i<4;i++)for(const s of[-1,1]){const p=box(.3,1.6,.3,M.woodDk,s*3.2,2.3,-3.2+i*2.13,g);const q=box(.3,1.6,.3,M.woodDk,-3.2+i*2.13,2.3,s*3.2,g);}
+  for(const s of[-1.2,1.2]){const c=new THREE.Group();c.position.set(s,1.6,1.6);c.rotation.y=.5;g.add(c);
+    cyl(.17,.22,2,M.iron,0,.45,.3,c,10).rotation.x=Math.PI/2-.12;box(.7,.35,1.2,M.woodDk,0,.15,0,c);
+    for(const w of[-.38,.38]){const wh=cyl(.25,.25,.1,M.woodDk,w,.12,-.2,c,10);wh.rotation.z=Math.PI/2;}}
+  const balls=[[0,0],[.3,.1],[.15,.32]];balls.forEach(([x,z])=>mesh(new THREE.SphereGeometry(.12,8,6),M.stone,x-2,1.75,z-1.5,g));
+  addCollider(bx,bz,6.6,6.6,-.6);
+}
+
+// ---------- a vila ----------
+const ANIM={smoke:[],fires:[],wheel:null,rollers:[],sails:[]};
+// Igreja matriz (frente para o sul)
+const IGREJA={x:12,z:-16};
+{ const g=groupAt(IGREJA.x,IGREJA.z,0,-.1);
+  box(8,5.4,14,M.taipa,0,2.7,0,g);box(8.4,.4,14.4,M.stone,0,.2,0,g);
+  mesh(gableGeo(14.6,9.4,3.2),M.telha,0,5.4,0,g).rotation.y=Math.PI/2;
+  // frontão
+  const f=new THREE.Shape();f.moveTo(-4,0);f.lineTo(4,0);f.lineTo(0,3);f.closePath();
+  const fm=add(new THREE.Mesh(new THREE.ShapeGeometry(f),M.taipa),g);fm.position.set(0,5.4,7.02);
+  box(1.8,3,.15,M.woodDk,0,1.5,7.03,g);box(2.3,.25,.25,M.stone,0,3.1,7.05,g);
+  const cr=new THREE.Group();cr.position.set(0,8.9,7);g.add(cr);box(.14,1.3,.14,M.woodDk,0,0,0,cr);box(.7,.14,.14,M.woodDk,0,.25,0,cr);
+  for(const s of[-1,1]){box(.6,1,.1,M.woodDk,s*2.6,3.6,7.03,g);box(.1,.9,.6,M.woodDk,s*4.03,3.4,-1,g);box(.1,.9,.6,M.woodDk,s*4.03,3.4,3,g);}
+  addCollider(IGREJA.x,IGREJA.z,8,14);
+  // campanário de madeira
+  const c=groupAt(19.5,-11,0);for(const sx of[-1,1])for(const sz of[-1,1])cyl(.13,.16,6,M.woodDk,sx*.9,3,sz*.9,c,6);
+  mesh(hipGeo(2.6,2.6,1.4),M.telha,0,6,0,c);box(2,.15,.15,M.woodDk,0,5.2,0,c);
+  const bell=mesh(new THREE.CylinderGeometry(.25,.5,.75,14,1,true),M.copper,0,4.75,0,c);bell.material=new THREE.MeshStandardMaterial({color:0x8a6a32,metalness:.8,roughness:.4,side:THREE.DoubleSide});
+  addCollider(19.5,-11,2,2);
+}
+// Casa da Câmara e Cadeia (frente para o leste)
+const CAM={x:-16,z:4};
+{ const g=groupAt(CAM.x,CAM.z,Math.PI/2,-.1);
+  box(12,4.2,7,M.taipa,0,2.1,0,g);box(12.4,.35,7.4,M.stone,0,.17,0,g);
+  mesh(gableGeo(12.8,8.2,2.6),M.telha,0,4.2,0,g);
+  // alpendre (varanda) na frente
+  box(12,.25,3.2,M.woodLt,0,.3,5.1,g);
+  for(let i=-2;i<=2;i++)cyl(.13,.15,3.4,M.wood,i*2.8,1.9,6.5,g,7);
+  const lean=box(12.8,.18,3.8,M.telha,0,3.75,5.1,g);lean.rotation.x=.16;
+  box(1.1,2.2,.12,M.woodDk,1.5,1.1,3.53,g);
+  // mesa dos oficiais da Câmara
+  box(3.6,.12,1.2,M.woodLt,0,1.05,4.8,g);for(const sx of[-1.6,1.6])for(const sz of[4.35,5.25])box(.1,.9,.1,M.woodDk,sx,.6,sz,g);
+  box(3.8,.1,.45,M.woodDk,0,.75,4.1,g);
+  box(.5,.06,.36,M.sugarW,.6,1.14,4.8,g);box(.08,.12,.08,M.dark,1.0,1.17,4.7,g);
+  // cadeia: janela gradeada nos fundos do prédio
+  const jw=new THREE.Group();jw.position.set(-4.2,1.7,3.52);g.add(jw);box(1.4,1.2,.08,M.dark,0,0,0,jw);for(let i=-2;i<=2;i++)box(.07,1.25,.1,M.iron,i*.3,0,.05,jw);
+  addCollider(CAM.x,CAM.z,12,7,Math.PI/2);
+}
+const CAMSLOT={table:{x:CAM.x+4.8,z:CAM.z},officials:[[CAM.x+4.0,CAM.z-1.2],[CAM.x+4.0,CAM.z-.4],[CAM.x+4.0,CAM.z+.4],[CAM.x+4.0,CAM.z+1.2]],
+  chief:{x:CAM.x+8.2,z:CAM.z-.3},comp:[[CAM.x+9.2,CAM.z-1.3],[CAM.x+9.3,CAM.z+.6]],pedro:{x:CAM.x+8.1,z:CAM.z+1.4},cam:{x:CAM.x+14.5,z:CAM.z+5.5}};
+// Pelourinho
+const PEL={x:3,z:3};
+{ const g=groupAt(PEL.x,PEL.z,0,-.1);box(2.6,.35,2.6,M.stone,0,.17,0,g);box(1.9,.35,1.9,M.stone,0,.52,0,g);
+  cyl(.24,.3,4.2,M.stone,0,2.8,0,g,8);box(.7,.4,.7,M.stone,0,5.0,0,g);mesh(new THREE.ConeGeometry(.4,.7,8),M.stone,0,5.55,0,g);
+  for(const a of[0,Math.PI/2,Math.PI,-Math.PI/2]){const r=mesh(new THREE.TorusGeometry(.13,.03,6,12),M.iron,Math.sin(a)*.36,4.6,Math.cos(a)*.36,g);r.rotation.y=a;}
+  colliders.push({x:PEL.x,z:PEL.z,r:1.1});
+}
+// Casas
+const PEDRO_HOUSE={x:18,z:15};
+[[-24,-14,0,7,5,'palha'],[-13,-17,0,6,5,'palha'],[-4,-17,0,6,5,'palha'],[25,-11,0,7,5,'telha',M.taipaOc],[26,-21,0,5,4,'palha'],
+ [-24,15,Math.PI,7,5,'palha',M.taipaOc],[-10,14,Math.PI,7,5,'telha'],[8,14,Math.PI,6,5,'palha'],[PEDRO_HOUSE.x,PEDRO_HOUSE.z,Math.PI,6,5,'palha',M.taipaOc],[28,14,Math.PI,6,5,'palha'],
+ [-16,25,Math.PI,6,4,'palha'],[10,25,Math.PI,6,4,'palha',M.taipaOc],[24,25,Math.PI,6,4,'palha'],[-22,-24,0,6,4,'palha',M.taipaOc],[-12,25,0,1,1,'x']].forEach(h=>{if(h[5]==='x')return;house(h[0],h[1],h[2],h[3],h[4],2.9,h[5],h[6]);});
+// quintal da casa de Pedro: pilão, rede e potes
+{ const g=groupAt(PEDRO_HOUSE.x+4.2,PEDRO_HOUSE.z-1.5,0);cyl(.3,.25,.8,M.wood,0,.4,0,g,10);cyl(.05,.05,1.3,M.woodLt,0,1.1,0,g,6);
+  for(let i=0;i<3;i++)mesh(new THREE.SphereGeometry(.28,10,8),M.clay,.8+i*.5,.25,.6,g).scale.y=1.2;}
+
+// ---------- porto ----------
+{ const deck=box(PIER.x1-PIER.x0,.2,3.4,M.woodLt,(PIER.x0+PIER.x1)/2,PIER.y-.1,0);deck.castShadow=true;
+  for(let x=PIER.x0+1;x<=PIER.x1;x+=2.5)for(const z of[-1.5,1.5])cyl(.14,.16,4,M.woodDk,x,PIER.y-2,z,scene,6);
+  // caixas de açúcar
+  const bx=new THREE.BoxGeometry(1,.7,.7);
+  [[52,0,-.8],[53.1,0,-.8],[52.5,.7,-.8],[54.2,0,-.8],[44,0,1],[45.1,0,1],[44.5,.7,1]].forEach(([x,y,z])=>{const m=mesh(bx,M.woodLt,x,PIER.y+.35+y,z);m.rotation.y=rnd()*.2;});
+  // batel junto ao trapiche
+  const b=groupAt(57.5,4,.1,-H(57.5,4));b.position.y=.15;
+  const hull=new THREE.Shape();hull.moveTo(-2.4,.6);hull.quadraticCurveTo(-2.2,-.3,-1,-.4);hull.lineTo(1.2,-.4);hull.quadraticCurveTo(2.4,-.2,2.6,.7);hull.lineTo(-2.4,.6);
+  const hg=new THREE.ExtrudeGeometry(hull,{depth:1.6,bevelEnabled:false});hg.translate(0,0,-.8);mesh(hg,M.wood,0,0,0,b);
+  for(let i=0;i<2;i++)mesh(bx,M.woodLt,-.5+i*1.1,.6,0,b);
+}
+// nau ancorada
+const SHIP={x:74,z:-12};
+{ const g=new THREE.Group();g.position.set(SHIP.x,0,SHIP.z);g.rotation.y=-.35;scene.add(g);
+  const sh=new THREE.Shape();sh.moveTo(-11,3.2);sh.quadraticCurveTo(-10,-1.6,-5,-2);sh.lineTo(6,-2);sh.quadraticCurveTo(10.5,-1.2,12.5,2.8);sh.lineTo(9,3);sh.lineTo(9,4.4);sh.lineTo(-11.5,5.2);sh.closePath();
+  const hg=new THREE.ExtrudeGeometry(sh,{depth:6,bevelEnabled:true,bevelSize:.6,bevelThickness:.8,bevelSegments:2});hg.translate(0,0,-3);mesh(hg,M.woodDk,0,0,0,g);
+  box(19,.3,5.4,M.woodLt,-.5,3.1,0,g);box(5,2.4,6.4,M.wood,-9,5,0,g);box(4,1.5,5.6,M.wood,8.5,4,0,g);
+  const crossTex=texCanvas(128,(c,s)=>{c.fillStyle='#efe5cc';c.fillRect(0,0,s,s);c.fillStyle='#b3261c';const w=s*.16;c.fillRect(s/2-w/2,s*.12,w,s*.76);c.fillRect(s*.15,s/2-w/2,s*.7,w);
+    c.fillStyle='#efe5cc';c.fillRect(s/2-w*.18,s*.12,w*.36,s*.76);c.fillRect(s*.15,s/2-w*.18,s*.7,w*.36);});
+  const sailM=new THREE.MeshStandardMaterial({map:crossTex,roughness:.9,side:THREE.DoubleSide});
+  [[-1,15,7.5,6.5],[6,11,5.5,5]].forEach(([x,h,sw,shh])=>{cyl(.22,.3,h,M.wood,x,3+h/2,0,g,8);box(.15,.15,sw+1,M.wood,x,3+h-1.2,0,g);
+    const sg=new THREE.PlaneGeometry(sw,shh,6,4);const q=sg.attributes.position;for(let i=0;i<q.count;i++){const u=q.getX(i)/sw;q.setZ(i,(1-4*u*u)*.7);}sg.computeVertexNormals();
+    const s=mesh(sg,sailM,x+.4,3+h-1.4-shh/2,0,g);s.rotation.y=Math.PI/2;ANIM.sails.push(s);});
+  const lat=new THREE.Shape();lat.moveTo(0,0);lat.lineTo(0,6);lat.lineTo(4,0);lat.closePath();const ls=mesh(new THREE.ShapeGeometry(lat),M.sail,-9.5,6.3,0,g);ls.rotation.y=Math.PI/2;
+  cyl(.15,.2,8,M.wood,-9.5,9,0,g,7);
+  const fl=box(1.4,.9,.04,new THREE.MeshStandardMaterial({color:0xf2f2f2}),-9.5,13.4,.7,g);
+  g.traverse(o=>{if(o.isMesh){o.castShadow=true;}});
+}
+// toras de pau-brasil na praia
+const PAU={x:41,z:11};
+{ const g=groupAt(PAU.x,PAU.z,.3,-.1);const lg=new THREE.CylinderGeometry(.28,.32,4.2,9);lg.rotateZ(Math.PI/2);
+  const cutM=new THREE.MeshStandardMaterial({color:0xa8322a,roughness:.7});
+  let k=0;for(let r=0;r<3;r++)for(let i=0;i<4-r;i++){const m=mesh(lg,M.woodDk,0,.3+r*.52,(i-(3-r)/2)*.62,g);m.rotation.y=(rnd()-.5)*.08;
+    for(const s of[-1,1]){const cap=mesh(new THREE.CircleGeometry(.28,10),cutM,s*2.11,.3+r*.52,(i-(3-r)/2)*.62,g);cap.rotation.y=s*Math.PI/2;}}
+  addCollider(PAU.x,PAU.z,4.4,3,.3);
+}
+// canoas na praia
+[[46,22,1.2],[48,26,1.0],[44,-18,.4]].forEach(([x,z,r])=>{const g=groupAt(x,z,r,-.05);const cg=new THREE.CylinderGeometry(.55,.55,5.5,12,1,false,0,Math.PI);cg.rotateZ(Math.PI/2);cg.rotateX(Math.PI);
+  const c=mesh(cg,M.wood,0,.55,0,g);c.material=new THREE.MeshStandardMaterial({color:0x6e4b2f,side:THREE.DoubleSide});mesh(new THREE.BoxGeometry(.06,.06,2.2),M.woodLt,1.2,.6,.6,g).rotation.y=.4;});
+
+// ---------- fonte (a futura "biquinha") ----------
+const FONTE={x:12,z:-42};
+{ const g=groupAt(FONTE.x,FONTE.z,0);
+  const rock=bumpy(new THREE.IcosahedronGeometry(3,1),.15,1.2);mesh(rock,M.stone,0,.6,-2.6,g).scale.set(1.6,.9,.8);
+  box(2.8,.6,1.8,M.stone,0,.3,0,g);box(2.4,.08,1.4,M.water,0,.58,0,g);
+  const bica=box(.18,.12,1.3,M.woodLt,0,1.6,-1,g);bica.rotation.x=.25;
+  const jet=mesh(new THREE.CylinderGeometry(.04,.06,1.0,6),M.water,0,1.1,-.38,g);
+  for(let i=0;i<3;i++)mesh(new THREE.SphereGeometry(.3,10,8),M.clay,-1.8+i*.65,.3,1.2,g).scale.y=1.25;
+  addCollider(FONTE.x,FONTE.z-.6,3,3.2);
+}
+
+// ---------- aldeia tupiniquim ----------
+const OCAS=[[-90,-6,.25],[-72,-8,-.3],[-94,14,1.45],[-74,22,.1]];
+{ const dome=new THREE.SphereGeometry(1,22,10,0,Math.PI*2,0,Math.PI/2);
+  OCAS.forEach(([x,z,r])=>{const g=groupAt(x,z,r,-.2);const d=mesh(dome,M.palha,0,0,0,g);d.scale.set(7.5,4.6,3.1);
+    for(const s of[-1,1]){const dr=box(.25,1.9,1.2,M.dark,s*7.42,.95,0,g);}
+    for(let i=-2;i<=2;i++){const rib=mesh(new THREE.TorusGeometry(1,.03,4,24,Math.PI),M.woodDk,i*2.8,0,0,g);rib.rotation.y=Math.PI/2;rib.scale.set(1,4.4*Math.cos(i*.32),3.15);}
+    addCollider(x,z,14.4,5.6,r);});
+  // fogueira e moquém no terreiro
+  const f=groupAt(ALDEIA.x+1,ALDEIA.z+4,0);for(let i=0;i<6;i++){const l=cyl(.08,.1,1.4,M.woodDk,Math.cos(i)*.3,.25,Math.sin(i)*.3,f,5);l.rotation.z=1.2;l.rotation.y=i;}
+  const fl=mesh(new THREE.ConeGeometry(.35,.9,7),M.fire,0,.55,0,f);ANIM.fires.push(fl);
+  const mq=groupAt(ALDEIA.x-4,ALDEIA.z+5,.4);for(const sx of[-1,1])for(const sz of[-1,1])cyl(.06,.07,1.2,M.woodDk,sx*.7,.6,sz*.5,mq,5);
+  for(let i=-3;i<=3;i++)box(.05,.05,1.2,M.woodDk,i*.2,1.15,0,mq);for(let i=0;i<3;i++)box(.5,.08,.14,M.woodLt,-.4+i*.4,1.22,(i-1)*.25,mq);
+  colliders.push({x:ALDEIA.x+1,z:ALDEIA.z+4,r:.8});
+  // casa de farinha: forno de barro, tipiti e cochos
+  const cf=groupAt(-70,13,-.5);
+  for(const sx of[-1,1])for(const sz of[-1,1])cyl(.12,.14,3,M.wood,sx*2.6,1.5,sz*2,cf,6);mesh(hipGeo(7,5.6,1.6),M.palha,0,3,0,cf);
+  box(1.8,.7,1.8,M.barro,-1,.35,0,cf);mesh(new THREE.CylinderGeometry(.95,.95,.08,16),M.clay,-1,.74,0,cf);mesh(new THREE.CylinderGeometry(.85,.85,.05,16),new THREE.MeshStandardMaterial({color:0xe8dcb6,roughness:1}),-1,.79,0,cf);
+  box(.3,2.4,.3,M.woodDk,1.6,1.2,-1.2,cf);const tp=cyl(.13,.16,1.6,new THREE.MeshStandardMaterial({color:0xc5a46a,roughness:1}),1.6,1.6,-.95,cf,8);
+  box(1.6,.4,.6,M.wood,1.4,.2,1,cf);
+  for(let i=0;i<3;i++){const c=mesh(new THREE.CylinderGeometry(.35,.25,.45,10),new THREE.MeshStandardMaterial({color:0xa98a55,roughness:1}),-2.3+i*.7,.22,1.6,cf);}
+  addCollider(-71,13,2.4,2.4,-.5);
+}
+
+// ---------- engenho ----------
+const WHEEL={x:-66,z:-70};
+{ const wy=H(WHEEL.x,WHEEL.z);
+  const wg=new THREE.Group();wg.position.set(WHEEL.x,wy+4.2,WHEEL.z);scene.add(wg);
+  for(const s of[-.5,.5]){const t=add(new THREE.Mesh(new THREE.TorusGeometry(3.7,.14,6,32),M.wood),wg);t.rotation.y=Math.PI/2;t.position.x=s;}
+  for(let i=0;i<8;i++){const sp=box(.18,7.4,.18,M.wood,0,0,0,wg);sp.rotation.x=i*Math.PI/8;}
+  for(let i=0;i<20;i++){const a=i/20*Math.PI*2;const p=box(1.1,.1,.75,M.woodLt,0,Math.sin(a)*3.75,Math.cos(a)*3.75,wg);p.rotation.x=-a;}
+  ANIM.wheel=wg;
+  const ax=cyl(.22,.22,10,M.woodDk,WHEEL.x+5,wy+4.2,WHEEL.z,scene,8);ax.rotation.z=Math.PI/2;
+  for(const s of[-1,1])box(.5,4.4,.5,M.woodDk,WHEEL.x+s*1.3,wy+2.2,WHEEL.z+0,scene);
+  // poço da roda
+  box(2.4,.15,8.6,M.water,WHEEL.x,wy-.3,WHEEL.z);
+  // calha de madeira que traz a água do riacho
+  const A=[-68,-94],B=[WHEEL.x,WHEEL.z-3.2];const ya=H(A[0],A[1])+.6,yb=wy+8.3;
+  const len=Math.hypot(B[0]-A[0],B[1]-A[1]),mx=(A[0]+B[0])/2,mz=(A[1]+B[1])/2;
+  const cg=new THREE.Group();cg.rotation.order='YXZ';cg.position.set(mx,(ya+yb)/2,mz);cg.rotation.y=Math.atan2(B[0]-A[0],B[1]-A[1]);cg.rotation.x=Math.atan2(ya-yb,len);scene.add(cg);
+  box(.9,.12,len,M.wood,0,0,0,cg);for(const s of[-.42,.42])box(.08,.45,len,M.wood,s,.22,0,cg);box(.7,.06,len,M.water,0,.2,0,cg);
+  for(let t=.08;t<1;t+=.12){const x=A[0]+(B[0]-A[0])*t,z=A[1]+(B[1]-A[1])*t,top=ya+(yb-ya)*t,gy=H(x,z);if(top-gy>.8)cyl(.1,.12,top-gy,M.woodDk,x,(top+gy)/2-.1,z,scene,6);}
+  colliders.push({x:WHEEL.x,z:WHEEL.z,r:4.4});
+}
+// moenda: três rolos sob um telhado
+const MOENDA={x:-56,z:-70};
+{ const g=shed(MOENDA.x,MOENDA.z,0,8,8,4,M.telha,false);
+  box(3.2,.3,1.8,M.woodDk,0,2.5,0,g);box(3.2,.5,2.2,M.woodDk,0,.25,0,g);
+  for(let i=-1;i<=1;i++){const r=cyl(.38,.38,2,M.woodLt,i*.85,1.45,0,g,14);ANIM.rollers.push({m:r,d:i===0?1:-1});
+    for(let k=0;k<6;k++){const b=box(.06,2,.06,M.iron,0,0,0,r);b.position.set(Math.cos(k)*.38,0,Math.sin(k)*.38);}}
+  box(1.8,.12,1.2,M.copper,0,.55,1.4,g);
+  // feixes de cana à espera
+  const cg=new THREE.CylinderGeometry(.03,.03,2.6,4);cg.rotateZ(Math.PI/2);
+  for(let k=0;k<3;k++)for(let i=0;i<14;i++)mesh(cg,M.cana,-2.6+ (i%5)*.05,.2+Math.floor(i/5)*.07,-2.3+k*.4+(i%3)*.06,g);
+  addCollider(MOENDA.x,MOENDA.z,3.4,2.4);
+}
+// casa das caldeiras
+const CALD={x:-44,z:-71};
+{ const g=shed(CALD.x,CALD.z,0,10,8,4.2,M.telha,true);
+  box(8,1.1,1.8,M.barro,0,.55,-1.4,g);
+  for(let i=0;i<4;i++){const x=-3+i*2;mesh(new THREE.CylinderGeometry(.75,.55,.6,16,1,true),new THREE.MeshStandardMaterial({color:0xb5673c,metalness:.7,roughness:.45,side:THREE.DoubleSide}),x,1.35,-1.4,g);
+    mesh(new THREE.CircleGeometry(.7,16),new THREE.MeshStandardMaterial({color:0xc69a4a,roughness:.4,emissive:0x3a2208}),x,1.5,-1.4,g).rotation.x=-Math.PI/2;
+    const fh=box(.6,.45,.05,M.fire,x,.35,-.48,g);ANIM.fires.push(fh);}
+  box(1.6,7,1.6,M.barro,4.6,3.5,-3.4,g);
+  for(let i=0;i<10;i++){const s=mesh(new THREE.SphereGeometry(.6,8,6),new THREE.MeshStandardMaterial({color:0x8a8580,transparent:true,opacity:.35,depthWrite:false}),0,0,0,scene);s.castShadow=false;
+    ANIM.smoke.push({m:s,x:CALD.x+4.6,z:CALD.z-3.4,y:H(CALD.x,CALD.z)+7,t:i/10});}
+  // lenha
+  const lg=new THREE.CylinderGeometry(.12,.12,1.6,6);lg.rotateZ(Math.PI/2);for(let i=0;i<18;i++)mesh(lg,M.woodDk,-4+(i%6)*.25,.12+Math.floor(i/6)*.22,2.6,g);
+  addCollider(CALD.x,CALD.z-1.4,8.2,2);addCollider(CALD.x+4.6,CALD.z-3.4,1.8,1.8);
+}
+// casa de purgar: as formas de barro
+const PURG={x:-29,z:-72};
+{ const g=shed(PURG.x,PURG.z,0,14,7,4,M.telha,true);
+  const forma=new THREE.ConeGeometry(.22,.55,10);forma.rotateX(Math.PI);
+  for(let r=0;r<3;r++){box(12.4,.12,.5,M.woodLt,0,.95,-2+r*1.4,g);for(const sx of[-6,0,6])box(.12,.95,.12,M.woodDk,sx,.47,-2+r*1.4,g);
+    for(let i=0;i<20;i++){mesh(forma,M.clay,-5.7+i*.6,1.3,-2+r*1.4,g);mesh(new THREE.CircleGeometry(.21,10),r===0?M.barro:M.sugarW,-5.7+i*.6,1.58,-2+r*1.4,g).rotation.x=-Math.PI/2;}}
+  for(let i=0;i<8;i++)mesh(new THREE.CylinderGeometry(.18,.22,.3,10),M.clay,-6+i*.9,.15,-3,g);
+  addCollider(PURG.x,PURG.z-.6,12.6,4.2);
+}
+// balcão de secar e caixas
+const SECAR={x:-17,z:-68};
+{ const g=groupAt(SECAR.x,SECAR.z,0);box(5,.15,3.4,M.woodLt,0,.9,0,g);for(const sx of[-2.3,2.3])for(const sz of[-1.5,1.5])box(.15,.9,.15,M.woodDk,sx,.45,sz,g);
+  for(let i=0;i<5;i++){const m=mesh(new THREE.SphereGeometry(.55,10,6,0,Math.PI*2,0,Math.PI/2),i%2?M.sugarB:M.sugarW,-1.8+i*.9,.98,(i%2-.5)*.9,g);m.scale.y=.45;}
+  const bx=new THREE.BoxGeometry(1,.7,.7);for(let i=0;i<5;i++)mesh(bx,M.woodLt,3.6+(i%3)*1.05,.35+Math.floor(i/3)*.7,0,g);
+  addCollider(SECAR.x+.9,SECAR.z,7.8,3.4);
+}
+// moradias das pessoas escravizadas e casa do feitor
+[[-56,-86],[-48,-87],[-40,-86],[-32,-87]].forEach(([x,z])=>{const g=groupAt(x,z,0,-.1);box(5,1.9,4,M.barro,0,.95,0,g);box(.9,1.5,.1,M.dark,-1,.75,2.02,g);mesh(hipGeo(6.2,5.2,2.4),M.palha,0,1.9,0,g);addCollider(x,z,5,4);});
+house(-20,-84,0,7,5,3,'telha',M.taipa);
+// carro de bois com cana
+const OXCART={x:-24,z:-56};
+{ const g=groupAt(OXCART.x,OXCART.z,-.35);box(1.8,.15,3.2,M.woodLt,0,1.0,0,g);
+  for(const s of[-1,1]){const w=cyl(.75,.75,.18,M.woodDk,s*1,.75,-.3,g,14);w.rotation.z=Math.PI/2;}
+  box(.12,.12,3.6,M.woodDk,0,.95,3.1,g);
+  const cg=new THREE.CylinderGeometry(.04,.04,3,4);cg.rotateX(Math.PI/2);for(let i=0;i<40;i++)mesh(cg,M.cana,-.7+(i%10)*.15,1.15+Math.floor(i/10)*.09,0,g);
+  const ox=(ox_x)=>{const o=new THREE.Group();o.position.set(ox_x,0,4.6);g.add(o);const bm=new THREE.MeshStandardMaterial({color:ox_x<0?0x8a6440:0xd8cdb6,roughness:.9});
+    box(.8,.8,2,bm,0,1.15,0,o);box(.55,.55,.7,bm,0,1.35,1.25,o);for(const s of[-1,1]){const h=cyl(.04,.07,.5,M.sugarW,s*.35,1.7,1.2,o,5);h.rotation.z=s*-1;}
+    for(const sx of[-.28,.28])for(const sz of[-.75,.75])box(.18,.8,.18,bm,sx,.4,sz,o);return o;};
+  ox(-.55);ox(.55);box(1.8,.15,.15,M.woodDk,0,1.65,5.3,g);
+  addCollider(OXCART.x,OXCART.z+1,2.4,6.6,-.35);
+}
+
+// ---------- figuras humanas ----------
+const _mc=new Map();
+function fm(c,kind){const k=c+'|'+kind;if(_mc.has(k))return _mc.get(k);const col=new THREE.Color(c);
+  if(kind==='cloth'||kind==='ds'){const l=col.r*.3+col.g*.59+col.b*.11;col.lerp(new THREE.Color(l,l,l),.15);}
+  const m=new THREE.MeshStandardMaterial({color:col,roughness:kind==='skin'?.62:kind==='hair'?.8:.95,metalness:0,side:kind==='ds'?THREE.DoubleSide:THREE.FrontSide});_mc.set(k,m);return m;}
+// pintura corporal: urucum (vermelho) ou jenipapo (preto-azulado) sobre a pele
+function paintMat(skin,kind){const k=skin+'|paint|'+kind;if(_mc.has(k))return _mc.get(k);
+  const cv=document.createElement('canvas');cv.width=cv.height=128;const c=cv.getContext('2d');c.fillStyle='#'+new THREE.Color(skin).getHexString();c.fillRect(0,0,128,128);
+  if(kind==='urucum'){c.fillStyle='rgba(180,50,25,.85)';c.fillRect(0,0,128,26);for(let x=0;x<128;x+=16)c.fillRect(x,30,6,60);}
+  else{c.strokeStyle='rgba(25,28,40,.9)';c.lineWidth=4;for(let y=18;y<110;y+=22){c.beginPath();for(let x=0;x<=128;x+=16)c.lineTo(x,y+((x/16)%2?8:0));c.stroke();}}
+  const t=new THREE.CanvasTexture(cv);const m=new THREE.MeshStandardMaterial({color:0xffffff,map:t,roughness:.65});_mc.set(k,m);return m;}
+function clothGeo(profile,folds,amp,seg=28,phiStart=0,phiLen=Math.PI*2){
+  const g=new THREE.LatheGeometry(profile.map(([r,y])=>new THREE.Vector2(r,y)),seg,phiStart,phiLen);
+  const q=g.attributes.position,yT=Math.max(...profile.map(p=>p[1])),yB=Math.min(...profile.map(p=>p[1]));
+  for(let i=0;i<q.count;i++){const x=q.getX(i),y=q.getY(i),z=q.getZ(i),th=Math.atan2(x,z),k=Math.pow(Math.max(0,(yT-y)/(yT-yB)),1.2);
+    const f=1+amp*k*(Math.sin(th*folds)*.7+Math.sin(th*folds*2.3+1.7)*.3);q.setX(i,x*f);q.setZ(i,z*f);}
+  g.computeVertexNormals();return g;}
+const FG={
+  tunic:clothGeo([[.22,.62],[.205,.8],[.19,.95],[.172,1.08],[.185,1.2],[.205,1.34],[.21,1.43],[.175,1.5],[.07,1.56]],11,.07,22),
+  short:clothGeo([[.19,.84],[.19,.95],[.172,1.08],[.185,1.2],[.205,1.34],[.21,1.43],[.175,1.5],[.07,1.56]],11,.03,22),
+  bare:clothGeo([[.175,.88],[.18,.95],[.165,1.08],[.18,1.2],[.2,1.34],[.205,1.43],[.17,1.5],[.07,1.56]],6,.0,20),
+  dress:clothGeo([[.3,.04],[.27,.35],[.23,.7],[.2,.95],[.172,1.06],[.19,1.2],[.205,1.34],[.205,1.43],[.17,1.5],[.07,1.56]],14,.1,24),
+  cassock:clothGeo([[.28,.04],[.26,.4],[.23,.75],[.2,.98],[.18,1.1],[.195,1.25],[.21,1.4],[.18,1.5],[.07,1.56]],12,.06,24),
+  leg:mergeGeos([[new THREE.CylinderGeometry(.072,.046,.86,7),_m4(0,-.43,0,1,1,1)],[new THREE.BoxGeometry(.085,.045,.22),_m4(0,-.875,.045,1,1,1)]]),
+  head:mergeGeos([[new THREE.SphereGeometry(.105,12,9),_m4(0,1.71,0,.94,1.13,1.04)],[new THREE.CylinderGeometry(.046,.05,.13,7),_m4(0,1.6,0,1,1,1)],[new THREE.ConeGeometry(.019,.055,4),_m4(0,1.7,.104,1,1,1,Math.PI/2)]]),
+  hair:new THREE.SphereGeometry(.114,12,7,0,Math.PI*2,0,Math.PI*.58),
+  longHair:new THREE.BoxGeometry(.2,.42,.06),
+  beard:new THREE.SphereGeometry(.072,8,6),
+  arm:mergeGeos([[new THREE.CylinderGeometry(.05,.033,.62,7),_m4(0,-.31,0,1,1,1)],[new THREE.SphereGeometry(.04,6,5),_m4(0,-.64,0,.85,1.25,.6)]]),
+  brim:new THREE.CylinderGeometry(.24,.24,.025,16),crown:new THREE.CylinderGeometry(.11,.12,.16,12),
+  belt:new THREE.TorusGeometry(.18,.025,5,16),
+  feather:new THREE.ConeGeometry(.025,.24,4),
+  pote:new THREE.LatheGeometry([[0,0],[.12,.02],[.19,.14],[.17,.3],[.09,.36],[.1,.4]].map(([r,y])=>new THREE.Vector2(r,y)),12),
+  cesto:new THREE.CylinderGeometry(.22,.16,.2,10),
+};
+const FIGS=[];
+const SK={pt:[0xd9a986,0xcf9d78,0xe0b393],ind:[0xa86f48,0xb27a50,0x9a6440],afr:[0x5a3a26,0x4a2f1f,0x6a452c],mam:[0xb98559]};
+function makeFigure(o={}){
+  const g=new THREE.Group();
+  const skinC=o.skin??SK.pt[Math.floor(rnd()*3)];const skin=fm(skinC,'skin');
+  const hairM=fm(o.hair??0x1d1610,'hair');
+  const part=(geo,mat,x,y,z,par=g,shadow=false)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=shadow;m.receiveShadow=true;par.add(m);return m;};
+  const legs=[-.095,.095].map(x=>{const l=new THREE.Group();l.position.set(x,.92,0);g.add(l);
+    part(FG.leg,o.trousers?fm(o.trousers,'cloth'):skin,0,0,0,l);return l;});
+  const cloth=[];
+  const torsoMat=o.bare?(o.paint?paintMat(skinC,o.paint):skin):fm(o.tunic??0xe9e1cf,'cloth');
+  cloth.push(part(o.cassock?FG.cassock:o.dress?FG.dress:o.bare?FG.bare:o.short?FG.short:FG.tunic,o.cassock?fm(0x1f1b1a,'cloth'):torsoMat,0,0,0,g,true));
+  if(o.bare){part(FG.belt,fm(o.belt??0x8a6a3a,'cloth'),0,.93,0).rotation.x=Math.PI/2;}
+  if(o.trousers&&!o.dress&&!o.cassock&&o.short){const hip=part(new THREE.CylinderGeometry(.2,.19,.16,12),fm(o.trousers,'cloth'),0,.88,0);}
+  part(FG.head,skin,0,0,0,g,true);
+  const hair=part(FG.hair,hairM,0,1.725,-.012);hair.scale.set(.96,1.08,1.08);
+  if(o.longHair){const lh=part(FG.longHair,hairM,0,1.5,-.09);}
+  const armMat=o.bare?skin:o.cassock?fm(0x1f1b1a,'cloth'):o.sleeves?fm(o.sleeves,'cloth'):(o.short&&!o.longSleeve?fm(o.tunic??0xe9e1cf,'cloth'):fm(o.tunic??0xe9e1cf,'cloth'));
+  const arms=[-.205,.205].map(x=>{const a=new THREE.Group();a.position.set(x,1.46,0);a.rotation.z=x<0?-.07:.07;g.add(a);
+    part(FG.arm,o.bare?skin:armMat,0,0,0,a);return a;});
+  if(o.beard){const b=part(FG.beard,hairM,0,1.625,.05);b.scale.set(1.15,1.25,.95);}
+  if(o.hat){const hm=fm(o.hat,'cloth');part(FG.brim,hm,0,1.84,0);part(FG.crown,hm,0,1.92,0);}
+  if(o.cap){const c=part(new THREE.SphereGeometry(.125,10,6,0,Math.PI*2,0,Math.PI*.5),fm(o.cap,'cloth'),0,1.76,-.01);c.scale.y=1.2;}
+  if(o.cocar){const cols=[0xc8321e,0xf2c230,0x2f6fb4,0xc8321e];for(let i=0;i<11;i++){const a=-1.4+i*.28;const f=part(FG.feather,fm(cols[i%4],'cloth'),Math.sin(a)*.12,1.86,Math.cos(a)*-.04-.02);f.rotation.z=-Math.sin(a)*.6;f.rotation.x=-.35;}
+    part(new THREE.TorusGeometry(.112,.02,5,16),fm(0x6a4a2a,'cloth'),0,1.78,0).rotation.x=Math.PI/2;}
+  if(o.headCarry){const p=part(o.headCarry==='cesto'?FG.cesto:FG.pote,o.headCarry==='cesto'?fm(0xa98a55,'cloth'):fm(0xb06c43,'cloth'),0,o.headCarry==='cesto'?1.92:1.84,0);arms[1].rotation.x=-2.95;arms[1].rotation.z=.25;}
+  if(o.box){part(new THREE.BoxGeometry(.7,.45,.5),fm(0x9a7650,'cloth'),0,1.95,.05);arms[0].rotation.x=-2.95;arms[1].rotation.x=-2.95;}
+  let tool=null;
+  if(o.tool){const tg=new THREE.Group();tg.position.set(0,-.62,0);arms[1].add(tg);
+    if(o.tool==='foice'){part(new THREE.CylinderGeometry(.02,.02,.35,5),fm(0x5a3e28,'cloth'),0,0,0,tg);const bl=part(new THREE.BoxGeometry(.04,.42,.02),fm(0x6a6a6a,'cloth'),0,-.3,.05,tg);bl.rotation.x=.4;}
+    if(o.tool==='pa'){const st=part(new THREE.CylinderGeometry(.02,.02,1.8,5),fm(0x5a3e28,'cloth'),0,-.2,.0,tg);st.rotation.x=.9;}
+    if(o.tool==='arco'){const b=part(new THREE.TorusGeometry(.7,.015,4,16,Math.PI*.9),fm(0x4a3220,'cloth'),0,.1,0,tg);b.rotation.y=Math.PI/2;b.rotation.z=Math.PI/2+.15;}
+    if(o.tool==='pena'){part(new THREE.ConeGeometry(.01,.2,4),fm(0xf2efe8,'cloth'),0,-.05,0,tg);}
+    if(o.tool==='cana'){part(new THREE.CylinderGeometry(.04,.04,1.6,5),M.cana,0,-.1,.2,tg).rotation.x=1.3;}
+    tool=tg;}
+  if(o.dress||o.cassock)legs.forEach(l=>l.visible=false);
+  const f={g,legs,arms,phase:Math.random()*6,raise:0,raiseT:0,gesture:0,work:o.work||0,carry:!!(o.headCarry||o.box),cloth};
+  f.anim=(dt,speed)=>{
+    f.phase+=dt*Math.max(speed,f.work?2:0)*2.2;const s=Math.min(1,speed/2);const sw=Math.sin(f.phase)*.55*s;
+    legs[0].rotation.x=sw;legs[1].rotation.x=-sw;
+    if(f.carry)return;
+    arms[0].rotation.x=-sw*.6;
+    if(f.work){const w=Math.sin(performance.now()/(f.work===2?260:420)+f.g.position.x);
+      if(f.work===1){arms[1].rotation.x=-1.6+w*.9;arms[0].rotation.x=-.5+w*.2;}
+      else if(f.work===2){arms[1].rotation.x=-1.0+w*.35;arms[0].rotation.x=-1.0+w*.35;}
+      else if(f.work===3){arms[1].rotation.x=-.6+w*.5;arms[0].rotation.x=-.3;}
+      return;}
+    f.raise+=(f.raiseT-f.raise)*Math.min(1,dt*6);
+    const gest=f.gesture?(-1.0+Math.sin(performance.now()/300+f.gesture)*.3):0;
+    arms[1].rotation.x=sw*.6*(1-f.raise)+(-2.9)*f.raise+gest*(1-f.raise);
+  };
+  if(o.kid)g.scale.setScalar(o.kidScale||.7);
+  FIGS.push(f);
+  return f;
+}
+const placeFig=(f,x,z,rot)=>{f.g.position.set(x,GY(x,z),z);f.g.rotation.y=rot;scene.add(f.g);return f;};
+const statics=[];
+const face=(x,z,tx,tz)=>Math.atan2(tx-x,tz-z);
+function seated(o,x,z,rot,y){const f=makeFigure(o);f.legs.forEach(l=>{l.rotation.x=-1.45;l.position.y=.58;l.position.z=.0;});f.g.position.set(x,(y??GY(x,z))-.36,z);f.g.rotation.y=rot;scene.add(f.g);statics.push(f);return f;}
+const IND=(o)=>Object.assign({bare:true,skin:SK.ind[Math.floor(rnd()*3)],hair:0x111111},o);
+const AFR=(o)=>Object.assign({short:true,skin:SK.afr[Math.floor(rnd()*3)],tunic:0xcdbf9e,trousers:0xb8a888,hair:0x111111},o);
+const POR=(o)=>Object.assign({short:true,tunic:[0x5a4a3a,0x7a5a3a,0x3f4a5a,0x6a3a2a][Math.floor(rnd()*4)],trousers:[0x3a3028,0x5a4a3a,0x2a2a30][Math.floor(rnd()*3)],beard:rnd()<.7,hair:[0x2e2018,0x4a3424,0x241a12][Math.floor(rnd()*3)]},o);
+
+// trabalhadores do engenho, da aldeia e da vila (parados, mas em movimento)
+const WORK=[
+  // canavial: cortadores (a maioria indígenas escravizados)
+  [IND({tool:'foice',work:1,belt:0x6a5a40}),-38,-47,1.2],[IND({tool:'foice',work:1}),-36,-44.5,1.9],[IND({tool:'foice',work:1,paint:'jenipapo'}),-41,-42.5,.6],[IND({longHair:true,work:3,tool:'cana'}),-34.5,-41.5,2.4],
+  // moenda
+  [IND({work:2}),MOENDA.x-1.2,MOENDA.z+1.6,Math.PI],[IND({work:2,paint:'urucum'}),MOENDA.x+1.2,MOENDA.z-1.6,0],
+  // caldeiras
+  [AFR({tool:'pa',work:2}),CALD.x-3,CALD.z+.1,Math.PI],[IND({tool:'pa',work:2}),CALD.x-1,CALD.z+.1,Math.PI],[IND({tool:'pa',work:2}),CALD.x+1,CALD.z+.1,Math.PI],[AFR({work:3}),CALD.x+3.4,CALD.z+.4,Math.PI],
+  // purgar e secar
+  [IND({work:3,longHair:true}),PURG.x-3,PURG.z+.3,Math.PI],[AFR({work:3}),SECAR.x-.5,SECAR.z+2.2,Math.PI],[IND({work:2}),SECAR.x+4.6,SECAR.z+1.4,Math.PI*.8],
+  // carreiro
+  [IND({tool:'cana'}),OXCART.x+2.2,OXCART.z+5,-.3],
+  // aldeia
+  [IND({longHair:true,work:3,paint:'jenipapo'}),-70.5,15.5,2.6],[IND({longHair:true,work:3}),-72.5,11,1.4],[IND({tool:'arco',cocar:false,paint:'urucum'}),-84,4,1.2],[IND({beard:false}),-77,12,-2.2],
+  [IND({longHair:true,work:1}),-80,40,.3],[IND({longHair:true,work:1}),-88,47,2.2],[IND({longHair:true,work:1,paint:'urucum'}),-74,51,-1],
+  [IND({kid:true}),-82,10,0],[IND({kid:true,kidScale:.6}),-80.5,11.5,2.6],[IND({kid:true,longHair:true}),-79,9.5,-1.5],
+  // porto: carregadores e marinheiros
+  [AFR({box:true}),49,-.9,Math.PI/2],[POR({cap:0x8a2a1e}),56,.9,-Math.PI/2],[POR({cap:0x3a4a6a,tunic:0xd8ccb0}),57,4.5,2],
+  // fonte
+  [POR({dress:true,tunic:0x7a6a54,longHair:true,beard:false,hair:0x3a2a1c}),FONTE.x-1.6,FONTE.z+1.6,Math.PI],[IND({dress:true,tunic:0xe6dcc6,longHair:true,headCarry:'pote'}),FONTE.x+1.8,FONTE.z+2,-.5],
+];
+WORK.forEach(([o,x,z,r])=>{const f=placeFig(makeFigure(o),x,z,r);statics.push(f);colliders.push({x,z,r:.25});});
+// feitor, de chapéu, vigiando as caldeiras
+{const f=placeFig(makeFigure(POR({hat:0x3a2e22,tunic:0x2f3a2c,beard:true})),CALD.x+5.5,CALD.z+4.6,-2.4);f.gesture=4;statics.push(f);colliders.push({x:CALD.x+5.5,z:CALD.z+4.6,r:.25});}
+
+// oficiais da Câmara sentados à mesa
+const OFFI=[{hat:0x1e1a16,tunic:0x2a2420,beard:true,hair:0x8a8580},{tunic:0x3a2c22,beard:true},{tunic:0x5a2a22,beard:true,hat:0x2a2420},{tunic:0x2a3040,beard:false,tool:'pena'}];
+const officials=OFFI.map((o,i)=>seated(POR(o),CAMSLOT.officials[i][0],CAMSLOT.officials[i][1],Math.PI/2,H(CAM.x,CAM.z)+.3));
+const chief=placeFig(makeFigure(IND({cocar:true,paint:'urucum',belt:0xc8a060})),CAMSLOT.chief.x,CAMSLOT.chief.z,-Math.PI/2);statics.push(chief);chief.g.visible=false;
+const comps=CAMSLOT.comp.map(([x,z])=>{const f=placeFig(makeFigure(IND({tool:'arco',paint:'jenipapo'})),x,z,-Math.PI/2);statics.push(f);f.g.visible=false;return f;});
+
+// rótulos no céu
+function label(text,x,y,z,w=9){
+  const cv=document.createElement('canvas');cv.width=640;cv.height=128;const c=cv.getContext('2d');
+  c.fillStyle='rgba(21,19,15,.86)';c.strokeStyle='#3f6fa6';c.lineWidth=6;c.beginPath();c.rect(3,3,634,122);c.fill();c.stroke();
+  c.fillStyle='#efe4c8';c.font='56px "IM Fell English", Georgia, serif';c.textAlign='center';c.textBaseline='middle';c.fillText(text,320,68,600);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true}));
+  s.position.set(x,y,z);s.scale.set(w*1.3,w*1.3/5,1);scene.add(s);return s;
+}
+
+// ---------- Pedro ----------
+const player=makeFigure({tunic:0xefe8d6,short:true,trousers:0xb59f78,skin:SK.mam[0],hair:0x16110c});scene.add(player.g);
+const axeG=new THREE.Group();axeG.position.set(0,-.62,0);player.arms[1].add(axeG);
+{const h=new THREE.Mesh(new THREE.CylinderGeometry(.022,.022,.55,5),fm(0x5a3e28,'cloth'));h.position.y=-.05;axeG.add(h);const b=new THREE.Mesh(new THREE.BoxGeometry(.04,.12,.16),M.iron);b.position.set(0,-.27,.08);axeG.add(b);}
+const sackG=new THREE.Mesh(new THREE.SphereGeometry(.17,10,8),fm(0xc9b48a,'cloth'));sackG.scale.set(1,1.2,.8);sackG.position.set(.12,1.2,-.2);sackG.visible=false;player.g.add(sackG);
+// Começar na pequena área livre em frente à casa, sem encostar a câmera na casa vizinha.
+const SPAWN={x:PEDRO_HOUSE.x-1,z:PEDRO_HOUSE.z-9.5};
+const P={x:SPAWN.x,z:SPAWN.z,a:face(SPAWN.x,SPAWN.z,-34,0),locked:false};
+
+// moradores andando pela vila
+const PATHS=[
+  [[-33,0],[30,0],[37,0],[52,0]],[[0,-33],[0,0],[0,28],[0,40]],[[-4,0],[-33,0],[-62,5]],[[0,-28],[0,-36],[-12,-42],[-22,-62],[-48,-62]],[[2,-8],[0,-36],[10,-40]],[[30,2],[2,2],[2,26],[-4,26]],[[-26,-3],[26,-3]]];
+const walkers=[];
+[[0,POR({}),.8],[0,IND({}),1.1],[1,POR({dress:true,tunic:0x6a5a48,longHair:true,beard:false}),.75],[1,AFR({headCarry:'cesto'}),.9],[2,IND({longHair:true,headCarry:'cesto'}),.85],[2,POR({hat:0x5a4632}),1],
+ [3,IND({tool:'cana'}),.9],[3,AFR({}),1],[4,IND({dress:true,tunic:0xe6dcc6,longHair:true,headCarry:'pote'}),.7],[5,POR({kid:true}),1.2],[5,IND({kid:true,kidScale:.62}),1.2],[6,POR({cassock:false,tunic:0x3a3a3a}),.8],[0,AFR({box:true}),.85]]
+ .forEach(([pi,o,sp],i)=>{const path=PATHS[pi];const k=i%path.length;const f=makeFigure(o);scene.add(f.g);
+   walkers.push({f,path,i:k,dir:1,x:path[k][0]+(rnd()-.5),z:path[k][1]+(rnd()-.5),sp:sp*1.6,wait:rnd()*3,off:(rnd()-.5)*1.6});});
+
+// ---------- estado do dia ----------
+const S={machado:true,farinha:false,gov:{},acucar:false,camara:false,home:false};
+const SAVE_KEY='sao-vicente-1548:progresso:v1';
+let recoveredGame=false;
+function saveProgress(){
+  if(!started)return;
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify({
+    farinha:!!S.farinha,gov:Object.keys(S.gov),acucar:!!S.acucar,
+    camara:!!S.camara,home:!!S.home,
+    talks:Object.keys(S.talks||{}),qs:Object.keys(S.qs||{}),
+    seen:PLACES.filter(p=>p.seen).map(p=>p.id),
+    position:[P.x,P.z,P.a]
+  }));}catch(e){/* Armazenamento pode ser bloqueado no navegador. */}
+}
+function restoreProgress(){
+  let data;
+  try{data=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');}catch(e){return false;}
+  if(!data||typeof data!=='object'||!Array.isArray(data.seen))return false;
+  const validGov=new Set(['igreja','camara','pelourinho','tranqueira']);
+  S.farinha=!!data.farinha;S.machado=!S.farinha;
+  S.gov=Object.fromEntries((Array.isArray(data.gov)?data.gov:[]).filter(id=>validGov.has(id)).map(id=>[id,1]));
+  S.acucar=!!data.acucar;S.camara=!!data.camara;S.home=!!data.home;
+  S.talks=Object.fromEntries((Array.isArray(data.talks)?data.talks:[]).filter(id=>TALKS.some(t=>t.id===id)).map(id=>[id,1]));
+  S.qs=Object.fromEntries((Array.isArray(data.qs)?data.qs:[]).filter(id=>QUESTS.some(q=>q.id===id)).map(id=>[id,1]));
+  const seen=new Set(data.seen);
+  PLACES.forEach(p=>{p.seen=seen.has(p.id);if(p.seen)p.ring.material.color.set(0x86a35a);});
+  TALKS.forEach(t=>{if(S.talks[t.id]){t.mark.material.map=Q_DONE;t.mark.material.needsUpdate=true;}});
+  QUESTS.forEach(q=>{if(S.qs[q.id]){q.mark.material.map=Q_DONE;q.mark.material.needsUpdate=true;}});
+  const pos=data.position;
+  if(Array.isArray(pos)&&pos.length===3&&pos.every(Number.isFinite)){
+    P.x=Math.max(-150,Math.min(80,pos[0]));
+    P.z=Math.max(-140,Math.min(120,pos[1]));P.a=pos[2];
+    collide();
+  }
+  if(S.camara)duskT=1;
+  recoveredGame=true;
+  return true;
+}
+const TASKS=[
+ {id:'escambo',t:'Trocar o machado por farinha, na aldeia tupiniquim',done:()=>S.farinha},
+ {id:'gov',t:()=>`Conhecer os lugares que organizam a vila (${Object.keys(S.gov).length} de 4)`,done:()=>Object.keys(S.gov).length>=4},
+ {id:'acucar',t:'Seguir o caminho do açúcar no engenho',done:()=>S.acucar},
+ {id:'camara',t:'Ser o "língua" (o intérprete) na Câmara',done:()=>S.camara},
+ {id:'home',t:'Voltar para casa com a farinha',done:()=>S.home},
+];
+function renderTasks(){
+  const ul=$('tasks');ul.innerHTML='';let cur=false;
+  TASKS.forEach(k=>{const li=document.createElement('li');li.textContent=typeof k.t==='function'?k.t():k.t;
+    if(k.done())li.className='done';else if(!cur){li.className='now';cur=true;}ul.appendChild(li);});
+  $('purse').innerHTML=`Pedro leva: <b>${S.farinha?'um paneiro de farinha de mandioca':'um machado de ferro'}</b><br>Descobertas: <b>${PLACES.filter(p=>p.seen).length} de ${PLACES.length}</b>`;
+  axeG.visible=!S.farinha;sackG.visible=S.farinha;saveProgress();
+}
+
+// ---------- pessoas que conversam com Pedro ----------
+const TALKS=[
+ {id:'t_ramalho',x:-5,z:9,rot:2.2,o:POR({tunic:0x6a5038,trousers:0x4a3a2a,beard:true,hair:0x9a948a,skin:0xc08a62}),who:'João Ramalho, de passagem pela vila',pages:[
+  '<p>"Eu cheguei a estas terras muito antes de Martim Afonso, há mais de trinta anos. Ninguém sabe direito como: uns dizem que foi num naufrágio, outros que fui deixado aqui como castigo."</p>',
+  '<p>"Vivo lá em cima, no <b>planalto</b>, depois da serra, junto dos <b>tupiniquins</b>. Casei com <b>Bartira</b>, filha do chefe <b>Tibiriçá</b>. Tenho muitos filhos, mamelucos como você, Pedro."</p>',
+  '<p>"Quando Martim Afonso chegou, em 1532, eu ajudei: falei com os chefes e mostrei os caminhos da serra. Sem os tupiniquins, os portugueses não teriam conseguido ficar aqui."</p>',
+  '<p>"Desci a serra para negociar. E não vou mentir: eu e meus filhos também fazemos guerra contra os inimigos dos tupiniquins e trazemos os prisioneiros para vender como escravos aqui na vila."</p>',
+  '<p class="src">João Ramalho é uma pessoa real. Os historiadores não sabem com certeza quando nem como ele chegou. As falas deste jogo foram escritas a partir do que se sabe sobre ele.</p>',
+  '<p class="hoje">Em 1553, a aldeia de João Ramalho no planalto virou a vila de <b>Santo André da Borda do Campo</b>. A cidade de Santo André, na Grande São Paulo, lembra esse nome.</p>']},
+ {id:'t_potira',x:PEDRO_HOUSE.x+3,z:PEDRO_HOUSE.z-3.6,rot:-2.6,o:{dress:true,tunic:0xe8e0cc,skin:SK.ind[1],longHair:true,hair:0x111111},who:'Potira, a mãe de Pedro',pages:[
+  '<p>"Pedro, meu filho, leve o machado à aldeia da minha irmã e traga farinha. Com um machado de ferro, um homem derruba uma árvore muito mais depressa que com um machado de pedra. Lá, um machado vale muito."</p>',
+  '<p>"Eu nasci numa aldeia tupiniquim. Quando seu pai chegou, o chefe da minha aldeia o aceitou como parente e me deu a ele como esposa. Para nós, isso fazia dele um <b>cunhado</b>: alguém que tem obrigações com a família."</p>',
+  '<p>"Por isso seu pai ganhou amigos, ajuda para plantar e gente para trabalhar. Muitos portugueses daqui fizeram o mesmo: quase não há mulheres portuguesas nesta vila."</p>',
+  '<p class="src">Os historiadores chamam esse costume de <b>cunhadismo</b>. Os casamentos com mulheres indígenas criaram alianças entre portugueses e aldeias, e muitos filhos mamelucos, como Pedro.</p>',
+  '<p class="hoje">Grande parte dos brasileiros tem antepassados indígenas, muitas vezes pelo lado das mães e avós, mesmo sem saber.</p>']},
+ {id:'t_degredado',x:7,z:-5,rot:-1.6,o:POR({tunic:0x7a6a54,trousers:0x5a4a3a,beard:true}),who:'Um degredado',pages:[
+  '<p>"Em Portugal, fui condenado por roubo. Em vez de me deixar preso, o juiz me mandou para cá: fui <b>degredado</b> para o Brasil por alguns anos."</p>',
+  '<p>"O rei precisa de gente para <b>ocupar</b> estas terras. Quase ninguém quer vir: a viagem é perigosa, o lugar é desconhecido e aqui não se achou ouro. Então mandam também os condenados."</p>',
+  '<p>"Hoje trabalho para um senhor de engenho. Quando cumprir a pena, quero ganhar um pedaço de terra e plantar cana por minha conta."</p>',
+  '<p class="hoje">Seria como cumprir a pena trabalhando longe de casa. Hoje, no Brasil, ninguém pode ser mandado para fora do país como castigo.</p>']},
+ {id:'t_vigario',x:9,z:-7.2,rot:.6,o:{cassock:true,skin:SK.pt[0],hair:0x6a5a4a},who:'O vigário da vila',pages:[
+  '<p>"Sou o vigário de São Vicente. Batizo, caso, enterro e rezo a missa de domingo. Quando um indígena é batizado, recebe um <b>nome cristão</b>, em português."</p>',
+  '<p>"Os portugueses dizem que vieram para <b>espalhar a fé católica</b>. Mas muitos aqui só pensam em açúcar e em escravos. Escrevo ao rei pedindo mais padres."</p>',
+  '<p class="src">Logo depois, em 1549, chegaram à Bahia o primeiro governador-geral, Tomé de Sousa, e os primeiros padres <b>jesuítas</b>. Em 1553, os jesuítas chegaram a São Vicente. Um deles era <b>José de Anchieta</b>, que ajudou a fundar São Paulo.</p>',
+  '<p class="hoje">A religião católica continua sendo a de muitos brasileiros. Mas hoje a Constituição garante a <b>liberdade de religião</b>: cada pessoa pode seguir a fé que quiser, ou nenhuma.</p>']},
+ {id:'t_marinheiro',x:50,z:1.1,rot:-2.2,o:POR({cap:0x8a2a1e,tunic:0xcdbf9e}),who:'Um marinheiro da nau',pages:[
+  '<p>"Saímos de Lisboa há quase três meses. Comemos biscoito duro, peixe salgado e bebemos água que apodrece nos barris. Muitos ficam doentes; alguns morreram no caminho."</p>',
+  '<p>"Está vendo a cruz vermelha nas velas? É a <b>Cruz da Ordem de Cristo</b>, que vai nos navios portugueses desde o tempo das primeiras viagens."</p>',
+  '<p>"Trouxemos ferro, ferramentas, tecidos, vinho, sal e alguns moradores novos. Agora esperamos as caixas de açúcar para voltar. Se Deus quiser, chegamos a Lisboa antes do inverno."</p>',
+  '<p class="hoje">De avião, a viagem entre Lisboa e São Paulo leva umas <b>11 horas</b>. Hoje o açúcar brasileiro ainda vai de navio, saindo justamente do <b>porto de Santos</b>, o maior do Brasil.</p>']},
+ {id:'t_mestre',x:CALD.x-5.6,z:CALD.z+5,rot:2.6,o:POR({tunic:0x8a6a48,trousers:0x4a3a2a,beard:true,hat:0x6a5a40}),who:'O mestre de açúcar',pages:[
+  '<p>"Vim da <b>ilha da Madeira</b>. Lá os portugueses fazem açúcar há quase cem anos, e foi de lá que vieram a cana e o jeito de trabalhar."</p>',
+  '<p>"Quem decide o <b>ponto</b> do caldo sou eu. Se ferver pouco, o açúcar não endurece; se ferver demais, queima. Um erro meu estraga um dia inteiro de trabalho."</p>',
+  '<p>"Sou homem livre e recebo salário. Um bom mestre de açúcar é raro e caro: sem mim, o engenho para."</p>',
+  '<p class="hoje">Seria o <b>técnico especializado</b> de uma fábrica, aquele que entende do processo e é difícil de substituir.</p>']},
+ {id:'t_antonio',x:CALD.x+2,z:CALD.z+5.2,rot:-2.9,o:AFR({tunic:0xb8a888,skin:SK.afr[1]}),who:'Antônio, trazido da Guiné',pages:[
+  '<p>"Aqui me chamam de <b>Antônio</b>. Na minha terra eu tinha outro nome, mas o padre me batizou com este. Venho da costa da <b>Guiné</b>, na África."</p>',
+  '<p>"Fui vendido a comerciantes portugueses. Atravessei o mar preso, no porão de um navio, com outras pessoas que eu não conhecia e cuja língua eu não entendia."</p>',
+  '<p>"Na minha terra eu já trabalhava com metal. Aqui conserto os tachos de cobre e os ferros da moenda. Neste engenho há só uns sete ou oito africanos, e todos temos um ofício."</p>',
+  '<p>"O feitor diz que pagaram caro por mim. Eu penso na minha família, do outro lado do mar."</p>',
+  '<p class="src">Uma carta escrita em Santos em 13 de maio de 1548, para os donos do engenho em Antuérpia, conta que ali havia uns 130 escravizados e só 7 ou 8 "negros de Guiné", todos com ofício.</p>',
+  '<p class="hoje">Nos séculos seguintes, o Brasil foi o lugar do mundo que mais recebeu africanos escravizados: cerca de <b>4,8 milhões</b> de pessoas. Hoje, mais da metade dos brasileiros se declara preta ou parda.</p>']},
+ {id:'t_pai',x:-11,z:-49,rot:-1.2,o:POR({tunic:0x7a5a3a,trousers:0x4a3a2a,beard:true,hat:0x8a7650,skin:0xd2a07a}),who:'Gonçalo, o pai de Pedro',pages:[
+  '<p>"Pedro! Já fez a troca na aldeia? Eu sou <b>lavrador de cana</b>: planto cana na minha terra e trago para moer neste engenho, porque não tenho dinheiro para ter uma moenda."</p>',
+  '<p>"Montar um engenho custa uma fortuna: rodas, tachos de cobre, prédios, bois, gente. Por isso este aqui foi montado por <b>sócios ricos</b>, e hoje pertence a uma família de comerciantes de Antuérpia."</p>',
+  '<p>"Em troca da moagem, o engenho fica com uma boa parte do açúcar da minha cana. Com o resto, eu pago as dívidas da safra. Um dia ainda quero ter meu próprio engenho."</p>',
+  '<p class="hoje">Seria como um pequeno agricultor que vende a produção para uma <b>usina</b> de açúcar e álcool. As usinas de cana ainda são muito importantes no estado de São Paulo.</p>']},
+];
+function qMark(txt,bg){const cv=document.createElement('canvas');cv.width=cv.height=128;const c=cv.getContext('2d');
+  c.fillStyle=bg;c.beginPath();c.arc(64,64,56,0,7);c.fill();c.lineWidth=8;c.strokeStyle='#efe4c8';c.stroke();
+  c.fillStyle='#fff';c.font='bold 84px Georgia, serif';c.textAlign='center';c.textBaseline='middle';c.fillText(txt,64,70);return new THREE.CanvasTexture(cv);}
+const T_MARK=qMark('…','#3f6fa6'),Q_ASK=qMark('?','#c4472c'),Q_DONE=qMark('✓','#5f7a3a');
+TALKS.forEach(t=>{const f=placeFig(makeFigure(t.o),t.x,t.z,t.rot);f.gesture=2;statics.push(f);colliders.push({x:t.x,z:t.z,r:.25});
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:T_MARK,depthTest:false}));sp.position.set(t.x,GY(t.x,t.z)+2.45,t.z);sp.scale.set(.75,.75,1);sp.renderOrder=5;scene.add(sp);t.mark=sp;t.fig=f;});
+function talkDialog(t){
+  lockScene();S.talks=S.talks||{};S.talks[t.id]=1;t.mark.material.map=Q_DONE;t.mark.material.needsUpdate=true;saveProgress();
+  const back=unlockScene;
+  dlg('Na vila · conversa',t.who,t.pages.join(''),[{t:'Voltar a passear ▸',main:true,f:back}]);
+}
+
+// ---------- perguntas de moradores e visitantes ----------
+const QUESTS=[
+ {id:'q_descobriu',x:-7,z:-4,rot:1.6,kid:true,o:POR({beard:false,tunic:0x5a6a7a}),who:'Um menino recém-chegado de Portugal',
+  ask:'"Pedro, foi Martim Afonso que descobriu esta terra?"',
+  opts:['Foi. Antes dele não morava ninguém aqui.','Não. Os indígenas viviam aqui havia milhares de anos, e outros europeus já tinham passado por aqui antes.','Foi Cabral, e ele fundou São Vicente.'],c:1,
+  ex:'<p>Os povos indígenas viviam nesta região havia <b>milhares de anos</b>. Bem antes dos tupiniquins, outros povos deixaram aqui os <b>sambaquis</b>: montes enormes de conchas, ossos e restos de comida, alguns com mais de 5 mil anos.</p><p>Cabral chegou à Bahia em <b>1500</b>. Navegadores portugueses passaram por este litoral pouco depois, e alguns europeus, como João Ramalho, já viviam com os indígenas. O que <b>Martim Afonso de Sousa</b> fez, em <b>22 de janeiro de 1532</b>, foi fundar a vila de São Vicente: começar a <b>ocupação</b> portuguesa com moradores, Câmara e leis.</p>'},
+ {id:'q_povos',x:34,z:-4,rot:-1.8,o:POR({cap:0x3a4a6a,tunic:0xd8ccb0,beard:false}),who:'Um marinheiro novato',
+  ask:'"Os índios daqui e os índios lá do norte são todos o mesmo povo?"',
+  opts:['São, todos os índios são iguais.','Não. São muitos povos diferentes, com chefes próprios. Alguns são inimigos entre si.','Não existem índios no norte.'],c:1,
+  ex:'<p>Os europeus chamaram todos de "índios" porque Colombo achou que tinha chegado às <b>Índias</b>, na Ásia. Mas eram <b>muitos povos diferentes</b>.</p><p>Aqui vivem os <b>tupiniquins</b>, aliados dos portugueses. Mais ao norte vivem os <b>tupinambás</b>: falam uma língua parecida, mas são inimigos dos tupiniquins e aliados dos <b>franceses</b>. Ao sul vivem os <b>carijós</b>. Cada aldeia tinha seus chefes, os <b>principais</b>, e suas alianças. Os portugueses aproveitavam essas inimizades para fazer guerra e conseguir aliados.</p>'},
+ {id:'q_escraviza',x:-63,z:2,rot:1.6,kid:true,o:IND({paint:'urucum'}),who:'Um menino tupiniquim',
+  ask:'"Pedro, como os portugueses conseguem tantas pessoas indígenas escravizadas?"',
+  opts:['Compram prisioneiros de guerra de outros povos ou atacam aldeias e capturam gente.','Os indígenas vão trabalhar no engenho porque querem.','Trazem todos de navio, da África.'],c:0,
+  ex:'<p>Havia vários caminhos. No <b>resgate</b>, os portugueses trocavam ferramentas por prisioneiros que os aliados tinham capturado em guerra. Na chamada <b>"guerra justa"</b>, os portugueses atacavam povos considerados inimigos e escravizavam os prisioneiros. E muitas vezes atacavam aldeias sem motivo nenhum, só para capturar trabalhadores.</p><p>Os portugueses chamavam os indígenas escravizados de <b>"negros da terra"</b>. Em 1548, eram a <b>maioria</b> dos trabalhadores dos engenhos de São Vicente.</p>'},
+ {id:'q_africanos',x:38,z:-6,rot:-1.4,o:POR({hat:0x1e1a16,tunic:0x2a2a3a,trousers:0x1e1e24,beard:true,hair:0xb89a6a,skin:0xe6bfa0}),who:'Um comerciante de Flandres',
+  ask:'"Diga, rapaz: por que no engenho dos meus patrões quase não há africanos?"',
+  opts:['Porque africanos escravizados custavam caro, e havia muitos indígenas por perto para escravizar.','Porque era proibido trazer africanos.','Porque os africanos não sabiam trabalhar com açúcar.'],c:0,
+  ex:'<p>Trazer uma pessoa da África custava <b>caro</b>: a viagem era longa e os traficantes cobravam muito. Em São Vicente, os colonos preferiam escravizar <b>indígenas</b>, que estavam perto. Os poucos africanos eram usados nos <b>ofícios</b> que exigiam experiência.</p><p>Isso mudou nas décadas seguintes. Doenças trazidas pelos europeus mataram muitos indígenas, outros fugiam para o interior, e o comércio de pessoas escravizadas pelo Atlântico enriquecia muito os traficantes. A partir de 1570, sobretudo em <b>Pernambuco</b> e na <b>Bahia</b>, os engenhos passaram a usar cada vez mais africanos escravizados.</p>'},
+ {id:'q_acucar',x:3,z:21,rot:Math.PI,o:POR({dress:true,tunic:0x5a4a3a,longHair:true,beard:false,hair:0x2a1e14}),who:'Uma moradora da vila',
+  ask:'"Pedro, para onde vai tanto açúcar? Aqui na vila a gente quase nem prova!"',
+  opts:['Para a Europa, onde o açúcar era caro e muito procurado.','Fica todo guardado na Câmara.','Vai para os indígenas do planalto.'],c:0,
+  ex:'<p>Na Europa, o açúcar era um <b>luxo</b>: servia para doces, conservas, remédios e banquetes dos ricos. Quem vendia açúcar ficava rico. Por isso os portugueses plantaram cana nas ilhas da <b>Madeira</b> e de <b>São Tomé</b>, e depois no Brasil.</p><p>O açúcar ia para <b>Lisboa</b> e, de lá, boa parte seguia para <b>Antuérpia</b>, em Flandres. A maior parte do lucro ficava com os donos dos engenhos e com os comerciantes, não com quem trabalhava.</p>'},
+ {id:'q_votar',x:29,z:6,rot:-2.2,o:POR({tunic:0x8a7a62,trousers:0x6a5a48,beard:true,cap:0x5a4632}),who:'Um pescador pobre',
+  ask:'"Pedro, eu sou português e moro aqui desde a fundação. Por que não posso ser vereador?"',
+  opts:['Porque só os "homens bons", donos de terras e engenhos, participavam da Câmara.','Porque pescador não pode morar dentro da vila.','Ele pode, basta pedir ao vigário.'],c:0,
+  ex:'<p>Nas vilas portuguesas, só os <b>homens bons</b> podiam votar e ser eleitos para a Câmara: homens adultos, católicos, donos de terras, de engenhos ou de escravizados, e que não trabalhavam com as próprias mãos.</p><p>Ficavam de fora os trabalhadores pobres, como este pescador, as mulheres, os indígenas, os africanos e a maioria dos mamelucos. A Câmara governava a vila inteira, mas era escolhida por <b>poucos</b>.</p>'},
+];
+QUESTS.forEach(q=>{const f=placeFig(makeFigure(Object.assign({kid:q.kid},q.o)),q.x,q.z,q.rot);f.gesture=3;statics.push(f);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:Q_ASK,depthTest:false}));sp.position.set(q.x,GY(q.x,q.z)+(q.kid?1.85:2.45),q.z);sp.scale.set(.75,.75,1);sp.renderOrder=5;scene.add(sp);q.mark=sp;
+  colliders.push({x:q.x,z:q.z,r:.25});});
+function askDialog(q){
+  lockScene();
+  const back=unlockScene;
+  const order=q.opts.map((_,i)=>i);
+  for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+  dlg('Uma pergunta para Pedro',q.who,'<p>'+q.ask+'</p><p style="font-size:.85em;opacity:.85">Ajude Pedro a responder:</p>',order.map(k=>({t:q.opts[k],ghost:true,f:()=>{
+    const ok=k===q.c;S.qs=S.qs||{};S.qs[q.id]=1;q.mark.material.map=Q_DONE;q.mark.material.needsUpdate=true;saveProgress();
+    $('dTxt').innerHTML='<p>'+q.ask+'</p><div class="fb '+(ok?'ok':'no')+'"><b>'+(ok?'Isso mesmo!':'Não é bem assim.')+'</b> A resposta é: <b>'+q.opts[q.c]+'</b></div>'+q.ex;
+    $('dlg').scrollTop=0;const B=$('dBtns');B.innerHTML='';const b=document.createElement('button');b.textContent='Voltar a passear ▸';b.dataset.main='1';b.onclick=back;B.appendChild(b);B.appendChild(spkBtn(()=>q.ex,'narrador'));say(q.ex,'narrador');}})));
+}
+
+// ---------- lugares ----------
+const FORMA_SVG='<div class="ill"><svg viewBox="0 0 120 120" role="img" aria-label="Forma de barro com açúcar"><circle cx="60" cy="60" r="58" fill="#3f6fa6"/><path d="M34 26h52L64 96h-8z" fill="#b06c43" stroke="#15130f" stroke-width="3"/><path d="M37 34h46l-5 14H42z" fill="#efe4c8"/><path d="M42 48h36l-6 20H48z" fill="#e2c48a"/><path d="M48 68h24l-6 20H54z" fill="#a86f36"/><path d="M34 26h52" stroke="#6b4a2e" stroke-width="5"/><path d="M60 96v12" stroke="#5a2a10" stroke-width="3" stroke-dasharray="3 3"/></svg><small>Na forma de barro, o açúcar de cima fica branco; o de baixo, escuro, é o mascavo. Pelo furo escorre o melaço.</small></div>';
+const TIPITI_SVG='<div class="ill"><svg viewBox="0 0 120 120" role="img" aria-label="Tipiti"><circle cx="60" cy="60" r="58" fill="#3f6fa6"/><path d="M60 8v14" stroke="#15130f" stroke-width="4"/><path d="M48 22h24l-4 76H52z" fill="#c5a46a" stroke="#15130f" stroke-width="3"/><path d="M50 30l20 10M50 42l18 10M51 54l17 10M51 66l16 10M52 78l15 10M70 30l-20 10M69 42l-18 10M68 54l-17 10M68 66l-16 10M67 78l-15 10" stroke="#6b4a2e" stroke-width="2"/><path d="M60 98v8" stroke="#e8dcb6" stroke-width="4"/><ellipse cx="60" cy="110" rx="12" ry="3" fill="#e8dcb6"/></svg><small>O tipiti: um tubo de palha trançada. Puxado para baixo, ele aperta a massa e espreme o caldo venenoso.</small></div>';
+const PLACES=[
+ {id:'casaPedro',x:PEDRO_HOUSE.x,z:PEDRO_HOUSE.z-4.4,t:'A casa de Pedro',sub:'Taipa e palha',lab:[PEDRO_HOUSE.x,7,PEDRO_HOUSE.z],w:6,
+  txt:'<p>A casa da família de Pedro é de <b>taipa</b>: uma armação de varas de madeira cheia de <b>barro</b> amassado. O telhado é de <b>palha</b>. Quase todas as casas da vila são assim: baixas, simples, com chão de terra batida. Só as casas dos mais ricos têm <b>telhas</b>.</p><p>Dentro há poucas coisas: uma mesa, um baú, panelas de barro e <b>redes</b> para dormir. A rede é invenção dos povos indígenas, e os portugueses logo passaram a dormir nelas.</p><p class="hoje">A rede continua em muitas casas do Brasil, principalmente no Norte e no Nordeste. Casas de taipa ou pau a pique ainda existem em zonas rurais.</p>',
+  act:()=>S.camara&&!S.home?{l:'Entrar em casa',f:goHome}:null},
+ {id:'igreja',x:IGREJA.x,z:IGREJA.z+9.5,t:'Igreja Matriz',sub:'A fé católica no centro da vila',gov:true,lab:[IGREJA.x,11.5,IGREJA.z],w:8,
+  txt:'<p>Toda vila portuguesa tinha uma <b>igreja</b>. Os portugueses eram católicos e diziam que um dos motivos de vir para estas terras era <b>espalhar a fé cristã</b>. Aos domingos, os moradores deviam ir à missa: portugueses, mamelucos, indígenas e africanos batizados.</p><p>Esta igreja é <b>nova</b>. No fim de 1541, uma <b>ressaca enorme</b> do mar destruiu a primeira igreja, a Câmara, a cadeia, o pelourinho e muitas casas. A vila foi reconstruída um pouco mais para dentro da ilha.</p><p>O padre anotava num livro os batizados, os casamentos e as mortes. Por isso os registros das igrejas são fontes importantes para os historiadores.</p><p class="hoje">A Igreja Matriz de São Vicente continua no centro da cidade, mas o prédio que está lá foi reconstruído muito tempo depois.</p>'},
+ {id:'camara',x:CAM.x+11,z:CAM.z+3.5,t:'Casa da Câmara e Cadeia',sub:'Quem governa a vila',gov:true,lab:[CAM.x,9.5,CAM.z],w:9,
+  txt:'<p>Numa sala deste prédio se reúne a <b>Câmara</b>, que governa a vila. Na outra, com <b>grades</b> na janela, fica a <b>cadeia</b>. Câmara e cadeia juntas mostravam que ali havia governo e justiça, em nome do rei de Portugal.</p><p>A Câmara cuida das ruas e caminhos, dos preços, das festas, das brigas entre moradores e da <b>defesa</b> da vila. Também escreve ao rei pedindo ajuda. Os oficiais são o <b>juiz ordinário</b>, os <b>vereadores</b> e o <b>procurador</b>, e um <b>escrivão</b> anota tudo no livro de atas.</p><p class="src">Em agosto de 1532, poucos meses depois da fundação, os homens bons de São Vicente elegeram a primeira Câmara. A cidade se orgulha de dizer que foi a primeira eleição das Américas.</p><p class="hoje">Seria parecido com a <b>Câmara de Vereadores</b> da sua cidade. A diferença: hoje todas as pessoas brasileiras a partir de 16 anos podem votar.</p>',
+  act:()=>S.camara?null:{l:'Entrar na reunião (ser o língua)',f:()=>startCamara(false)}},
+ {id:'pelourinho',x:PEL.x+2.6,z:PEL.z+2.2,t:'O pelourinho',sub:'O símbolo da vila',gov:true,lab:[PEL.x,8.2,PEL.z],w:6,
+  txt:'<p>Esta coluna de pedra é o <b>pelourinho</b>. Só uma <b>vila</b> podia ter pelourinho: ele mostrava que ali havia Câmara, juiz e leis do rei de Portugal.</p><p>Era também o lugar dos <b>castigos públicos</b>. Quem cometia crimes era amarrado aqui e açoitado na frente de todos. Os castigos mais duros caíam sobre as pessoas <b>escravizadas</b>.</p><p class="src">O pelourinho de São Vicente caiu no mar na ressaca de 1541. Conta-se que foi tirado de dentro da água e erguido de novo em 1543.</p><p class="hoje">Hoje os castigos físicos são proibidos. Mas o nome ficou: o bairro do <b>Pelourinho</b>, em Salvador, se chama assim por causa do pelourinho que existia ali.</p>'},
+ {id:'tranqueira',x:25.5,z:-24,t:'A tranqueira e os berços',sub:'Defender a vila',gov:true,lab:[29,8,-26],w:8,
+  txt:'<p>A vila é cercada por uma <b>tranqueira</b>: uma cerca de troncos pontudos fincados no chão. Neste canto há uma plataforma com <b>berços</b>, pequenos canhões que atiram balas de pedra ou de ferro.</p><p>De quem os moradores têm medo? Dos <b>tupinambás</b>, inimigos dos tupiniquins e dos portugueses, que atacam em canoas de guerra. E dos <b>franceses</b>, que vêm buscar pau-brasil e são aliados dos tupinambás.</p><p>Ao norte da ilha, na <b>Bertioga</b>, os portugueses ergueram uma fortificação para vigiar o canal por onde chegam as canoas tupinambás.</p><p class="src">Em 1554, o alemão <b>Hans Staden</b>, artilheiro da Bertioga, foi capturado pelos tupinambás. Ele contou o que viveu num livro publicado em 1557.</p><p class="hoje">O <b>Forte de São João</b>, na Bertioga, ainda está de pé e pode ser visitado.</p>'},
+ {id:'porto',x:41,z:-2.6,t:'O porto e o trapiche',sub:'Daqui o açúcar parte para a Europa',lab:[50,7,0],w:7,
+  txt:'<p>No <b>trapiche</b>, o cais de madeira, os carregadores levam <b>caixas de açúcar</b> até o batel, que as leva até a nau. A nau vai para <b>Lisboa</b>, e de lá muito açúcar segue para <b>Antuérpia</b>, em Flandres, a maior cidade de comércio da Europa.</p><p>Na volta, os navios trazem o que a vila não produz: ferro, ferramentas, armas, tecidos, vinho, azeite, sal... e novos moradores.</p><p>Do outro lado da ilha há um porto mais protegido, onde os navios grandes preferem ancorar: a vila de <b>Santos</b>, fundada por <b>Brás Cubas</b> poucos anos antes.</p><p class="src">A carta de Santos de 13 de maio de 1548 conta que o engenho dos Schetz fez umas 900 arrobas de açúcar naquele ano: mais de 13 toneladas.</p>'},
+ {id:'paubrasil',x:PAU.x-3.2,z:PAU.z-1.4,t:'Toras de pau-brasil',sub:'A primeira riqueza',
+  txt:'<p>Estas toras, vermelhas por dentro, são de <b>pau-brasil</b>. Da madeira se fazia uma <b>tinta vermelha</b> muito cara, usada para tingir tecidos na Europa.</p><p>Nos primeiros 30 anos depois de 1500, os portugueses quase não moravam aqui. Os navios paravam na costa e trocavam ferramentas, facas e espelhos com os indígenas, que cortavam e carregavam as toras. Essa troca se chama <b>escambo</b>.</p><p>Os <b>franceses</b> também vinham buscar pau-brasil. Para não perder a terra para eles, o rei de Portugal decidiu ocupá-la: mandou Martim Afonso em 1530 e, em 1534, dividiu o litoral em <b>capitanias hereditárias</b>.</p><p class="hoje">O pau-brasil quase acabou de tanto ser cortado. Hoje é uma árvore protegida e ameaçada de extinção. E deu nome ao país: Brasil.</p>'},
+ {id:'aldeia',x:ALDEIA.x+8,z:ALDEIA.z-2,t:'Uma aldeia tupiniquim',sub:'Os aliados dos portugueses',lab:[ALDEIA.x,9,ALDEIA.z],w:9,
+  txt:'<p>Esta é uma aldeia <b>tupiniquim</b>. Cada <b>oca</b> é uma casa comprida, coberta de palha, onde moram várias famílias aparentadas, cada uma com suas <b>redes</b> e seu fogo. As ocas ficam em volta de um pátio, o <b>terreiro</b>.</p><p>Os tupiniquins viviam aqui muito antes de 1500. São <b>aliados</b> dos portugueses: o chefe <b>Tibiriçá</b>, que mora no planalto, é sogro do português João Ramalho. Os inimigos deles são os <b>tupinambás</b>.</p><p>Quando a terra das roças se cansava, depois de alguns anos, a aldeia mudava de lugar e abria roças novas na mata.</p><p class="hoje">Os tupiniquins ainda existem: vivem hoje no <b>Espírito Santo</b>, em Aracruz. No estado de São Paulo vivem povos como os <b>guarani</b> e os <b>kaingang</b>; há aldeias guarani até dentro da cidade de São Paulo.</p>'},
+ {id:'farinha',x:-64.5,z:10.5,t:'A casa de farinha',sub:'Escambo: um machado por farinha',
+  txt:'<p>As mulheres tupiniquins fazem <b>farinha de mandioca</b>. A mandioca daqui é <b>brava</b>: crua, é venenosa. Elas descascam e <b>ralam</b> as raízes, colocam a massa no <b>tipiti</b> para espremer o caldo venenoso, peneiram e <b>torram</b> a farinha num grande forno de barro.</p>'+TIPITI_SVG+'<p>Os portugueses aprenderam tudo isso com as indígenas. Sem a farinha de mandioca, que dura muitos dias sem estragar, os colonos não teriam sobrevivido aqui. Eles a chamavam de <b>"pão da terra"</b>.</p><p class="hoje">Farinha, <b>tapioca</b>, <b>beiju</b> e polvilho (do pão de queijo) vêm desse conhecimento indígena.</p>',
+  act:()=>S.farinha?null:{l:'Trocar o machado pela farinha',f:escambo}},
+ {id:'roca',x:ROCA.x1+2.5,z:ROCA.z0+6,t:'A roça de mandioca',sub:'Trabalho das mulheres',
+  txt:'<p>Para abrir uma roça, os homens derrubam um pedaço da mata e <b>queimam</b> os troncos; as cinzas adubam a terra. Depois, as <b>mulheres</b> plantam e colhem: mandioca, milho, feijão, abóbora, batata-doce, amendoim.</p><p>É aqui que um <b>machado de ferro</b> faz diferença: com ele, derrubar uma árvore leva muito menos tempo que com um machado de pedra. Por isso os indígenas queriam tanto as ferramentas dos europeus.</p><p class="hoje">A queimada ainda é usada para abrir roças e pastos no Brasil, mas hoje é controlada por lei, porque destrói florestas e polui o ar.</p>'},
+ {id:'fonte',x:FONTE.x,z:FONTE.z+4.6,t:'A fonte da vila',sub:'Água do morro',lab:[FONTE.x,6.5,FONTE.z-2],w:6,
+  txt:'<p>As casas não têm água encanada. A água limpa vem desta <b>fonte</b>, que nasce no morro. Todos os dias, mulheres e pessoas escravizadas vêm encher os potes de barro e levam na cabeça.</p><p>Anos depois, a tradição vai contar que o padre jesuíta <b>José de Anchieta</b> vinha aqui ensinar as crianças. Por isso o lugar ganhou o nome de <b>Biquinha de Anchieta</b>. Mas, em 1548, Anchieta ainda não tinha chegado: ele só viria em 1553.</p><p class="hoje">A <b>Biquinha de Anchieta</b> ainda existe em São Vicente e pode ser visitada.</p>'},
+ {id:'canavial',x:-16,z:-45,t:'O canavial',sub:'Cana de açúcar',lab:[-31,8,-48],w:7,
+  txt:'<p>A <b>cana-de-açúcar</b> veio da Ásia. Os portugueses já a plantavam na <b>ilha da Madeira</b>, e a trouxeram para cá porque aqui o clima é quente e úmido, como ela gosta.</p><p>Quem corta a cana são, na maioria, <b>indígenas escravizados</b>. Os portugueses os chamavam de <b>"negros da terra"</b>. O trabalho vai do nascer ao pôr do sol.</p>'},
+ {id:'engenho',x:-22,z:-60.5,t:'Engenho de São Jorge',sub:'O engenho dos Schetz',lab:[-44,12,-72],w:11,
+  txt:'<p>Este é o engenho mais importante da ilha. Foi montado por volta de <b>1534</b> por <b>Martim Afonso de Sousa</b> e seus sócios, e por isso era chamado de <b>Engenho do Governador</b>. Depois foi comprado por uma família de comerciantes de <b>Antuérpia</b>, os <b>Schetz</b>. O dono é Erasmo Schetz: por isso o povo diz <b>Engenho dos Erasmos</b>.</p><p>Os donos moram na Europa e nunca vieram aqui. Quem manda no dia a dia é um <b>feitor</b>.</p><p>Um engenho é uma <b>fábrica</b>: um conjunto de prédios onde a cana vira açúcar. Siga o caminho do açúcar.</p><p class="hoje">As <b>ruínas</b> deste engenho ainda existem, em Santos. Pertencem à USP e podem ser visitadas de graça.</p>',
+  act:()=>({l:S.acucar?'Seguir o caminho de novo':'Seguir o caminho do açúcar',f:startAcucar})},
+ {id:'moenda',x:MOENDA.x+3.2,z:MOENDA.z+5.2,t:'A moenda e a roda d\'água',sub:'Onde a cana é espremida',
+  txt:'<p>A <b>roda d\'água</b> gira com a água do riacho que chega pela <b>calha</b> de madeira. A roda faz girar os <b>três rolos</b> da moenda, que espremem a cana. Sai o caldo, a <b>garapa</b>.</p><p>Muitos engenhos não têm riacho e usam <b>bois</b> para girar a moenda. Era um trabalho perigoso: uma distração, e a mão de quem empurrava a cana era puxada pelos rolos.</p>'},
+ {id:'caldeiras',x:CALD.x-2,z:CALD.z+6.2,t:'A casa das caldeiras',sub:'Fogo dia e noite',
+  txt:'<p>Aqui o caldo <b>ferve</b> em grandes tachos de <b>cobre</b>. Os trabalhadores tiram a espuma com escumadeiras e passam o caldo de um tacho para outro, até virar um melado grosso.</p><p>No tempo da <b>safra</b>, o fogo não apaga: trabalha-se dia e noite, em turnos. As fornalhas queimam montanhas de <b>lenha</b>, e a mata em volta do engenho vai sendo derrubada.</p>'},
+ {id:'purgar',x:PURG.x+3,z:PURG.z+5,t:'A casa de purgar',sub:'Onde o açúcar fica branco',lab:[PURG.x,9.5,PURG.z],w:8,
+  txt:'<p>O melado vai para <b>formas de barro</b> em forma de cone, com um furo embaixo. Por cima, põe-se barro molhado: a água desce devagar e "lava" o açúcar, que vai ficando <b>branco</b>. Isso leva semanas.</p>'+FORMA_SVG+'<p>Do melaço que escorre pelo furo também se fazia <b>aguardente</b>.</p>'},
+ {id:'moradias',x:-44,z:-80,t:'Onde vivem os escravizados',sub:'130 pessoas',
+  txt:'<p>Nestas casas baixas de barro e palha vivem as pessoas escravizadas do engenho. A carta de 1548 conta que eram <b>umas 130</b>. Metade delas não podia trabalhar no pesado, porque eram <b>crianças</b> ou <b>velhos</b>: eram famílias inteiras.</p><p>A maioria era <b>indígena</b>. Muitos morriam de doenças trazidas pelos europeus, como a varíola e o sarampo, contra as quais os indígenas não tinham defesa. Outros fugiam para a mata.</p><p class="hoje">A escravidão acabou no Brasil em <b>1888</b>, com a Lei Áurea: o Brasil foi o último país das Américas a acabar com ela. Hoje, obrigar alguém a trabalhar como escravo é <b>crime</b>.</p>'},
+];
+TALKS.forEach(t=>PLACES.push({id:t.id,x:t.x+Math.sin(t.rot)*1.6,z:t.z+Math.cos(t.rot)*1.6,t:'Alguém quer conversar',sub:t.who,
+  txt:t.pages[0],act:()=>({l:(S.talks&&S.talks[t.id])?'Conversar de novo':'Conversar',f:()=>talkDialog(t)})}));
+QUESTS.forEach(q=>PLACES.push({id:q.id,x:q.x+Math.sin(q.rot)*1.6,z:q.z+Math.cos(q.rot)*1.6,t:'Uma pergunta para Pedro',sub:q.who,
+  txt:'<p>'+q.ask+'</p>',act:()=>({l:(S.qs&&S.qs[q.id])?'Responder de novo':'Responder',f:()=>askDialog(q)})}));
+const ringGeo=new THREE.TorusGeometry(1.4,.11,8,32);ringGeo.rotateX(Math.PI/2);
+PLACES.forEach(p=>{p.seen=false;p.ring=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color:0xe8b060}));p.ring.position.set(p.x,GY(p.x,p.z)+.25,p.z);scene.add(p.ring);
+  if(p.lab)label(p.t,p.lab[0],H(p.lab[0],p.lab[2])+p.lab[1],p.lab[2],p.w||9);});
+label('Vila de São Vicente',2,13,-2,12);
+
+// ---------- cartão ----------
+let nearPlace=null;
+function showCard(p){if(nearPlace===p)return;nearPlace=p;if(!p){$('card').hidden=true;stopSay();return;}p.pg=0;
+  p.seen=true;p.ring.material.color.set(0x86a35a);
+  if(p.gov)S.gov[p.id]=1;renderTasks();refreshCard();}
+function refreshCard(){const p=nearPlace;if(!p)return;
+  const pages=splitPages(p.txt);p.pg=Math.min(p.pg||0,pages.length-1);const k=p.pg;
+  $('cardTitle').textContent=p.t;$('cardSub').textContent=p.sub;
+  $('cardText').innerHTML=pages[k]+(pages.length>1?'<div class="pg">'+(k+1)+' / '+pages.length+'</div>':'');
+  const B=$('cardBtns');B.innerHTML='';const a=p.act&&p.act();
+  if(a){const b=document.createElement('button');b.textContent=a.l+' (E)';b.onclick=a.f;B.appendChild(b);}
+  if(pages.length>1){const m=document.createElement('button');m.className=a?'ghost':'';m.textContent=k<pages.length-1?'Mais ▸'+(a?'':' (E)'):'◂ Voltar ao início';m.onclick=()=>{p.pg=k<pages.length-1?k+1:0;refreshCard();};B.appendChild(m);}
+  B.appendChild(spkBtn(()=>pages[k],p.sub));
+  $('card').hidden=false;say(pages[k],p.sub);}
+
+// ---------- controles ----------
+const keys={};
+const joy={x:0,y:0,id:null};
+function resetJoystick(){joy.id=null;joy.x=joy.y=0;$('knob').style.transform='';}
+function resetControls(){for(const k in keys)keys[k]=false;resetJoystick();}
+addEventListener('keydown',e=>{
+  if(!started||e.altKey||e.ctrlKey||e.metaKey)return;
+  if(e.code==='Escape'&&P.locked){e.preventDefault();unlockScene();return;}
+  keys[e.code]=true;
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)&&document.activeElement.tagName!=='BUTTON')e.preventDefault();
+  if(e.repeat)return;
+  if(e.code==='KeyE'&&!P.locked&&!$('card').hidden&&$('dlg').hidden){const b=$('cardBtns').querySelector('button');if(b){e.preventDefault();b.click();}}
+  if((e.code==='Enter'||e.code==='Space')&&!$('dlg').hidden&&document.activeElement.tagName!=='BUTTON'){
+    const b=$('dBtns').querySelector('button[data-main]');if(b){e.preventDefault();b.click();}
+  }
+});
+addEventListener('keyup',e=>{keys[e.code]=false;});
+addEventListener('blur',resetControls);
+document.addEventListener('visibilitychange',()=>{if(document.hidden){resetControls();saveProgress();}});
+addEventListener('pagehide',saveProgress);
+{const J=$('joy'),K=$('knob');
+ const set=(e)=>{const r=J.getBoundingClientRect();let dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);const m=Math.hypot(dx,dy),R=Math.max(1,r.width/2-20);if(m>R){dx*=R/m;dy*=R/m;}joy.x=dx/R;joy.y=dy/R;K.style.transform=`translate(${dx}px,${dy}px)`;};
+ J.addEventListener('pointerdown',e=>{if(joy.id!==null)return;joy.id=e.pointerId;J.setPointerCapture(e.pointerId);set(e);});
+ J.addEventListener('pointermove',e=>{if(e.pointerId===joy.id)set(e);});
+ const end=e=>{if(e.pointerId===joy.id)resetJoystick();};
+ J.addEventListener('pointerup',end);J.addEventListener('pointercancel',end);J.addEventListener('lostpointercapture',end);
+}
+
+// ---------- mapa ----------
+const map=$('map'),mc=map.getContext('2d');
+const MAP_BOUNDS={x0:-160,x1:90,z0:-150,z1:135};
+const MAP_X_SCALE=340/(MAP_BOUNDS.x1-MAP_BOUNDS.x0);
+const MAP_Z_SCALE=340/(MAP_BOUNDS.z1-MAP_BOUNDS.z0);
+const MX=x=>(x-MAP_BOUNDS.x0)*MAP_X_SCALE, MZ=z=>(z-MAP_BOUNDS.z0)*MAP_Z_SCALE;
+function target(){
+  if(!S.farinha)return[-64.5,10.5];
+  if(!TASKS[1].done()){for(const id of['camara','pelourinho','igreja','tranqueira']){const p=PLACES.find(q=>q.id===id);if(!S.gov[id])return[p.x,p.z];}}
+  if(!S.acucar)return[-22,-60.5];if(!S.camara)return[CAM.x+11,CAM.z+3.5];if(!S.home)return[PEDRO_HOUSE.x,PEDRO_HOUSE.z-4.4];return null;}
+function drawMap(){
+  mc.clearRect(0,0,340,340);
+  mc.fillStyle='rgba(46,115,145,.55)';mc.beginPath();mc.moveTo(MX(SHORE(MAP_BOUNDS.z0)),0);for(let z=MAP_BOUNDS.z0;z<=MAP_BOUNDS.z1;z+=5)mc.lineTo(MX(SHORE(z)),MZ(z));mc.lineTo(340,340);mc.lineTo(340,0);mc.fill();
+  mc.fillStyle='rgba(60,90,40,.35)';for(const[x,z,r]of[[-85,-125,40],[40,-118,30]]){mc.beginPath();mc.arc(MX(x),MZ(z),r*MAP_X_SCALE,0,7);mc.fill();}
+  mc.strokeStyle='rgba(220,180,130,.65)';mc.lineWidth=5;for(const r of ROADS){mc.beginPath();mc.moveTo(MX(r[0][0]),MZ(r[0][1]));mc.lineTo(MX(r[1][0]),MZ(r[1][1]));mc.stroke();}
+  mc.strokeStyle='rgba(156,192,230,.8)';mc.lineWidth=2.5;mc.strokeRect(MX(VILA.x0),MZ(VILA.z0),(VILA.x1-VILA.x0)*MAP_X_SCALE,(VILA.z1-VILA.z0)*MAP_Z_SCALE);
+  mc.fillStyle='rgba(143,174,74,.45)';mc.fillRect(MX(CANA.x0),MZ(CANA.z0),(CANA.x1-CANA.x0)*MAP_X_SCALE,(CANA.z1-CANA.z0)*MAP_Z_SCALE);
+  mc.fillStyle='rgba(90,162,196,.9)';mc.lineWidth=3;mc.strokeStyle='rgba(90,162,196,.9)';mc.beginPath();STREAM.forEach(([x,z],i)=>i?mc.lineTo(MX(x),MZ(z)):mc.moveTo(MX(x),MZ(z)));mc.stroke();
+  mc.font='bold 20px Alegreya Sans, sans-serif';mc.textAlign='center';mc.fillStyle='#efe4c8';
+  mc.fillText('Vila',MX(2),MZ(-2));mc.fillText('Aldeia',MX(ALDEIA.x),MZ(ALDEIA.z-12));mc.fillText('Engenho',MX(-44),MZ(-80));mc.fillText('Mar',MX(64),MZ(40));
+  for(const p of PLACES){mc.fillStyle=p.seen?'#86a35a':'#e8b060';mc.beginPath();mc.arc(MX(p.x),MZ(p.z),4.5,0,7);mc.fill();}
+  const t=target();if(t){mc.strokeStyle='#fff';mc.lineWidth=3;mc.beginPath();mc.arc(MX(t[0]),MZ(t[1]),15+Math.sin(performance.now()/300)*4,0,7);mc.stroke();}
+  mc.save();mc.translate(MX(P.x),MZ(P.z));mc.rotate(-P.a+Math.PI);mc.fillStyle='#fff';mc.strokeStyle='#15130f';mc.lineWidth=3;
+  mc.beginPath();mc.moveTo(0,-14);mc.lineTo(10,10);mc.lineTo(0,5);mc.lineTo(-10,10);mc.closePath();mc.stroke();mc.fill();mc.restore();
+}
+
+// ---------- textos em pedaços curtos ----------
+function splitPages(html){
+  // DOM real para não cortar tags <b>, <i> ou <span> no meio das frases.
+  const root=document.createElement('div');root.innerHTML=html;
+  const out=[];
+  for(const block of root.childNodes){
+    if(block.nodeType!==1){if(block.textContent.trim())out.push(block.textContent);continue;}
+    if(block.tagName!=='P'||block.matches('.src,.hoje')||block.textContent.length<320){
+      out.push(block.outerHTML);continue;
+    }
+    const plain=block.textContent;
+    const ends=[];
+    const re=/(?<=[.!?"”»])\s+(?=[A-ZÀ-ÚÇ"“(<])/g;
+    let hit;
+    while((hit=re.exec(plain)))ends.push(hit.index);
+    ends.push(plain.length);
+    const ranges=[];let start=0,previous=0;
+    for(const end of ends){
+      if(end-start>300&&previous>start){ranges.push([start,previous]);start=previous;}
+      previous=end;
+    }
+    ranges.push([start,plain.length]);
+    const walker=document.createTreeWalker(block,NodeFilter.SHOW_TEXT);
+    const texts=[];let node,total=0;
+    while((node=walker.nextNode())){texts.push({node,start:total,end:total+node.length});total+=node.length;}
+    if(!texts.length){out.push(block.outerHTML);continue;}
+    const locate=i=>{
+      for(const t of texts)if(i<=t.end)return[t.node,Math.max(0,i-t.start)];
+      return[texts[texts.length-1].node,texts[texts.length-1].node.length];
+    };
+    for(const [a,b] of ranges){
+      const x=locate(a),y=locate(b),r=document.createRange();
+      r.setStart(x[0],x[1]);r.setEnd(y[0],y[1]);
+      const p=block.cloneNode(false);p.appendChild(r.cloneContents());out.push(p.outerHTML);
+    }
+  }
+  return out.length?out:[html];
+}
+// ---------- vozes ----------
+const VOICE={on:false,v:null};
+function pickVoice(){const vs=speechSynthesis.getVoices();VOICE.v=vs.find(v=>/pt[-_]BR/i.test(v.lang))||vs.find(v=>/^pt/i.test(v.lang))||null;}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+const PROF={homem:[.9,.95],velho:[.72,.85],mulher:[1.3,1],crianca:[1.55,1.05],principal:[.7,.82],narrador:[1,.98]};
+function profFor(who){const w=(who||'').toLowerCase();
+  if(/principal|tupiniquim fala/.test(w))return'principal';if(/menin|garot|crian/.test(w))return'crianca';
+  if(/potira|mãe|moradora|mulher|uma /.test(w))return'mulher';if(/ramalho|vigário|juiz|velh/.test(w))return'velho';
+  if(/^um |^o |antônio|gonçalo|mestre|marinheiro|vereador|degredado|comerciante|pescador/.test(w))return'homem';return'narrador';}
+function say(html,who,force){
+  if(!(VOICE.on||force)||!('speechSynthesis' in window))return;
+  try{
+    speechSynthesis.cancel();
+    const t=html.replace(/<svg[\s\S]*?<\/svg>/g,'').replace(/<div class="pg">[\s\S]*?<\/div>/g,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+    if(!t)return;
+    speechSynthesis.resume();
+    const u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';
+    if(VOICE.v)u.voice=VOICE.v;
+    const [pi,ra]=PROF[profFor(who)];u.pitch=pi;u.rate=ra;
+    speechSynthesis.speak(u);
+  }catch(e){console.warn('A voz falhou, mas o jogo pode continuar:',e);}
+}
+function stopSay(){if('speechSynthesis' in window){try{speechSynthesis.cancel();}catch(e){console.warn('Não foi possível interromper a voz:',e);}}}
+let quiet=null;
+function hideDlg(){
+  $('dlg').hidden=true;
+  stopSay();
+  let b=null,bd=5;
+  for(const p of PLACES){const d=Math.hypot(P.x-p.x,P.z-p.z);if(d<bd){bd=d;b=p;}}
+  quiet=b;
+}
+function spkBtn(getHtml,who){const e=document.createElement('button');e.className='ghost spk';e.textContent='🔊';e.title='Ouvir este texto';e.setAttribute('aria-label','Ouvir este texto');e.onclick=()=>say(getHtml(),who,true);return e;}
+$('voiceBtn').onclick=()=>{VOICE.on=!VOICE.on;const b=$('voiceBtn');b.textContent=VOICE.on?'🔊 Vozes: ligadas':'🔊 Vozes: desligadas';b.setAttribute('aria-pressed',String(VOICE.on));
+  if(!VOICE.on)stopSay();else if(!('speechSynthesis' in window)){b.textContent='🔊 Vozes: não disponíveis neste navegador';VOICE.on=false;}
+  else say('Vozes ligadas. Agora os quadros e as pessoas falam.','narrador',true);try{localStorage.setItem('pedroVoz',VOICE.on?'1':'0');}catch(e){}};
+try{if(localStorage.getItem('pedroVoz')==='1'&&'speechSynthesis' in window){VOICE.on=true;$('voiceBtn').textContent='🔊 Vozes: ligadas';$('voiceBtn').setAttribute('aria-pressed','true');}}catch(e){}
+let seq=[],si=0;
+function runSeq(steps){seq=steps;si=0;seq[0]();}
+function next(){si++;if(seq[si])seq[si]();}
+function dlg(role,who,html,btns){
+  const pages=splitPages(html);let k=0;const B=$('dBtns');
+  function render(){
+    setMin('dlg',false);$('dRole').textContent=role;$('dWho').textContent=who;
+    $('dTxt').innerHTML=pages[k]+(pages.length>1?'<div class="pg">'+(k+1)+' / '+pages.length+'</div>':'');B.innerHTML='';
+    if(k<pages.length-1){const e=document.createElement('button');e.textContent='Continuar ▸';e.dataset.main='1';e.onclick=()=>{k++;render();};B.appendChild(e);}
+    else (btns||[{t:'Continuar ▸',f:next,main:true}]).forEach(b=>{const e=document.createElement('button');e.textContent=b.t;if(b.ghost)e.className='ghost';if(b.main)e.dataset.main='1';e.onclick=b.f;B.appendChild(e);});
+    B.appendChild(spkBtn(()=>pages[k],who));
+    $('dlg').hidden=false;$('dlg').scrollTop=0;say(pages[k],who);
+  }
+  render();
+}
+function lockScene(){
+  resetControls();
+  P.locked=true;
+  $('card').hidden=true;
+  nearPlace=null;
+  $('joy').hidden=true;
+  $('resumeBtn').hidden=false;
+}
+function unlockScene(){
+  // A liberação deve ocorrer mesmo se a voz ou o fechamento do diálogo falhar.
+  try{hideDlg();}catch(e){console.warn('Falha ao fechar o diálogo:',e);$('dlg').hidden=true;}
+  finally{
+    P.locked=false;
+    S.inCamara=false;
+    CAMVIEW=null;
+    lockT=0;
+    resetControls();
+    $('joy').hidden=false;
+    $('resumeBtn').hidden=true;
+    $('card').hidden=true;
+    nearPlace=null;
+    try{canvas.focus({preventScroll:true});}catch(e){canvas.focus();}
+    saveProgress();
+  }
+}
+$('resumeBtn').onclick=unlockScene;
+let CAMVIEW=null;
+function moveP(x,z,lx,lz){P.x=x;P.z=z;P.a=face(x,z,lx,lz);}
+
+// ---------- escambo na aldeia ----------
+function escambo(){lockScene();
+  runSeq([
+   ()=>dlg('Casa de farinha · escambo','Pedro fala em tupi','<p>Pedro cumprimenta a tia na <b>língua tupi</b> e mostra o <b>machado de ferro</b>. Ela pega o machado, passa o dedo no fio e chama as outras mulheres para ver.</p><p>Para os tupiniquins, uma ferramenta de ferro é preciosa: com ela, derrubar uma árvore para abrir uma roça leva muito menos tempo do que com um machado de pedra.</p>'),
+   ()=>{S.farinha=true;S.machado=false;renderTasks();dlg('Casa de farinha · escambo','A troca está feita','<p>Em troca, ela enche um <b>paneiro</b> (um cesto forrado de folhas) com <b>farinha de mandioca</b> torrada. Dá para a família comer por muitos dias.</p><p>Ninguém usou dinheiro: foi uma troca direta de uma coisa por outra. Isso é o <b>escambo</b>, o mesmo tipo de negócio que os portugueses faziam com os indígenas pelo pau-brasil, nos primeiros anos depois de 1500.</p><p class="src">Mas atenção: o que cada lado achava da troca era diferente. Para os indígenas, trocar presentes criava <b>alianças</b> e obrigações entre parentes. Para muitos europeus, era só comércio.</p>',
+     [{t:'Voltar a passear ▸',main:true,f:unlockScene}]);}]);}
+
+// ---------- o caminho do açúcar ----------
+const ACU=[
+ {l:'Cortar a cana no canavial',at:[-31,-44],look:[-38,-44],cam:[-25,-41],h:6.5,
+  ex:'<p>Os cortadores derrubam a cana com <b>foices</b>, bem rente ao chão, onde o caldo é mais doce. A cana cortada precisa ser moída em <b>um ou dois dias</b>, senão azeda. Por isso o canavial fica perto da moenda, e os feixes seguem logo no <b>carro de bois</b>.</p>'},
+ {l:'Moer a cana na moenda',at:[MOENDA.x+3.6,MOENDA.z+4.6],look:[MOENDA.x,MOENDA.z],cam:[MOENDA.x+8,MOENDA.z+10],
+  ex:'<p>Na <b>moenda</b>, a cana é espremida entre <b>três rolos</b>. Quem gira os rolos é a <b>roda d\'água</b>, empurrada pela água do riacho que chega pela calha. Sai o caldo de cana, a <b>garapa</b>, que escorre para um cocho de cobre.</p>'},
+ {l:'Ferver o caldo nas caldeiras',at:[CALD.x,CALD.z+5],look:[CALD.x,CALD.z-1],cam:[CALD.x+3,CALD.z+11],
+  ex:'<p>Nas <b>caldeiras</b>, o caldo ferve em tachos de <b>cobre</b>, passando de um para outro até virar um <b>melado</b> grosso. O <b>mestre de açúcar</b> decide quando está no ponto. Na safra, o fogo arde dia e noite, e a mata em volta vira lenha.</p>'},
+ {l:'Branquear o açúcar nas formas de barro',at:[PURG.x,PURG.z+5],look:[PURG.x,PURG.z-1],cam:[PURG.x+4,PURG.z+11],
+  ex:'<p>Na <b>casa de purgar</b>, o melado endurece em <b>formas de barro</b>. Por cima, barro molhado: a água desce devagar e deixa o açúcar <b>branco</b>. Leva semanas.</p>'+FORMA_SVG},
+ {l:'Secar, separar e encaixotar',at:[SECAR.x,SECAR.z+3.8],look:[SECAR.x,SECAR.z],cam:[SECAR.x+3,SECAR.z+9],
+  ex:'<p>O "pão de açúcar" sai da forma, é quebrado e <b>seca ao sol</b>. A parte de cima é o <b>açúcar branco</b>, o mais caro; a de baixo, escura, é o <b>mascavo</b>. Tudo vai para <b>caixas</b> de madeira, pesadas em <b>arrobas</b> (1 arroba é quase 15 kg).</p>'},
+ {l:'Levar ao porto e embarcar para a Europa',at:[47,1],look:[SHIP.x,SHIP.z],cam:[42,8],
+  ex:'<p>O carro de bois leva as caixas até o <b>porto</b>. O batel leva até a nau, que segue para <b>Lisboa</b>. De lá, muito açúcar vai para <b>Antuérpia</b>, onde os Schetz, donos do engenho, vendem para toda a Europa.</p>'},
+];
+function startAcucar(){lockScene();let k=0;
+  const ask=(msg)=>{const opts=ACU.map((s,i)=>i).filter(i=>i>=k);for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}
+    dlg('O caminho do açúcar · etapa '+(k+1)+' de '+ACU.length,'Qual é a próxima etapa?','<p>'+(msg?msg+' ':'')+(k===0?'Ajude Pedro a seguir a cana até virar açúcar no navio. Escolha a <b>primeira etapa</b>.':'E agora, para onde vai?')+'</p>',
+      opts.map(i=>({t:ACU[i].l,ghost:true,f:()=>{if(i!==k){ask('<b>Ainda não.</b> "'+ACU[i].l+'" vem depois. Pense: o que precisa acontecer antes?');return;}
+        const st=ACU[k];moveP(st.at[0],st.at[1],st.look[0],st.look[1]);CAMVIEW={pos:[st.cam[0],st.cam[1]],look:[st.look[0],st.look[1]],h:st.h};k++;
+        dlg('✓ Isso! · etapa '+k+' de '+ACU.length,st.l,st.ex,[{t:k<ACU.length?'Próxima etapa ▸':'Concluir ▸',main:true,f:()=>k<ACU.length?ask():finish()}]);}})));};
+  const finish=()=>{S.acucar=true;renderTasks();dlg('O caminho do açúcar','Da cana ao navio',
+    '<p>Cana → moenda → caldeiras → formas de barro → caixas → navio. Para fazer açúcar era preciso <b>terra</b>, <b>máquinas caras</b>, <b>especialistas</b>, <b>navios</b> e, principalmente, <b>muita gente trabalhando à força</b>.</p><p>Por isso o açúcar mudou a colonização: os portugueses deixaram de só passar pela costa para buscar pau-brasil e passaram a <b>morar aqui</b>, ocupar terras e escravizar pessoas.</p>',
+    [{t:'Voltar a passear ▸',main:true,f:unlockScene}]);};
+  ask();}
+
+// ---------- a reunião da Câmara ----------
+function startCamara(force=false){
+  if(!force&&(!S.farinha||!TASKS[1].done()||!S.acucar)){
+    const needed=[];
+    if(!S.farinha)needed.push('trocar o machado por farinha na aldeia');
+    if(!TASKS[1].done())needed.push('visitar os quatro lugares que organizam a vila');
+    if(!S.acucar)needed.push('seguir o caminho do açúcar no engenho');
+    lockScene();
+    dlg('Antes da reunião','Pedro ainda tem tarefas',
+      '<p>Antes de participar da Câmara, Pedro precisa:</p><p>'+needed.join('; ')+'.</p><p>O professor também pode abrir a reunião diretamente pelo menu <b>Atalhos</b>.</p>',
+      [{t:'Voltar a passear ▸',main:true,f:unlockScene}]);return;
+  }
+  lockScene();S.inCamara=true;
+  chief.g.visible=true;comps.forEach(c=>c.g.visible=true);
+  moveP(CAMSLOT.pedro.x,CAMSLOT.pedro.z,CAMSLOT.table.x,CAMSLOT.table.z);
+  CAMVIEW={pos:[CAM.x+12.5,CAM.z+4.5],look:[CAMSLOT.table.x+1.5,CAMSLOT.table.z],h:3.6,ly:-.4};
+  const say2=(who,html,btns)=>dlg('Casa da Câmara · fim da tarde',who,html,btns);
+  let fiel=null;
+  runSeq([
+   ()=>say2('A reunião vai começar','<p>Debaixo do alpendre, em volta da mesa, estão os oficiais da Câmara: o <b>juiz ordinário</b>, de chapéu; dois <b>vereadores</b>; e o <b>escrivão</b>, com a pena na mão, pronto para anotar tudo no <b>livro de atas</b>. Todos são <b>homens bons</b>: portugueses donos de terras, engenhos e escravizados.</p><p>Chamaram Pedro porque chegou um <b>principal</b>, um chefe tupiniquim, para falar com a Câmara. Quase ninguém ali fala bem o tupi. Pedro vai ser o <b>"língua"</b>: o intérprete.</p>'),
+   ()=>{chief.gesture=1;say2('O principal tupiniquim fala','<p>"Nós somos amigos dos portugueses. Lutamos ao lado de vocês contra os tupinambás. Demos nossas filhas como esposas aos homens desta vila."</p><p>"Mas, há três luas, homens daqui entraram na minha aldeia e levaram <b>seis pessoas</b>: dois homens, três mulheres e um menino. Disseram que eram inimigos. <b>Não são.</b> São meus parentes. Quero que voltem para casa."</p>');},
+   ()=>{chief.gesture=0;say2('O que Pedro faz?','<p>Os vereadores esperam a tradução. Pedro percebe que o juiz já está de cara fechada. O pai de Pedro vende cana para esses homens...</p><p><b>Como Pedro traduz?</b></p>',[
+     {t:'Traduz tudo, palavra por palavra',f:()=>{fiel=true;next();}},
+     {t:'Suaviza: diz só que o chefe "pede um favor"',f:()=>{fiel=false;next();}}]);},
+   ()=>say2(fiel?'Pedro traduz tudo':'Pedro suaviza',fiel?'<p>Pedro respira fundo e traduz tudo: a aliança, as esposas, os seis parentes levados. O principal olha para Pedro e acena com a cabeça: entendeu que foi bem traduzido.</p><div class="fb ok">O <b>língua</b> tinha muito poder: dele dependia o que cada lado entendia do outro. Um intérprete honesto ajudava a manter a paz.</div>':'<p>Pedro diz aos vereadores que o chefe "pede um favor sobre umas pessoas da aldeia". O principal percebe que a fala ficou curta demais e se irrita.</p><div class="fb no">Quando o <b>língua</b> esconde partes da fala, um lado não entende o outro. Muitas brigas e guerras começaram assim. Pedro conta o resto, e o principal se acalma um pouco.</div>'),
+   ()=>{officials[1].gesture=2;say2('Respondem os vereadores','<p>Um vereador, dono de muitas roças, fala alto: <b>"Esses índios foram pegos em guerra justa. São escravos e ficam com quem os capturou. Precisamos de braços para os engenhos!"</b></p><p>O outro vereador discorda: <b>"Se não devolvermos, os tupiniquins deixam de ser nossos aliados. E sem eles, quem defende a vila dos tupinambás?"</b></p>');},
+   ()=>{officials[1].gesture=0;say2('Hora de decidir','<p>O juiz manda votar. <b>Pedro pode votar?</b></p>',[
+     {t:'Pode. Ele mora na vila e está na reunião.',ghost:true,f:()=>{$('dTxt').innerHTML='<div class="fb no"><b>Não pode.</b> Pedro é jovem, é mameluco e não tem terras: não é um <b>homem bom</b>. Ele traduz, mas não decide.</div>';fixNext();}},
+     {t:'Não. Só os homens bons decidem.',ghost:true,f:()=>{$('dTxt').innerHTML='<div class="fb ok"><b>Isso.</b> Pedro é jovem, é mameluco e não tem terras: não é um <b>homem bom</b>. Ele traduz, mas não decide. O principal também não vota: ele só pode pedir.</div>';fixNext();}}]);},
+   ()=>{say2('A decisão da Câmara','<p>Os oficiais votam. Decidem devolver <b>as três mulheres e o menino</b>. Os dois homens ficam como escravos no engenho, "até se provar que não eram inimigos".</p><p>O escrivão anota no livro de atas. O principal ouve a tradução de Pedro, fica um longo tempo calado e vai embora sem se despedir.</p>');},
+   ()=>say2('O que aconteceu depois','<p>Brigas assim aconteceram muitas vezes. Os colonos queriam trabalhadores; os povos indígenas queriam seus parentes e sua liberdade. Em <b>1562</b>, parte dos tupiniquins atacou a vila de São Paulo. Tibiriçá ficou do lado dos portugueses e lutou contra os próprios parentes.</p><p>Em <b>1570</b>, uma lei do rei Dom Sebastião proibiu escravizar indígenas, menos em "guerra justa". Na prática, a escravização indígena continuou por muito tempo em São Paulo.</p><p class="src">A reunião deste jogo foi <b>inventada</b>: as pessoas e a decisão não são reais. Mas ela foi escrita a partir de situações parecidas que aparecem em cartas e atas de câmaras do século XVI.</p>',
+     [{t:'Sair da Câmara ▸',main:true,f:endCamara}]),
+  ]);
+  function fixNext(){const B=$('dBtns');B.innerHTML='';const n=document.createElement('button');n.textContent='Continuar ▸';n.dataset.main='1';n.onclick=next;B.appendChild(n);B.appendChild(spkBtn(()=>$('dTxt').innerHTML,'narrador'));}
+}
+function endCamara(){S.camara=true;S.inCamara=false;duskT=1;renderTasks();chief.g.visible=false;comps.forEach(c=>c.g.visible=false);
+  moveP(CAM.x+12.5,CAM.z+7,PEDRO_HOUSE.x,PEDRO_HOUSE.z);collide();unlockScene();
+  setTimeout(()=>{if(started&&!S.home&&!P.locked){lockScene();dlg('Fim da tarde','O sol está se pondo',S.farinha?'<p>O sino da igreja toca. É hora de <b>voltar para casa</b> e levar a farinha para Potira. A casa fica na rua do sul, perto da tranqueira do leste.</p>':'<p>O sino da igreja toca. Pedro ainda está com o machado! Antes de voltar para casa, ele precisa <b>trocar o machado por farinha</b> na aldeia tupiniquim, a oeste da vila.</p>',[{t:'Continuar ▸',main:true,f:unlockScene}]);}},400);}
+
+// ---------- fim do dia ----------
+function goHome(){if(!S.farinha){lockScene();dlg('Em casa','Potira, a mãe de Pedro','<p>"Pedro! E a farinha? Volte à aldeia e troque o machado, antes que escureça."</p>',[{t:'Voltar a passear ▸',main:true,f:unlockScene}]);return;}
+  lockScene();
+  runSeq([
+   ()=>dlg('Em casa · noite','Potira, a mãe de Pedro','<p>Potira abre o paneiro e sorri. Com essa farinha e o peixe que Gonçalo trouxe, a família come a semana inteira. Ela começa a preparar <b>beiju</b> no fogo.</p><p>Pedro conta o dia: a aldeia, o engenho, a Câmara. Gonçalo fica sério quando ouve a decisão sobre os dois homens. Potira não diz nada: os levados eram de uma aldeia vizinha à dela.</p>'),
+   ()=>dlg('O que aconteceu depois','A colônia cresce',
+    '<p><b>1549</b>: o rei manda um <b>governador-geral</b>, Tomé de Sousa, para governar todo o Brasil a partir de Salvador, na Bahia. Com ele chegam os <b>jesuítas</b>.</p><p><b>1554</b>: os jesuítas Manuel da Nóbrega e José de Anchieta, com a ajuda de Tibiriçá, fundam o colégio de <b>São Paulo de Piratininga</b>, no planalto. Ali nasce a cidade de São Paulo.</p><p>Nas décadas seguintes, o açúcar cresce muito mais em <b>Pernambuco</b> e na <b>Bahia</b>, com milhares de africanos escravizados. São Vicente perde importância, e os paulistas passam a viver de roças, gado e da captura de indígenas no sertão.</p>'),
+   ()=>dlg('Para pensar com a turma','Por que os portugueses vieram morar aqui?',
+    '<p>Pedro viu os motivos ao longo do dia:</p><p>o <b>pau-brasil</b> e o medo de perder a terra para os <b>franceses</b>; o lucro do <b>açúcar</b>, que exigia morar aqui e escravizar pessoas; a vontade de <b>espalhar a fé católica</b>; e a ajuda dos <b>tupiniquins</b>, sem a qual a vila não teria sobrevivido.</p><p><b>Qual desses motivos você acha que pesou mais? Por quê?</b></p>',
+    [{t:'Continuar passeando ▸',main:true,f:()=>{S.home=true;renderTasks();unlockScene();}}]),
+  ]);}
+
+// ---------- colisão ----------
+function collide(){
+  const EPS=1e-7;
+  // Repetir evita que uma colisão empurre Pedro para dentro de outro objeto.
+  for(let pass=0;pass<3;pass++){
+    let adjusted=false;
+    for(const c of colliders){
+      if(c.seg){
+        const[ax,az,bx,bz]=c.seg,vx=bx-ax,vz=bz-az,L=vx*vx+vz*vz;
+        if(L<EPS)continue;
+        const t=Math.max(0,Math.min(1,((P.x-ax)*vx+(P.z-az)*vz)/L));
+        const qx=ax+vx*t,qz=az+vz*t,dx=P.x-qx,dz=P.z-qz,d=Math.hypot(dx,dz),R=c.r+.4;
+        if(d<R){
+          // No centro exato, escolher uma normal válida em vez de ignorar a cerca.
+          const inv=d>EPS?1/d:1/Math.sqrt(L);
+          const nx=d>EPS?dx*inv:-vz*inv,nz=d>EPS?dz*inv:vx*inv;
+          P.x=qx+nx*R;P.z=qz+nz*R;adjusted=true;
+        }
+        continue;
+      }
+      if(c.r){
+        let dx=P.x-c.x,dz=P.z-c.z,d=Math.hypot(dx,dz);
+        if(d<c.r+.4){
+          if(d<EPS){dx=1;dz=0;d=1;}
+          const R=c.r+.4;P.x=c.x+dx/d*R;P.z=c.z+dz/d*R;adjusted=true;
+        }
+        continue;
+      }
+      const dx=P.x-c.x,dz=P.z-c.z,angle=c.rot||0,cos=Math.cos(angle),sin=Math.sin(angle);
+      let lx=dx*cos-dz*sin,lz=dx*sin+dz*cos;
+      const hw=c.hw+.42,hd=c.hd+.42;
+      if(Math.abs(lx)<hw&&Math.abs(lz)<hd){
+        const px=hw-Math.abs(lx),pz=hd-Math.abs(lz);
+        if(px<pz)lx=Math.sign(lx||1)*hw;else lz=Math.sign(lz||1)*hd;
+        P.x=c.x+lx*cos+lz*sin;P.z=c.z-lx*sin+lz*cos;adjusted=true;
+      }
+    }
+    P.x=Math.max(-150,Math.min(80,P.x));P.z=Math.max(-140,Math.min(120,P.z));
+    if(!adjusted)break;
+  }
+}
+
+// ---------- laço ----------
+const camRay=new THREE.Raycaster(),camPos=new THREE.Vector3(),camLook=new THREE.Vector3();let started=false,last=performance.now(),t0=0;
+// Evita a visão tomada por paredes/telhados quando Pedro passa perto das casas.
+function cameraFollowTarget(py=GY(P.x,P.z)){
+  const eye=new THREE.Vector3(P.x,py+1.8,P.z);
+  const offsets=[0,.65,-.65,1.25,-1.25];
+  let fallback=null,bestDist=-1;
+  for(const offset of offsets){
+    const a=P.a+offset;
+    const desired=new THREE.Vector3(P.x-Math.sin(a)*7.5,py+3.6,P.z-Math.cos(a)*7.5);
+    desired.y=Math.max(desired.y,GY(desired.x,desired.z)+1.3,.8);
+    const dir=desired.clone().sub(eye),len=dir.length();
+    if(len<.01)continue;
+    dir.divideScalar(len);camRay.set(eye,dir);camRay.far=len;
+    const hit=camRay.intersectObjects(occluders,false)[0];
+    const clear=hit?Math.max(.55,hit.distance-.6):len;
+    if(clear>=len-.15)return desired;
+    if(clear>bestDist){bestDist=clear;fallback=eye.clone().addScaledVector(dir,Math.min(clear,len));}
+  }
+  return fallback||new THREE.Vector3(P.x,py+3,P.z-2);
+}
+function snapFollowCamera(){
+  const y=GY(P.x,P.z);
+  camPos.copy(cameraFollowTarget(y));
+  camLook.set(P.x,y+1.7,P.z);
+  camera.position.copy(camPos);
+  camera.lookAt(camLook);
+}
+
+function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=w/h<1?72:58;camera.updateProjectionMatrix();}
+addEventListener('resize',resize);resize();
+const cDay={sun:new THREE.Color(0xfff0d6),top:new THREE.Color(0x4f8fc8),bot:new THREE.Color(0xe3ece8),fog:new THREE.Color(0xcfdcd8)};
+const cDusk={sun:new THREE.Color(0xff8a48),top:new THREE.Color(0x2f3f7a),bot:new THREE.Color(0xf09a62),fog:new THREE.Color(0xc88f78)};
+let cullT=0,lockT=0,stopped=false,mapClock=0,autosaveClock=0;
+canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();stopped=true;resetControls();showFailure('A conexão com a placa gráfica foi interrompida. Recarregue o jogo para continuar do progresso salvo.');});
+function frame(now){
+  if(stopped)return;
+  try{step(now);}catch(e){
+    console.error('Erro no ciclo do jogo:',e);stopped=true;resetControls();
+    showFailure('Ocorreu um problema na execução do cenário. Recarregue a página para continuar do progresso salvo.');return;
+  }
+  requestAnimationFrame(frame);
+}
+function step(now){
+  const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;t0+=dt;
+  if(started){autosaveClock+=dt;if(autosaveClock>15){autosaveClock=0;saveProgress();}}
+  let speed=0;
+  if(P.locked&&$('dlg').hidden&&!S.inCamara){
+    lockT+=dt;
+    if(lockT>1.2)unlockScene();
+  }else lockT=0;
+  if(started&&!P.locked){
+    let fwd=0,turn=0;
+    if(keys.KeyW||keys.ArrowUp)fwd+=1;if(keys.KeyS||keys.ArrowDown)fwd-=1;
+    if(keys.KeyA||keys.ArrowLeft)turn+=1;if(keys.KeyD||keys.ArrowRight)turn-=1;
+    if(joy.id!==null){fwd+=-joy.y;turn+=-joy.x;}
+    fwd=Math.max(-1,Math.min(1,fwd));turn=Math.max(-1,Math.min(1,turn));
+    const run=keys.ShiftLeft||keys.ShiftRight||Math.hypot(joy.x,joy.y)>.95;
+    P.a+=turn*dt*2.3;const v=fwd*(run?11:6)*(fwd<0?.5:1);
+    const lx=P.x,lz=P.z;P.x+=Math.sin(P.a)*v*dt;P.z+=Math.cos(P.a)*v*dt;collide();speed=Math.abs(v);
+    if(!isFinite(P.x)||!isFinite(P.z)||(GY(P.x,P.z)<-.3)){P.x=lx;P.z=lz;}
+    let best=null,bd=4.5;for(const p of PLACES){const d=Math.hypot(P.x-p.x,P.z-p.z);if(d<bd){bd=d;best=p;}}
+    if(quiet&&Math.hypot(P.x-quiet.x,P.z-quiet.z)>6)quiet=null;
+    if(best&&best===quiet)best=null;
+    if(best)showCard(best);else if(nearPlace&&(nearPlace===quiet||Math.hypot(P.x-nearPlace.x,P.z-nearPlace.z)>7))showCard(null);
+  }
+  const py=GY(P.x,P.z);
+  player.g.position.set(P.x,py,P.z);player.g.rotation.y=P.a;player.anim(dt,speed);
+  statics.forEach(f=>f.anim(dt,0));
+  cullT-=dt;if(cullT<=0){cullT=.35;const cx=camera.position.x,cz=camera.position.z;
+    for(const f of FIGS){if(f===chief||comps.includes(f))continue;const e=f.g.matrixWorld.elements;f.g.visible=f===player||Math.hypot(e[12]-cx,e[14]-cz)<75;}}
+  for(const w of walkers){
+    let sp=0;const tg=w.path[w.i];const tx=tg[0]+w.off,tz=tg[1]+w.off;const d=Math.hypot(tx-w.x,tz-w.z);
+    if(w.wait>0)w.wait-=dt;
+    else if(d<.3){if(w.i+w.dir<0||w.i+w.dir>=w.path.length){w.dir*=-1;w.wait=2+rnd()*4;}w.i+=w.dir;}
+    else sp=w.sp;
+    if(sp){w.x+=(tx-w.x)/d*sp*dt;w.z+=(tz-w.z)/d*sp*dt;const ta=Math.atan2(tx-w.x,tz-w.z);let da=ta-w.f.g.rotation.y;da=Math.atan2(Math.sin(da),Math.cos(da));w.f.g.rotation.y+=da*Math.min(1,dt*5);}
+    w.f.g.position.set(w.x,GY(w.x,w.z),w.z);w.f.anim(dt,sp);
+  }
+  for(const p of PLACES){p.ring.rotation.y+=dt;p.ring.position.y=GY(p.x,p.z)+.25+Math.sin(t0*2+p.x)*.12;}
+  if(ANIM.wheel)ANIM.wheel.rotation.x-=dt*.6;
+  ANIM.rollers.forEach(r=>r.m.rotation.y+=dt*1.2*r.d);
+  ANIM.fires.forEach((f,i)=>{f.scale.y=1+Math.sin(t0*14+i*2)*.2;f.scale.x=1+Math.sin(t0*11+i)*.1;});
+  ANIM.smoke.forEach(s=>{s.t=(s.t+dt*.12)%1;s.m.position.set(s.x+s.t*5+Math.sin(t0+s.t*6)*.6,s.y+s.t*14,s.z-s.t*2);s.m.scale.setScalar(.6+s.t*3.2);s.m.material.opacity=.42*(1-s.t);});
+  ANIM.sails.forEach((s,i)=>s.rotation.x=Math.sin(t0*.7+i)*.03);
+  SEA_M.emissiveIntensity=.35+.08*Math.sin(t0*.8);
+
+  dusk+=(duskT-dusk)*Math.min(1,dt*.35);
+  sun.color.copy(cDay.sun).lerp(cDusk.sun,dusk);sun.intensity=1.3-.5*dusk;hemi.intensity=.66-.24*dusk;
+  skyU.top.value.copy(cDay.top).lerp(cDusk.top,dusk);skyU.bot.value.copy(cDay.bot).lerp(cDusk.bot,dusk);scene.fog.color.copy(cDay.fog).lerp(cDusk.fog,dusk);
+
+  let want,look;
+  if(CAMVIEW){const[cx,cz]=CAMVIEW.pos,[lx2,lz2]=CAMVIEW.look;want=new THREE.Vector3(cx,GY(cx,cz)+(CAMVIEW.h||4.5),cz);look=new THREE.Vector3(lx2,GY(lx2,lz2)+(CAMVIEW.ly??.5),lz2);}
+  else if(!started){const r=95,an=t0*.05;want=new THREE.Vector3(Math.sin(an)*r-15,48,Math.cos(an)*r-20);look=new THREE.Vector3(-10,3,-20);}
+  else{want=cameraFollowTarget(py);look=new THREE.Vector3(P.x,py+1.7,P.z);}
+  if(CAMVIEW||!started)want.y=Math.max(want.y,GY(want.x,want.z)+1.2,.8);
+  const k=started?Math.min(1,dt*(CAMVIEW?2.5:4)):1;camPos.lerp(want,k);camLook.lerp(look,k);
+  camera.position.copy(camPos);camera.lookAt(camLook);
+  sun.position.set(P.x+50-80*dusk,py+110-75*dusk,P.z+30);sun.target.position.set(P.x,py,P.z);
+  renderer.render(scene,camera);
+  if(started&&!$('map').hidden){mapClock+=dt;if(mapClock>=.08){mapClock=0;drawMap();}}
+}
+camPos.set(70,55,40);camLook.set(-10,3,-20);requestAnimationFrame(frame);
+
+// ---------- introdução ----------
+const INTRO=[
+ `<div class="eyebrow">A vida de Pedro, morador da vila</div><h1>São Vicente, <span>1548</span></h1>
+  <p>É uma manhã de <b>maio de 1548</b>, na ilha de São Vicente, no litoral do que hoje é o estado de São Paulo. <b>Pedro</b>, de 13 anos, mora na vila de São Vicente, a primeira vila fundada pelos portugueses nestas terras, em <b>1532</b>.</p>`,
+ `<div class="eyebrow">Quem é Pedro</div><h2>Um menino que fala duas línguas</h2>
+  <p>O pai de Pedro, <b>Gonçalo</b>, é um português que planta cana. A mãe, <b>Potira</b>, é <b>tupiniquim</b>. Filhos de portugueses com indígenas, como Pedro, eram chamados de <b>mamelucos</b>, e havia muitos na vila.</p>
+  <p>Pedro fala <b>português</b> e <b>tupi</b>. Por isso os adultos às vezes o chamam para ser o <b>"língua"</b>: o intérprete entre portugueses e indígenas.</p>
+  <p class="src" style="font-size:19px">Pedro e sua família foram inventados para este jogo. Os lugares, as datas e muitas pessoas que ele encontra são históricos.</p>`,
+ `<div class="eyebrow">O seu dia</div><h2>Você vai viver o dia de Pedro</h2>
+  <ol><li>Levar o <b>machado de ferro</b> à <b>aldeia tupiniquim</b> e trocar por farinha.</li><li>Conhecer os <b>lugares que organizam a vila</b>: igreja, Câmara, pelourinho e tranqueira.</li><li>Seguir o <b>caminho do açúcar</b> no engenho.</li><li>Ser o <b>intérprete</b> numa reunião da Câmara.</li><li>Voltar para casa.</li></ol>
+  <ul><li>Computador: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> ou setas para andar, <kbd>Shift</kbd> para correr, <kbd>E</kbd> para agir.</li><li>Celular ou tablet: use o círculo no canto da tela.</li><li>Chegue perto dos <b>círculos brilhantes</b>. O mapa mostra aonde ir. Pessoas com <b>?</b> ou <b>…</b> na cabeça querem falar com você. Ligue as <b>vozes</b> no quadro de tarefas para ouvir os textos.</li></ul>`,
+];
+let ip=0;
+function renderIntro(){
+  const lastP=ip===INTRO.length-1;
+  $('intro').innerHTML=INTRO[ip]+`<div class="row">${ip>0?'<button class="ghost" id="iBack">◂ Voltar</button>':''}
+   ${lastP?'<button id="bStart">'+(recoveredGame?'Continuar de onde parei':'Começar o dia')+'</button><button id="bSkip" class="ghost">Ir direto para o engenho</button>'+(recoveredGame?'<button id="bRestart" class="ghost">Recomeçar do zero</button>':''):'<button id="iNext">Continuar ▸</button>'}
+   <span class="dots">${ip+1} de ${INTRO.length}</span></div>`;
+  if($('iNext'))$('iNext').onclick=()=>{ip++;renderIntro();};
+  if($('iBack'))$('iBack').onclick=()=>{ip--;renderIntro();};
+  if($('bStart'))$('bStart').onclick=()=>begin(false);
+  if($('bSkip'))$('bSkip').onclick=()=>begin(true);
+  if($('bRestart'))$('bRestart').onclick=()=>{try{localStorage.removeItem(SAVE_KEY);}catch(e){}location.reload();};
+  const f=$('intro').querySelector('button:not(.ghost)');if(f)f.focus();
+}
+// ---------- atalhos (o professor leva Pedro direto a um lugar) ----------
+const JUMPS=[
+ {t:'Casa de Pedro',at:[PEDRO_HOUSE.x,PEDRO_HOUSE.z-5.5],look:[PEDRO_HOUSE.x,PEDRO_HOUSE.z]},
+ {t:'Aldeia tupiniquim',at:[-62,6],look:[ALDEIA.x,ALDEIA.z]},
+ {t:'Casa de farinha (escambo)',at:[-63,10.5],look:[-70,13]},
+ {t:'Roça de mandioca',at:[-62,40],look:[-80,46]},
+ {t:'Pelourinho',at:[PEL.x+3.5,PEL.z+3.5],look:[PEL.x,PEL.z]},
+ {t:'Igreja Matriz',at:[IGREJA.x,IGREJA.z+11],look:[IGREJA.x,IGREJA.z]},
+ {t:'Câmara e cadeia',at:[CAM.x+12,CAM.z+3.5],look:[CAM.x,CAM.z]},
+ {t:'Tranqueira e berços',at:[24,-22],look:[29,-26]},
+ {t:'Fonte (Biquinha)',at:[FONTE.x,FONTE.z+5.5],look:[FONTE.x,FONTE.z]},
+ {t:'Porto e nau',at:[42,-2.5],look:[SHIP.x,SHIP.z]},
+ {t:'Pau-brasil',at:[37,8],look:[PAU.x,PAU.z]},
+ {t:'Canavial',at:[-31,-44],look:[-40,-44]},
+ {t:'Engenho: entrada',at:[-20,-61],look:[-44,-63]},
+ {t:'Moenda e roda d\'água',at:[MOENDA.x+3.5,MOENDA.z+6],look:[MOENDA.x-4,MOENDA.z]},
+ {t:'Caldeiras',at:[CALD.x,CALD.z+6.5],look:[CALD.x,CALD.z]},
+ {t:'Casa de purgar',at:[PURG.x+3,PURG.z+6],look:[PURG.x,PURG.z]},
+ {t:'Moradias dos escravizados',at:[-44,-79],look:[-44,-87]},
+ {t:'Reunião da Câmara',camara:true},
+];
+function jumpTo(j){
+  if(P.locked){jumpMsg('Termine a cena que está na tela antes de usar um atalho.');return;}
+  $('jump').hidden=true;$('jumpBtn').setAttribute('aria-expanded','false');
+  if(j.camara){startCamara(true);return;}
+  P.x=j.at[0];P.z=j.at[1];P.a=face(P.x,P.z,j.look[0],j.look[1]);collide();
+  // Teletransporte instantâneo da câmera: não atravessar uma casa durante o salto.
+  snapFollowCamera();
+  nearPlace=null;$('card').hidden=true;quiet=null;canvas.focus();
+}
+function jumpMsg(m){let e=$('jump').querySelector('.jmsg');if(!e){e=document.createElement('div');e.className='jmsg';$('jump').prepend(e);}e.textContent=m;}
+JUMPS.forEach(j=>{const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);});
+$('jumpBtn').onclick=()=>{const h=!$('jump').hidden;if(!h){$('card').hidden=true;nearPlace=null;}$('jump').hidden=h;$('jumpBtn').setAttribute('aria-expanded',String(!h));const m=$('jump').querySelector('.jmsg');if(m)m.remove();};
+
+// ---------- minimizar quadros ----------
+function setMin(id,on){const el=$(id),b=$(id==='hud'?'hudMin':id==='card'?'cardMin':'dlgMin');el.classList.toggle('min',on);
+  b.textContent=on?'+':'–';b.setAttribute('aria-expanded',String(!on));b.setAttribute('aria-label',(on?'Mostrar ':'Minimizar ')+(id==='hud'?'o quadro de tarefas':id==='card'?'o texto do lugar':'o texto da cena'));}
+$('hudMin').onclick=()=>setMin('hud',!$('hud').classList.contains('min'));
+$('cardMin').onclick=()=>setMin('card',!$('card').classList.contains('min'));
+$('cardTitle').onclick=()=>{if($('card').classList.contains('min'))setMin('card',false);};
+$('dlgMin').onclick=()=>setMin('dlg',!$('dlg').classList.contains('min'));
+let mapOff=false;
+$('mapBtn').onclick=()=>{mapOff=!mapOff;$('map').hidden=mapOff;const b=$('mapBtn');b.classList.toggle('off',mapOff);b.textContent=mapOff?'Mapa':'–';b.setAttribute('aria-label',mapOff?'Mostrar o mapa':'Esconder o mapa');};
+
+restoreProgress();
+renderIntro();
+function begin(skip){
+  $('start').hidden=true;$('hud').hidden=false;$('map').hidden=mapOff;$('mapBtn').hidden=false;$('joy').hidden=false;$('resumeBtn').hidden=true;P.locked=false;started=true;renderTasks();
+  if(innerHeight<500)setMin('hud',true);
+  if(skip){jumpTo(JUMPS.find(j=>j.t==='Engenho: entrada'));}
+  else{snapFollowCamera();canvas.focus();}
+}
+})();
+</script>
+
+</body></html>
