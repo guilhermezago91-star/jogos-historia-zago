@@ -293,6 +293,7 @@ body:has(#clock:not([hidden])) #toolsBar,body:has(#tally:not([hidden])) #toolsBa
   <button id="btnNotebook" title="Ver objetos e lugares conhecidos">📖 Caderno</button>
   <button id="btnRoute" title="Escolher para onde olhar no mapa">🧭 Lugares</button>
   <button id="btnLost" title="Voltar à praça, sem perder descobertas">⌂ Estou perdido</button>
+  <button id="btnCam" title="Aproximar ou afastar a câmera">🎥 Câmera: média</button>
   <button id="teacherOpen" title="Controles para uso do professor">🎓 Professor</button>
 </div>
 <div id="toast" role="status" hidden></div>
@@ -1175,7 +1176,7 @@ const PNYX={x:-50,z:-76}, BEMA={x:-50,z:-92}, ACRO={x:62,z:-58};
 function H(x,z){
   return plateau(x,z,ACRO.x,ACRO.z,36,22,.5)+plateau(x,z,24,-36,14,6,.2)+plateau(x,z,PNYX.x,PNYX.z,40,9,.52)
    +plateau(x,z,-54,6,20,5,.35)+plateau(x,z,150,95,55,55,.05)+plateau(x,z,280,-40,140,75,0)+plateau(x,z,-60,-210,120,40,0)
-   +0.35*Math.sin(x*.05)*Math.cos(z*.07);
+   +0.35*Math.sin(x*.05)*Math.cos(z*.07)-plateau(x,z,-352,-352,78,4.2,.55);
 }
 function segDist(px,pz,a,b){const vx=b[0]-a[0],vz=b[1]-a[1];let t=((px-a[0])*vx+(pz-a[1])*vz)/(vx*vx+vz*vz);t=Math.max(0,Math.min(1,t));return Math.hypot(px-a[0]-vx*t,pz-a[1]-vz*t);}
 const ROADS=[[[-34,78],[0,12]],[[0,12],[30,-30]],[[30,-30],[38,-46]],[[-12,-22],[-30,-46]],[[-30,-46],[-46,-60]],[[-30,18],[-6,20]],[[38,-46],[42,-58]]];
@@ -1533,9 +1534,17 @@ const PROMA={x:51,z:-62};
   const cx=62,cz=-17,y0=H(cx,cz);
   mesh(new THREE.CylinderGeometry(4.2,4.2,.3,36),M.stone,cx,y0+.1,cz);
   box(1,.8,1,M.marble,cx,y0+.6,cz-1.5);  // altar de Dioniso no centro
-  for(let i=0;i<11;i++){const r=4.6+i*1.25,yy=H(cx,cz-r)+.25;
-    mesh(new THREE.CylinderGeometry(r,r+1.3,.7,48,1,true,Math.PI/2,Math.PI),M.stone,cx,yy,cz).material.side=THREE.DoubleSide;
-    mesh(new THREE.RingGeometry(r,r+1.3,48,1,0,Math.PI).rotateX(-Math.PI/2),M.stone,cx,yy+.35,cz);}
+  // Degraus maciços: cada fileira desce até o chão. Nas laterais, onde o morro é mais baixo,
+  // muros de arrimo de pedra (os analemmata) seguram a arquibancada.
+  const seatM=M.stone.clone();seatM.side=THREE.DoubleSide;
+  for(let i=0;i<11;i++){const r=4.6+i*1.25,yy=H(cx,cz-r)+.25,top=yy+.35;
+    let minG=top;for(let k=0;k<=24;k++){const a=-Math.PI/2+Math.PI*k/24;for(const rr of[r,r+1.3])minG=Math.min(minG,H(cx+Math.sin(a)*rr,cz-Math.cos(a)*rr));}
+    const bot=minG-.4,h=top-bot;
+    mesh(new THREE.CylinderGeometry(r,r,h,48,1,true,Math.PI/2,Math.PI),seatM,cx,bot+h/2,cz);           // espelho do degrau, até o chão
+    mesh(new THREE.RingGeometry(r,r+1.3,48,1,0,Math.PI).rotateX(-Math.PI/2),M.stone,cx,top,cz);   // o assento
+    if(i===10)mesh(new THREE.CylinderGeometry(r+1.3,r+1.3,h,48,1,true,Math.PI/2,Math.PI),seatM,cx,bot+h/2,cz); // muro do fundo
+    for(const s of[-1,1]){const w=mesh(new THREE.PlaneGeometry(1.3,h),seatM,cx+s*(r+.65),bot+h/2,cz);}  // muros laterais
+  }
   box(9,3.2,2.2,M.plaster,cx,y0+1.6,cz+4.2);box(9.6,.4,2.8,M.tile,cx,y0+3.4,cz+4.2);   // skené: o prédio de cena
   for(let i=0;i<3;i++)col(.22,3,M.marble,cx-3+i*3,y0+1.5,cz+2.9);
   colliders.push({x:cx,z:cz+4.2,hw:4.6,hd:1.2},{x:cx,z:cz-1.5,r:.7});
@@ -2114,6 +2123,8 @@ const SOF={x:-19,z:34};
 // Nikos
 const player=makeFigure({tunic:0xf2ead9,himation:0x8c3b2a,skin:0xc08a62,beard:false});scene.add(player.g);
 const P={x:-24,z:62,a:Math.atan2(22,-46),locked:false};
+// controle da câmera: arrastar para girar, roda do mouse (ou botões) para aproximar
+const CAMCTL={dist:7.5,drag:0,dragA:0,DISTS:[4.2,7.5,12]};
 
 // vendedores atrás das barracas
 [[12,28.6,Math.PI,{tunic:0x9e5a3c,beard:true}],[20,25.4,Math.PI*.85,{tunic:0x6f7d55,beard:true}],[9.5,16,Math.PI*.5,{dress:true,tunic:0xb88a5a,veil:0x6a4a3a}],
@@ -2146,10 +2157,11 @@ function equiparHoplita(f){
   const bronze=new THREE.MeshStandardMaterial({color:0xa47a3d,metalness:.48,roughness:.42});
   const rim=new THREE.MeshStandardMaterial({color:0x5c4630,metalness:.28,roughness:.54});
   const crest=lam(0x9c3c29),dark=lam(0x3c3026);
-  const addPart=(geom,mat,parent,x,y,z)=>{const m=new THREE.Mesh(geom,mat);m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;};
+  const gear=[];f.handGear=gear;
+  const addPart=(geom,mat,parent,x,y,z)=>{const m=new THREE.Mesh(geom,mat);m.position.set(x,y,z);m.castShadow=true;parent.add(m);gear.push(m);return m;};
   // Couraça e faixas de couro sobre a túnica.
-  addPart(new THREE.CylinderGeometry(.225,.255,.60,12),bronze,f.g,0,1.22,0);
-  for(const x of[-.19,.19])addPart(new THREE.BoxGeometry(.075,.40,.055),rim,f.g,x,1.23,.22);
+  f.bodyItems.push(addPart(new THREE.CylinderGeometry(.225,.255,.60,12),bronze,f.g,0,1.22,0));gear.pop();
+  for(const x of[-.19,.19]){f.bodyItems.push(addPart(new THREE.BoxGeometry(.075,.40,.055),rim,f.g,x,1.23,.22));gear.pop();}
   // Elmo com proteção do nariz e crista vermelha.
   const helm=addPart(new THREE.SphereGeometry(.158,16,12),bronze,f.g,0,1.78,-.005);
   helm.scale.set(1,1.0,1.15);
@@ -2939,7 +2951,8 @@ function collide(){
       P.x=c.x+lx*cos+lz*sin;P.z=c.z-lx*sin+lz*cos;
     }
   }
-  P.x=Math.max(-170,Math.min(170,P.x));P.z=Math.max(-190,Math.min(130,P.z));
+  P.x=Math.max(-336,Math.min(170,P.x));P.z=Math.max(-336,Math.min(142,P.z));
+  if(H(P.x,P.z)<-0.75){if(collide.ok){P.x=collide.ok[0];P.z=collide.ok[1];}}else collide.ok=[P.x,P.z];
 }
 
 // ---------- laço ----------
@@ -2997,20 +3010,22 @@ function step(now){
   let speed=0;
   if(P.locked&&$('dlg').hidden&&!S.inAssembly){lockT+=dt;if(lockT>1.2){P.locked=false;$('joy').hidden=false;lockT=0;}}else lockT=0;
   if(started&&!P.locked){
-    let fwd=0,turn=0;
+    let fwd=0,turn=0,side=0;
     if(keys.KeyW||keys.ArrowUp)fwd+=1;if(keys.KeyS||keys.ArrowDown)fwd-=1;
-    if(keys.KeyA||keys.ArrowLeft)turn+=1;if(keys.KeyD||keys.ArrowRight)turn-=1;
+    if(keys.ArrowLeft||keys.KeyQ)turn+=1;if(keys.ArrowRight||keys.KeyE)turn-=1;
+    if(keys.KeyA)side-=1;if(keys.KeyD)side+=1;
+    turn+=CAMCTL.drag;CAMCTL.drag=0;
     if(joy.id!==null){fwd+=-joy.y;turn+=-joy.x;}
     fwd=Math.max(-1,Math.min(1,fwd));turn=Math.max(-1,Math.min(1,turn));
     const run=keys.ShiftLeft||keys.ShiftRight||Math.hypot(joy.x,joy.y)>.95;
-    P.a+=turn*dt*2.3;const v=fwd*(run?11:6)*(fwd<0?.5:1);
-    const lx=P.x,lz=P.z;P.x+=Math.sin(P.a)*v*dt;P.z+=Math.cos(P.a)*v*dt;collide();speed=Math.abs(v);if(!isFinite(P.x)||!isFinite(P.z)){P.x=isFinite(lx)?lx:-24;P.z=isFinite(lz)?lz:62;}
+    P.a+=turn*dt*2.3+CAMCTL.dragA;CAMCTL.dragA=0;const v=fwd*(run?11:6)*(fwd<0?.5:1),vs=side*(run?8:4.5);
+    const lx=P.x,lz=P.z;P.x+=Math.sin(P.a)*v*dt-Math.cos(P.a)*vs*dt;P.z+=Math.cos(P.a)*v*dt+Math.sin(P.a)*vs*dt;collide();speed=Math.max(Math.abs(v),Math.abs(vs));if(!isFinite(P.x)||!isFinite(P.z)){P.x=isFinite(lx)?lx:-24;P.z=isFinite(lz)?lz:62;}
     let best=null,bd=4.5;for(const p of PLACES){const d=Math.hypot(P.x-p.x,P.z-p.z);if(d<bd){bd=d;best=p;}}
     if(quiet&&Math.hypot(P.x-quiet.x,P.z-quiet.z)>6)quiet=null;
     if(best&&best===quiet)best=null;
     if(best)showCard(best);else if(nearPlace&&(nearPlace===quiet||Math.hypot(P.x-nearPlace.x,P.z-nearPlace.z)>7))showCard(null);
     if(!S.assembly&&!S.inAssembly&&!(GUIDE_MODE&&GUIDE.active)&&Math.hypot(P.x-PNYX.x,P.z-(PNYX.z-2))<17)startAssembly();
-    if(S.athena&&!S.home&&!(GUIDE_MODE&&GUIDE.active)&&Math.hypot(P.x+31,P.z-73)<6){S.home=true;renderTasks();P.locked=true;$('card').hidden=true;nearPlace=null;runSeq(ENDING);}
+    if(S.athena&&!S.home&&!(GUIDE_MODE&&GUIDE.active)&&Math.hypot(P.x+31,P.z-73)<6){S.home=true;duskT=2;renderTasks();P.locked=true;$('card').hidden=true;nearPlace=null;runSeq(ENDING);}
   }
   player.g.position.set(P.x,H(P.x,P.z),P.z);player.g.rotation.y=P.a;player.anim(dt,speed);
   speaker.anim(dt,0);statics.forEach(f=>f.anim(dt,0));
@@ -3025,7 +3040,7 @@ function step(now){
     a.girl.arms[1].rotation.x=-1.3+Math.cos(t0*2.5+1)*.3;
   }
   cullT-=dt;if(cullT<=0){cullT=.35;const cx=camera.position.x,cz=camera.position.z;
-    for(const f of FIGS){const e=f.g.matrixWorld.elements;f.g.visible=f===player||Math.hypot(e[12]-cx,e[14]-cz)<70;}}
+    for(const f of FIGS){if(f===player)continue;const e=f.g.matrixWorld.elements;f.g.visible=!f.hide&&Math.hypot(e[12]-cx,e[14]-cz)<70;}}
   for(const w of walkers){
     if(walkersPaused){w.f.anim(dt,0);continue;}
     if(w.follow){w.tx=w.follow.x-Math.sin(w.follow.f.g.rotation.y)*1.4;w.tz=w.follow.z-Math.cos(w.follow.f.g.rotation.y)*1.4;}
@@ -3048,22 +3063,22 @@ function step(now){
 
   // pôr do sol
   dusk+=(duskT-dusk)*Math.min(1,dt*.4);
-  sun.color.copy(cDay.sun).lerp(cDusk.sun,dusk);sun.intensity=1.25-.45*dusk;hemi.intensity=.62-.22*dusk;
-  skyU.top.value.copy(cDay.top).lerp(cDusk.top,dusk);skyU.bot.value.copy(cDay.bot).lerp(cDusk.bot,dusk);scene.fog.color.copy(cDay.fog).lerp(cDusk.fog,dusk);
 
   const py=H(P.x,P.z);let want,look;
-  if(S.inTheatre){want=new THREE.Vector3(TEATRO.cx-2.2,0,TEATRO.cz-11);want.y=H(want.x,want.z)+2.2;look=new THREE.Vector3(TEATRO.cx,TEATRO.y0+1.3,TEATRO.cz+1.4);}
+  if(S.inDinner){want=DINCAM.want.clone();look=DINCAM.look.clone();}
+  else if(S.inRow){want=ROWCAM.want.clone();look=ROWCAM.look.clone();}
+  else if(S.inTheatre){want=new THREE.Vector3(TEATRO.cx-2.2,0,TEATRO.cz-11);want.y=H(want.x,want.z)+2.2;look=new THREE.Vector3(TEATRO.cx,TEATRO.y0+1.3,TEATRO.cz+1.4);}
   else if(S.inAssembly){want=new THREE.Vector3(P.x-Math.sin(P.a)*6,py+4.2,P.z-Math.cos(P.a)*6);look=new THREE.Vector3(BEMA.x,H(BEMA.x,BEMA.z)+2.2,BEMA.z);}
   else if(!started){const r=90,an=t0*.05;want=new THREE.Vector3(Math.sin(an)*r-5,50,Math.cos(an)*r-15);look=new THREE.Vector3(0,4,-15);}
-  else{want=new THREE.Vector3(P.x-Math.sin(P.a)*7.5,py+3.6,P.z-Math.cos(P.a)*7.5);look=new THREE.Vector3(P.x,py+1.7,P.z);}
+  else{const cd=CAMCTL.dist;want=new THREE.Vector3(P.x-Math.sin(P.a)*cd,py+1.2+cd*.34,P.z-Math.cos(P.a)*cd);look=new THREE.Vector3(P.x,py+1.7,P.z);}
   want.y=Math.max(want.y,H(want.x,want.z)+1.2);
-  if(started&&!S.inTheatre){const eye=new THREE.Vector3(P.x,py+1.8,P.z),dir=want.clone().sub(eye),dl=dir.length();dir.normalize();
+  if(started&&!S.inTheatre&&!S.inRow&&!S.inDinner){const eye=new THREE.Vector3(P.x,py+1.8,P.z),dir=want.clone().sub(eye),dl=dir.length();dir.normalize();
     camRay.set(eye,dir);camRay.far=dl;const hit=camRay.intersectObjects(occluders,false)[0];
     if(hit){want.copy(eye).addScaledVector(dir,Math.max(1.2,hit.distance-.6));want.y+=.6;}}
   const k=started?Math.min(1,dt*4):1;camPos.lerp(want,k);camLook.lerp(look,k);
   camera.position.copy(camPos);camera.lookAt(camLook);
   if(started)clearFoliage(new THREE.Vector3(P.x,py+1.65,P.z),camera.position,dt);
-  sun.position.set(P.x+60-30*dusk,py+110-70*dusk,P.z+40);sun.target.position.set(P.x,py,P.z);
+  applyTOD(dusk,py);
   renderer.render(scene,camera);
   if(started)drawMap();
 }
@@ -3081,19 +3096,21 @@ const INTRO=[
  `<div class="eyebrow">O seu dia</div><h2>Você vai viver o dia de Nikos</h2>
   <p>Você pode <b>explorar sem cumprir tarefas</b>. Veja as barracas, converse com as pessoas, descubra o azeite e o vinho, visite uma casa com mulheres fiando e tecendo, experimente um sorteio e entre na assembleia para votar.</p>
   <p>Se quiser, use o <b>caderno</b> para guardar o que encontrou. Não há prazo nem ordem obrigatória na exploração livre.</p>
-  <ul><li>Computador: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> ou setas para andar, <kbd>Shift</kbd> para correr, <kbd>E</kbd> para comprar ou agir.</li><li>Celular ou tablet: use o círculo no canto da tela.</li><li>Chegue perto dos <b>círculos brilhantes</b>. O mapa mostra aonde ir. Pessoas com <b>?</b> ou <b>…</b> em cima da cabeça querem conversar com você. Ligue as <b>vozes</b> no painel para ouvir os textos.</li></ul>`,
+  <ul><li>Computador: <kbd>W</kbd> e <kbd>S</kbd> para andar, <kbd>A</kbd> e <kbd>D</kbd> para ir para os lados, setas ou <b>arrastar o mouse</b> para virar, <b>rodinha do mouse</b> para aproximar ou afastar a câmera, <kbd>Shift</kbd> para correr e <kbd>E</kbd> para agir.</li><li>Celular ou tablet: use o círculo no canto da tela e arraste a tela para virar.</li><li>Chegue perto dos <b>círculos brilhantes</b>. O mapa mostra aonde ir. Pessoas com <b>?</b> ou <b>…</b> em cima da cabeça querem conversar com você. Ligue as <b>vozes</b> no painel para ouvir os textos.</li></ul>`,
 ];
 let ip=0;
 function renderIntro(){
   const last=ip===INTRO.length-1;
   const nav='<div class="mode-choice"><a href="https://atenas-415-nikos.vercel.app/" class="'+(!GUIDE_MODE?'active':'')+'">🧭 Exploração livre</a><a href="https://atenas-415-nikos.vercel.app/guiado.html" class="'+(GUIDE_MODE?'active':'')+'">🗺️ Roteiro guiado</a></div>';
-  $('intro').innerHTML=nav+INTRO[ip]+`<div class="row">${ip>0?'<button class="ghost" id="iBack">◂ Voltar</button>':''}
+  $('intro').innerHTML=nav+INTRO[ip]+`${window.SAVE&&SAVE.has()?'<div class="row"><button id="bLoad">⟳ Continuar de onde parei</button><button id="bWipe" class="ghost">Começar do zero</button></div>':''}<div class="row">${ip>0?'<button class="ghost" id="iBack">◂ Voltar</button>':''}
    ${last?(GUIDE_MODE?'<button id="bStart">Começar roteiro guiado ▸</button>':'<button id="bStart">Explorar Atenas livremente ▸</button><button id="bSkip" class="ghost">Ir direto para a assembleia</button>'):'<button id="iNext">Continuar ▸</button>'}
    <span class="dots">${ip+1} de ${INTRO.length}</span></div>`;
   if($('iNext'))$('iNext').onclick=()=>{ip++;renderIntro();};
   if($('iBack'))$('iBack').onclick=()=>{ip--;renderIntro();};
   if($('bStart'))$('bStart').onclick=()=>begin(false);
   if($('bSkip'))$('bSkip').onclick=()=>begin(true);
+  if($('bLoad'))$('bLoad').onclick=()=>SAVE.load();
+  if($('bWipe'))$('bWipe').onclick=()=>{SAVE.wipe();renderIntro();};
   const f=$('intro').querySelector('button:not(.ghost)');if(f)f.focus();
 }
 // ---------- atalhos (o professor leva Nikos direto a um lugar) ----------
@@ -3413,6 +3430,8 @@ async function animatePeople(){
   await new Promise(res=>{const stepUp=()=>{const t=performance.now();while(i<list.length&&performance.now()-t<12){const f=list[i++];
       try{upgradeFigure(f);if(!driven.has(f)&&!f.driven)statics.push(f);}catch(e){console.warn('Pessoa não animada',e);}}
     if(i<list.length)requestAnimationFrame(stepUp);else res();};stepUp();});
+  hoplite.arms[0].rotation.x=-.55;hoplite.arms[1].rotation.x=-.5;
+  if(typeof gearHoplite==='function')gearHoplite(hoplite).catch(e=>console.warn('Equipamento do hoplita:',e&&e.message));
 }
 
 // ---------- novos lugares no mapa ----------
@@ -3462,6 +3481,679 @@ function startUpgrades(){
   animatePeople().catch(e=>console.warn('Pessoas animadas indisponíveis:',e&&e.message));
 }
 setTimeout(startUpgrades,300);
+// =====================================================================
+// RODADA 2: controles, câmera, salvamento, modelos do 0 A.D. (Wildfire Games,
+// CC BY-SA 3.0), animais, carregadores, hoplita equipado, palestra, Pireu,
+// trirreme e oficina de cerâmica.
+// =====================================================================
+
+// ---------- câmera: arrastar para virar, rodinha para aproximar ----------
+{ let drag=null;
+  canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;drag={id:e.pointerId,x:e.clientX};});
+  addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x;drag.x=e.clientX;
+    if(started&&!P.locked)CAMCTL.dragA-=dx*(e.pointerType==='mouse'?.006:.009);});
+  addEventListener('pointerup',e=>{if(drag&&e.pointerId===drag.id)drag=null;});
+  addEventListener('pointercancel',()=>{drag=null;});
+  const names=['perto','média','longe'];
+  const setDist=i=>{i=Math.max(0,Math.min(2,i));CAMCTL.i=i;CAMCTL.dist=CAMCTL.DISTS[i];$('btnCam').textContent='🎥 Câmera: '+names[i];};
+  CAMCTL.i=1;
+  canvas.addEventListener('wheel',e=>{e.preventDefault();setDist(CAMCTL.i+(e.deltaY>0?1:-1));},{passive:false});
+  $('btnCam').onclick=()=>setDist((CAMCTL.i+1)%3);
+}
+
+// ---------- salvamento automático ----------
+const EXTRA={};   // progresso das novidades (vaso, remo, etc.)
+const SAVE={KEY:'atenas-nikos-progresso-v1',
+  has(){try{return !!localStorage.getItem(this.KEY);}catch(e){return false;}},
+  wipe(){try{localStorage.removeItem(this.KEY);}catch(e){}},
+  save(){if(!started||P.locked||S.inAssembly||S.inTheatre||!$('dlg').hidden)return;
+    const s={...S};delete s.inAssembly;delete s.inTheatre;delete s.inRow;delete s.inDinner;
+    try{localStorage.setItem(this.KEY,JSON.stringify({v:1,t:Date.now(),S:s,d:[...discovered],seen:PLACES.filter(p=>p.seen).map(p=>p.id),P:{x:P.x,z:P.z,a:P.a},X:EXTRA}));}catch(e){}},
+  load(){let d=null;try{d=JSON.parse(localStorage.getItem(this.KEY));}catch(e){}
+    begin(false);if(!d)return;
+    Object.assign(S,d.S||{});S.inAssembly=false;S.inTheatre=false;S.inRow=false;
+    (d.d||[]).forEach(id=>discovered.add(id));Object.assign(EXTRA,d.X||{});
+    const seen=new Set(d.seen||[]);PLACES.forEach(p=>{if(seen.has(p.id)){p.seen=true;p.ring.material.color.set(0x9fae5c);}});
+    if(d.P&&isFinite(d.P.x)){P.x=d.P.x;P.z=d.P.z;P.a=d.P.a;collide();const y=H(P.x,P.z);camPos.set(P.x-Math.sin(P.a)*7.5,y+3.6,P.z-Math.cos(P.a)*7.5);camLook.set(P.x,y+1.7,P.z);}
+    renderTasks();EXTRA_RESTORE.forEach(f=>{try{f();}catch(e){}});
+    toast('Progresso recuperado: '+discovered.size+' descobertas e '+Math.floor(S.obols/6)+' dracmas.');}
+};
+window.SAVE=SAVE;const EXTRA_RESTORE=[];
+setInterval(()=>SAVE.save(),4000);
+addEventListener('pagehide',()=>SAVE.save());
+
+// ---------- ajuda para colocar modelos com tamanho real ----------
+async function put0ad(name,o){const h=await putModel('0ad/'+name+'.glb',{...o,s:1});
+  const b=new THREE.Box3().setFromObject(h),sz=b.getSize(new THREE.Vector3());
+  const k=(o.size||1)/Math.max(o.byHeight?sz.y:Math.max(sz.x,sz.z),1e-6);
+  if(o.flip){const w=h.children[0];w.rotation.x=Math.PI;w.position.y+=sz.y/h.scale.y;}
+  h.scale.multiplyScalar(k);
+  if(o.ry)h.children[0].rotation.y=o.ry;
+  return h;}
+const soft0ad=(n,o)=>put0ad(n,o).catch(e=>{console.warn('0 A.D. opcional não carregado:',n,e.message);return null;});
+
+// ---------- animais pela cidade ----------
+const ANIMALS=[];
+const ASZ={chicken:.42,goat:1.25,sheep:1.25,pig:1.15,donkey:1.9,dog:1.05},ASP={chicken:.7,goat:.8,sheep:.6,pig:.6,donkey:1,dog:2.2};
+function spawnAnimal(kind,x,z,r=6,o={}){
+  const a={kind,hx:x,hz:z,x,z,tx:x,tz:z,r,wait:rnd()*4,phase:rnd()*6,rot:rnd()*6.28,h:null,area:o.area,follow:o.follow,peck:0};
+  ANIMALS.push(a);
+  soft0ad(kind,{x,z,size:ASZ[kind],rot:a.rot,shadow:kind!=='chicken'}).then(h=>{a.h=h;if(o.onLoad&&h)o.onLoad(h);});
+  return a;
+}
+EXTRA_TICKS.push(dt=>{
+  const cx=camera.position.x,cz=camera.position.z;
+  for(const a of ANIMALS){if(!a.h)continue;
+    const far=Math.hypot(a.x-cx,a.z-cz)>80;a.h.visible=!far;if(far)continue;
+    let sp=0;
+    if(a.follow){const f=a.follow;const fx=f.x-Math.sin(f.f.g.rotation.y)*1.8,fz=f.z-Math.cos(f.f.g.rotation.y)*1.8;a.tx=fx;a.tz=fz;
+      const d=Math.hypot(a.tx-a.x,a.tz-a.z);if(d>.25)sp=Math.min(d*1.6,f.sp*1.15);}
+    else{const d=Math.hypot(a.tx-a.x,a.tz-a.z);
+      if(a.wait>0){a.wait-=dt;}
+      else if(d<.2){a.wait=1+rnd()*(a.kind==='dog'?2:5);
+        if(a.area){[a.tx,a.tz]=a.area();}else{const an=rnd()*6.28,rr=rnd()*a.r;a.tx=a.hx+Math.cos(an)*rr;a.tz=a.hz+Math.sin(an)*rr;}}
+      else sp=ASP[a.kind];}
+    const d=Math.hypot(a.tx-a.x,a.tz-a.z);
+    if(sp&&d>.01){a.x+=(a.tx-a.x)/d*sp*dt;a.z+=(a.tz-a.z)/d*sp*dt;const ta=Math.atan2(a.tx-a.x,a.tz-a.z);let da=ta-a.rot;da=Math.atan2(Math.sin(da),Math.cos(da));a.rot+=da*Math.min(1,dt*4);}
+    a.phase+=dt*(sp?sp*7:1.2);
+    const bob=sp?Math.abs(Math.sin(a.phase))*(a.kind==='chicken'?.03:.05):0;
+    a.h.position.set(a.x,H(a.x,a.z)+bob,a.z);a.h.rotation.y=a.rot;
+    // a galinha bica o chão; os outros abaixam a cabeça para pastar
+    if(!sp){a.peck+=dt;const pk=a.kind==='chicken'?Math.max(0,Math.sin(a.peck*5))*.55:a.kind==='dog'?0:Math.max(0,Math.sin(a.peck*.8))*.12;a.h.rotation.x=pk;}
+    else{a.h.rotation.x=0;a.h.rotation.z=Math.sin(a.phase)*.04;}
+  }
+});
+
+// ---------- carregadores: carrinho de mão e burro com cestos ----------
+const CART_ROUTE=[[-33,76],[-27,66],[-18,50],[-9,34],[-4,22],[-9,34],[-18,50],[-27,66]];
+const carter={f:makeFigure({tunic:0x8a7a62,short:true,beard:true}),x:CART_ROUTE[0][0],z:CART_ROUTE[0][1],tx:CART_ROUTE[1][0],tz:CART_ROUTE[1][1],
+  sp:1.0,wait:0,route:CART_ROUTE,routeIndex:1,patrol:true};
+scene.add(carter.f.g);walkers.push(carter);carter.f.arms[0].rotation.x=-.7;carter.f.arms[1].rotation.x=-.7;
+let cartH=null;
+soft0ad('handcart',{x:carter.x,z:carter.z,size:2.3,ry:Math.PI/2}).then(h=>{cartH=h;
+  if(h)soft0ad('basket',{parent:h,x:0,z:0,y:0,size:.55}).then(b=>{if(b)b.position.set(0,.5/h.scale.y,0);});});
+EXTRA_TICKS.push(()=>{if(!cartH)return;const r=carter.f.g.rotation.y;const x=carter.x+Math.sin(r)*1.45,z=carter.z+Math.cos(r)*1.45;cartH.position.set(x,H(x,z),z);cartH.rotation.y=r;});
+// um homem puxando um burro carregado, vindo do campo para o mercado
+const DONKEY_ROUTE=[[-36,95],[-34,80],[-26,64],[-16,46],[-6,30],[4,22],[-6,30],[-16,46],[-26,64],[-34,80]];
+const muleteer={f:makeFigure({tunic:0x76764f,short:true,beard:true,cap:0x8c6c4e}),x:DONKEY_ROUTE[0][0],z:DONKEY_ROUTE[0][1],tx:DONKEY_ROUTE[1][0],tz:DONKEY_ROUTE[1][1],
+  sp:1.05,wait:0,route:DONKEY_ROUTE,routeIndex:1,patrol:true};
+scene.add(muleteer.f.g);walkers.push(muleteer);
+spawnAnimal('donkey',muleteer.x-1,muleteer.z+1,0,{follow:muleteer,onLoad:h=>{
+  for(const s of[-1,1])soft0ad('basket',{parent:h,x:0,z:0,y:0,size:.5}).then(b=>{if(b)b.position.set(s*.4/h.scale.x,.95/h.scale.y,0);});}});
+// animais soltos
+for(let i=0;i<6;i++)spawnAnimal('chicken',-20+rnd()*4,104+rnd()*4,4);
+for(let i=0;i<3;i++)spawnAnimal('chicken',HOUSE.x+9+rnd()*2,HOUSE.z+8+rnd()*2,2.5);
+for(let i=0;i<5;i++)spawnAnimal(i%2?'goat':'sheep',-95+rnd()*10,82+rnd()*10,9);
+for(let i=0;i<4;i++)spawnAnimal(i%2?'sheep':'goat',120+rnd()*8,-120+rnd()*8,8);
+spawnAnimal('pig',-28+rnd()*2,104+rnd()*2,3);
+spawnAnimal('dog',8,18,0,{area:rndAg});
+spawnAnimal('dog',-14,100,7);
+
+// ---------- o hoplita com elmo coríntio, escudo e lança do 0 A.D. ----------
+async function gearHoplite(f){
+  if(!f.up||!f.bones)return;
+  f.g.updateMatrixWorld(true);
+  // esconde as peças feitas à mão, mantendo a couraça
+  (f.handGear||[]).forEach(m=>m.visible=false);
+  const B=f.bones,wp=b=>f.g.worldToLocal(b.getWorldPosition(new THREE.Vector3()));
+  const [helm,shield,spear]=await Promise.all([
+    put0ad('helmet',{parent:f.g,x:0,z:0,y:0,size:.44,byHeight:true}),
+    put0ad('shield',{parent:f.g,x:0,z:0,y:0,size:.92}),
+    put0ad('spear',{parent:f.g,x:0,z:0,y:0,size:2.5,byHeight:true,flip:true})]);
+  const hp=wp(B.Head);helm.position.set(hp.x,hp.y-.03,hp.z+.02);B.Head.attach(helm);if(f.headItems[0])f.headItems[0].visible=false;
+  const lp=wp(B.lowerarm_l),lh=wp(B.hand_l);shield.position.set((lp.x+lh.x)/2+(lp.x>0?.12:-.12),(lp.y+lh.y)/2-.25,lp.z+.3);B.lowerarm_l.attach(shield);
+  const rh=wp(B.hand_r);spear.position.set(rh.x,rh.y-1.0,rh.z+.05);B.hand_r.attach(spear);
+  [helm,shield,spear].forEach(o=>o.traverse(m=>{if(m.isMesh)m.castShadow=true;}));
+}
+
+// ---------- PALESTRA / GINÁSIO DA ACADEMIA ----------
+const GYM={x:-66,z:110,rot:Math.PI*.15};
+soft0ad('gymnasium',{x:GYM.x,z:GYM.z,rot:GYM.rot,size:22});
+addCollider(GYM.x,GYM.z,9,6,GYM.rot);  // só o prédio central; o pátio de areia fica livre
+const gymL=(lx,lz)=>{const c=Math.cos(GYM.rot),s=Math.sin(GYM.rot);return[GYM.x+lx*c+lz*s,GYM.z-lx*s+lz*c];};
+// pista de corrida (dromos) em frente ao ginásio
+const TRACK={x:-60,z:132,rx:12,rz:5};
+{ // a pista acompanha o relevo, ponto a ponto
+  const N=72,pos=[],idx=[];for(let i=0;i<=N;i++){const t=i/N*Math.PI*2;for(const k of[.94,1.18]){const x=TRACK.x+Math.cos(t)*TRACK.rx*k,z=TRACK.z+Math.sin(t)*TRACK.rz*k;pos.push(x,H(x,z)+.06,z);}}
+  for(let i=0;i<N;i++){const a=i*2;idx.push(a,a+1,a+2,a+1,a+3,a+2);}
+  const gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));gg.setIndex(idx);gg.computeVertexNormals();
+  const g=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:0xd8c19a,roughness:.95,side:THREE.DoubleSide}));g.receiveShadow=true;scene.add(g);}
+const runners=[];
+for(let i=0;i<3;i++){const f=makeFigure({tunic:[0xe4dac4,0xcfc0a0,0xb99a68][i],short:true,beard:i===2});f.driven=true;scene.add(f.g);runners.push({f,t:i*2.1,sp:.42+i*.04});}
+EXTRA_TICKS.push(dt=>{for(const r of runners){r.t+=dt*r.sp;const x=TRACK.x+Math.cos(r.t)*TRACK.rx*1.06,z=TRACK.z+Math.sin(r.t)*TRACK.rz*1.06;
+  const nx=TRACK.x+Math.cos(r.t+.05)*TRACK.rx,nz=TRACK.z+Math.sin(r.t+.05)*TRACK.rz;r.f.g.position.set(x,H(x,z),z);r.f.g.rotation.y=Math.atan2(nx-x,nz-z);
+  if(r.f.g.visible)r.f.anim(dt,Math.hypot(TRACK.rx,TRACK.rz)*r.sp*.9);}});
+// lutadores, um treinador com a vara e um rapaz com o disco
+const wrestlers=[];
+for(const [lx,lz,rot,anim] of [[-1.2,9.5,Math.PI/2,'Push_Loop'],[-0.45,9.5,-Math.PI/2,'Push_Loop'],[3.2,11.5,Math.PI*.4,'Punch_Jab'],[4.0,11.8,-Math.PI*.6,'Punch_Cross']]){
+  const [x,z]=gymL(lx,lz);const f=placeFig(makeFigure({tunic:0xd8c6a4,short:true,beard:false}),x,z,rot+GYM.rot);f.forceAnim=anim;statics.push(f);wrestlers.push(f);colliders.push({x,z,r:.3});}
+{ const [x,z]=gymL(1.4,7.2);const tr=placeFig(makeFigure({tunic:0x7a2f2f,himation:0xcfc0a0,beard:true,hair:0x9a948a}),x,z,GYM.rot+Math.PI);tr.gesture=3;statics.push(tr);colliders.push({x,z,r:.3});
+  box(.04,1.6,.04,M.wood,.28,.8,.2,tr.g).rotation.z=.25;
+  const [dx,dz]=gymL(-4.5,12);const db=placeFig(makeFigure({tunic:0xe4dac4,short:true}),dx,dz,GYM.rot+.3);db.forceAnim='Sword_Idle';statics.push(db);colliders.push({x:dx,z:dz,r:.3});
+  const disc=mesh(new THREE.CylinderGeometry(.11,.11,.03,18),new THREE.MeshStandardMaterial({color:0x9a7a3a,metalness:.5,roughness:.4}),.3,1.05,.25,db.g);disc.rotation.z=Math.PI/2;
+  db.discus=disc;}
+addPlace({id:'palestra',x:gymL(1,4)[0],z:gymL(1,4)[1],t:'A palestra da Academia',sub:'Ginásio fora das muralhas',
+  txt:'<p>Fora das muralhas, perto do bosque sagrado do herói Academo, fica um <b>ginásio</b>. No pátio de areia, a <b>palestra</b>, os rapazes treinam <b>luta</b>, <b>pugilato</b> e <b>arremesso de disco</b>. Na pista em frente, outros treinam <b>corrida</b>.</p><p>O <b>pedótriba</b>, o treinador, corrige os movimentos com uma vara. Os atletas treinavam <b>nus</b> e untados com <b>azeite</b>, que depois raspavam com o <b>estrígil</b>.</p><p>O ginásio também era lugar de conversa. Anos depois, o filósofo <b>Platão</b> vai abrir aqui a sua escola: por isso, até hoje, chamamos as escolas de <b>academias</b>.</p><p class="hoje">Os treinos lembram a <b>educação física</b> da escola. Mas só os filhos de famílias com tempo e dinheiro passavam o dia no ginásio.</p>'});
+DISCOVERY_ITEMS.push({id:'palestra',ico:'🤼',title:'Palestra',text:'No ginásio, rapazes treinam luta, corrida e disco, untados com azeite.'});
+
+// ---------- OFICINA DE CERÂMICA DE NIKOS (fora do Dípilo, no Cerâmico exterior) ----------
+const OF={x:-17,z:104,rot:Math.PI*.95};
+const ofG=groupAt(OF.x,OF.z,OF.rot);
+{ // telheiro de madeira e telhas
+  for(const [x,z] of [[-3,-2],[3,-2],[-3,2],[3,2]])box(.2,2.6,.2,M.wood,x,1.3,z,ofG);
+  box(6.8,.16,4.8,M.tile,0,2.66,0,ofG);
+  // torno de oleiro: disco giratório
+  const wheelBase=box(.5,.55,.5,M.wood,-1.2,.28,.4,ofG);
+  const wheel=mesh(new THREE.CylinderGeometry(.42,.42,.07,24),M.wood,-1.2,.6,.4,ofG);
+  const clay=mesh(new THREE.CylinderGeometry(.14,.18,.3,18),M.clay,-1.2,.79,.4,ofG);
+  // forno (kámino) em forma de cúpula, com boca de fogo
+  const kiln=new THREE.Group();kiln.position.set(4.8,0,-.6);ofG.add(kiln);
+  mesh(new THREE.SphereGeometry(1.35,20,14,0,Math.PI*2,0,Math.PI/2),lam(0x9a5a38),0,.55,0,kiln);
+  mesh(new THREE.CylinderGeometry(1.35,1.45,.55,20),lam(0x8a4e30),0,.27,0,kiln);
+  const fire=mesh(new THREE.SphereGeometry(.28,10,8),new THREE.MeshBasicMaterial({color:0xff8a2a}),0,.32,1.32,kiln);
+  // prateleira com vasos secando
+  box(3,.08,.5,M.wood,0,1.2,-2.1,ofG);box(3,.08,.5,M.wood,0,.6,-2.1,ofG);
+  for(const [n,x,y] of [['Amphora_Tall',-1.1,.64],['Vase_Wide',-.35,.64],['Bowl_1',.4,.64],['Amphora_Lidded',1.1,.64],['Oil_Lamp',-1,1.24],['Vase_Wide',-.2,1.24],['Bowl_1',.7,1.24]])
+    softPut('gregos/classical-pottery-set.glb',{parent:ofG,node:n,x,z:-2.1,y,s:.11});
+  // monte de argila e lenha
+  mesh(new THREE.SphereGeometry(.6,10,8).scale(1,.45,1),lam(0x8a5a3c),2,.12,1.6,ofG);
+  for(let i=0;i<6;i++){const l=box(.12,.12,1.2,M.wood,5.2+(i%3)*.15,.08+Math.floor(i/3)*.13,1.6,ofG);l.rotation.y=.1*i;}
+  addCollider(OF.x,OF.z,3.2,2.3,OF.rot);
+  const kp=new THREE.Vector3(4.8,0,-.6).applyAxisAngle(new THREE.Vector3(0,1,0),OF.rot);colliders.push({x:OF.x+kp.x,z:OF.z+kp.z,r:1.5});
+  // o mestre oleiro e um menino pintor
+  const master=makeFigure({tunic:0x8c6c4e,short:true,beard:true,hair:0x9a948a});master.seated=true;master.legs.forEach(l=>l.visible=false);
+  master.g.position.set(-1.2,.55-.72,1.05);master.g.rotation.y=Math.PI;ofG.add(master.g);master.arms[0].rotation.x=-1.1;master.arms[1].rotation.x=-1.1;statics.push(master);
+  const painter=makeFigure({tunic:0xcfc0a0,short:true});painter.seated=true;painter.legs.forEach(l=>l.visible=false);painter.g.scale.setScalar(.8);
+  painter.g.position.set(1.4,.45-.58,.6);painter.g.rotation.y=-Math.PI/2;ofG.add(painter.g);painter.arms[1].rotation.x=-1.3;statics.push(painter);
+  softPut('gregos/classical-pottery-set.glb',{parent:ofG,node:'Amphora_Tall',x:.85,z:.6,y:0,s:.13});
+  EXTRA_TICKS.push(dt=>{wheel.rotation.y+=dt*6;clay.rotation.y+=dt*6;const k=.8+Math.sin(t0*9)*.15+Math.sin(t0*23)*.08;fire.scale.setScalar(k);});
+  window.__oficina={ofG,wheel,clay};
+}
+addPlace({id:'oficina',x:OF.x+1.5,z:OF.z-4.2,t:'A oficina de cerâmica',sub:'Onde Nikos trabalha',
+  txt:'<p>Aqui fora do portão do Dípilo, no bairro do <b>Cerâmico</b>, ficam as oficinas dos oleiros. É aqui que <b>Nikos trabalha</b>.</p><p>O mestre modela a argila no <b>torno</b>, o menino pinta os vasos e o <b>forno</b> está aceso. A argila vem das margens do rio <b>Erídano</b>, que passa aqui perto.</p>',
+  act:()=>EXTRA.vaso?{l:'Ver o seu vaso na prateleira',f:()=>toast('O seu vaso está secando na prateleira. Bom trabalho!')}:{l:'Fazer um vaso com o mestre',f:makeVase}});
+DISCOVERY_ITEMS.push({id:'oficina',ico:'🏺',title:'Oficina de cerâmica',text:'Amassar, tornear, pintar e queimar: Nikos fez um vaso e recebeu pelo trabalho.'});
+
+// ---------- minijogo de tempo (torno e remo) ----------
+// uma barra com um marcador que vai e volta: aperte quando ele estiver na faixa verde
+let TIMING=null;
+// sem <p> nem <div>: assim o quadro não divide o minijogo em várias páginas
+function timingHTML(txt,label){return '<section><span class="mgp">'+txt+'</span><span class="tbar" aria-hidden="true"><span class="tz"></span><span class="tm"></span></span><span class="src mgp" id="tInfo">'+label+'</span></section>';}
+function startTiming(o){ // o: {speed, zone, onHit, onMiss}
+  stopTiming();const T={pos:0,dir:1,speed:o.speed||1.1,zone:o.zone||.18,o};TIMING=T;
+  const zEl=document.querySelector('#dTxt .tz');if(zEl){zEl.style.left=(50-T.zone*50)+'%';zEl.style.width=(T.zone*100)+'%';}
+  let last=performance.now();
+  const loop=()=>{if(TIMING!==T)return;const now=performance.now(),dt=Math.min(.1,(now-last)/1000);last=now;T.pos+=T.dir*T.speed*dt;if(T.pos>1){T.pos=1;T.dir=-1;}if(T.pos<0){T.pos=0;T.dir=1;}
+    const m=document.querySelector('#dTxt .tm');if(m)m.style.left=(T.pos*100)+'%';requestAnimationFrame(loop);};loop();
+}
+function stopTiming(){TIMING=null;}
+function hitTiming(){const T=TIMING;if(!T)return null;const ok=Math.abs(T.pos-.5)<=T.zone/2;return ok;}
+// estilos do minijogo
+{ const st=document.createElement('style');st.textContent=`
+.tbar{display:block;position:relative;height:34px;margin:10px 0 6px;border:2px solid var(--clay);border-radius:6px;background:rgba(0,0,0,.35);overflow:hidden}
+.tbar .tz{position:absolute;top:0;bottom:0;background:rgba(159,174,92,.55);border-left:2px solid var(--olive);border-right:2px solid var(--olive)}
+.tbar .tm{position:absolute;top:-2px;bottom:-2px;width:6px;margin-left:-3px;background:var(--bone);box-shadow:0 0 8px #fff}
+.tapcount{display:block;font:800 30px var(--f-body);color:var(--clay-lt);text-align:center;margin:6px 0}
+.mgp{display:block;margin:0 0 8px}.tbar .tz,.tbar .tm{display:block}`;document.head.appendChild(st);}
+
+// ---------- a missão do vaso ----------
+function makeVase(){
+  P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;markDiscovery('oficina');
+  let kneads=0,shape=null,tech=null,wheelTries=0;
+  const finish=()=>{stopTiming();hideDlg();P.locked=false;$('joy').hidden=false;};
+  runSeq([
+   ()=>dlg('Oficina de cerâmica · 1 de 5','Amassar a argila','<section><span class="mgp">O mestre entrega um bloco de argila molhada. Antes de tudo, é preciso <b>amassar</b> bem para tirar as bolhas de ar. Se ficar ar dentro, o vaso <b>racha no forno</b>.</span><span class="tapcount" id="tapN">0 de 8</span></section>',
+     [{t:'Amassar! 👐',main:true,f:()=>{kneads++;$('tapN').textContent=kneads+' de 8';if(kneads>=8){toast('Argila pronta, sem bolhas de ar.');next();}}}]),
+   ()=>{dlg('Oficina de cerâmica · 2 de 5','Centralizar no torno',timingHTML('O menino gira o torno. Nikos precisa <b>centralizar</b> a argila: aperte quando o marcador estiver na <b>faixa verde</b>.','Botão, barra de espaço ou Enter.'),
+     [{t:'Agora! 🎯',main:true,f:()=>{const ok=hitTiming();wheelTries++;
+       if(ok){stopTiming();toast('A argila ficou bem no centro.');next();}
+       else{$('tInfo').textContent=wheelTries<3?'Quase! A argila ficou torta. Tente de novo.':'O mestre segura suas mãos e ajuda. Tente mais uma vez, agora mais devagar.';if(wheelTries>=3&&TIMING){TIMING.speed=.6;TIMING.zone=.3;const z=document.querySelector('#dTxt .tz');z.style.left='35%';z.style.width='30%';}}}}]);
+     startTiming({speed:1.15,zone:.2});},
+   ()=>dlg('Oficina de cerâmica · 3 de 5','Que vaso fazer?','<p>O mestre pergunta: "Que forma você vai dar ao vaso?"</p>',[
+     {t:'Ânfora: guardar vinho ou azeite',f:()=>{shape='Amphora_Tall';next();}},
+     {t:'Hídria: buscar água na fonte',f:()=>{shape='Amphora_Lidded';next();}},
+     {t:'Kílix: taça de beber vinho',f:()=>{shape='Bowl_1';next();}}]),
+   ()=>dlg('Oficina de cerâmica · 4 de 5','Como pintar?','<p>Depois de secar um pouco, o vaso é pintado com um <b>barro líquido</b> bem fino. Qual técnica Nikos vai usar?</p>',[
+     {t:'Figuras negras: desenhos pretos no fundo laranja',f:()=>{tech='negras';next();}},
+     {t:'Figuras vermelhas: fundo preto e figuras cor de barro',f:()=>{tech='vermelhas';next();}}]),
+   ()=>dlg('Oficina de cerâmica · 4 de 5','Boa escolha',tech==='vermelhas'?'<p>As <b>figuras vermelhas</b> são a moda em Atenas agora. O pintor deixa as figuras na cor do barro e pinta o fundo. Assim, dá para desenhar músculos, dobras de roupa e rostos com pincel fino.</p>':'<p>As <b>figuras negras</b> são a técnica mais antiga. O pintor desenha as figuras com barro líquido e risca os detalhes com uma ponta. Em 415 a.C., quase ninguém usa mais: a moda agora são as <b>figuras vermelhas</b>. Mas alguns vasos de festa ainda são feitos assim.</p>'),
+   ()=>{const Q={q:'No forno, o barro líquido da pintura fica <b>preto e brilhante</b>, mas o resto do vaso fica <b>laranja</b>. Como o oleiro consegue isso?',
+       o:['Pinta de preto depois de queimar','Fecha a entrada de ar do forno por um tempo e depois abre de novo','Usa dois fornos diferentes'],c:1,
+       e:'O forno passa por três fases. Com ar, tudo fica vermelho. Sem ar, com fumaça, tudo fica preto. Quando o ar volta, a parte grossa do vaso volta a ficar laranja, mas o barro fino da pintura continua preto e brilhante.'};
+     dlg('Oficina de cerâmica · 5 de 5','Queimar no forno','<p>'+Q.q+'</p>',Q.o.map((t,i)=>({t,f:()=>{const ok=i===Q.c;
+       $('dTxt').innerHTML='<div class="fb '+(ok?'ok':'no')+'"><b>'+(ok?'Isso mesmo.':'Não foi assim.')+'</b> '+(ok?'':'A resposta é: <b>'+Q.o[Q.c]+'</b>. ')+Q.e+'</div>';
+       const B=$('dBtns');B.innerHTML='';const b=document.createElement('button');b.textContent='Tirar o vaso do forno ▸';b.dataset.main='1';b.onclick=next;B.appendChild(b);}})));},
+   ()=>{EXTRA.vaso={shape,tech};S.obols+=3;renderTasks();showVase();
+     dlg('Oficina de cerâmica','O mestre paga Nikos','<p>O vaso saiu do forno inteiro! O mestre olha com cuidado e põe na prateleira para vender no mercado.</p><p>Ele paga <b>3 óbolos</b> pelo trabalho de meio dia. Um artesão com experiência ganha cerca de <b>1 dracma por dia</b> (6 óbolos). Agora Nikos tem mais dinheiro para fazer compras na ágora.</p>',
+       [{t:'Voltar a passear ▸',main:true,f:finish}]);},
+  ]);
+}
+function showVase(){if(!EXTRA.vaso||showVase.done)return;showVase.done=true;
+  softPut('gregos/classical-pottery-set.glb',{parent:window.__oficina.ofG,node:EXTRA.vaso.shape||'Amphora_Tall',x:-1.2,z:.4,y:.64,s:.12});
+  window.__oficina.clay.visible=false;}
+EXTRA_RESTORE.push(showVase);
+
+// ---------- O PORTO DO PIREU ----------
+const SEA_Y=-1.1;
+// o cais fica onde o terreno encontra o mar, na diagonal da baía
+const PIR=(()=>{for(let d=0;d<140;d+=.5){const x=-352+d*.7071,z=-352+d*.7071;if(H(x,z)>SEA_Y+.45)return{x:x+.7,z:z+.7};}return{x:-296,z:-300};})();
+{ // o mar: só a sudoeste, entrando pela baía
+  const wm=new THREE.MeshStandardMaterial({color:0x3f7895,roughness:.25,metalness:.1,transparent:true,opacity:.92});
+  const sea=new THREE.Mesh(new THREE.PlaneGeometry(1500,1500,1,1).rotateX(-Math.PI/2),wm);sea.position.set(-1000,SEA_Y,-1000);sea.receiveShadow=true;scene.add(sea);
+  window.__sea=sea;
+}
+const PIRL=(along,out)=>{const a=Math.PI*.25;return[PIR.x-Math.cos(a)*out+Math.sin(a)*along,PIR.z-Math.sin(a)*out-Math.cos(a)*along];};
+for(let i=-6;i<=6;i++){const[x,z]=PIRL(i*5.4,.6);const b=box(5.4,1.8,3,M.stone,x,SEA_Y+.55,z);b.rotation.y=Math.PI/4;b.receiveShadow=true;}
+// estaleiros e docas
+soft0ad('dock',{x:PIRL(-16,4)[0],z:PIRL(-16,4)[1],y:SEA_Y-.6,rot:Math.PI*1.25,size:26});
+// trirremes ancoradas e uma que vai treinar
+const TRI=[];
+for(const [along,out,rot] of [[-4,13,Math.PI*.75],[30,13,Math.PI*.75],[10,27,Math.PI*.72]]){
+  const [x,z]=PIRL(along,out);const t={x,z,rot,h:null,base:SEA_Y-.9};TRI.push(t);
+  soft0ad('trireme',{x,z,y:t.base,rot,size:37}).then(h=>{t.h=h;});}
+EXTRA_TICKS.push(()=>{for(const t of TRI){if(!t.h||t.rowing)continue;t.h.position.y=t.base+Math.sin(t0*.9+t.x)*.08;t.h.rotation.z=Math.sin(t0*.7+t.z)*.012;}});
+// armazém, ânforas empilhadas e gente trabalhando
+{ const [wx,wz]=PIRL(10,-9);const g=groupAt(wx,wz,Math.PI*.25);
+  box(16,4.2,6,M.plaster,0,2.1,0,g);box(17,.4,7,M.tile,0,4.3,0,g);for(let i=0;i<5;i++)col(.25,3.6,M.marble,-6.5+i*3.25,1.8,3.4,g);
+  addCollider(wx,wz,8,3.1,Math.PI*.25);
+  for(let i=0;i<14;i++)softPut('gregos/classical-pottery-set.glb',{parent:g,node:'Amphora_Tall',x:-7+(i%7)*1.05,z:4.6+Math.floor(i/7)*.9,y:0,s:.16,rot:i});
+  softPut('gregos/olive-grove-set.glb',{parent:g,node:'Basket_Olives_Low',x:5.5,z:4.8,y:0,s:.25});
+}
+const PORT_ROUTE=[PIRL(4,-1.5),PIRL(10,-4.5),PIRL(16,-1.5),PIRL(10,-4.5)];
+for(let i=0;i<4;i++){const R=PORT_ROUTE.map(p=>[p[0]+i*.8,p[1]-i*.6]);const f=makeFigure({tunic:[0x8a7a62,0x76764f,0x985c44,0x8c6c4e][i],short:true,beard:i%2===0,carry:i%2===0});
+  scene.add(f.g);walkers.push({f,x:R[i%R.length][0],z:R[i%R.length][1],tx:R[(i+1)%R.length][0],tz:R[(i+1)%R.length][1],sp:1+i*.1,wait:i,route:R,routeIndex:(i+1)%R.length,patrol:true});}
+// pescadores consertando a rede e um comerciante estrangeiro
+{ const [fx,fz]=PIRL(-4,-1.6);for(let i=0;i<2;i++){const f=placeFig(makeFigure({tunic:0x6a6a64,short:true,beard:true,cap:0x8c6c4e}),fx+i*1.4,fz,Math.PI*.25+i);f.kneel=true;f.legs.forEach(l=>l.visible=false);f.g.position.y-=.3;statics.push(f);}
+  softPut('comida/fish.glb',{x:fx+.7,z:fz+.8,s:.9,rz:Math.PI/2});
+  const net=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.6,8,6).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x8a7a5a,wireframe:true}));net.position.set(fx+.7,H(fx,fz)+.05,fz+.4);scene.add(net);
+  const [mx,mz]=PIRL(18,-2.5);const m=placeFig(makeFigure({tunic:0x2f4a6a,himation:0xb99a68,beard:true,cap:0xd8c6a4}),mx,mz,Math.PI*1.25);m.gesture=2;statics.push(m);colliders.push({x:mx,z:mz,r:.3});
+  window.__pirMerchant=[mx,mz];}
+// um trierarca, o comandante, convida Nikos para o treino
+const [kx,kz]=PIRL(3,-1.8);
+{ const f=placeFig(makeFigure({tunic:0x9e2f25,himation:0xd8c6a4,beard:true}),kx,kz,Math.PI*1.25);f.gesture=4;statics.push(f);colliders.push({x:kx,z:kz,r:.3});}
+addPlace({id:'pireu',x:PIRL(-6,-4)[0],z:PIRL(-6,-4)[1],t:'O porto do Pireu',sub:'A 7 km da cidade, ligado pelas Muralhas Longas',
+  txt:'<p>Este é o <b>Pireu</b>, o porto de Atenas. As <b>Muralhas Longas</b> ligam a cidade ao porto: assim, mesmo cercada por terra, Atenas recebe <b>trigo</b> pelo mar.</p><p>Nos <b>estaleiros</b> ficam as <b>trirremes</b>, os navios de guerra. Atenas tem cerca de <b>300</b>. Nos armazéns chegam ânforas de vinho e azeite e o trigo do mar Negro.</p><p class="hoje">O Pireu ainda é o maior porto da Grécia.</p>'});
+addPlace({id:'trirreme',x:PIRL(5,-3.5)[0],z:PIRL(5,-3.5)[1],t:'O trierarca e a trirreme',sub:'Treino de remadores',
+  txt:'<p>"Ei, rapaz! Faltam remadores hoje. Quer experimentar?"</p><p>A <b>trirreme</b> tem três fileiras de remos de cada lado e cerca de <b>170 remadores</b>. Na frente, um <b>esporão de bronze</b> serve para furar os navios inimigos.</p>',
+  act:()=>EXTRA.remo?{l:'Remar mais uma vez',f:rowTrireme}:{l:'Subir a bordo e remar',f:rowTrireme}});
+addPlace({id:'pir_comerciante',x:PIRL(18,-5)[0],z:PIRL(18,-5)[1],t:'Um comerciante meteco',sub:'Estrangeiro que mora em Atenas',
+  txt:'<p>"Trago trigo do <b>mar Negro</b> e levo azeite e vasos de Atenas. Pago imposto como meteco, sirvo na frota quando a cidade pede..."</p><p>"Mas não voto na assembleia, não posso ser jurado e não posso comprar terra. Meu filho nasceu aqui e também não vai ser cidadão."</p><p class="hoje">Muitos <b>metecos</b> eram ricos e importantes para a economia, mas ficavam <b>fora da política</b>.</p>'});
+DISCOVERY_ITEMS.push({id:'pireu',ico:'⚓',title:'Pireu',text:'O porto de Atenas, com estaleiros, trirremes e armazéns.'},
+  {id:'trirreme',ico:'🚣',title:'Trirreme',text:'170 remadores, quase todos cidadãos pobres, pagos por dia.'});
+[{t:'Porto do Pireu',at:PIRL(-2,-6),look:PIRL(4,12)},{t:'Palestra (Academia)',at:gymL(1,-2),look:gymL(0,10)},{t:'Oficina de cerâmica',at:[OF.x+4,OF.z-8],look:[OF.x,OF.z]}]
+  .forEach(j=>{JUMPS.push(j);const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);});
+
+// ---------- treino de remo na trirreme ----------
+function rowTrireme(){
+  const t=TRI[0];if(!t.h){toast('A trirreme ainda está carregando. Tente de novo em instantes.');return;}
+  P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;markDiscovery('trirreme');
+  S.inRow=true;player.g.visible=false;t.rowing=true;
+  const start={x:t.h.position.x,z:t.h.position.z};let strokes=0,good=0,vel=0;
+  const fwd=new THREE.Vector3(0,0,1).applyAxisAngle(new THREE.Vector3(0,1,0),t.rot);
+  const tick=dt=>{if(!S.inRow)return;vel*=Math.pow(.55,dt);t.h.position.x+=fwd.x*vel*dt;t.h.position.z+=fwd.z*vel*dt;t.h.position.y=t.base+Math.sin(t0*1.4)*.1;
+    const p=t.h.position;ROWCAM.want.set(p.x-fwd.x*24+fwd.z*12,SEA_Y+11,p.z-fwd.z*24-fwd.x*12);ROWCAM.look.set(p.x+fwd.x*8,SEA_Y+1,p.z+fwd.z*8);};
+  EXTRA_TICKS.push(tick);
+  const end=()=>{stopTiming();S.inRow=false;EXTRA_TICKS.splice(EXTRA_TICKS.indexOf(tick),1);t.rowing=false;
+    t.h.position.x=start.x;t.h.position.z=start.z;player.g.visible=true;hideDlg();P.locked=false;$('joy').hidden=false;
+    [P.x,P.z]=PIRL(5,-4);collide();};
+  const rowPage=()=>{dlg('Treino na trirreme','O keleustés marca o ritmo',timingHTML('O <b>keleustés</b> grita "<b>Ô-opop!</b>" e o tocador de aulo marca o compasso. Puxe o remo quando o marcador estiver na <b>faixa verde</b>.','Remadas: '+strokes+' de 8 · no ritmo: '+good),
+    [{t:'Remar! 🚣',main:true,f:()=>{const ok=hitTiming();strokes++;if(ok){good++;vel+=4.2;}else vel+=1;
+      $('tInfo').textContent=(ok?'No ritmo! ':'Fora do ritmo: os remos se batem. ')+'Remadas: '+strokes+' de 8 · no ritmo: '+good;
+      if(strokes>=8){stopTiming();setTimeout(next,600);}}}]);
+    startTiming({speed:1,zone:.22});};
+  runSeq([
+   ()=>dlg('Porto do Pireu','A bordo da trirreme','<p>Nikos desce para o banco mais baixo, o dos <b>talamitas</b>, quase na altura da água. Em cima dele há mais duas fileiras de remadores.</p><p>Quem rema são principalmente os <b>tetas</b>, os cidadãos mais pobres, como Nikos. Também remam metecos e alguns escravizados.</p>'),
+   rowPage,
+   ()=>{EXTRA.remo=true;dlg('Treino na trirreme',good>=6?'Remador de primeira!':good>=3?'Nada mal para a primeira vez':'É preciso treinar mais',
+     '<p>Nikos acertou <b>'+good+' de 8</b> remadas no ritmo.</p><p>Numa trirreme, <b>170 homens</b> precisam remar juntos, como um só. Um remador que perde o ritmo atrapalha o navio inteiro. Por isso a frota treina muito.</p><p>Na expedição à Sicília, Atenas paga <b>1 dracma por dia</b> a cada remador. Para Nikos, a guerra também é um <b>salário</b>.</p><p class="hoje">É por isso que os cidadãos pobres apoiavam a frota: ela dava trabalho, dinheiro e importância política a quem não tinha dinheiro para ser hoplita.</p>',
+     [{t:'Voltar ao cais ▸',main:true,f:end}]);},
+  ]);
+}
+const ROWCAM={want:new THREE.Vector3(),look:new THREE.Vector3()};
+
+// ---------- O MISTÉRIO DAS HERMAS (algumas semanas depois) ----------
+const HERMS=scene.children.filter(o=>o.isGroup&&Math.abs(o.position.z-45.5)<.01&&o.position.x>-22.1&&o.position.x<-8.9);
+const hermBroken=[];
+function breakHerms(on){
+  if(on){HERMS.forEach((h,i)=>{h.children.forEach(c=>{if(c.position.y>1.68&&(i%3!==2||c.position.z>.2)){c.visible=false;}});
+      const frag=[];for(let k=0;k<3;k++){const f=mesh(new THREE.DodecahedronGeometry(.09+((i+k)%3)*.03,0),lam(0xe9dfce),h.position.x+.4-k*.3,h.position.y+.08,h.position.z+.55+k*.15);f.rotation.set(i,k,i+k);frag.push(f);}
+      hermBroken.push(...frag);});}
+  else{HERMS.forEach(h=>h.children.forEach(c=>c.visible=true));hermBroken.forEach(f=>scene.remove(f));hermBroken.length=0;}
+}
+function quiz(role,who,Q,after){dlg(role,who,'<p>'+Q.q+'</p>',Q.o.map((t,i)=>({t,f:()=>{const ok=i===Q.c;
+  $('dTxt').innerHTML='<div class="fb '+(ok?'ok':'no')+'"><b>'+(ok?'Boa pista.':'Pense de novo.')+'</b> '+(ok?'':'A resposta é: <b>'+Q.o[Q.c]+'</b>. ')+Q.e+'</div>';
+  const B=$('dBtns');B.innerHTML='';const b=document.createElement('button');b.textContent=after||'Continuar ▸';b.dataset.main='1';b.onclick=next;B.appendChild(b);}})));}
+function hermMystery(){
+  P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;markDiscovery('hermas_misterio');
+  breakHerms(true);
+  P.x=-15.5;P.z=49.5;P.a=Math.PI;collide();
+  let pistas=0;
+  const done=()=>{breakHerms(false);hideDlg();P.locked=false;$('joy').hidden=false;EXTRA.hermas=true;};
+  runSeq([
+   ()=>dlg('Algumas semanas depois','A cidade acorda assustada','<p>A frota para a Sicília está quase pronta. Mas numa manhã, os atenienses acordam e encontram <b>quase todas as hermas da cidade quebradas</b>: rostos esmagados, narizes e barbas no chão.</p><p>Ninguém viu nada. A cidade inteira quer saber: <b>quem fez isso, e por quê?</b> Nikos decide investigar.</p>'),
+   ()=>quiz('Pista 1 de 3','Por que tanto medo?',{q:'Hermes é o deus que protege os <b>viajantes</b> e os caminhos. Por que a destruição das hermas assusta tanto os atenienses <b>justamente agora</b>?',
+      o:['Porque as estátuas eram muito caras','Porque a maior frota de Atenas está para viajar, e isso parece um mau sinal dos deuses','Porque Hermes era o deus da guerra'],c:1,
+      e:'Muitos achavam que era um <b>mau presságio</b> para a expedição. Outros temiam que fosse um plano para <b>derrubar a democracia</b>: gente organizada, agindo à noite, em segredo.'}),
+   ()=>quiz('Pista 2 de 3','A testemunha',{q:'Um homem chamado <b>Diocleides</b> diz à assembleia que viu uns 300 homens naquela noite e reconheceu os rostos <b>à luz da lua</b>. Mas, segundo o escritor Plutarco, a noite do crime foi de <b>lua nova</b>. O que isso indica?',
+      o:['Que ele tinha uma visão muito boa','Que a história dele pode ser falsa: sem lua, não dava para reconhecer ninguém','Que o crime aconteceu de dia'],c:1,
+      e:'Mais tarde, Diocleides confessou que tinha <b>mentido</b>. Mas antes disso muitos homens foram presos por causa do testemunho dele. Testemunhas podiam ganhar <b>recompensas</b>, e isso estimulava falsas denúncias.'}),
+   ()=>quiz('Pista 3 de 3','Um nome muito conveniente',{q:'Logo surge outro boato: <b>Alcibíades</b>, o líder da expedição, teria zombado de cerimônias religiosas sagradas. Ele pede para ser julgado <b>antes</b> de partir. Os inimigos dele preferem deixar o julgamento para <b>depois</b>. Por quê?',
+      o:['Porque assim o julgamento seria mais justo','Porque, com Alcibíades longe e os soldados que o apoiavam também longe, seria mais fácil condená-lo','Porque a lei proibia julgamentos em tempo de guerra'],c:1,
+      e:'Os soldados e remadores gostavam de Alcibíades. Com eles fora de Atenas, os inimigos dele teriam mais força na cidade. Uma acusação também pode ser uma <b>arma política</b>.'}),
+   ()=>dlg('O que aconteceu depois','O mistério nunca foi resolvido','<p>A frota partiu. Pouco depois, a cidade mandou um navio buscar Alcibíades na Sicília para ser julgado. No caminho, ele <b>fugiu para Esparta</b>, a grande inimiga de Atenas, e passou a ajudar os espartanos.</p><p>Um homem chamado <b>Andócides</b> confessou e apontou outros nomes para salvar a própria vida. Alguns acusados foram executados e outros fugiram.</p><p>Até hoje, os historiadores <b>não sabem ao certo</b> quem quebrou as hermas.</p><p class="hoje">Investigar o passado também é assim: comparar <b>fontes</b>, desconfiar de boatos e perguntar <b>quem ganha</b> com cada versão.</p>',
+     [{t:'Voltar ao dia da assembleia ▸',main:true,f:done}]),
+  ]);
+}
+addPlace({id:'hermas_misterio',x:-15.5,z:48.6,t:'O mistério das hermas',sub:'Algumas semanas depois de hoje',
+  txt:'<p>Daqui a algumas semanas, numa única noite, quase todas as hermas da cidade serão <b>quebradas</b>. Quer saltar no tempo e investigar o que aconteceu?</p>',
+  act:()=>({l:EXTRA.hermas?'Investigar de novo':'Investigar o mistério',f:hermMystery})});
+DISCOVERY_ITEMS.push({id:'hermas_misterio',ico:'🔍',title:'Mistério das hermas',text:'Boatos, falsas testemunhas e acusações políticas: o caso nunca foi resolvido.'});
+
+// =====================================================================
+// RODADA 3: templos pintados, templo de Atena Nice, amanhecer, noite e lamparinas
+// =====================================================================
+const GOLD=new THREE.MeshStandardMaterial({color:0xd9a93c,metalness:.65,roughness:.32});
+const RED=lam(0xa8322a),BLUE=lam(0x24468f),GREEN=lam(0x3f6b3a),OCHRE=lam(0xc28a3a);
+function canvasTex(w,h,draw,rep=1){const cv=document.createElement('canvas');cv.width=w;cv.height=h;draw(cv.getContext('2d'),w,h);
+  const t=new THREE.CanvasTexture(cv);t.wrapS=THREE.RepeatWrapping;t.anisotropy=4;t.repeat.x=rep;return t;}
+const MARBLE_C='#efe6d4';
+// pequena figura em relevo, desenhada em canvas (cabeça, corpo, pernas e braços)
+function relief(c,x,y,s,o={}){c.save();c.translate(x,y);c.scale(s,s);c.fillStyle=o.col||MARBLE_C;c.strokeStyle=o.col||MARBLE_C;c.lineCap='round';
+  c.lineWidth=7;c.beginPath();c.arc(0,-62,9,0,7);c.fill();                        // cabeça
+  c.beginPath();c.moveTo(-10,-50);c.lineTo(10,-50);c.lineTo(o.robe?16:8,o.robe?2:-14);c.lineTo(o.robe?-16:-8,o.robe?2:-14);c.fill(); // corpo
+  if(o.cloth){c.fillStyle=o.cloth;c.beginPath();c.moveTo(-11,-46);c.lineTo(11,-46);c.lineTo(o.robe?17:10,o.robe?4:-10);c.lineTo(o.robe?-17:-10,o.robe?4:-10);c.fill();c.fillStyle=o.col||MARBLE_C;}
+  if(!o.robe){c.beginPath();c.moveTo(-4,-14);c.lineTo(-12-(o.step||8),14);c.moveTo(4,-14);c.lineTo(10+(o.step||8),14);c.stroke();}
+  c.beginPath();c.moveTo(-8,-46);c.lineTo(-22,-30+(o.armA||0));c.moveTo(8,-46);c.lineTo(22,-34-(o.armB||0));c.stroke();
+  if(o.shield){c.fillStyle='#d9a93c';c.beginPath();c.arc(-22,-30,13,0,7);c.fill();c.fillStyle=o.col||MARBLE_C;c.beginPath();c.arc(-22,-30,9,0,7);c.fill();}
+  if(o.spear){c.strokeStyle='#5a3a22';c.lineWidth=3;c.beginPath();c.moveTo(22,-34);c.lineTo(34,-80);c.stroke();}
+  c.restore();}
+function horse(c,x,y,s,col){c.save();c.translate(x,y);c.scale(s,s);c.fillStyle=col||MARBLE_C;c.strokeStyle=col||MARBLE_C;c.lineWidth=7;c.lineCap='round';
+  c.beginPath();c.ellipse(0,-22,26,11,0,0,7);c.fill();c.beginPath();c.moveTo(20,-28);c.lineTo(34,-50);c.stroke();c.beginPath();c.ellipse(38,-52,8,5,-.5,0,7);c.fill();
+  for(const [a,b] of[[-18,-28],[-10,-6],[12,22],[18,30]]){c.beginPath();c.moveTo(a,-14);c.lineTo(b,10);c.stroke();}c.restore();}
+// friso dórico: tríglifos azuis e métopas vermelhas com cenas de luta
+const DORIC=canvasTex(1024,128,(c,w,h)=>{
+  for(let i=0;i<4;i++){const x0=i*256;
+    c.fillStyle='#1f3f8a';c.fillRect(x0,0,96,h);c.fillStyle='#132a5e';for(const gx of[22,46,70])c.fillRect(x0+gx,8,8,h-16);
+    c.fillStyle='#a8322a';c.fillRect(x0+96,0,160,h);c.strokeStyle='#7d231d';c.lineWidth=3;c.strokeRect(x0+99,3,154,h-6);
+    const m=x0+96;
+    if(i===0){relief(c,m+55,h-14,1.25,{shield:true,spear:true,step:12});horse(c,m+112,h-12,1.05);relief(c,m+120,h-48,.85,{armB:20});}  // lápita contra centauro
+    if(i===1){relief(c,m+50,h-14,1.25,{shield:true,step:14,armB:25});relief(c,m+112,h-14,1.25,{shield:true,spear:true,step:6});}
+    if(i===2){relief(c,m+45,h-14,1.25,{robe:true,cloth:'#3f6b3a'});relief(c,m+112,h-14,1.25,{shield:true,spear:true,step:10});}
+    if(i===3){relief(c,m+80,h-14,1.3,{robe:true,cloth:'#c28a3a',armA:-12,armB:12});}
+  }
+  c.fillStyle='#d9a93c';c.fillRect(0,0,w,5);c.fillRect(0,h-5,w,5);
+});
+// friso jônico do Partenon: a procissão das Panateneias, em fundo azul
+const PROCESSION=canvasTex(2048,128,(c,w,h)=>{
+  c.fillStyle='#2b4f9a';c.fillRect(0,0,w,h);
+  const cl=['#a8322a','#3f6b3a','#c28a3a','#7a2f5a'];
+  for(let i=0;i<22;i++){const x=40+i*92;
+    if(i%4===1){horse(c,x,h-12,1.1);relief(c,x+6,h-46,.85,{step:2,armB:10,cloth:cl[i%4]});}
+    else relief(c,x,h-12,1.3,{robe:i%3!==0,cloth:cl[i%4],armB:i%2?20:0,step:6});
+    if(i%5===3){c.fillStyle='#c26a3a';c.beginPath();c.ellipse(x+22,h-90,9,13,0,0,7);c.fill();} // jarro levado na cabeça
+  }
+  c.fillStyle='#d9a93c';c.fillRect(0,0,w,4);c.fillRect(0,h-4,w,4);
+});
+// faixa de meandro (a "grega") em dourado sobre vermelho
+const MEANDER=canvasTex(512,32,(c,w,h)=>{c.fillStyle='#a8322a';c.fillRect(0,0,w,h);c.strokeStyle='#e8c35a';c.lineWidth=4;
+  for(let x=0;x<w;x+=32){c.beginPath();c.moveTo(x+2,28);c.lineTo(x+2,4);c.lineTo(x+26,4);c.lineTo(x+26,22);c.lineTo(x+12,22);c.lineTo(x+12,12);c.lineTo(x+18,12);c.stroke();}
+  c.fillStyle='#24468f';c.fillRect(0,0,w,2);c.fillRect(0,h-2,w,2);});
+function bandMat(tex,rep){const t=tex.clone();t.needsUpdate=true;t.repeat.x=rep;return new THREE.MeshStandardMaterial({map:t,roughness:.75});}
+// coloca uma faixa pintada nos 4 lados de um retângulo (comprimento L em x, largura W em z)
+function band4(g,tex,L,W,y,h,tile,off=.02){
+  for(const s of[-1,1]){
+    const a=new THREE.Mesh(new THREE.PlaneGeometry(L,h),bandMat(tex,L/tile));a.position.set(0,y,s*(W/2+off));a.rotation.y=s>0?0:Math.PI;g.add(a);
+    const b=new THREE.Mesh(new THREE.PlaneGeometry(W,h),bandMat(tex,W/tile));b.position.set(s*(L/2+off),y,0);b.rotation.y=s*Math.PI/2;g.add(b);}
+}
+function acroterion(g,x,y,z,s=1){const a=new THREE.Group();a.position.set(x,y,z);a.scale.setScalar(s);g.add(a);
+  mesh(new THREE.SphereGeometry(.22,10,8).scale(1,1.4,.35),GOLD,0,.28,0,a);for(const k of[-1,1]){const l=mesh(new THREE.SphereGeometry(.12,8,6).scale(1,1.6,.35),GOLD,k*.2,.16,0,a);l.rotation.z=-k*.6;}
+  mesh(new THREE.CylinderGeometry(.08,.12,.14,8),GOLD,0,0,0,a);return a;}
+// estátuas coloridas no frontão (como se pintavam de verdade)
+function pedimentStatues(g,xFace,base,w,hMax,dir){
+  const robes=[RED,BLUE,GREEN,OCHRE,RED,BLUE,GREEN,OCHRE,BLUE];
+  const skin=lam(0xe9dcc6),n=9;
+  for(let i=0;i<n;i++){const u=-1+2*(i+.5)/n,hAv=hMax*(1-Math.abs(u))-.08,z=u*(w/2-.9);
+    const f=new THREE.Group();f.position.set(xFace,base,z);f.rotation.y=dir>0?Math.PI/2:-Math.PI/2;g.add(f);
+    if(hAv<.75){ // figuras deitadas nos cantos
+      const b=mesh(new THREE.CylinderGeometry(.15,.18,.95,8),robes[i],0,.17,0,f);b.rotation.z=Math.PI/2;b.rotation.y=u>0?.25:-.25;
+      mesh(new THREE.SphereGeometry(.12,8,6),skin,(u>0?-1:1)*-.5,.27,0,f);continue;}
+    const hh=Math.min(hAv,2.2),k=hh/1.8;
+    mesh(new THREE.CylinderGeometry(.14*k,.24*k,1.3*k,10),robes[i],0,.65*k,0,f);
+    mesh(new THREE.SphereGeometry(.13*k,10,8),skin,0,1.43*k,0,f);
+    mesh(new THREE.SphereGeometry(.135*k,10,6,0,Math.PI*2,0,Math.PI*.55),lam(0x5a3a22),0,1.47*k,-.01,f);
+    if(i===4){ // no centro, Atena com elmo e lança dourados
+      mesh(new THREE.ConeGeometry(.15*k,.3*k,10),GOLD,0,1.62*k,0,f);col(.025*k,2.1*k,GOLD,.3*k,1.05*k,0,f);
+      mesh(new THREE.CylinderGeometry(.3*k,.3*k,.04,14),GOLD,-.28*k,.9*k,.1,f).rotation.x=Math.PI/2;}
+    else if(i%2)col(.02*k,.9*k,GOLD,.22*k,.95*k,0,f).rotation.z=.4;
+  }
+}
+function paintTemple(g,o={}){
+  const {w,d,ch}=g.userData,top=1.2+ch;
+  // friso dórico em volta, por fora das peças antigas
+  band4(g,DORIC,d+.44,w+.44,top+.55,.6,1.2*4,.06);
+  // meandro logo abaixo do telhado
+  band4(g,MEANDER,d+.62,w+.62,top+.93,.16,.8,.02);
+  // ressalto (geison) onde ficam as estátuas do frontão
+  for(const s of[-1,1]){box(.6,.14,w+.2,M.marble,s*(d/2+.55),top+1.03,0,g);pedimentStatues(g,s*(d/2+.5),top+1.1,w,w*.18-.25,s);}
+  // acrotérios dourados no alto e nas pontas dos frontões
+  for(const s of[-1,1]){acroterion(g,s*(d/2+.32),top+1+w*.18+.05,0,1.4);for(const k of[-1,1])acroterion(g,s*(d/2+.32),top+1.12,k*(w/2+.25),.9);}
+  // capitéis com anéis vermelho e azul
+  const r=w*.035,cy=1.2+ch/2;const ringR=new THREE.CylinderGeometry(r*1.06,r*1.06,.1,12),ringB=new THREE.CylinderGeometry(r*1.18,r*1.12,.12,12);
+  const cols=[];for(let i=0;i<o.nz;i++)for(const s of[-1,1])cols.push([-d/2+.6+i*(d-1.2)/(o.nz-1),s*(w/2-.6)]);
+  for(let j=1;j<o.nx-1;j++)for(const s of[-1,1])cols.push([s*(d/2-.6),-w/2+.6+j*(w-1.2)/(o.nx-1)]);
+  for(const [x,z] of cols){mesh(ringR,RED,x,cy+ch/2-.42,z,g);mesh(ringB,BLUE,x,cy+ch/2-.12,z,g);}
+  // portas de bronze e madeira nas duas pontas da cela
+  for(const s of[-1,1]){const dr=box(.08,ch*.55,w*.2,lam(0x6b4a2a),s*(d/2-1.79),1.2+ch*.275,0,g);box(.1,.12,w*.22,GOLD,s*(d/2-1.79),1.2+ch*.55,0,g);}
+  // Partenon: o friso das Panateneias no alto das paredes da cela
+  if(o.procession)band4(g,PROCESSION,d-3.6,w-3.2,top-.4,.75,8,.03);
+}
+paintTemple(PARTENON,{nx:8,nz:17,procession:true});
+paintTemple(HEPH,{nx:6,nz:13});
+// Propileus: faixas pintadas e acrotérios
+{ const pr=scene.children.find(o=>o.isGroup&&Math.abs(o.position.x-42)<.01&&Math.abs(o.position.z+58)<.01);
+  if(pr){band4(pr,MEANDER,7.2,8.2,6.45,.16,.8,.02);
+    for(const s of[-1,1]){const w=new THREE.Group();w.position.x=s*5.6;pr.add(w);band4(w,MEANDER,4.9,7.5,7.33,.14,.8,.01);}}}
+
+// ---------- TEMPLO DE ATENA NICE, sobre o bastião ----------
+const NIKE={x:35.5,z:-47.5};
+{ const top=H(42,-58)+.4,bot=Math.min(H(NIKE.x,NIKE.z),H(NIKE.x-4,NIKE.z+4))-1;
+  const bh=top-bot;box(9,bh,8,M.stone,NIKE.x,bot+bh/2,NIKE.z);   // bastião de pedra
+  colliders.push({x:NIKE.x,z:NIKE.z,hw:4.5,hd:4});
+  const g=new THREE.Group();g.position.set(NIKE.x,top,NIKE.z);g.rotation.y=0;scene.add(g);
+  const L=8.2,W=5.4;
+  box(L,.45,W,M.marble,0,.22,0,g);
+  box(4.2,3.6,4.2,M.plaster,0,2.25,0,g);                         // cela pequena
+  for(const s of[-1,1])for(let i=0;i<4;i++){const z=-W/2+.55+i*(W-1.1)/3;col(.2,3.6,M.marble,s*(L/2-.5),2.25,z,g);
+    for(const k of[-1,1]){const v=mesh(new THREE.CylinderGeometry(.11,.11,.16,10),BLUE,s*(L/2-.5),4.06,z+k*.2,g);v.rotation.x=Math.PI/2;}  // volutas jônicas
+    box(.5,.12,.55,M.marble,s*(L/2-.5),4.12,z,g);}
+  box(L+.2,.5,W+.2,M.marble,0,4.43,0,g);
+  const ng={userData:{}};
+  band4(g,PROCESSION,L+.22,W+.22,4.88,.5,8,.03);                  // friso jônico contínuo
+  box(L+.4,.18,W+.4,M.marble,0,5.22,0,g);band4(g,MEANDER,L+.42,W+.42,5.22,.16,.8,.01);
+  gable(L+.4,W+.5,1.0,M.marble,0,5.3,0,g);gable(L+.2,W+.7,1.0,M.tile,0,5.4,0,g);
+  const tri=new THREE.Shape();tri.moveTo(-W/2+.25,0);tri.lineTo(W/2-.25,0);tri.lineTo(0,.85);tri.lineTo(-W/2+.25,0);
+  for(const s of[-1,1]){const p=new THREE.Mesh(new THREE.ShapeGeometry(tri),BLUE);p.rotation.y=s*Math.PI/2;p.position.set(s*(L/2+.21),5.31,0);g.add(p);
+    acroterion(g,s*(L/2+.22),6.3,0,1);for(const k of[-1,1])acroterion(g,s*(L/2+.22),5.4,k*(W/2+.2),.7);}
+  // a estátua de Atena Nice, de madeira, vista pela porta
+  const st=new THREE.Group();st.position.set(1.4,.45,0);st.rotation.y=Math.PI/2;g.add(st);
+  mesh(new THREE.CylinderGeometry(.2,.32,1.6,10),OCHRE,0,.8,0,st);mesh(new THREE.SphereGeometry(.16,10,8),lam(0x8a6a4a),0,1.75,0,st);
+  mesh(new THREE.ConeGeometry(.17,.3,10),GOLD,0,1.92,0,st);mesh(new THREE.SphereGeometry(.12,8,6),GOLD,.35,1.15,.1,st);   // romã na mão
+  box(.06,2.6,1.6,lam(0x6b4a2a),2.12,1.75,0,g);                                        // porta aberta (batentes)
+  window.__nike={g,top};
+}
+addPlace({id:'nike',x:NIKE.x+4.6,z:NIKE.z-3.2,t:'Templo de Atena Nice',sub:'A deusa que traz a vitória',
+  txt:'<p>Este templo pequeno, todo de mármore, foi terminado há poucos anos. Ele fica num <b>bastião</b>, uma antiga muralha avançada na entrada da Acrópole.</p><p><b>Nice</b> quer dizer <b>vitória</b> em grego. Aqui Atena é honrada como a deusa que dá a vitória na guerra. As colunas são do estilo <b>jônico</b>, com volutas em espiral. O friso mostra deuses e <b>batalhas</b>, inclusive a de Maratona contra os persas.</p><p>Muito tempo depois, um viajante grego contou que a estátua de madeira daqui não tinha asas: assim, a vitória <b>nunca iria embora</b> de Atenas.</p><p class="hoje">A palavra <b>Nike</b> virou nome de uma marca de tênis e de muitos prêmios esportivos.</p>'});
+DISCOVERY_ITEMS.push({id:'nike',ico:'🏛️',title:'Atena Nice',text:'Templo jônico da deusa da vitória, na entrada da Acrópole.'});
+{ const j={t:'Templo de Atena Nice',at:[NIKE.x+8,NIKE.z-7],look:[NIKE.x,NIKE.z]};JUMPS.push(j);const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);}
+
+// ---------- AMANHECER, DIA, ENTARDECER E NOITE ----------
+const cDawn={sun:new THREE.Color(0xffb08a),top:new THREE.Color(0x8c9fd0),bot:new THREE.Color(0xf6c3a8),fog:new THREE.Color(0xe7c9b8)};
+const cNight={sun:new THREE.Color(0xa6bcef),top:new THREE.Color(0x050b1f),bot:new THREE.Color(0x1c2846),fog:new THREE.Color(0x1a2236)};
+// estrelas e lua acompanham a câmera, como se estivessem no céu
+const stars=(()=>{const n=900,p=new Float32Array(n*3);for(let i=0;i<n;i++){const a=Math.random()*6.28,e=Math.random()*.95+.05,r=520;
+    p[i*3]=Math.cos(a)*Math.cos(e*1.5)*r;p[i*3+1]=Math.sin(e*1.5)*r;p[i*3+2]=Math.sin(a)*Math.cos(e*1.5)*r;}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  const m=new THREE.PointsMaterial({color:0xffffff,size:1.8,sizeAttenuation:false,transparent:true,opacity:0,fog:false,depthWrite:false});
+  const s=new THREE.Points(g,m);s.visible=false;scene.add(s);return s;})();
+const moon=mesh(new THREE.SphereGeometry(14,20,14),new THREE.MeshBasicMaterial({color:0xf3efdc,fog:false}),0,0,0);moon.visible=false;
+const glowTex=canvasTex(64,64,(c)=>{const g=c.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,220,150,1)');g.addColorStop(.25,'rgba(255,170,70,.6)');g.addColorStop(1,'rgba(255,120,30,0)');c.fillStyle=g;c.fillRect(0,0,64,64);});
+glowTex.wrapS=THREE.ClampToEdgeWrapping;
+const CLOUD_MATS=[];scene.traverse(o=>{if(o.isMesh&&o.material&&o.material.transparent&&o.material.opacity===.92&&o.material.fog===false&&!CLOUD_MATS.includes(o.material))CLOUD_MATS.push(o.material);});
+const TOD={night:0,lampK:0};
+function applyTOD(d,py){
+  let a,b,k;if(d<0){a=cDay;b=cDawn;k=-d;}else if(d<=1){a=cDay;b=cDusk;k=d;}else{a=cDusk;b=cNight;k=Math.min(1,d-1);}
+  sun.color.copy(a.sun).lerp(b.sun,k);skyU.top.value.copy(a.top).lerp(b.top,k);skyU.bot.value.copy(a.bot).lerp(b.bot,k);scene.fog.color.copy(a.fog).lerp(b.fog,k);
+  const night=Math.max(0,Math.min(1,d-1));TOD.night=night;TOD.lampK=Math.max(0,Math.min(1,(d-.75)/1));
+  sun.intensity=d<0?1.25-.35*k:d<=1?1.25-.45*d:.8-.52*night;
+  hemi.intensity=d<0?.62-.12*k:d<=1?.62-.22*d:.40-.16*night;
+  renderer.toneMappingExposure=1.02;
+  const dl=Math.max(0,Math.min(1,d));
+  sun.position.set(P.x+60-30*dl-(d<0?140*k:0)-60*night,py+110-70*dl-(d<0?55*k:0)+90*night,P.z+40-30*night);sun.target.position.set(P.x,py,P.z);
+  stars.visible=night>.02;stars.material.opacity=night;stars.position.copy(camera.position);
+  moon.visible=night>.02;moon.position.set(camera.position.x-180,camera.position.y+300,camera.position.z-260);
+  for(const m of CLOUD_MATS){m.emissive.setScalar(.54*(1-night*.85));m.color.setScalar(1-night*.75);}
+}
+
+// ---------- lamparinas e tochas ----------
+const LAMPS=[];
+function lampAt(x,z,y){LAMPS.push({x,z,y:y!==undefined?y:H(x,z)});}
+// ao longo das ruas
+for(const [a,b] of ROADS){const L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.floor(L/15),nx=-(b[1]-a[1])/L,nz=(b[0]-a[0])/L;
+  for(let i=1;i<=n;i++){const t=i/(n+1),s=i%2?1:-1;lampAt(a[0]+(b[0]-a[0])*t+nx*2.6*s,a[1]+(b[1]-a[1])*t+nz*2.6*s);}}
+// nas portas e pórticos
+const atLocal=(x,z,rot,lx,lz)=>[x+lx*Math.cos(rot)+lz*Math.sin(rot),z-lx*Math.sin(rot)+lz*Math.cos(rot)];
+for(const [x,z,len,rot] of [[-33,18,22,Math.PI/2],[10,40,30,Math.PI]])for(const s of[-1,1])lampAt(...atLocal(x,z,rot,s*(len/2+1),5.2));
+lampAt(...atLocal(-37,0,Math.PI/2,-8.5,8));lampAt(...atLocal(-37,0,Math.PI/2,8.5,8));
+lampAt(HOUSE.x-3.6,HOUSE.z-3.6);lampAt(HOUSE.x-3.6,HOUSE.z+3.6);
+lampAt(TEATRO.cx-5.6,TEATRO.cz+1.8);lampAt(TEATRO.cx+5.6,TEATRO.cz+1.8);
+lampAt(...atLocal(OF.x,OF.z,OF.rot,-3.6,2.6));
+for(let i=-2;i<=2;i++)lampAt(...PIRL(i*12,-1.2));
+for(const s of[-1,1])lampAt(...gymL(s*9,9));
+lampAt(BEMA.x-3,BEMA.z+3);lampAt(BEMA.x+3,BEMA.z+3);
+lampAt(PARTH.x+15,PARTH.z-4,H(ACRO.x,ACRO.z));lampAt(PARTH.x+15,PARTH.z+4,H(ACRO.x,ACRO.z));lampAt(PARTH.x-15,PARTH.z-5,H(ACRO.x,ACRO.z));lampAt(PARTH.x-15,PARTH.z+5,H(ACRO.x,ACRO.z));
+lampAt(NIKE.x+4.4,NIKE.z-3,window.__nike.top);lampAt(46,-52);lampAt(46,-64);
+lampAt(-22,-15);lampAt(-6,-17);lampAt(0,4);lampAt(14,10);lampAt(-12,32);lampAt(20,30);
+// postes, bacias e chamas desenhados de uma vez (InstancedMesh), para pesar pouco
+const LAMP_N=LAMPS.length;
+const postI=new THREE.InstancedMesh(new THREE.CylinderGeometry(.06,.08,2.2,6),M.wood,LAMP_N);
+const bowlI=new THREE.InstancedMesh(new THREE.CylinderGeometry(.22,.1,.18,10),M.bronze||GOLD,LAMP_N);
+const flameMat=new THREE.MeshBasicMaterial({color:0xffb040,transparent:true,opacity:0});
+const flameI=new THREE.InstancedMesh(new THREE.ConeGeometry(.13,.42,7),flameMat,LAMP_N);
+{ const o=new THREE.Object3D();LAMPS.forEach((l,i)=>{o.position.set(l.x,l.y+1.1,l.z);o.updateMatrix();postI.setMatrixAt(i,o.matrix);
+    o.position.y=l.y+2.25;o.updateMatrix();bowlI.setMatrixAt(i,o.matrix);o.position.y=l.y+2.52;o.updateMatrix();flameI.setMatrixAt(i,o.matrix);
+    colliders.push({x:l.x,z:l.z,r:.2});});
+  postI.castShadow=true;scene.add(postI,bowlI,flameI);}
+// brilho das chamas: um único conjunto de pontos com brilho aditivo
+const glowPts=(()=>{const p=new Float32Array(LAMP_N*3);LAMPS.forEach((l,i)=>{p[i*3]=l.x;p[i*3+1]=l.y+2.55;p[i*3+2]=l.z;});
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  const m=new THREE.PointsMaterial({size:2.6,map:glowTex,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,color:0xffc070});
+  const s=new THREE.Points(g,m);s.visible=false;scene.add(s);return s;})();
+// manchas de luz no chão em volta de cada tocha (sem luzes de verdade, para não pesar)
+const poolMat=new THREE.MeshBasicMaterial({map:glowTex,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,color:0xff9a50,polygonOffset:true,polygonOffsetFactor:-2});
+const poolI=new THREE.InstancedMesh(new THREE.PlaneGeometry(9,9).rotateX(-Math.PI/2),poolMat,LAMP_N);
+{ const o=new THREE.Object3D();LAMPS.forEach((l,i)=>{o.position.set(l.x,l.y+.08,l.z);o.updateMatrix();poolI.setMatrixAt(i,o.matrix);});poolI.visible=false;scene.add(poolI);}
+EXTRA_TICKS.push(dt=>{
+  const k=TOD.lampK;flameMat.opacity=k;flameI.visible=k>.01;glowPts.visible=k>.01;glowPts.material.opacity=k*(.85+Math.sin(t0*9)*.08);
+  poolI.visible=k>.01;poolMat.opacity=k*.55*(1+Math.sin(t0*7)*.04);
+  // fogo do altar de Zeus e do forno ficam mais visíveis à noite
+  if(window.__zeusFire&&window.__zeusFire.fire&&!window.__zeusFire.flame.visible)window.__zeusFire.fire.intensity=0;
+});
+
+// ---------- botão para escolher a hora do dia ----------
+{ const HOURS=[['🌅 Amanhecer',-1],['☀️ Dia',0],['🌇 Entardecer',1],['🌙 Noite',2]];
+  const b=document.createElement('button');b.id='btnHour';b.title='Mudar a hora do dia';
+  const label=()=>{let i=0,best=9;HOURS.forEach((h,j)=>{const e=Math.abs(h[1]-duskT);if(e<best){best=e;i=j;}});b.textContent=HOURS[i][0];return i;};
+  b.onclick=()=>{const i=(label()+1)%HOURS.length;duskT=HOURS[i][1];EXTRA.hora=duskT;label();
+    if(duskT===2)toast('Noite em Atenas: as lamparinas de azeite e as tochas iluminam as ruas.');
+    if(duskT===-1)toast('Amanhecer: a cidade acorda cedo, antes do calor.');};
+  $('btnCam').after(b);label();setInterval(label,1500);
+  EXTRA_RESTORE.push(()=>{if(typeof EXTRA.hora==='number'){duskT=EXTRA.hora;label();}});
+}
+// o jogo começa ao amanhecer e clareia aos poucos
+{ const _begin=begin;begin=function(...a){const r=_begin.apply(this,a);if(duskT===0)dusk=-1;return r;};}
+
+// =====================================================================
+// RODADA 4: o jantar com a família, à noite, no fim do dia
+// =====================================================================
+const DIN={lx:5.5,lz:.2};                                    // mesa no pátio da casa (coordenadas da casa)
+const DINW=[HOUSE.x+DIN.lx,HOUSE.z+DIN.lz];
+const dinG=new THREE.Group();dinG.position.set(DIN.lx,.2,DIN.lz);window.__house.add(dinG);
+{ // mesa baixa e banquinhos
+  mesh(new THREE.CylinderGeometry(.75,.75,.07,20),M.wood,0,.5,0,dinG);
+  for(let i=0;i<3;i++){const a=i*2.09;const l=box(.07,.47,.07,M.wood,Math.cos(a)*.5,.24,Math.sin(a)*.5,dinG);}
+  for(const [a] of [[0],[Math.PI/2],[-Math.PI/2]]){const x=Math.sin(a)*1.25,z=Math.cos(a)*1.25;
+    mesh(new THREE.CylinderGeometry(.22,.2,.08,12),M.wood,x,.42,z,dinG);for(const k of[-1,1])box(.05,.4,.05,M.wood,x+k*.13,.2,z,dinG);}
+  // comida: pão, lentilhas, azeitonas, figos, queijo, cebola e o vaso de misturar vinho com água
+  softPut('comida/loaf-round.glb',{parent:dinG,x:.25,z:-.2,y:.54,s:.32});
+  softPut('comida/loaf-round.glb',{parent:dinG,x:.05,z:-.35,y:.54,s:.26,rot:1});
+  softPut('comida/cheese.glb',{parent:dinG,x:-.35,z:.2,y:.54,s:.3});
+  softPut('comida/onion.glb',{parent:dinG,x:-.15,z:.42,y:.54,s:.24});softPut('comida/onion.glb',{parent:dinG,x:-.02,z:.48,y:.54,s:.22,rot:2});
+  softPut('gregos/classical-pottery-set.glb',{parent:dinG,node:'Bowl_1',x:.38,z:.3,y:.54,s:.09});
+  mesh(new THREE.CylinderGeometry(.11,.11,.02,14),lam(0x6b4a2a),.38,.6,.3,dinG);      // lentilhas na tigela
+  const oliveM=lam(0x48492b),figM=lam(0x5a3550);
+  for(let i=0;i<9;i++){const a=i*2.4;mesh(new THREE.SphereGeometry(.03,6,5),oliveM,-.4+Math.cos(a)*.07,.57,-.25+Math.sin(a)*.07,dinG);}
+  for(let i=0;i<5;i++){const a=i*1.3;mesh(new THREE.SphereGeometry(.045,8,6).scale(1,1.2,1),figM,-.1+Math.cos(a)*.08,.58,-.05+Math.sin(a)*.08,dinG);}
+  softPut('gregos/classical-pottery-set.glb',{parent:dinG,node:'Vase_Wide',x:1.15,z:.75,y:0,s:.16});  // krater no chão
+  // a lamparina de azeite no meio da mesa
+  softPut('gregos/classical-pottery-set.glb',{parent:dinG,node:'Oil_Lamp',x:0,z:.05,y:.54,s:.07});
+}
+const dinFlame=mesh(new THREE.ConeGeometry(.035,.12,7),new THREE.MeshBasicMaterial({color:0xffb040}),.05,.66,.05,dinG);
+const dinGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xffc070,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+dinGlow.scale.setScalar(1.3);dinGlow.position.set(.05,.68,.05);dinG.add(dinGlow);
+// a família: mãe, irmã mais nova e avô (aparecem só no jantar)
+const FAMILY={};
+function seatAt(o,a,scale=1){const f=makeFigure(o);f.seated=true;f.legs.forEach(l=>l.visible=false);f.g.scale.setScalar(scale);
+  f.g.position.set(Math.sin(a)*1.25,.46-.72*scale+.0,Math.cos(a)*1.25);f.g.rotation.y=a+Math.PI;dinG.add(f.g);statics.push(f);f.hide=true;f.g.visible=false;return f;}
+FAMILY.mae=seatAt({dress:true,tunic:0x7c6a52,veil:0x8c6c4e},Math.PI/2);
+FAMILY.irma=seatAt({dress:true,tunic:0xb99a68,hair:0x2e2018},0,.82);
+FAMILY.avo=seatAt({tunic:0xcfc0a0,himation:0x6a6a64,beard:true,hair:0xbdb6aa},-Math.PI/2);
+FAMILY.mae.arms[1].rotation.x=-.9;FAMILY.avo.arms[0].rotation.x=-.8;
+function familyVisible(on){for(const k in FAMILY){FAMILY[k].hide=!on;FAMILY[k].g.visible=on;}dinG.visible=true;}
+// a câmera fica no lugar de Nikos, olhando a família do outro lado da mesa
+const DINCAM={want:new THREE.Vector3(),look:new THREE.Vector3()};
+function setDinCam(){const y=H(DINW[0],DINW[1])+.2;DINCAM.want.set(DINW[0],y+1.7,DINW[1]-2.4);DINCAM.look.set(DINW[0],y+.85,DINW[1]+.5);}
+function speakAt(f){for(const k in FAMILY)FAMILY[k].gesture=0;if(f)f.gesture=1;}
+const voteTxt=()=>S.vote==='war'?'Nikos conta que levantou a mão <b>a favor da expedição</b>, como quase todo mundo.':S.vote==='peace'?'Nikos conta que votou <b>contra a expedição</b>, junto com os poucos que concordaram com Nícias.':'Nikos conta como foi a assembleia e a grande discussão sobre a Sicília.';
+function dinnerQuiz(role,who,Q,f){speakAt(f);dlg(role,who,'<p>'+Q.q+'</p>',Q.o.map((t,i)=>({t,f:()=>{
+  const ok=Q.c===undefined||i===Q.c;const fb=Q.fb?Q.fb[i]:Q.e;
+  $('dTxt').innerHTML='<div class="fb '+(ok?'ok':'no')+'">'+(Q.c!==undefined?'<b>'+(ok?'Isso mesmo.':'Não poderia.')+'</b> '+(ok?'':'A resposta é: <b>'+Q.o[Q.c]+'</b>. '):'')+fb+'</div>';
+  const B=$('dBtns');B.innerHTML='';const b=document.createElement('button');b.textContent='Continuar ▸';b.dataset.main='1';b.onclick=next;B.appendChild(b);}})));}
+const DINNER=[
+ ()=>{S.inDinner=true;setDinCam();familyVisible(true);player.g.visible=false;duskT=2;
+   const ol=window.__house.children.find(o=>o.isPointLight);if(ol){DINNER.light=ol;DINNER.lp=ol.position.clone();DINNER.li=ol.intensity;ol.position.set(DIN.lx,1.3,DIN.lz);ol.intensity=1.4;ol.distance=6;}
+   speakAt(null);
+   dlg('Em casa, à noite','O jantar da família','<p>Já é noite. Em casa, a mãe de Nikos acendeu a <b>lamparina de azeite</b>. A família se senta em volta da mesa baixa, no pátio: a mãe, a irmã mais nova e o avô.</p><p>No jantar tem <b>pão de cevada</b>, <b>lentilhas</b>, <b>azeitonas</b>, <b>figos secos</b>, <b>queijo</b> e <b>cebola</b>. Para beber, vinho bem misturado com <b>água</b> num vaso grande, o <b>cratera</b>. Carne é rara: só nos dias de festa e de sacrifício.</p>');},
+ ()=>dinnerQuiz('Pergunta rápida','O que não poderia estar nesta mesa?',{q:'Qual destes alimentos uma família de Atenas <b>nunca</b> poderia comer em 415 a.C.?',
+   o:['Pão de cevada','Lentilhas','Batata e tomate','Azeitonas e figos'],c:2,
+   e:'A batata e o tomate são plantas da <b>América</b>. Eles só chegaram à Europa depois de 1492, quase dois mil anos depois desta noite.'}),
+ ()=>{speakAt(FAMILY.mae);dlg('A mãe pergunta','Como foi na Pnyx?','<p>"Então, meu filho? A cidade decidiu ir à guerra na Sicília?"</p><p>'+voteTxt()+'</p><p>A mãe fica em silêncio por um momento. "Se a frota partir, vão precisar de <b>remadores</b>..."</p>');},
+ ()=>dinnerQuiz('A mãe pergunta','"Você vai remar?"',{q:'O que Nikos responde?',o:['"Vou: pagam uma dracma por dia, e a cidade precisa de mim."','"Prefiro ficar na oficina e cuidar da família."'],
+   fb:['A mãe segura a mão dele. "Uma dracma por dia é muito dinheiro para nós. Mas a Sicília é longe, do outro lado do mar." Muitas famílias pobres de Atenas pensavam assim: a frota dava <b>salário</b>, mas também levava os filhos para longe.',
+       'O avô concorda com a cabeça: "Alguém precisa fazer os vasos." Mas, se a cidade convocar, Nikos não poderá escolher: os cidadãos tinham o <b>dever</b> de servir.']},FAMILY.mae),
+ ()=>dinnerQuiz('A irmã pergunta','"E por que eu não posso votar?"',{q:'A irmã de Nikos tem 12 anos. Ela quer saber por que nunca vai poder ir à assembleia. O que Nikos explica?',
+   o:['"Só os homens adultos, filhos de pai e mãe atenienses, são cidadãos."','"Porque você ainda é criança. Quando crescer, vai poder votar."'],c:0,
+   e:'Em Atenas, mulheres <b>nunca</b> votavam, em nenhuma idade. Também ficavam de fora os metecos e as pessoas escravizadas. A irmã responde: "Mas sou eu que fio a lã das suas túnicas! E as moças de Atenas é que tecem o manto novo de Atena para a grande festa." <span class="hoje" style="display:block;margin-top:8px">No Brasil, as mulheres só conquistaram o direito de votar em <b>1932</b>.</span>'},FAMILY.irma),
+ ()=>{speakAt(FAMILY.avo);dlg('O avô se lembra','Quem já viveu muitas guerras','<p>O avô bebe um gole e fala devagar:</p><p>"Eu era moço quando a nossa frota foi destruída no <b>Egito</b>. Depois veio a guerra contra Esparta, e a <b>peste</b> levou metade da nossa rua e até o grande Péricles."</p><p>"Na assembleia, todo mundo grita vitória. Mas quem paga é quem rema e quem fica esperando em casa."</p>');},
+ ()=>{speakAt(FAMILY.avo);dlg('Antes de dormir','Uma oferenda a Héstia','<p>Antes de dormir, o avô derrama um pouco de vinho no fogo da casa: é uma <b>libação</b> para <b>Héstia</b>, a deusa do lar. Ele pede proteção para a família e para a cidade.</p><p>A mãe apaga a lamparina. Amanhã Nikos volta à oficina... e a frota começa a ser preparada no Pireu.</p>',
+   [{t:'Boa noite ▸',main:true,f:()=>{endDinner();next();}}]);},
+];
+function endDinner(){S.inDinner=false;speakAt(null);player.g.visible=true;
+  if(DINNER.light){DINNER.light.position.copy(DINNER.lp);DINNER.light.intensity=DINNER.li;DINNER.light.distance=4;}
+  P.x=HOUSE.x+DIN.lx+2.2;P.z=HOUSE.z+DIN.lz-1.2;P.a=-Math.PI/2;collide();EXTRA.jantar=true;}
+// o jantar entra depois da chegada em casa e antes das perguntas finais
+ENDING.splice(1,0,...DINNER);
+// o primeiro quadro do fim agora leva para dentro de casa
+ENDING[0]=()=>dlg('Fim do dia','Nikos volta para casa','<p>A noite está chegando. Nikos volta para o seu bairro, o <b>Cerâmico</b>, onde trabalha numa <b>oficina de cerâmica</b>.</p><p>Hoje ele foi à ágora, foi sorteado jurado, votou pela primeira vez na assembleia e rezou pelos deuses da cidade. <b>Foi o seu primeiro dia como cidadão.</b></p><p>Em casa, a família espera por ele para o jantar.</p>');
+// a lamparina tremula e o jantar também pode ser revisto depois
+EXTRA_TICKS.push(()=>{dinFlame.visible=dinGlow.visible=TOD.lampK>.05||S.inDinner;dinFlame.scale.y=1+Math.sin(t0*13)*.18;dinGlow.material.opacity=.75+Math.sin(t0*9)*.1;
+  if(S.inDinner){FAMILY.irma.arms[1].rotation.x=-.6-Math.max(0,Math.sin(t0*1.3))*.4;}});
+addPlace({id:'jantar',x:HOUSE.x+DIN.lx+2.4,z:HOUSE.z+DIN.lz-1.6,t:'A mesa da família',sub:'Jantar ateniense',
+  txt:'<p>Uma família pobre de Atenas comia quase sempre <b>cereais</b> (pão e papa de cevada), <b>legumes</b> como lentilhas e grão-de-bico, <b>azeitonas</b>, <b>figos</b>, queijo e cebola. Peixe salgado era comum; carne, só em festas.</p><p>A refeição principal era o <b>jantar</b>, depois do pôr do sol, à luz de lamparinas de azeite.</p>',
+  act:()=>S.home?{l:'Rever o jantar com a família',f:()=>{P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;
+    runSeq([...DINNER.slice(0,-1),()=>{speakAt(FAMILY.avo);dlg('Antes de dormir','Uma oferenda a Héstia','<p>O avô faz a libação a Héstia, e a família vai dormir.</p>',[{t:'Voltar a passear ▸',main:true,f:()=>{endDinner();hideDlg();P.locked=false;$('joy').hidden=false;}}]);}]);}}:null});
+DISCOVERY_ITEMS.push({id:'jantar',ico:'🍲',title:'Jantar em família',text:'Pão de cevada, lentilhas, azeitonas e uma conversa sobre a guerra.'});
+EXTRA_RESTORE.push(()=>{if(S.home)familyVisible(true);});
+
 
 
 renderIntro();
