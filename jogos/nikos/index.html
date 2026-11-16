@@ -1462,21 +1462,25 @@ const kleroPlates=[];
 // Portão do Dípilon (saída para o Cerâmico)
 // ---------- muralhas ----------
 const wallMat=lam(0xb9a98c),wallTop=lam(0xa8977a);
+let WALLTAG='';const WALLSEGS=[],WALLTOWERS=[];
 function wallSeg(ax,az,bx,bz,h,th,top,collide=true){
   const mx=(ax+bx)/2,mz=(az+bz)/2,len=Math.hypot(bx-ax,bz-az)+.6,rot=Math.atan2(-(bz-az),bx-ax);
   const base=Math.min(H(ax,az),H(bx,bz),H(mx,mz))-1.5,y1=top??(Math.max(H(ax,az),H(bx,bz),H(mx,mz))+h);
   const m=add(new THREE.Mesh(new THREE.BoxGeometry(len,y1-base,th),wallMat));m.position.set(mx,(base+y1)/2,mz);m.rotation.y=rot;
+  const rec={mx,mz,len,rot,base,y1,th,tag:WALLTAG,box:m,crenels:[]};WALLSEGS.push(rec);
   // ameias
   const n=Math.floor(len/1.6);
   for(let i=0;i<n;i++){const t=(i+.5)/n,b=add(new THREE.Mesh(new THREE.BoxGeometry(.8,.8,th*.35),wallTop));
-    const ox=Math.sin(rot)*th*.32,oz=Math.cos(rot)*th*.32;b.position.set(ax+(bx-ax)*t+ox,y1+.4,az+(bz-az)*t+oz);b.rotation.y=rot;}
+    const ox=Math.sin(rot)*th*.32,oz=Math.cos(rot)*th*.32;b.position.set(ax+(bx-ax)*t+ox,y1+.4,az+(bz-az)*t+oz);b.rotation.y=rot;rec.crenels.push(b);}
   if(collide)colliders.push({seg:[ax,az,bx,bz],r:th/2});
 }
 function tower(x,z,s,h){const y=H(x,z);const m=add(new THREE.Mesh(new THREE.BoxGeometry(s,h+2,s),wallMat));m.position.set(x,y+h/2-1,z);
-  const r=add(new THREE.Mesh(new THREE.BoxGeometry(s+.6,.5,s+.6),wallTop));r.position.set(x,y+h,z);colliders.push({x,z,r:s*.62});}
+  const r=add(new THREE.Mesh(new THREE.BoxGeometry(s+.6,.5,s+.6),wallTop));r.position.set(x,y+h,z);colliders.push({x,z,r:s*.62});
+  WALLTOWERS.push({x,z,y,s,h,tag:WALLTAG,meshes:[m,r]});}
 // Muralha da cidade (de Temístocles), uma volta ao redor de Atenas
 const CW={cx:0,cz:-40,rx:150,rz:125},DIPT=Math.atan2((80-CW.cz)/CW.rz,(-35-CW.cx)/CW.rx);
 const cwPt=t=>[CW.cx+Math.cos(t)*CW.rx,CW.cz+Math.sin(t)*CW.rz];
+WALLTAG='city';
 { const N=180;
   for(let i=0;i<N;i++){const t0=i/N*Math.PI*2,t1=(i+1)/N*Math.PI*2,tm=(t0+t1)/2;
     let dd=Math.abs(Math.atan2(Math.sin(tm-DIPT),Math.cos(tm-DIPT)));if(dd<.035)continue;
@@ -1485,18 +1489,20 @@ const cwPt=t=>[CW.cx+Math.cos(t)*CW.rx,CW.cz+Math.sin(t)*CW.rz];
 }
 // Portão do Dípilon (saída para o Cerâmico)
 { const[x,z]=cwPt(DIPT),tx=-Math.sin(DIPT)*CW.rx,tz=Math.cos(DIPT)*CW.rz;
-  const g=groupAt(x,z,Math.atan2(-tz,tx));
+  const g=groupAt(x,z,Math.atan2(-tz,tx));window.__dipylonOld=g;
   box(4.5,12,6,M.stone,-5.2,5,0,g);box(4.5,12,6,M.stone,5.2,5,0,g);box(15,2.4,6,M.stone,0,10.2,0,g);
   for(let i=0;i<9;i++)box(.8,.8,1.2,wallTop,-6.4+i*1.6,11.8,2.4,g);
   const l=new THREE.Vector3(1,0,0).applyAxisAngle(new THREE.Vector3(0,1,0),g.rotation.y);
   for(const s of[-1,1])colliders.push({x:x+l.x*s*5.2,z:z+l.z*s*5.2,r:3});
 }
 // Muralhas Longas, que ligam Atenas ao porto do Pireu
+WALLTAG='long';
 { const dir=[-.62,-.78];
   for(const t of[3.42,3.62]){let[x,z]=cwPt(t);const side=t<3.5?-1:1;
     for(let i=0;i<26;i++){const nx=x+dir[0]*12,nz=z+dir[1]*12;wallSeg(x,z,nx,nz,6,2.4,undefined,false);if(i%4===0)tower(x,z,3.8,8.5);x=nx;z=nz;}}
 }
 // Muralha da Acrópole, com abertura nos Propileus
+WALLTAG='acro';
 { const R=22,N=44,topY=H(ACRO.x,ACRO.z)+2.4;
   for(let i=0;i<N;i++){const t0=i/N*Math.PI*2,t1=(i+1)/N*Math.PI*2,tm=(t0+t1)/2;
     if(Math.abs(Math.atan2(Math.sin(tm-Math.PI),Math.cos(tm-Math.PI)))<.27)continue;
@@ -1726,10 +1732,12 @@ let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
     o.position.set(x,y+.05,z);o.scale.set(a+.12,.7,b+.12);o.updateMatrix();pl.setMatrixAt(i,o.matrix);
     o.position.set(x+Math.sin(r)*(b/2+.03),y+.55,z+Math.cos(r)*(b/2+.03));o.scale.set(1,1,1);o.updateMatrix();dm.setMatrixAt(i,o.matrix);});
   wm.castShadow=wm.receiveShadow=rm.castShadow=pl.receiveShadow=true;scene.add(wm,rm,dm,pl);
+  window.__cityHouses={walls,list:[wm,rm,dm,pl]};
   const trees=[[-8,22],[-2,30],[22,32],[24,-2],[10,-14],[-14,-10],[-4,-12],[-20,40]].map(p=>[...p,1.5]);
   for(let k=0;k<180;k++){const x=-160+rnd()*320,z=-180+rnd()*300;if(x>-52&&x<32&&z>-44&&z<52)continue;if(roadD(x,z)<3||Math.hypot(x-PNYX.x,z-PNYX.z)<26||Math.hypot(x-ACRO.x,z-ACRO.z)<26)continue;
     if(Math.abs(x-HOUSE.x)<14&&Math.abs(z-HOUSE.z)<13)continue;if(Math.hypot(x-62,z+17)<16||Math.hypot(x-12,z+30)<8||Math.hypot(x+44,z+36)<8)continue;{const e=Math.hypot((x-CW.cx)/CW.rx,(z-CW.cz)/CW.rz);if(e>.94&&e<1.06)continue;}trees.push([x,z,.8+rnd()*.5]);}
   // oliveiras (copa cinza-esverdeada, tronco torto) e ciprestes (altos e finos)
+  window.__trees=trees;
   const olives=[],cyps=[];trees.forEach((t,k)=>{const[x,z]=t;const inA=x>-52&&x<32&&z>-44&&z<52;(!inA&&k%4===0?cyps:olives).push(t);});
   const tr=new THREE.InstancedMesh(OLIVE_TRUNK,new THREE.MeshStandardMaterial({color:0x5b4a3a,roughness:1}),olives.length);
   const cr=new THREE.InstancedMesh(OLIVE_CROWN,new THREE.MeshStandardMaterial({color:0xffffff,roughness:.95}),olives.length);
@@ -1739,6 +1747,7 @@ let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
   cyps.forEach(([x,z,s],i)=>{const y=H(x,z),k=s*(.9+rnd()*.4);o.position.set(x,y-.1,z);o.rotation.set(0,rnd()*6.28,0);o.scale.set(k,k*(1+rnd()*.3),k);o.updateMatrix();cy.setMatrixAt(i,o.matrix);foliageScreens.push({kind:'cypress',mesh:cy,index:i,x,z,y,s:k,r:o.rotation.y,shown:1});
     c.setRGB(.2+rnd()*.04,.28+rnd()*.04,.17+rnd()*.03);cy.setColorAt(i,c);});
   tr.castShadow=cr.castShadow=cy.castShadow=true;cr.receiveShadow=cy.receiveShadow=true;scene.add(tr,cr,cy);
+  window.__treeMeshes={tr,cr,cy,olives,cyps};
   // Azeitonas discretas nas copas próximas à praça, sem objetos individuais caros.
   const fruits=[];
   olives.filter(([x,z])=>x>-28&&x<28&&z>-30&&z<52).forEach(([x,z,s])=>{
@@ -2825,6 +2834,8 @@ const ASSEMBLY=[
    '<p>Nikos chegou à <b>Pnyx</b>, a colina onde se reúne a <b>assembleia dos cidadãos</b> (em grego, <b>eclésia</b>). Ela se reúne umas <b>40 vezes por ano</b>. Cabem uns 6.000 homens aqui.</p><p>Lá embaixo fica a <b>bema</b>, a tribuna de pedra. Ao lado, sentados, estão os <b>prítanes</b>, os conselheiros sorteados que cuidam da assembleia.</p>');},
  ()=>{setSpeaker('Arauto',0x7a3b2b);dlg('Fala o arauto','A ordem do dia',
    '<p>Os prítanes convocaram a assembleia para uma questão séria:</p><p><b>Atenas deve mandar uma frota de guerra à ilha da Sicília para ajudar a cidade de Egeste?</b></p><p>Egeste está em guerra com cidades vizinhas, ajudadas pela poderosa Siracusa. Egeste pede ajuda a Atenas e promete pagar pela guerra.</p>');},
+ ()=>{setSpeaker('Arauto',0x7a3b2b);dlg('O arauto mostra o caminho','Onde fica a Sicília?',
+   '<section><img src="imagens/mapa-sicilia.jpg" alt="Mapa do mar Mediterrâneo com o caminho da frota: sai de Atenas, contorna o Peloponeso, passa por Corcira e atravessa o mar Jônico até a Sicília, onde ficam Egeste, Catânia e Siracusa." style="display:block;max-width:100%;max-height:34vh;width:auto;margin:0 auto 8px;border-radius:6px;border:2px solid var(--clay)"><span style="display:block">A linha marrom mostra o caminho da frota: sai de <b>Atenas</b>, contorna o Peloponeso, para em <b>Corcira</b> e atravessa o <b>mar Jônico</b> até a <b>Sicília</b>. Lá ficam <b>Egeste</b> (no mapa, <i>Segesta</i>), que pediu ajuda, e <b>Siracusa</b>, a cidade mais forte da ilha.</span><span style="display:block;margin-top:8px">São mais de <b>1.000 km</b> de mar. Seriam semanas de viagem, longe de casa.</span></section>');},
  ()=>dlg('O que Nikos pensa','Um remador, não um hoplita',
    '<p>Nikos está preocupado. Se Atenas entrar em guerra, <b>ele vai lutar</b>.</p><p>Os <b>hoplitas</b>, soldados a pé com escudo, capacete e lança, compram as próprias armas. Nikos vem de uma <b>família pobre</b> e não tem dinheiro para isso. Então ele provavelmente será <b>remador</b> numa <b>trirreme</b>, um navio de guerra com três fileiras de remos e cerca de 170 remadores.</p>'),
  ()=>{dlg('Como funciona o debate','O relógio de água',
@@ -3040,7 +3051,7 @@ function step(now){
     a.girl.arms[1].rotation.x=-1.3+Math.cos(t0*2.5+1)*.3;
   }
   cullT-=dt;if(cullT<=0){cullT=.35;const cx=camera.position.x,cz=camera.position.z;
-    for(const f of FIGS){if(f===player)continue;const e=f.g.matrixWorld.elements;f.g.visible=!f.hide&&Math.hypot(e[12]-cx,e[14]-cz)<70;}}
+    const CD=window.__atenasQuality==='alto'?70:52;for(const f of FIGS){if(f===player)continue;const e=f.g.matrixWorld.elements;f.g.visible=!f.hide&&Math.hypot(e[12]-cx,e[14]-cz)<CD;}}
   for(const w of walkers){
     if(walkersPaused){w.f.anim(dt,0);continue;}
     if(w.follow){w.tx=w.follow.x-Math.sin(w.follow.f.g.rotation.y)*1.4;w.tz=w.follow.z-Math.cos(w.follow.f.g.rotation.y)*1.4;}
@@ -3070,10 +3081,11 @@ function step(now){
   else if(S.inTheatre){want=new THREE.Vector3(TEATRO.cx-2.2,0,TEATRO.cz-11);want.y=H(want.x,want.z)+2.2;look=new THREE.Vector3(TEATRO.cx,TEATRO.y0+1.3,TEATRO.cz+1.4);}
   else if(S.inAssembly){want=new THREE.Vector3(P.x-Math.sin(P.a)*6,py+4.2,P.z-Math.cos(P.a)*6);look=new THREE.Vector3(BEMA.x,H(BEMA.x,BEMA.z)+2.2,BEMA.z);}
   else if(!started){const r=90,an=t0*.05;want=new THREE.Vector3(Math.sin(an)*r-5,50,Math.cos(an)*r-15);look=new THREE.Vector3(0,4,-15);}
-  else{const cd=CAMCTL.dist;want=new THREE.Vector3(P.x-Math.sin(P.a)*cd,py+1.2+cd*.34,P.z-Math.cos(P.a)*cd);look=new THREE.Vector3(P.x,py+1.7,P.z);}
+  else{const cd=CAMCTL.dist,pt=CAMCTL.pitch||0,el=Math.max(-.12,.36-pt*.55),fx=Math.sin(P.a),fz=Math.cos(P.a);
+    want=new THREE.Vector3(P.x-fx*cd*Math.cos(el),py+1.5+cd*Math.sin(el),P.z-fz*cd*Math.cos(el));look=new THREE.Vector3(P.x+fx*(1+pt*2),py+1.7+pt*7.5,P.z+fz*(1+pt*2));}
   want.y=Math.max(want.y,H(want.x,want.z)+1.2);
   if(started&&!S.inTheatre&&!S.inRow&&!S.inDinner){const eye=new THREE.Vector3(P.x,py+1.8,P.z),dir=want.clone().sub(eye),dl=dir.length();dir.normalize();
-    camRay.set(eye,dir);camRay.far=dl;const hit=camRay.intersectObjects(occluders,false)[0];
+    camRay.set(eye,dir);camRay.far=dl;const hit=camRay.intersectObjects(occluders.filter(o=>o.visible),false)[0];
     if(hit){want.copy(eye).addScaledVector(dir,Math.max(1.2,hit.distance-.6));want.y+=.6;}}
   const k=started?Math.min(1,dt*4):1;camPos.lerp(want,k);camLook.lerp(look,k);
   camera.position.copy(camPos);camera.lookAt(camLook);
@@ -3420,7 +3432,7 @@ function upgradeFigure(f){
 }
 async function animatePeople(){
   if((window.__atenasQuality||'equilibrado')==='leve'||!THREE.SkeletonUtils)return;
-  const g=await glb('pessoas/UAL1_Standard.glb');
+  const g=await glb('pessoas/UAL1_leve.glb');
   ANIM.base=g.scene;ANIM.clips={};g.animations.forEach(c=>ANIM.clips[c.name]=c);
   ANIM.standPelvis=measurePelvis('Idle_Loop');ANIM.sitPelvis=measurePelvis('Sitting_Idle_Loop');
   const driven=new Set([player,speaker,...walkers.map(w=>w.f),...statics]);
@@ -3608,7 +3620,7 @@ async function gearHoplite(f){
 
 // ---------- PALESTRA / GINÁSIO DA ACADEMIA ----------
 const GYM={x:-66,z:110,rot:Math.PI*.15};
-soft0ad('gymnasium',{x:GYM.x,z:GYM.z,rot:GYM.rot,size:22});
+soft0ad('gymnasium',{x:GYM.x,z:GYM.z,rot:GYM.rot,size:22}).then(h=>{if(!h)return;const b=new THREE.Box3().setFromObject(h);h.position.y-=(b.max.y-b.min.y)*.14/.48;});
 addCollider(GYM.x,GYM.z,9,6,GYM.rot);  // só o prédio central; o pátio de areia fica livre
 const gymL=(lx,lz)=>{const c=Math.cos(GYM.rot),s=Math.sin(GYM.rot);return[GYM.x+lx*c+lz*s,GYM.z-lx*s+lz*c];};
 // pista de corrida (dromos) em frente ao ginásio
@@ -3670,7 +3682,7 @@ const ofG=groupAt(OF.x,OF.z,OF.rot);
   window.__oficina={ofG,wheel,clay};
 }
 addPlace({id:'oficina',x:OF.x+1.5,z:OF.z-4.2,t:'A oficina de cerâmica',sub:'Onde Nikos trabalha',
-  txt:'<p>Aqui fora do portão do Dípilo, no bairro do <b>Cerâmico</b>, ficam as oficinas dos oleiros. É aqui que <b>Nikos trabalha</b>.</p><p>O mestre modela a argila no <b>torno</b>, o menino pinta os vasos e o <b>forno</b> está aceso. A argila vem das margens do rio <b>Erídano</b>, que passa aqui perto.</p>',
+  txt:'<p>Aqui fora do portão do Dípilo, no bairro do <b>Cerâmico</b>, ficam as oficinas dos oleiros. É aqui que <b>Nikos trabalha</b>.</p><p>O mestre modela a argila no <b>torno</b>, o menino pinta os vasos e o <b>forno</b> está aceso. O bairro fica às margens do pequeno rio <b>Erídano</b>, e a água é essencial para preparar a argila.</p>',
   act:()=>EXTRA.vaso?{l:'Ver o seu vaso na prateleira',f:()=>toast('O seu vaso está secando na prateleira. Bom trabalho!')}:{l:'Fazer um vaso com o mestre',f:makeVase}});
 DISCOVERY_ITEMS.push({id:'oficina',ico:'🏺',title:'Oficina de cerâmica',text:'Amassar, tornear, pintar e queimar: Nikos fez um vaso e recebeu pelo trabalho.'});
 
@@ -3780,7 +3792,7 @@ addPlace({id:'pir_comerciante',x:PIRL(18,-5)[0],z:PIRL(18,-5)[1],t:'Um comercian
   txt:'<p>"Trago trigo do <b>mar Negro</b> e levo azeite e vasos de Atenas. Pago imposto como meteco, sirvo na frota quando a cidade pede..."</p><p>"Mas não voto na assembleia, não posso ser jurado e não posso comprar terra. Meu filho nasceu aqui e também não vai ser cidadão."</p><p class="hoje">Muitos <b>metecos</b> eram ricos e importantes para a economia, mas ficavam <b>fora da política</b>.</p>'});
 DISCOVERY_ITEMS.push({id:'pireu',ico:'⚓',title:'Pireu',text:'O porto de Atenas, com estaleiros, trirremes e armazéns.'},
   {id:'trirreme',ico:'🚣',title:'Trirreme',text:'170 remadores, quase todos cidadãos pobres, pagos por dia.'});
-[{t:'Porto do Pireu',at:PIRL(-2,-6),look:PIRL(4,12)},{t:'Palestra (Academia)',at:gymL(1,-2),look:gymL(0,10)},{t:'Oficina de cerâmica',at:[OF.x+4,OF.z-8],look:[OF.x,OF.z]}]
+[{t:'Porto do Pireu',at:PIRL(-2,-6),look:PIRL(4,12)},{t:'Palestra (Academia)',at:gymL(-7,17),look:gymL(0,9)},{t:'Oficina de cerâmica',at:[OF.x+4,OF.z-8],look:[OF.x,OF.z]}]
   .forEach(j=>{JUMPS.push(j);const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);});
 
 // ---------- treino de remo na trirreme ----------
@@ -4153,6 +4165,425 @@ addPlace({id:'jantar',x:HOUSE.x+DIN.lx+2.4,z:HOUSE.z+DIN.lz-1.6,t:'A mesa da fam
     runSeq([...DINNER.slice(0,-1),()=>{speakAt(FAMILY.avo);dlg('Antes de dormir','Uma oferenda a Héstia','<p>O avô faz a libação a Héstia, e a família vai dormir.</p>',[{t:'Voltar a passear ▸',main:true,f:()=>{endDinner();hideDlg();P.locked=false;$('joy').hidden=false;}}]);}]);}}:null});
 DISCOVERY_ITEMS.push({id:'jantar',ico:'🍲',title:'Jantar em família',text:'Pão de cevada, lentilhas, azeitonas e uma conversa sobre a guerra.'});
 EXTRA_RESTORE.push(()=>{if(S.home)familyVisible(true);});
+
+// =====================================================================
+// RODADA 5: muralhas, torres, o Dípilo duplo e casas gregas do 0 A.D.
+// Cada modelo é desenhado uma vez para todas as cópias (InstancedMesh),
+// para não pesar nos computadores da escola.
+// =====================================================================
+function kitFrom(gltf,name,ground=false){
+  const node=gltf.scene.getObjectByName(name);if(!node)throw new Error('peça '+name+' ausente');
+  fixMaterials(node);gltf.scene.updateMatrixWorld(true);
+  const inv=new THREE.Matrix4().copy(node.matrixWorld).invert(),parts=[],b=new THREE.Box3();
+  node.traverse(o=>{if(!o.isMesh)return;const m=new THREE.Matrix4().multiplyMatrices(inv,o.matrixWorld);
+    if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.union(o.geometry.boundingBox.clone().applyMatrix4(m));
+    (Array.isArray(o.material)?o.material:[o.material]).forEach(mt=>{mt.side=THREE.DoubleSide;});
+    parts.push({geo:o.geometry,mat:o.material,m});});
+  const c=b.getCenter(new THREE.Vector3()),size=b.getSize(new THREE.Vector3());
+  // ground=true: o "chão" do modelo é o y=0 original do 0 A.D.; a fundação fica enterrada
+  const norm=new THREE.Matrix4().makeTranslation(-c.x,ground?0:-b.min.y,-c.z);parts.forEach(p=>p.m.premultiply(norm));
+  if(ground)size.y=b.max.y;
+  return {parts,size};
+}
+function placeKit(kit,mats,shadow=true){const out=[],t=new THREE.Matrix4();
+  for(const p of kit.parts){const im=new THREE.InstancedMesh(p.geo,p.mat,mats.length);
+    mats.forEach((M,i)=>{t.multiplyMatrices(M,p.m);im.setMatrixAt(i,t);});
+    im.castShadow=shadow;im.receiveShadow=true;im.frustumCulled=false;scene.add(im);out.push(im);}
+  return out;}
+// caixas invisíveis para a câmera não entrar nos prédios novos
+const OCC_MAT=new THREE.MeshBasicMaterial({visible:false});
+function occProxies(list){if(!list.length)return;const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),OCC_MAT,list.length);
+  list.forEach((m,i)=>im.setMatrixAt(i,m));im.frustumCulled=false;scene.add(im);occluders.push(im);}
+function occBox(x,y,z,rot,w,h,d){return new THREE.Matrix4().compose(new THREE.Vector3(x,y+h/2,z),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),rot),new THREE.Vector3(w,h,d));}
+const trs=(x,y,z,ry,sx,sy,sz)=>new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),ry),new THREE.Vector3(sx,sy,sz));
+
+// ---------- o Dípilo: dois portões com um pátio no meio ----------
+const DIPY=(()=>{const[x,z]=cwPt(DIPT);let tx=-Math.sin(DIPT)*CW.rx,tz=Math.cos(DIPT)*CW.rz;const tl=Math.hypot(tx,tz);tx/=tl;tz/=tl;
+  let nx=Math.cos(DIPT)/CW.rx,nz=Math.sin(DIPT)/CW.rz;const nl=Math.hypot(nx,nz);nx/=nl;nz/=nl;
+  return {x,z,tx,tz,nx,nz,rot:Math.atan2(-tz,tx),depth:15,w:14};})();
+// colisões do portão de fora e dos muros do pátio (o portão de dentro já tem as dele)
+{ const ox=DIPY.x+DIPY.nx*DIPY.depth,oz=DIPY.z+DIPY.nz*DIPY.depth;
+  for(const s of[-1,1]){colliders.push({x:ox+DIPY.tx*s*5.2,z:oz+DIPY.tz*s*5.2,r:2.6});
+    const ax=DIPY.x+DIPY.tx*s*6.4,az=DIPY.z+DIPY.tz*s*6.4;colliders.push({seg:[ax,az,ax+DIPY.nx*DIPY.depth,az+DIPY.nz*DIPY.depth],r:1.2});}
+}
+async function buildWalls(){
+  if((window.__atenasQuality||'equilibrado')==='leve')return;   // no modo leve, ficam as muralhas simples
+  const g=await glb('0ad/muralha.glb');
+  const gate=kitFrom(g,'gate'),tw=kitFrom(g,'wtower'),wl=kitFrom(g,'wlong');
+  // trechos de muralha da cidade e das Muralhas Longas
+  const segs=WALLSEGS.filter(r=>r.tag==='city'||r.tag==='long'),mats=[];
+  for(const r of segs){const full=r.y1-r.base,mh=Math.min(full,9.5);
+    mats.push(trs(r.mx,r.y1-mh,r.mz,r.rot,(r.len+.15)/wl.size.x,mh/wl.size.y,r.th/wl.size.z));
+    r.crenels.forEach(c=>c.visible=false);
+    if(full<=mh+.05)r.box.visible=false;else{const keep=full-mh+.4;r.box.scale.y=keep/full;r.box.position.y=r.base+keep/2;}}
+  // o pátio do Dípilo: dois muros ligando os portões
+  for(const s of[-1,1]){const ax=DIPY.x+DIPY.tx*s*6.4,az=DIPY.z+DIPY.tz*s*6.4,mx=ax+DIPY.nx*DIPY.depth/2,mz=az+DIPY.nz*DIPY.depth/2;
+    const y=Math.min(H(ax,az),H(mx,mz),H(ax+DIPY.nx*DIPY.depth,az+DIPY.nz*DIPY.depth))-.5;
+    mats.push(trs(mx,y,mz,DIPY.rot+Math.PI/2,(DIPY.depth+1)/wl.size.x,8.5/wl.size.y,2.2/wl.size.z));}
+  const wallShadow=window.__atenasQuality==='alto';
+  placeKit(wl,mats,wallShadow);
+  // torres
+  const tws=WALLTOWERS.filter(t=>t.tag==='city'||t.tag==='long');
+  placeKit(tw,tws.map(t=>{t.meshes.forEach(m=>m.visible=false);const k=(t.s+.5)/Math.max(tw.size.x,tw.size.z);return trs(t.x,t.y-1.2,t.z,0,k,k*(t.h>9?1:.85),k);}),wallShadow);
+  // os dois portões e quatro torres ao lado deles
+  const kg=DIPY.w/gate.size.x,gm=[],tm=[],kt=5/Math.max(tw.size.x,tw.size.z);
+  for(const d of[0,DIPY.depth]){const x=DIPY.x+DIPY.nx*d,z=DIPY.z+DIPY.nz*d;gm.push(trs(x,H(x,z)-.6,z,DIPY.rot,kg,kg,kg));
+    if(d>0)for(const s of[-1,1]){const px=x+DIPY.tx*s*(DIPY.w/2+2.2),pz=z+DIPY.tz*s*(DIPY.w/2+2.2);tm.push(trs(px,H(px,pz)-1,pz,DIPY.rot,kt,kt,kt));colliders.push({x:px,z:pz,r:2.6});}}
+  placeKit(gate,gm);placeKit(tw,tm);
+  if(window.__dipylonOld)window.__dipylonOld.visible=false;
+}
+// ---------- casas gregas misturadas às casas simples ----------
+async function buildHouses(){
+  const q=window.__atenasQuality||'equilibrado';if(q==='leve'||!window.__LOTS)return;
+  const g=await glb('0ad/casas.glb'),kits=['houseA','houseB','houseC','houseD'].map(n=>kitFrom(g,n,true));
+  // perto de Nikos: casas detalhadas do 0 A.D.; longe: as casas simples continuam no lugar
+  const every=q==='alto'?2:3,NEAR=q==='alto'?120:85,CELL=40,cells=new Map(),occ=[],zero=new THREE.Matrix4().makeScale(0,0,0),LM=window.__lotMeshes,t=new THREE.Matrix4();
+  window.__LOTS.forEach((L,i)=>{if(i%every!==0)return;const asp=L.a/L.b;if(asp<.7||asp>1.45)return;
+    const v=(i/every|0)%4,k=kits[v],sc=Math.max(L.a,L.b)*1.02/Math.max(k.size.x,k.size.z),y=H(L.x,L.z);
+    const key=Math.floor(L.x/CELL)+','+Math.floor(L.z/CELL);if(!cells.has(key))cells.set(key,{per:[[],[],[],[]],lots:[],x:0,z:0});
+    const c=cells.get(key);c.per[v].push(trs(L.x,y+.05,L.z,L.rot+(i%2)*Math.PI,sc,sc*(.9+((i*7)%5)*.05),sc));c.lots.push(L);c.x+=L.x;c.z+=L.z;
+    occ.push(occBox(L.x,y,L.z,L.rot,k.size.x*sc*.85,k.size.y*sc*.9,k.size.z*sc*.85));});
+  const CH=[];
+  for(const c of cells.values()){c.x/=c.lots.length;c.z/=c.lots.length;const near=[];
+    c.per.forEach((list,v)=>{if(!list.length)return;for(const part of kits[v].parts){const im=new THREE.InstancedMesh(part.geo,part.mat,list.length);
+      list.forEach((M,i)=>{t.multiplyMatrices(M,part.m);im.setMatrixAt(i,t);});im.castShadow=q==='alto';im.receiveShadow=true;
+      im.frustumCulled=false;
+      im.visible=false;scene.add(im);near.push(im);}});
+    CH.push({x:c.x,z:c.z,near,lots:c.lots,on:false});}
+  // as instâncias simples dos lotes trocados ligam e desligam junto com o detalhe
+  const setLot=(L,show)=>{const[mv,wi,ri,di]=L.inst;if(show){LM.WMS[mv].setMatrixAt(wi,L._m||zero);LM.rm.setMatrixAt(ri,L._r||zero);LM.dm.setMatrixAt(di,L._d||zero);}
+    else{LM.WMS[mv].setMatrixAt(wi,zero);LM.rm.setMatrixAt(ri,zero);LM.dm.setMatrixAt(di,zero);}};
+  for(const c of CH)for(const L of c.lots){const[mv,wi,ri,di]=L.inst;L._m=new THREE.Matrix4();L._r=new THREE.Matrix4();L._d=new THREE.Matrix4();
+    LM.WMS[mv].getMatrixAt(wi,L._m);LM.rm.getMatrixAt(ri,L._r);LM.dm.getMatrixAt(di,L._d);}
+  occProxies(occ);
+  // as caixas invisíveis só valem onde a casa detalhada está visível: elas não atrapalham porque ficam do tamanho da casa simples
+  let acc=1;EXTRA_TICKS.push(dt=>{acc+=dt;if(acc<.4)return;acc=0;const cx=camera.position.x,cz=camera.position.z;let dirty=false;
+    for(const c of CH){const on=Math.hypot(c.x-cx,c.z-cz)<NEAR;if(on===c.on)continue;c.on=on;dirty=true;c.near.forEach(m=>m.visible=on);c.lots.forEach(L=>setLot(L,!on));}
+    if(dirty){LM.WMS.forEach(m=>m&&(m.instanceMatrix.needsUpdate=true));LM.rm.instanceMatrix.needsUpdate=true;LM.dm.instanceMatrix.needsUpdate=true;}});
+  window.__nHouses=CH.reduce((s,c)=>s+c.lots.length,0);
+}
+addPlace({id:'dipilo',x:DIPY.x+DIPY.nx*DIPY.depth/2+DIPY.tx*3.6,z:DIPY.z+DIPY.nz*DIPY.depth/2+DIPY.tz*3.6,t:'O Dípilo, o portão duplo',sub:'A principal entrada de Atenas',
+  txt:'<p><b>Dípilo</b> quer dizer "portão duplo". São <b>dois portões</b>, um atrás do outro, com um <b>pátio</b> no meio, cercado de muros e torres.</p><p>Se um inimigo derrubasse o portão de fora, ficaria preso no pátio, cercado pelos soldados nas torres e nos muros.</p><p>Por aqui passam a estrada para a <b>Academia</b> e o caminho da procissão das Panateneias. Lá fora fica o <b>Cerâmico</b>, o bairro dos oleiros, com o cemitério da cidade.</p><p class="hoje">As ruínas do Dípilo ainda podem ser visitadas em Atenas, no sítio arqueológico do Cerâmico.</p>'});
+DISCOVERY_ITEMS.push({id:'dipilo',ico:'🏰',title:'Dípilo',text:'O portão duplo: dois portões com um pátio de defesa no meio.'});
+{ const j={t:'Portão do Dípilo',at:[DIPY.x-DIPY.nx*10+DIPY.tx*4,DIPY.z-DIPY.nz*10+DIPY.tz*4],look:[DIPY.x+DIPY.nx*8,DIPY.z+DIPY.nz*8]};JUMPS.push(j);
+  const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);}
+occProxies([occBox(GYM.x,H(GYM.x,GYM.z),GYM.z,GYM.rot,16,6,17)]);
+setTimeout(()=>{buildWalls().catch(e=>console.warn('Muralhas do 0 A.D. não carregadas:',e&&e.message));
+  buildHouses().catch(e=>console.warn('Casas do 0 A.D. não carregadas:',e&&e.message));},600);
+
+// =====================================================================
+// RODADA 6: navio de trigo e barcos de pesca no Pireu, o armeiro e
+// carga espalhada pelo mercado e pelo porto (0 A.D., Wildfire Games)
+// =====================================================================
+// sacos de trigo feitos à mão (o saco do 0 A.D. veio vazio)
+const SACKS=[];function sackAt(x,y,z,r=0,s=1){SACKS.push([x,y,z,r,s]);}
+function buildSacks(){if(!SACKS.length)return;
+  const geo=new THREE.SphereGeometry(.32,10,8);geo.scale(1,.72,.8);geo.translate(0,.2,0);
+  const im=new THREE.InstancedMesh(geo,new THREE.MeshStandardMaterial({color:0xc9b48a,roughness:1}),SACKS.length);
+  const tie=new THREE.InstancedMesh(new THREE.CylinderGeometry(.06,.1,.14,8).translate(0,.47,0),new THREE.MeshStandardMaterial({color:0xa8925f,roughness:1}),SACKS.length);
+  SACKS.forEach(([x,y,z,r,s],i)=>{const M=trs(x,y,z,r,s,s,s);im.setMatrixAt(i,M);tie.setMatrixAt(i,M);});
+  im.castShadow=true;im.receiveShadow=true;im.frustumCulled=tie.frustumCulled=false;scene.add(im,tie);}
+// pilhas de sacos: em fileiras, com outra camada por cima
+function sackPile(x,z,rot,n=6){const c=Math.cos(rot),s=Math.sin(rot),y=H(x,z);
+  for(let i=0;i<n;i++){const lx=(i%3-1)*.66,lz=Math.floor(i/3)*.55;sackAt(x+lx*c+lz*s,y,z-lx*s+lz*c,rot+i*.3);}
+  for(let i=0;i<Math.floor(n/3);i++){const lx=(i-.5)*.66;sackAt(x+lx*c+.27*s,y+.38,z-lx*s+.27*c,rot+i);}}
+
+// ---------- PIREU: o navio de trigo e os barcos de pesca ----------
+const TRIGO={along:21,out:6.5};
+// a segunda trirreme vai um pouco mais para fora, para o navio mercante caber no cais
+if(TRI[1]){const[x,z]=PIRL(32,17);TRI[1].x=x;TRI[1].z=z;EXTRA_TICKS.push(()=>{const t=TRI[1];if(t.h&&!t.rowing){t.h.position.x=t.x;t.h.position.z=t.z;}});}
+const BOATS=[];
+async function buildPort(){
+  const g=await glb('0ad/barcos.glb');
+  const mk=(name,size)=>{const node=g.scene.getObjectByName(name).clone(true);node.position.set(0,0,0);fixMaterials(node);
+    const w=new THREE.Group();w.add(node);const b=new THREE.Box3().setFromObject(w),c=b.getCenter(new THREE.Vector3());node.position.set(-c.x,-b.min.y,-c.z);
+    const h=new THREE.Group();h.add(w);const sz=b.getSize(new THREE.Vector3());h.scale.setScalar(size/Math.max(sz.x,sz.z));scene.add(h);return h;};
+  // o navio mercante, a vela, encostado no cais
+  const [mx,mz]=PIRL(TRIGO.along,TRIGO.out);const ship=mk('merchant',15);ship.position.set(mx,SEA_Y-2.5,mz);ship.rotation.y=Math.PI*.75;
+  BOATS.push({h:ship,x:mx,z:mz,base:SEA_Y-2.5,moor:true});
+  // prancha do navio até o cais
+  const pl=box(1,.12,5.5,M.wood,0,0,0);const[px,pz]=PIRL(TRIGO.along,3.2);pl.position.set(px,SEA_Y+1.05,pz);pl.rotation.y=Math.PI*.25;pl.rotation.x=.08;
+  // barcos de pesca na baía, indo e voltando devagar
+  for(let i=0;i<3;i++){const b=mk('fishing',7);const p=PIRL(-24+i*20,34+i*7);b.position.set(p[0],SEA_Y-.35,p[1]);
+    BOATS.push({h:b,x:p[0],z:p[1],base:SEA_Y-.35,ang:i*2,rad:6+i*2,cx:p[0],cz:p[1]});}
+}
+EXTRA_TICKS.push(dt=>{for(const b of BOATS){const ph=t0*.8+b.x*.1;
+  if(b.moor){b.h.position.y=b.base+Math.sin(ph)*.07;b.h.rotation.z=Math.sin(ph*.7)*.015;continue;}
+  b.ang+=dt*.05;const x=b.cx+Math.cos(b.ang)*b.rad,z=b.cz+Math.sin(b.ang)*b.rad;b.h.position.set(x,b.base+Math.sin(ph*1.3)*.1,z);
+  b.h.rotation.y=-b.ang+Math.PI;b.h.rotation.z=Math.sin(ph)*.04;}});
+// carga no cais: sacos de trigo, caixotes e ânforas
+for(let i=0;i<4;i++){const[x,z]=PIRL(TRIGO.along-6+i*3.4,-2.2-(i%2)*1.6);sackPile(x,z,Math.PI*.25+i*.2,6);}
+// estivadores levando sacos do navio para o armazém
+{ const R=[PIRL(TRIGO.along,-.4),PIRL(TRIGO.along-4,-4.6),PIRL(TRIGO.along-9,-6.5),PIRL(TRIGO.along-4,-4.6)];
+  for(let i=0;i<3;i++){const RR=R.map(p=>[p[0]+i*.7,p[1]-i*.5]);const f=makeFigure({tunic:[0x8a7a62,0x985c44,0x6a6a64][i],short:true,beard:i!==1,carry:true});
+    scene.add(f.g);walkers.push({f,x:RR[i%4][0],z:RR[i%4][1],tx:RR[(i+1)%4][0],tz:RR[(i+1)%4][1],sp:.9+i*.12,wait:i*1.5,route:RR,routeIndex:(i+1)%4,patrol:true});}}
+addPlace({id:'navio_trigo',x:PIRL(TRIGO.along+3,-1.6)[0],z:PIRL(TRIGO.along+3,-1.6)[1],t:'Um navio de trigo',sub:'Comércio pelo mar',
+  txt:'<p>Este é um <b>navio mercante</b>. Ele não tem remadores como a trirreme: anda com a <b>vela</b>, por isso é mais lento, mas leva muito mais carga.</p><p>Os estivadores descarregam <b>sacos de trigo</b> e ânforas. A terra da Ática é pobre para cereais, e a cidade cresceu demais. Por isso, boa parte do trigo de Atenas vinha de longe, principalmente das terras em volta do <b>mar Negro</b>.</p><p>É por isso que Atenas protegia as rotas do mar com a frota e construiu as <b>Muralhas Longas</b>: se o inimigo cortasse a ligação com o porto, a cidade passava fome.</p><p class="hoje">O Brasil também depende de navios: boa parte do que o país compra e vende passa pelos portos, como o de <b>Santos</b>.</p>'});
+DISCOVERY_ITEMS.push({id:'navio_trigo',ico:'🌾',title:'Navio de trigo',text:'Atenas comia trigo que vinha de longe, pelo mar.'});
+
+// ---------- O ARMEIRO, perto do templo de Hefesto ----------
+const ARM={x:-86,z:-28,rot:Math.PI/2};
+let smith=null;
+async function buildArmory(){
+  const g=await glb('0ad/ferreiro.glb');const k=kitFrom(g,'blacksmith',true),kan=kitFrom(g,'anvil');
+  const sc=12/Math.max(k.size.x,k.size.z);placeKit(k,[trs(ARM.x,H(ARM.x,ARM.z)+.05,ARM.z,ARM.rot,sc,sc,sc)]);
+  occProxies([occBox(ARM.x,H(ARM.x,ARM.z),ARM.z,ARM.rot,k.size.x*sc*.8,k.size.y*sc*.8,k.size.z*sc*.7)]);
+  const [ax,az]=atLocal(ARM.x,ARM.z,ARM.rot,2.5,7.4);const ka=.85/kan.size.y;placeKit(kan,[trs(ax,H(ax,az),az,ARM.rot,ka,ka,ka)]);
+}
+addCollider(ARM.x,ARM.z,11,10,ARM.rot);
+{ const [ax,az]=atLocal(ARM.x,ARM.z,ARM.rot,2.5,7.4);colliders.push({x:ax,z:az,r:.5});
+  // a peça de bronze quente sobre a bigorna e a fornalha acesa
+  const hot=mesh(new THREE.BoxGeometry(.45,.06,.18),new THREE.MeshBasicMaterial({color:0xff7a2a}),ax,H(ax,az)+.9,az);
+  const [fx,fz]=atLocal(ARM.x,ARM.z,ARM.rot,4.6,7.6);const fy=H(fx,fz);
+  box(1.3,.9,1.1,M.stone,fx,fy+.45,fz);const coal=mesh(new THREE.SphereGeometry(.42,10,6,0,Math.PI*2,0,Math.PI/2),new THREE.MeshBasicMaterial({color:0xff6a1a}),fx,fy+.9,fz);
+  colliders.push({x:fx,z:fz,r:.8});
+  // o armeiro, com avental de couro, martelando
+  const [sx,sz]=atLocal(ARM.x,ARM.z,ARM.rot,1.6,7.4);
+  smith=placeFig(makeFigure({tunic:0x6b4a2a,short:true,beard:true,hair:0x2e2018}),sx,sz,ARM.rot+Math.PI/2);statics.push(smith);colliders.push({x:sx,z:sz,r:.35});
+  const hammer=box(.08,.08,.3,lam(0x3a3a3a),0,0,0);smith.arms[1].add(hammer);hammer.position.set(0,-.62,.12);
+  // um aprendiz no fole
+  const [bx,bz]=atLocal(ARM.x,ARM.z,ARM.rot,5.6,8.6);const ap=placeFig(makeFigure({tunic:0xb99a68,short:true}),bx,bz,ARM.rot+Math.PI*1.2);ap.g.scale.setScalar(.85);statics.push(ap);colliders.push({x:bx,z:bz,r:.3});
+  EXTRA_TICKS.push(()=>{const k=Math.max(0,Math.sin(t0*4.2));if(smith){smith.arms[1].rotation.x=-1.0-k*1.3;}hot.material.color.setHSL(.06,1,.45+Math.sin(t0*3)*.05);
+    coal.scale.setScalar(1+Math.sin(t0*7)*.04);ap.arms[0].rotation.x=ap.arms[1].rotation.x=-.9-Math.max(0,Math.sin(t0*2.5))*.5;});
+}
+function armorer(){
+  P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;markDiscovery('armeiro');
+  const finish=()=>{hideDlg();P.locked=false;$('joy').hidden=false;EXTRA.armeiro=true;};
+  const PIECES=[['Elmo de bronze',true],['Escudo redondo (áspis)',true],['Arco e flechas',false],['Couraça',true],['Caneleiras de bronze',true],['Lança comprida',true],['Funda de atirar pedras',false],['Espada curta',true]];
+  let chosen=new Set();
+  const panoply=()=>{const B=PIECES.map((p,i)=>({t:(chosen.has(i)?'✓ ':'')+p[0],f:()=>{chosen.has(i)?chosen.delete(i):chosen.add(i);panoply();}}));
+    B.push({t:'Pronto, é isso ▸',main:true,f:()=>{const right=PIECES.every((p,i)=>p[1]===chosen.has(i));
+      const missing=PIECES.filter((p,i)=>p[1]&&!chosen.has(i)).map(p=>p[0].toLowerCase()),extra=PIECES.filter((p,i)=>!p[1]&&chosen.has(i)).map(p=>p[0].toLowerCase());
+      $('dTxt').innerHTML='<div class="fb '+(right?'ok':'no')+'"><b>'+(right?'Equipamento completo!':'Quase.')+'</b> '+(missing.length?'Faltou: <b>'+missing.join(', ')+'</b>. ':'')+(extra.length?'Arco e funda não são de hoplita: são armas dos soldados leves, que lutavam de longe. ':'')+'A <b>panóplia</b> do hoplita tem elmo, couraça, caneleiras, escudo, lança e espada curta.</div>';
+      const D=$('dBtns');D.innerHTML='';const b=document.createElement('button');b.textContent='Continuar ▸';b.dataset.main='1';b.onclick=next;D.appendChild(b);}});
+    dlg('Na oficina do armeiro','Monte o equipamento de um hoplita','<p>Escolha as peças que um <b>hoplita</b> leva para a batalha. Toque de novo para tirar.</p>',B);};
+  runSeq([
+   ()=>dlg('Perto do templo de Hefesto','A oficina do armeiro','<p>Aqui, perto do templo de <b>Hefesto</b>, o deus dos ferreiros, ficam as oficinas de <b>bronze</b> e de ferro. O armeiro bate o metal quente na bigorna, e o aprendiz sopra o fole para o fogo não apagar.</p><p>"Vai lutar na Sicília, rapaz? Então precisa de equipamento!"</p>'),
+   panoply,
+   ()=>{const Q={q:'O armeiro diz o preço de tudo. Para um artesão como Nikos, que ganha cerca de <b>1 dracma por dia</b>, quanto trabalho isso custa?',
+      o:['Alguns dias de trabalho','Muitos meses de trabalho','Nada: a cidade dá o equipamento de graça'],c:1,
+      e:'Uma panóplia completa custava <b>dezenas de dracmas</b>: meses de salário de um trabalhador. Cada hoplita comprava o próprio equipamento. A cidade só dava as armas de graça aos <b>órfãos</b> de soldados mortos na guerra, quando ficavam adultos.'};
+     dlg('O preço','Quanto custa ser hoplita?','<p>'+Q.q+'</p>',Q.o.map((t,i)=>({t,f:()=>{const ok=i===Q.c;
+       $('dTxt').innerHTML='<div class="fb '+(ok?'ok':'no')+'"><b>'+(ok?'Isso mesmo.':'Não é isso.')+'</b> '+(ok?'':'A resposta é: <b>'+Q.o[Q.c]+'</b>. ')+Q.e+'</div>';
+       const B=$('dBtns');B.innerHTML='';const b=document.createElement('button');b.textContent='Continuar ▸';b.dataset.main='1';b.onclick=next;B.appendChild(b);}})));},
+   ()=>dlg('Então, quem rema?','Os pobres na frota','<p>Quem não tem dinheiro para a panóplia, como Nikos, vai para a <b>frota</b>: para remar, basta o corpo e o treino. Os ricos lutam como hoplitas ou pagam as trirremes.</p><p>Um escritor da época, que não gostava da democracia, reclamou que em Atenas "o povo pobre manda" porque é ele que <b>rema os navios</b> e mantém a cidade forte. Ele estava irritado, mas apontou uma coisa verdadeira: quem defende a cidade quer ter voz nas decisões.</p>',
+     [{t:'Agradecer e sair ▸',main:true,f:finish}]),
+  ]);
+}
+addPlace({id:'armeiro',x:atLocal(ARM.x,ARM.z,ARM.rot,0,8.2)[0],z:atLocal(ARM.x,ARM.z,ARM.rot,0,8.2)[1],t:'A oficina do armeiro',sub:'Bronze, ferro e o preço da guerra',
+  txt:'<p>Ferreiros e armeiros trabalham perto do templo de Hefesto. Os escudos, lanças e espadas na frente da oficina estão à venda.</p>',
+  act:()=>({l:EXTRA.armeiro?'Montar o equipamento de novo':'Conversar com o armeiro',f:armorer})});
+DISCOVERY_ITEMS.push({id:'armeiro',ico:'🛡️',title:'O armeiro',text:'Ser hoplita custava meses de trabalho; os pobres remavam.'});
+{ const j={t:'Oficina do armeiro',at:atLocal(ARM.x,ARM.z,ARM.rot,-8,10),look:atLocal(ARM.x,ARM.z,ARM.rot,2,7)};JUMPS.push(j);const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);}
+
+// ---------- caixotes e sacos no mercado da ágora ----------
+async function buildCargo(){const g=await glb('0ad/carga.glb');const k=kitFrom(g,'crates'),mats=[];
+  const sc=1.6/Math.max(k.size.x,k.size.z);
+  STALLS.forEach((st,i)=>{const[x,z]=atLocal(st.position.x,st.position.z,st.rotation.y,(i%2?1:-1)*2.4,-1.9);mats.push(trs(x,H(x,z),z,st.rotation.y+i,sc,sc,sc));colliders.push({x,z,r:.8});});
+  for(let i=0;i<5;i++){const[x,z]=PIRL(-10+i*5.5,-3.4-(i%2)*2);mats.push(trs(x,H(x,z),z,Math.PI*.25+i,sc,sc,sc));}
+  placeKit(k,mats);}
+STALLS.forEach((st,i)=>{if(i%2)return;const[x,z]=atLocal(st.position.x,st.position.z,st.rotation.y,(i%4?-1:1)*1.2,-2.3);sackPile(x,z,st.rotation.y,3);});
+buildSacks();
+setTimeout(()=>{buildPort().catch(e=>console.warn('Barcos do 0 A.D.:',e&&e.message));buildArmory().catch(e=>console.warn('Armeiro do 0 A.D.:',e&&e.message));
+  buildCargo().catch(e=>console.warn('Carga do 0 A.D.:',e&&e.message));},900);
+
+// =====================================================================
+// RODADA 7: Atenas reconstruída — bairros densos, gente nas ruas,
+// prédios do 0 A.D. na ágora e nos bairros, campo fora das muralhas,
+// olhar para cima e telhados que somem quando Nikos entra.
+// =====================================================================
+
+// ---------- A) levantar e baixar a cabeça ----------
+CAMCTL.pitch=0;
+{ let drag=null;
+  canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;drag={id:e.pointerId,y:e.clientY};});
+  addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;const dy=e.clientY-drag.y;drag.y=e.clientY;
+    if(started&&!P.locked)CAMCTL.pitch=Math.max(-.45,Math.min(1.3,CAMCTL.pitch-dy*(e.pointerType==='mouse'?.004:.006)));});
+  addEventListener('pointerup',e=>{if(drag&&e.pointerId===drag.id)drag=null;});
+  const b=document.createElement('button');b.id='btnLook';b.title='Olhar para cima, para ver prédios altos';
+  const lbl=()=>{b.textContent=CAMCTL.pitch>.3?'🔭 Olhar reto':'🔭 Olhar para cima';};
+  b.onclick=()=>{CAMCTL.pitch=CAMCTL.pitch>.3?0:.95;lbl();};$('btnCam').after(b);lbl();
+  EXTRA_TICKS.push(dt=>{if(!started||P.locked)return;const k=(keys.KeyR||keys.PageUp?1:0)-(keys.KeyF||keys.PageDown?1:0);
+    if(k){CAMCTL.pitch=Math.max(-.45,Math.min(1.3,CAMCTL.pitch+k*dt*1.1));}lbl();});
+}
+
+// ---------- B) telhados que somem quando Nikos entra ----------
+const CUTS=[];
+function cutaway(g,yCut,hw,hd){if(!g)return;const hide=g.children.filter(c=>c.position.y>=yCut);CUTS.push({g,hide,hw,hd,inside:false});}
+const _cv=new THREE.Vector3();
+EXTRA_TICKS.push(()=>{for(const c of CUTS){_cv.set(P.x,H(P.x,P.z)+1,P.z);c.g.worldToLocal(_cv);
+  const inside=started&&Math.abs(_cv.x)<c.hw&&Math.abs(_cv.z)<c.hd;if(inside!==c.inside){c.inside=inside;c.hide.forEach(m=>m.visible=!inside);}}});
+cutaway(window.__boule&&window.__boule.g,6.0,8,7.6);
+cutaway(window.__tolos&&window.__tolos.g,5.0,6.8,6.8);
+cutaway(scene.children.find(o=>o.isGroup&&o.position.x===-44&&o.position.z===-36),3.9,5.2,4.2);
+
+// ---------- C) verificar se um terreno está livre ----------
+const WALK_SEGS=[];for(const w of walkers)if(w.route&&w.route.length>1)for(let i=0;i<w.route.length;i++){const a=w.route[i],b=w.route[(i+1)%w.route.length];WALK_SEGS.push([a[0],a[1],b[0],b[1]]);}
+function freeAt(x,z,r,opt={}){
+  if(((x-CW.cx)/(CW.rx-7))**2+((z-CW.cz)/(CW.rz-7))**2>1&&!opt.outside)return false;
+  if(opt.outside&&((x-CW.cx)/(CW.rx+10))**2+((z-CW.cz)/(CW.rz+10))**2<1)return false;
+  if(!opt.agora&&x>-54&&x<34&&z>-46&&z<54)return false;
+  if(Math.hypot(x-ACRO.x,z-ACRO.z)<40||Math.hypot(x-PNYX.x,z-PNYX.z)<34||Math.hypot(x-62,z+17)<24||Math.hypot(x-24,z+36)<15)return false;
+  if(Math.abs(x-HOUSE.x)<15&&Math.abs(z-HOUSE.z)<14)return false;
+  if(roadD(x,z)<r+(opt.lot?1.7:2.6))return false;
+  const h=H(x,z);if(Math.abs(H(x+r,z)-h)+Math.abs(H(x-r,z)-h)+Math.abs(H(x,z+r)-h)+Math.abs(H(x,z-r)-h)>2.6)return false;
+  for(const p of PLACES)if(Math.hypot(x-p.x,z-p.z)<r+3.2)return false;
+  for(const s of WALK_SEGS)if(segDist(x,z,[s[0],s[1]],[s[2],s[3]])<r+(opt.lot?1.0:1.6))return false;
+  for(const c of colliders){
+    if(c.seg){if(segDist(x,z,[c.seg[0],c.seg[1]],[c.seg[2],c.seg[3]])<c.r+r)return false;continue;}
+    if(c.r){if(Math.hypot(x-c.x,z-c.z)<c.r+r)return false;continue;}
+    const dx=x-c.x,dz=z-c.z,co=Math.cos(c.rot||0),si=Math.sin(c.rot||0),lx=dx*co-dz*si,lz=dx*si+dz*co;
+    if(Math.abs(lx)<c.hw+r&&Math.abs(lz)<c.hd+r)return false;}
+  return true;}
+
+// ---------- D) casas novas: fachadas pintadas em canvas ----------
+function facadeTex(base,dark){return canvasTex(256,160,(c,w,h)=>{
+  c.fillStyle=base;c.fillRect(0,0,w,h);
+  for(let i=0;i<1400;i++){const v=Math.random()*24-12;c.fillStyle=`rgba(${v>0?255:60},${v>0?245:50},${v>0?225:40},${Math.abs(v)/160})`;c.fillRect(Math.random()*w,Math.random()*h,2+Math.random()*5,1+Math.random()*3);}
+  // rodapé de pedra
+  c.fillStyle=dark;c.fillRect(0,h*.78,w,h*.22);c.strokeStyle='rgba(40,30,20,.45)';c.lineWidth=2;
+  for(let y=h*.78;y<h;y+=12)for(let x=(y/12%2)*14;x<w;x+=28)c.strokeRect(x,y,28,12);
+  // janelinhas altas, com moldura de madeira
+  for(const x of[.22,.72]){c.fillStyle='#5b3f28';c.fillRect(w*x-11,h*.18,22,26);c.fillStyle='#1d140e';c.fillRect(w*x-8,h*.2,16,21);}
+  // marcas de chuva e sujeira embaixo
+  const gr=c.createLinearGradient(0,h*.55,0,h*.78);gr.addColorStop(0,'rgba(90,70,50,0)');gr.addColorStop(1,'rgba(90,70,50,.28)');c.fillStyle=gr;c.fillRect(0,h*.55,w,h*.23);
+},1);}
+const FACADES=[facadeTex('#e9e1cf','#8f8270'),facadeTex('#d9c29a','#7d6c58'),facadeTex('#c9a27a','#6e5a46')];
+FACADES.forEach(t=>{t.wrapS=THREE.ClampToEdgeWrapping;});
+// casas antigas ganham a fachada nova (sem a porta solta por cima)
+if(window.__cityHouses){const [wm,,dm]=window.__cityHouses.list;wm.material.map=FACADES[0];wm.material.needsUpdate=true;}
+function roofGeo(){const xyz=[],uv=[];const tri=(a,b,c,ua,ub,uc)=>{xyz.push(...a,...b,...c);uv.push(...ua,...ub,...uc);};
+  const z0=-.53,z1=.53,ri=.6,l0=[-.53,0,z0],l1=[-.53,0,z1],r0=[.53,0,z0],r1=[.53,0,z1],m0=[0,ri,z0],m1=[0,ri,z1];
+  tri(l0,m0,l1,[0,0],[1,0],[0,3]);tri(m0,m1,l1,[1,0],[1,3],[0,3]);tri(m0,r0,m1,[0,0],[1,0],[0,3]);tri(r0,r1,m1,[1,0],[1,3],[0,3]);
+  tri(l0,r0,m0,[0,0],[2,0],[1,1]);tri(l1,m1,r1,[0,0],[1,1],[2,0]);
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(xyz,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.computeVertexNormals();return g;}
+
+// ---------- E) prédios do 0 A.D. nos bairros (posições escolhidas antes das casas) ----------
+const SPOTS={workshop:[],storehouse:[],shrine:[],market:null};
+function pickSpots(list,n,r,box,opt={}){let tries=0;while(list.length<n&&tries<4000){tries++;const x=box[0]+rnd()*(box[1]-box[0]),z=box[2]+rnd()*(box[3]-box[2]);
+  if(!freeAt(x,z,r,opt))continue;if(list.some(s=>Math.hypot(s.x-x,s.z-z)<r*2.4))continue;const rot=Math.floor(rnd()*4)*Math.PI/2+.2;
+  list.push({x,z,rot});addCollider(x,z,r*1.7,r*1.7,rot);}}
+pickSpots(SPOTS.workshop,4,6.2,[-110,-55,30,80]);            // oleiros e ferreiros perto do Cerâmico
+pickSpots(SPOTS.workshop,3,6.2,[-120,-60,-90,-20]);          // oficinas a sudoeste
+pickSpots(SPOTS.storehouse,4,5,[-60,60,-110,90]);
+pickSpots(SPOTS.shrine,9,2.8,[-140,140,-160,80]);
+{ const m=[];pickSpots(m,1,7,[-30,32,-44,52],{agora:true,lot:true});SPOTS.market=m[0]||null;}
+
+// ---------- F) os bairros: casas em quarteirões, com ruelas entre elas ----------
+// as casas antigas, espalhadas ao acaso, saem; os quarteirões novos ocupam o lugar delas
+if(window.__cityHouses){const old=new Set(window.__cityHouses.walls.map(w=>w[0]+','+w[1]));
+  for(let i=colliders.length-1;i>=0;i--){const c=colliders[i];if(c.hw!==undefined&&old.has(c.x+','+c.z))colliders.splice(i,1);}
+  window.__cityHouses.list.forEach(m=>m.visible=false);}
+const TREES=window.__trees||[];
+const LOTS=[],GRID=7.3,GANG=.2,gc=Math.cos(GANG),gs=Math.sin(GANG);
+const toW=(i,j)=>[CW.cx+i*GRID*gc-j*GRID*gs,CW.cz+i*GRID*gs+j*GRID*gc];
+const nearTree=(x,z,r)=>TREES.some(t=>Math.hypot(t[0]-x,t[1]-z)<r+1.4);
+for(let i=-23;i<=23;i++)for(let j=-19;j<=19;j++){let[x,z]=toW(i,j);x+=(rnd()-.5)*.8;z+=(rnd()-.5)*.8;
+  const a=4.6+rnd()*2.1,b=4.4+rnd()*1.9;const r=Math.max(a,b)/2+.15;
+  if(!freeAt(x,z,r,{lot:true}))continue;const rot=GANG+(rnd()-.5)*.08+(rnd()<.5?0:Math.PI/2);
+  LOTS.push({x,z,a,b,rot,h:2.9+rnd()*1.9+(rnd()<.18?1.6:0),v:Math.floor(rnd()*3),wing:rnd()<.38});addCollider(x,z,a,b,rot);}
+window.__LOTS=LOTS;
+{ const T=window.__treeMeshes;if(T){const zero=new THREE.Matrix4().makeScale(0,0,0);const hit=(x,z)=>LOTS.some(L=>Math.hypot(L.x-x,L.z-z)<Math.max(L.a,L.b)/2+.9);
+  let n=0;T.olives.forEach(([x,z],i)=>{if(hit(x,z)){T.tr.setMatrixAt(i,zero);T.cr.setMatrixAt(i,zero);n++;}});
+  T.cyps.forEach(([x,z],i)=>{if(hit(x,z)){T.cy.setMatrixAt(i,zero);n++;}});
+  for(let k=foliageScreens.length-1;k>=0;k--){const f=foliageScreens[k];if(hit(f.x,f.z))foliageScreens.splice(k,1);}
+  T.tr.instanceMatrix.needsUpdate=T.cr.instanceMatrix.needsUpdate=T.cy.instanceMatrix.needsUpdate=true;window.__treesRemoved=n;}}
+{ const per=[[],[],[]],roofs=[],doors=[],socles=[],c=new THREE.Color(),rc=[];
+  for(const L of LOTS){const y=H(L.x,L.z);
+    L.inst=[L.v,per[L.v].length,roofs.length,doors.length];
+    per[L.v].push(trs(L.x,y+L.h/2-.3,L.z,L.rot,L.a,L.h,L.b));
+    roofs.push(trs(L.x,y+L.h-.3,L.z,L.rot,L.a*1.14,.62+rnd()*.3,L.b*1.15));const t=.8+rnd()*.2;rc.push([t,.88*t,.8*t]);
+    const co=Math.cos(L.rot),si=Math.sin(L.rot);doors.push(trs(L.x+si*(L.b/2+.03),y+.55,L.z+co*(L.b/2+.03),L.rot,1,1,1));
+    if(L.wing){const wa=L.a*.55,wb=L.b*.5,ox=(L.a/2+wa/2-.2),wx=L.x+co*ox,wz=L.z-si*ox;if(freeAt(wx,wz,Math.max(wa,wb)/2)){const wh=L.h*.78;
+      per[L.v].push(trs(wx,y+wh/2-.3,wz,L.rot,wa,wh,wb));roofs.push(trs(wx,y+wh-.3,wz,L.rot,wa*1.16,.55,wb*1.16));rc.push([.85,.75,.68]);addCollider(wx,wz,wa,wb,L.rot);}}}
+  const box1=new THREE.BoxGeometry(1,1,1);
+  const WMS=[];window.__lotMeshes={WMS};
+  per.forEach((list,v)=>{if(!list.length){WMS.push(null);return;}const im=new THREE.InstancedMesh(box1,new THREE.MeshStandardMaterial({map:FACADES[v],roughness:.95}),list.length);
+    list.forEach((M,i)=>im.setMatrixAt(i,M));im.castShadow=im.receiveShadow=true;im.frustumCulled=false;scene.add(im);occluders.push(im);WMS.push(im);});
+  const roofMat=M.tile.clone();roofMat.side=THREE.DoubleSide;
+  const rm=new THREE.InstancedMesh(roofGeo(),roofMat,roofs.length);roofs.forEach((M,i)=>{rm.setMatrixAt(i,M);c.setRGB(...rc[i]);rm.setColorAt(i,c);});
+  rm.castShadow=true;rm.frustumCulled=false;scene.add(rm);window.__lotMeshes.rm=rm;
+  const dm=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1.75,.12),lam(0x5b3a22),doors.length);doors.forEach((M,i)=>dm.setMatrixAt(i,M));dm.frustumCulled=false;scene.add(dm);window.__lotMeshes.dm=dm;
+  window.__nLots=LOTS.length;
+}
+
+// ---------- G) gente nas ruas: grupos parados conversando, e mais gente andando ----------
+{ const spots=[];
+  for(const L of LOTS){if(rnd()>.42)continue;const co=Math.cos(L.rot),si=Math.sin(L.rot),d=L.b/2+1.3;
+    const x=L.x+si*d+co*(rnd()-.5)*2,z=L.z+co*d-si*(rnd()-.5)*2;const n=1+Math.floor(rnd()*3);
+    for(let k=0;k<n;k++){const a=k/n*Math.PI*2+rnd(),px=x+Math.cos(a)*.55*(n>1),pz=z+Math.sin(a)*.55*(n>1);spots.push([px,pz,Math.atan2(x-px,z-pz)+(n>1?0:L.rot),rnd()<.2?.72:1]);}}
+  // grupos conversando no meio da ágora
+  { let made=0;for(let t=0;t<2500&&made<(window.__atenasQuality==='leve'?40:110);t++){const x=-46+rnd()*76,z=-40+rnd()*88;
+      let ok=true;for(const p of PLACES)if(Math.hypot(x-p.x,z-p.z)<2.6){ok=false;break;}if(!ok)continue;
+      for(const sg of WALK_SEGS)if(segDist(x,z,[sg[0],sg[1]],[sg[2],sg[3]])<1.3){ok=false;break;}if(!ok)continue;
+      for(const c of colliders){if(c.seg){if(segDist(x,z,[c.seg[0],c.seg[1]],[c.seg[2],c.seg[3]])<c.r+1.2){ok=false;break;}continue;}
+        if(c.r){if(Math.hypot(x-c.x,z-c.z)<c.r+1.2){ok=false;break;}continue;}
+        const dx=x-c.x,dz=z-c.z,co=Math.cos(c.rot||0),si=Math.sin(c.rot||0),lx=dx*co-dz*si,lz=dx*si+dz*co;if(Math.abs(lx)<c.hw+1.2&&Math.abs(lz)<c.hd+1.2){ok=false;break;}}
+      if(!ok)continue;const n=2+Math.floor(rnd()*3);
+      for(let k=0;k<n;k++){const a=k/n*Math.PI*2+rnd()*.4,px=x+Math.cos(a)*.6,pz=z+Math.sin(a)*.6;spots.push([px,pz,Math.atan2(x-px,z-pz),rnd()<.15?.75:1]);}
+      colliders.push({x,z,r:.8});made++;}}
+  for(const s of SPOTS.shrine)for(let k=0;k<3;k++){const a=k*2.1+rnd(),px=s.x+Math.cos(a)*3.6,pz=s.z+Math.sin(a)*3.6;spots.push([px,pz,Math.atan2(s.x-px,s.z-pz),1]);}
+  const N=spots.length;
+  const body=new THREE.InstancedMesh(clothGeo([[.25,0],[.26,.3],[.22,.75],[.2,1.05],[.21,1.3],[.12,1.42]],10,.06,10),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.95}),N);
+  const head=new THREE.InstancedMesh(new THREE.SphereGeometry(.12,8,6).scale(.94,1.12,1.04).translate(0,1.58,0),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.65}),N);
+  const hair=new THREE.InstancedMesh(new THREE.SphereGeometry(.128,8,4,0,Math.PI*2,0,Math.PI*.58).translate(0,1.6,-.01),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.85}),N);
+  const arms=new THREE.InstancedMesh(new THREE.CylinderGeometry(.05,.05,.62,6).rotateZ(.25).translate(.24,1.05,.04),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.7}),N*2);
+  const c=new THREE.Color();
+  spots.forEach(([x,z,r,s],i)=>{const y=H(x,z);const M=trs(x,y,z,r,s,s*(.94+rnd()*.12),s);body.setMatrixAt(i,M);head.setMatrixAt(i,M);hair.setMatrixAt(i,M);
+    c.setHex(TUN[Math.floor(rnd()*TUN.length)]);body.setColorAt(i,c);const sk=SKIN[i%SKIN.length];c.setHex(sk);head.setColorAt(i,c);
+    c.setHex([0x2e2018,0x3b2a1e,0x1d140e,0x6a6a64][i%4]);hair.setColorAt(i,c);
+    arms.setMatrixAt(i*2,M);arms.setMatrixAt(i*2+1,trs(x,y,z,r+Math.PI,s,s,s));c.setHex(sk);arms.setColorAt(i*2,c);arms.setColorAt(i*2+1,c);});
+  [body,head,hair,arms].forEach(m=>{m.frustumCulled=false;m.castShadow=m===body;scene.add(m);});
+  window.__nStanding=N;
+}
+// gente andando pelas ruelas dos bairros (com animação)
+{ const NODE=[];for(let i=-23;i<=23;i++)for(let j=-19;j<=19;j++){const[x,z]=toW(i+.5,j+.5);NODE.push({i,j,x,z,ok:freeAt(x,z,.8)});}
+  const at=(i,j)=>NODE.find(n=>n.i===i&&n.j===j&&n.ok);
+  const segFree=(a,b)=>{for(let t=.25;t<1;t+=.25)if(!freeAt(a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t,.6))return false;return true;};
+  const ok=NODE.filter(n=>n.ok);let made=0;const want=window.__atenasQuality==='leve'?10:26;
+  for(let tries=0;tries<300&&made<want;tries++){let n=ok[Math.floor(rnd()*ok.length)];const path=[n];
+    for(let s=0;s<9;s++){const dirs=[[1,0],[-1,0],[0,1],[0,-1]].sort(()=>rnd()-.5);let moved=false;
+      for(const[di,dj]of dirs){const m=at(n.i+di,n.j+dj);if(m&&!path.includes(m)&&segFree(n,m)){path.push(m);n=m;moved=true;break;}}if(!moved)break;}
+    if(path.length<4)continue;const R=[...path,...path.slice(1,-1).reverse()].map(p=>[p.x,p.z]);
+    const fem=rnd()<.4;const f=makeFigure(fem?{dress:true,tunic:TUN[made%TUN.length],veil:[0x8c6c4e,0x6a6a64,0xd8c6a4][made%3],headCarry:rnd()<.3}:{tunic:TUN[made%TUN.length],short:rnd()<.6,beard:rnd()<.6,carry:rnd()<.25});
+    scene.add(f.g);walkers.push({f,x:R[0][0],z:R[0][1],tx:R[1][0],tz:R[1][1],sp:.9+rnd()*.4,wait:rnd()*3,route:R,routeIndex:1,patrol:true});made++;}
+  window.__nStreetWalkers=made;
+}
+
+// ---------- H) campo fora das muralhas: sítios, currais e plantações ----------
+const FARMS=[];
+{ for(let k=0;k<60&&FARMS.length<10;k++){const t=rnd()*Math.PI*2;if(t>3.2&&t<3.9)continue;   // não no caminho das Muralhas Longas
+    const s=1.2+rnd()*.35,x=CW.cx+Math.cos(t)*CW.rx*s,z=CW.cz+Math.sin(t)*CW.rz*s;
+    if(Math.abs(x)>320||Math.abs(z)>320||Math.hypot(x-150,z-95)<70||Math.hypot(x-280,z+40)<150)continue;
+    if(!freeAt(x,z,9,{outside:true}))continue;if(FARMS.some(f=>Math.hypot(f.x-x,f.z-z)<40))continue;
+    const rot=rnd()*Math.PI;FARMS.push({x,z,rot});addCollider(x,z,9,9,rot);}
+  const fieldTex=[canvasTex(128,128,(c)=>{c.fillStyle='#8f9a4f';c.fillRect(0,0,128,128);for(let y=0;y<128;y+=6){c.fillStyle='rgba(60,70,30,.35)';c.fillRect(0,y,128,2);}}),
+                  canvasTex(128,128,(c)=>{c.fillStyle='#b59a62';c.fillRect(0,0,128,128);for(let y=0;y<128;y+=5){c.fillStyle='rgba(110,80,40,.4)';c.fillRect(0,y,128,2);}})];
+  FARMS.forEach((f,i)=>{for(const s of[-1,1]){const cx=f.x+Math.cos(f.rot)*s*19,cz=f.z-Math.sin(f.rot)*s*19;
+    const g=new THREE.PlaneGeometry(22,16,10,8);g.rotateX(-Math.PI/2);g.rotateY(f.rot);const p=g.attributes.position;
+    for(let k=0;k<p.count;k++){const x=p.getX(k)+cx,z=p.getZ(k)+cz;p.setY(k,H(x,z)+.07);}g.computeVertexNormals();
+    const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({map:fieldTex[(i+(s>0?1:0))%2],roughness:1}));m.position.set(cx,0,cz);m.position.set(0,0,0);
+    g.translate(cx,0,cz);m.receiveShadow=true;scene.add(m);}});
+}
+
+// ---------- I) carregar os modelos do 0 A.D. desta rodada ----------
+async function buildRound7(){
+  const q=window.__atenasQuality||'equilibrado';
+  const gb=await glb('0ad/bairros.glb'),ga=await glb('0ad/agora0ad.glb'),gc2=await glb('0ad/campo.glb');
+  const K={workshop:kitFrom(gb,'workshop',true),storehouse:kitFrom(gb,'storehouse',true),shrine:kitFrom(gb,'shrine1',true),stoa:kitFrom(ga,'stoa',true),market:kitFrom(ga,'market',true),farm:kitFrom(gc2,'farm',true),corral:kitFrom(gc2,'corral',true)};
+  const put=(k,list,size,sh=q==='alto')=>{if(!list.length)return;const occ=[];
+    placeKit(K[k],list.map(s=>{const sc=size/Math.max(K[k].size.x,K[k].size.z);occ.push(occBox(s.x,H(s.x,s.z),s.z,s.rot,K[k].size.x*sc*.8,K[k].size.y*sc*.8,K[k].size.z*sc*.8));return trs(s.x,H(s.x,s.z)+.05,s.z,s.rot,sc,sc,sc);}),sh);occProxies(occ);};
+  put('workshop',SPOTS.workshop,13);put('storehouse',SPOTS.storehouse,10);put('shrine',SPOTS.shrine,5.6,false);
+  if(SPOTS.market)put('market',[SPOTS.market],14,false);
+  put('farm',FARMS,14);put('corral',FARMS.map(f=>({x:f.x+Math.sin(f.rot)*13,z:f.z+Math.cos(f.rot)*13,rot:f.rot})),11,false);
+  // os dois pórticos da ágora ganham o modelo do 0 A.D.; as pinturas do Pórtico Pintado continuam no lugar
+  const stoas=[[-33,18,22,Math.PI/2],[10,40,30,Math.PI]];const mats=[];
+  for(const[x,z,len,rot]of stoas){const old=scene.children.find(o=>o.isGroup&&Math.abs(o.position.x-x)<.01&&Math.abs(o.position.z-z)<.01);
+    if(old)old.children.forEach(ch=>{if(!(ch.geometry&&ch.geometry.type==='PlaneGeometry')&&!(ch.material===M.wood))ch.visible=false;});
+    const sc=(len+1)/K.stoa.size.x;mats.push(trs(x,H(x,z)+.05,z,rot,sc,sc,sc*1.02));}
+  placeKit(K.stoa,mats,true);
+}
+setTimeout(()=>buildRound7().catch(e=>console.warn('Rodada 7 (0 A.D.):',e&&e.message)),1200);
 
 
 
