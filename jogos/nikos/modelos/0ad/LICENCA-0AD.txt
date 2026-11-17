@@ -1,0 +1,11 @@
+Modelos 3D desta pasta: 0 A.D. (https://play0ad.com), arte de Wildfire Games (https://wildfiregames.com)
+Licença: Creative Commons Atribuição-CompartilhaIgual 3.0 (CC BY-SA 3.0)
+https://creativecommons.org/licenses/by-sa/3.0/deed.pt_BR
+
+Alterações: os modelos originais (.dae) e suas peças foram combinados, convertidos para .glb
+e tiveram as texturas reduzidas e convertidas para .png. Estes arquivos convertidos
+também ficam sob a licença CC BY-SA 3.0.
+
+Modelos: pórtico (stoa), mercado, oficina, armazém, santuário, sítio, curral, navio mercante, barco de pesca, oficina de ferreiro, bigorna, caixotes, casas gregas (4 tipos), portão, torre e trecho de muralha atenienses, trirreme ateniense, doca ateniense, ginásio ateniense, elmo coríntio,
+escudo (aspis) ateniense, lança de hoplita, carrinho de mão, cesto, galinha, cabra,
+ovelha, porco, burro e cão.
