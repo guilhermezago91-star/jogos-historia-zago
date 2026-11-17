@@ -1,0 +1,13 @@
+Atena Varvakeion (cópia romana em escala reduzida da Atena Pártenos de Fídias)
+Museu Arqueológico Nacional de Atenas, Grécia.
+
+Modelo 3D: Scan-the-World (2026). The Varvakeion Athena at The National Archaeological
+Museum of Athens, Greece (Version Enriched) [Dataset]. Zenodo.
+https://doi.org/10.5281/zenodo.21375907
+
+Licença: Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 (CC BY-NC-SA 4.0)
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Alterações feitas para o jogo: malha simplificada de 763 mil para cerca de 61 mil triângulos
+(gltf-transform + meshoptimizer), sem compressão Draco; as cores de ouro e marfim são
+aplicadas pelo jogo. Uso educacional, sem fins comerciais.
