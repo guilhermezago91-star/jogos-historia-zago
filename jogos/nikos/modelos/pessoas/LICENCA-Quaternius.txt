@@ -10,3 +10,6 @@ Consider supporting me on Patreon!
 
 https://www.patreon.com/quaternius
 
+
+
+UAL1_leve.glb: versão simplificada (menos triângulos, um só material) do UAL1_Standard.glb, feita para o jogo rodar melhor. Mesma licença CC0.
