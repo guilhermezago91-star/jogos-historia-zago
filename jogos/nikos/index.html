@@ -3519,11 +3519,11 @@ const SAVE={KEY:'atenas-nikos-progresso-v1',
   has(){try{return !!localStorage.getItem(this.KEY);}catch(e){return false;}},
   wipe(){try{localStorage.removeItem(this.KEY);}catch(e){}},
   save(){if(!started||P.locked||S.inAssembly||S.inTheatre||!$('dlg').hidden)return;
-    const s={...S};delete s.inAssembly;delete s.inTheatre;delete s.inRow;delete s.inDinner;
+    const s={...S};delete s.inAssembly;delete s.inTheatre;delete s.inRow;delete s.inDinner;delete s.inParth;
     try{localStorage.setItem(this.KEY,JSON.stringify({v:1,t:Date.now(),S:s,d:[...discovered],seen:PLACES.filter(p=>p.seen).map(p=>p.id),P:{x:P.x,z:P.z,a:P.a},X:EXTRA}));}catch(e){}},
   load(){let d=null;try{d=JSON.parse(localStorage.getItem(this.KEY));}catch(e){}
     begin(false);if(!d)return;
-    Object.assign(S,d.S||{});S.inAssembly=false;S.inTheatre=false;S.inRow=false;
+    Object.assign(S,d.S||{});S.inAssembly=false;S.inTheatre=false;S.inRow=false;S.inParth=false;
     (d.d||[]).forEach(id=>discovered.add(id));Object.assign(EXTRA,d.X||{});
     const seen=new Set(d.seen||[]);PLACES.forEach(p=>{if(seen.has(p.id)){p.seen=true;p.ring.material.color.set(0x9fae5c);}});
     if(d.P&&isFinite(d.P.x)){P.x=d.P.x;P.z=d.P.z;P.a=d.P.a;collide();const y=H(P.x,P.z);camPos.set(P.x-Math.sin(P.a)*7.5,y+3.6,P.z-Math.cos(P.a)*7.5);camLook.set(P.x,y+1.7,P.z);}
