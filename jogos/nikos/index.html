@@ -4024,6 +4024,7 @@ function applyTOD(d,py){
   stars.visible=night>.02;stars.material.opacity=night;stars.position.copy(camera.position);
   moon.visible=night>.02;moon.position.set(camera.position.x-180,camera.position.y+300,camera.position.z-260);
   for(const m of CLOUD_MATS){m.emissive.setScalar(.54*(1-night*.85));m.color.setScalar(1-night*.75);}
+  if(S.inParth){hemi.intensity=.08;sun.intensity=.02;}   // dentro do templo, só a luz das lamparinas
 }
 
 // ---------- lamparinas e tochas ----------
@@ -4467,6 +4468,7 @@ pickSpots(SPOTS.workshop,4,6.2,[-110,-55,30,80]);            // oleiros e ferrei
 pickSpots(SPOTS.workshop,3,6.2,[-120,-60,-90,-20]);          // oficinas a sudoeste
 pickSpots(SPOTS.storehouse,4,5,[-60,60,-110,90]);
 pickSpots(SPOTS.shrine,9,2.8,[-140,140,-160,80]);
+SPOTS.tavern=[];pickSpots(SPOTS.tavern,1,5.2,[-82,-56,10,50]);if(!SPOTS.tavern.length)pickSpots(SPOTS.tavern,1,5.2,[-100,40,-90,60]);
 { const m=[];pickSpots(m,1,7,[-30,32,-44,52],{agora:true,lot:true});SPOTS.market=m[0]||null;}
 
 // ---------- F) os bairros: casas em quarteirões, com ruelas entre elas ----------
@@ -4554,7 +4556,7 @@ window.__LOTS=LOTS;
 const FARMS=[];
 { for(let k=0;k<60&&FARMS.length<10;k++){const t=rnd()*Math.PI*2;if(t>3.2&&t<3.9)continue;   // não no caminho das Muralhas Longas
     const s=1.2+rnd()*.35,x=CW.cx+Math.cos(t)*CW.rx*s,z=CW.cz+Math.sin(t)*CW.rz*s;
-    if(Math.abs(x)>320||Math.abs(z)>320||Math.hypot(x-150,z-95)<70||Math.hypot(x-280,z+40)<150)continue;
+    if((x<-170&&z>-125&&z<150)||Math.abs(x)>320||Math.abs(z)>320||Math.hypot(x-150,z-95)<70||Math.hypot(x-280,z+40)<150)continue;
     if(!freeAt(x,z,9,{outside:true}))continue;if(FARMS.some(f=>Math.hypot(f.x-x,f.z-z)<40))continue;
     const rot=rnd()*Math.PI;FARMS.push({x,z,rot});addCollider(x,z,9,9,rot);}
   const fieldTex=[canvasTex(128,128,(c)=>{c.fillStyle='#8f9a4f';c.fillRect(0,0,128,128);for(let y=0;y<128;y+=6){c.fillStyle='rgba(60,70,30,.35)';c.fillRect(0,y,128,2);}}),
@@ -4586,6 +4588,766 @@ async function buildRound7(){
 setTimeout(()=>buildRound7().catch(e=>console.warn('Rodada 7 (0 A.D.):',e&&e.message)),1200);
 
 
+
+
+// =====================================================================
+// OLÍMPIA: um portal na ágora leva Nikos aos Jogos Olímpicos (verão de 416 a.C.)
+// =====================================================================
+const OLY={x:-262,z:20,arrive:[-205,8]};
+const OLYG=new THREE.Group();scene.add(OLYG);OLYG.visible=false;
+const oAdd=(m)=>{OLYG.add(m);return m;};
+// serra entre Atenas e Olímpia (o monte Egáleo, visto de Atenas), para uma não aparecer na outra
+{ const hm=new THREE.MeshStandardMaterial({color:0xa89b78,roughness:1,flatShading:true});
+  const ridge=(x,z,sx,sy,sz,ry=0)=>{const m=new THREE.Mesh(new THREE.IcosahedronGeometry(1,2),hm);m.scale.set(sx,sy,sz);m.position.set(x,H(x,z)-sy*.35,z);m.rotation.y=ry;m.receiveShadow=true;scene.add(m);};
+  for(let z=-118;z<=150;z+=34)ridge(-187+((z*7)%9),z,15,30+((z*13)%10),24);
+  for(let x=-336;x<=-200;x+=34)ridge(x,-117+((x*5)%6),24,26+((x*11)%9),15);
+  colliders.push({seg:[-188,-122,-188,150],r:7},{seg:[-336,-117,-188,-117],r:7});
+}
+// ---------- o santuário ----------
+const STD={x:OLY.x,z:OLY.z+18,len:120,w:16};      // estádio, comprido no eixo x
+{ const y=H(STD.x,STD.z);
+  // pista de terra batida
+  const tr=new THREE.Mesh(new THREE.PlaneGeometry(STD.len,STD.w).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0xcbb38a,roughness:1}));tr.position.set(STD.x,y+.05,STD.z);tr.receiveShadow=true;oAdd(tr);
+  // linhas de partida e chegada (pedra) e raias
+  for(const s of[-1,1]){const b=new THREE.Mesh(new THREE.BoxGeometry(.6,.12,STD.w),M.marble);b.position.set(STD.x+s*(STD.len/2-3),y+.08,STD.z);oAdd(b);}
+  for(let i=1;i<6;i++){const l=new THREE.Mesh(new THREE.BoxGeometry(STD.len-6,.02,.06),lam(0xe8dcc0));l.position.set(STD.x,y+.07,STD.z-STD.w/2+i*STD.w/6);oAdd(l);}
+  // taludes de terra dos dois lados, cobertos de grama seca
+  const em=new THREE.MeshStandardMaterial({color:0x9a9461,roughness:1});
+  for(const s of[-1,1]){const g=new THREE.BoxGeometry(STD.len+10,6,14);const m=new THREE.Mesh(g,em);m.position.set(STD.x,y-.6,STD.z+s*(STD.w/2+6.2));m.rotation.x=s*.42;m.receiveShadow=true;oAdd(m);
+    colliders.push({seg:[STD.x-STD.len/2-5,STD.z+s*(STD.w/2+2.2),STD.x+STD.len/2+5,STD.z+s*(STD.w/2+2.2)],r:.6});}
+  // túnel de entrada (a krypte), no lado leste
+  const ax=STD.x+STD.len/2+5;for(const s of[-1,1]){const p=new THREE.Mesh(new THREE.BoxGeometry(3,4,1.2),M.stone);p.position.set(ax,y+2,STD.z+s*3);oAdd(p);}
+  const lin=new THREE.Mesh(new THREE.BoxGeometry(3.2,1,7.4),M.stone);lin.position.set(ax,y+4.4,STD.z);oAdd(lin);
+  // tribuna dos juízes (helanódicas), de roupa roxa
+  const jb=new THREE.Mesh(new THREE.BoxGeometry(8,1.2,3),M.wood);jb.position.set(STD.x+10,y+.6,STD.z+STD.w/2+1.6);oAdd(jb);colliders.push({x:STD.x+10,z:STD.z+STD.w/2+1.6,hw:4,hd:1.5});
+  window.__olyJudges=[];for(let i=0;i<3;i++){const f=makeFigure({tunic:0x6a2a6a,himation:0x4a1a4a,beard:true,hair:0x6a6a64});f.seated=true;f.legs.forEach(l=>l.visible=false);
+    f.g.position.set(STD.x+7.5+i*2.5,y+1.2+.46-.72,STD.z+STD.w/2+1.9);f.g.rotation.y=Math.PI;oAdd(f.g);statics.push(f);window.__olyJudges.push(f);}
+  // a plateia: só homens, sentados nos taludes
+  const seats=[];for(const s of[-1,1])for(let r=0;r<4;r++)for(let x=-STD.len/2+2;x<STD.len/2-2;x+=.95){if(s>0&&r<2&&Math.abs(x-10)<5)continue;if((x*13+r*7)%5<.6)continue;
+    seats.push([STD.x+x+(r%2)*.45,y+.5+r*1.1,STD.z+s*(STD.w/2+2.8+r*1.9),s>0?Math.PI:0]);}
+  const N=seats.length,body=new THREE.InstancedMesh(clothGeo([[.25,0],[.26,.3],[.22,.65],[.21,.85],[.12,.95]],10,.06,8),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.95}),N);
+  const head=new THREE.InstancedMesh(new THREE.SphereGeometry(.12,8,6).translate(0,1.1,0),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.65}),N);
+  const c=new THREE.Color();seats.forEach(([x,yy,z,r],i)=>{const Mx=trs(x,yy,z,r,1,1,1);body.setMatrixAt(i,Mx);head.setMatrixAt(i,Mx);c.setHex(TUN[i%TUN.length]);body.setColorAt(i,c);c.setHex(SKIN[i%SKIN.length]);head.setColorAt(i,c);});
+  body.frustumCulled=head.frustumCulled=false;oAdd(body);oAdd(head);
+}
+// templo de Zeus, altar e o bosque sagrado (a Áltis)
+const ZEUS_T={x:OLY.x,z:OLY.z-40};
+{ const t=temple(ZEUS_T.x,ZEUS_T.z,H(ZEUS_T.x,ZEUS_T.z),14,30,6,13,0);scene.remove(t);OLYG.add(t);if(typeof paintTemple==='function')paintTemple(t,{nx:6,nz:13});
+  addCollider(ZEUS_T.x,ZEUS_T.z,31,15,0);
+  const ay=H(OLY.x+38,OLY.z-30);const al=new THREE.Mesh(new THREE.CylinderGeometry(3,3.6,1.6,20),M.stone);al.position.set(OLY.x+38,ay+.8,OLY.z-30);oAdd(al);colliders.push({x:OLY.x+38,z:OLY.z-30,r:3.8});
+  const ash=new THREE.Mesh(new THREE.ConeGeometry(2.6,1.6,16),lam(0x8a8478));ash.position.set(OLY.x+38,ay+2.4,OLY.z-30);oAdd(ash);
+  const tm=new THREE.InstancedMesh(OLIVE_TRUNK,new THREE.MeshStandardMaterial({color:0x5b4a3a,roughness:1}),24),cm=new THREE.InstancedMesh(OLIVE_CROWN,new THREE.MeshStandardMaterial({color:0x6f7a4f,roughness:.95}),24);
+  let k=0;for(let i=0;i<40&&k<24;i++){const x=OLY.x-60+((i*37)%120),z=OLY.z-70+((i*23)%40);if(Math.abs(x-ZEUS_T.x)<19&&Math.abs(z-ZEUS_T.z)<10)continue;if(Math.hypot(x-OLY.x-38,z-OLY.z+30)<6)continue;
+    const Mx=trs(x,H(x,z)-.1,z,i,1.2,1.2,1.2);tm.setMatrixAt(k,Mx);cm.setMatrixAt(k,Mx);colliders.push({x,z,r:.5});k++;}
+  tm.count=cm.count=k;oAdd(tm);oAdd(cm);
+  // a oliveira sagrada de onde se cortam as coroas
+  const kot=new THREE.Mesh(new THREE.TorusGeometry(.35,.06,6,16),lam(0x4f6b3a));kot.rotation.x=Math.PI/2;window.__kotinos=kot;
+}
+// hipódromo (corrida de carros), ao sul
+const HIP={x:OLY.x,z:OLY.z-100,rx:50,rz:11};
+{ const y=H(HIP.x,HIP.z);const r=new THREE.Mesh(new THREE.RingGeometry(1,1.25,64).scale(HIP.rx,HIP.rz,1).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0xc4ab80,roughness:1,side:THREE.DoubleSide}));r.position.set(HIP.x,y+.05,HIP.z);oAdd(r);
+  for(const s of[-1,1]){const p=new THREE.Mesh(new THREE.CylinderGeometry(.6,.8,2.4,10),M.stone);p.position.set(HIP.x+s*HIP.rx*1.0,y+1.2,HIP.z);oAdd(p);}  // marcos de volta
+}
+const CHARIOTS=[];
+async function buildChariots(){const g=await glb('gregos/classical-racing-chariot.glb');
+  for(let i=0;i<4;i++){const node=g.scene.clone(true);fixMaterials(node);const w=new THREE.Group();w.add(node);const b=new THREE.Box3().setFromObject(w),c=b.getCenter(new THREE.Vector3()),sz=b.getSize(new THREE.Vector3());
+    node.position.set(-c.x,-b.min.y,-c.z);const h=new THREE.Group();h.add(w);h.scale.setScalar(5.2/Math.max(sz.x,sz.z));oAdd(h);
+    // descobrir para que lado os cavalos apontam: o modelo é mais comprido no eixo z
+    CHARIOTS.push({h,t:i*.35,sp:.36+i*.012,lane:1.02+i*.06,flip:sz.x>sz.z});}}
+EXTRA_TICKS.push(dt=>{if(!OLYG.visible)return;for(const c of CHARIOTS){c.t+=dt*c.sp;const a=c.t,x=HIP.x+Math.cos(a)*HIP.rx*c.lane,z=HIP.z+Math.sin(a)*HIP.rz*c.lane*1.05;
+  const nx=HIP.x+Math.cos(a+.02)*HIP.rx*c.lane,nz=HIP.z+Math.sin(a+.02)*HIP.rz*c.lane*1.05;c.h.position.set(x,H(x,z)+Math.abs(Math.sin(a*30))*.05,z);c.h.rotation.y=Math.atan2(nx-x,nz-z)+(c.flip?Math.PI/2:0);}});
+
+// ---------- os portais ----------
+function makePortal(x,z,rot,label){const g=new THREE.Group();g.position.set(x,H(x,z),z);g.rotation.y=rot;
+  for(const s of[-1,1]){const c=col(.35,5,M.marble,s*2,2.5,0,g);}box(5,.6,.9,M.marble,0,5.2,0,g);
+  const glowM=new THREE.MeshBasicMaterial({color:0x7fd0ff,transparent:true,opacity:.55,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false});
+  const disk=new THREE.Mesh(new THREE.PlaneGeometry(3.4,4.7),glowM);disk.position.set(0,2.45,0);g.add(disk);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(1.75,.08,8,40),new THREE.MeshBasicMaterial({color:0xfff0b0}));ring.scale.y=1.38;ring.position.set(0,2.45,.05);g.add(ring);
+  for(const s of[-1,1])colliders.push({x:x+Math.cos(rot)*s*2,z:z-Math.sin(rot)*s*2,r:.5});
+  EXTRA_TICKS.push(()=>{glowM.opacity=.4+Math.sin(t0*2.5)*.15;ring.rotation.z+=.01;disk.scale.x=1+Math.sin(t0*3)*.03;});
+  return g;}
+const PORTAL_A={x:-26,z:30,rot:-.7};             // na ágora, perto do caminho do Cerâmico
+scene.add(makePortal(PORTAL_A.x,PORTAL_A.z,PORTAL_A.rot));
+const PORTAL_B={x:OLY.arrive[0]-4,z:OLY.arrive[1],rot:Math.PI/2};
+OLYG.add(makePortal(PORTAL_B.x,PORTAL_B.z,PORTAL_B.rot));
+let olyFog=null;
+function setOlympia(on){OLYG.visible=on;if(on&&!CHARIOTS.length)buildChariots().catch(e=>console.warn('Carros de corrida:',e&&e.message));}
+EXTRA_TICKS.push(()=>{const inOly=P.x<-186&&P.z>-116;if(inOly!==OLYG.visible)setOlympia(inOly);});
+function travel(toOly){P.locked=true;$('card').hidden=true;nearPlace=null;
+  const f=document.createElement('div');f.style.cssText='position:fixed;inset:0;background:#fff;opacity:0;transition:opacity .6s;z-index:50;pointer-events:none';document.body.appendChild(f);
+  requestAnimationFrame(()=>f.style.opacity='1');
+  setTimeout(()=>{if(toOly){P.x=OLY.arrive[0];P.z=OLY.arrive[1];P.a=-Math.PI/2;markDiscovery('olimpia');}else{P.x=PORTAL_A.x+2.5;P.z=PORTAL_A.z-2.5;P.a=Math.PI*.8;}
+    collide();setOlympia(toOly);const y=H(P.x,P.z);camPos.set(P.x-Math.sin(P.a)*7,y+4,P.z-Math.cos(P.a)*7);camLook.set(P.x,y+1.7,P.z);
+    f.style.opacity='0';setTimeout(()=>f.remove(),700);P.locked=false;
+    if(toOly)dlg('Um salto no tempo e no espaço','Olímpia, verão de 416 a.C.','<p>O portal leva Nikos a <b>Olímpia</b>, um santuário de <b>Zeus</b> no oeste da Grécia, a uns <b>300 km</b> de Atenas. A pé, a viagem levaria mais de uma semana.</p><p>É o verão de <b>416 a.C.</b>, meses antes do dia da assembleia. Começaram os <b>Jogos Olímpicos</b>, que acontecem de <b>4 em 4 anos</b>.</p><p>Gregos de todas as cidades estão aqui. Durante os jogos vale a <b>trégua sagrada</b>: ninguém pode atacar quem está viajando para Olímpia.</p>',[{t:'Explorar Olímpia ▸',main:true,f:()=>{hideDlg();}}]);
+  },650);}
+addPlace({id:'portal_olimpia',x:PORTAL_A.x+2.4,z:PORTAL_A.z-2.4,t:'Um portal misterioso',sub:'Viagem para Olímpia',
+  txt:'<p>Uma luz azul brilha entre duas colunas. Do outro lado, dá para ouvir uma multidão gritando e cavalos correndo...</p><p>O portal leva aos <b>Jogos Olímpicos</b>.</p>',act:()=>({l:'Atravessar o portal ▸',f:()=>travel(true)})});
+addPlace({id:'portal_volta',x:PORTAL_B.x+2.6,z:PORTAL_B.z,t:'Portal de volta',sub:'Atenas, 415 a.C.',txt:'<p>Este portal leva Nikos de volta para a ágora de Atenas.</p>',act:()=>({l:'Voltar para Atenas ▸',f:()=>travel(false)})});
+addPlace({id:'olimpia',x:OLY.arrive[0]-2,z:OLY.arrive[1]+4.5,t:'Olímpia',sub:'Santuário de Zeus',
+  txt:'<p>Olímpia não é uma cidade: é um <b>santuário</b>, um lugar sagrado de Zeus. Aqui ficam o <b>templo de Zeus</b>, o grande <b>altar</b> feito das cinzas dos sacrifícios, o <b>estádio</b> e o <b>hipódromo</b>.</p><p>Dentro do templo está a estátua de Zeus feita por <b>Fídias</b>, de ouro e marfim, uma das <b>Sete Maravilhas</b> do mundo antigo.</p><p class="hoje">Os jogos acabaram no ano 393 d.C. Os <b>Jogos Olímpicos modernos</b> começaram em <b>1896</b>, em Atenas, e a chama olímpica ainda é acesa em Olímpia antes de cada edição.</p>'});
+addPlace({id:'oly_zeus',x:ZEUS_T.x+17,z:ZEUS_T.z+9,t:'O templo de Zeus',sub:'Uma das Sete Maravilhas',
+  txt:'<p>Lá dentro, sentado num trono, está <b>Zeus</b>, com uns <b>12 metros</b> de altura, feito de <b>ouro e marfim</b> por Fídias, o mesmo escultor da Atena do Partenon.</p><p>Os atletas fazem aqui um <b>juramento</b> diante de uma estátua de Zeus: prometem competir com honestidade. Quem trapaceava pagava multa, e o dinheiro servia para fazer estátuas de Zeus com o nome do trapaceiro, para todos verem.</p>'});
+addPlace({id:'oly_hipodromo',x:HIP.x+HIP.rx+8,z:HIP.z+14,t:'O hipódromo',sub:'A corrida de carros',
+  txt:'<p>Na corrida de <b>quadrigas</b>, carros puxados por quatro cavalos dão <b>12 voltas</b>. A curva no marco é o momento mais perigoso: os carros batem e viram.</p><p>Quem ganha a coroa é o <b>dono dos cavalos</b>, não o condutor. Neste ano, <b>Alcibíades</b> mandou <b>sete carros</b>. Segundo o historiador Tucídides, ficou com o <b>1º, o 2º e o 4º lugar</b>. Nunca um particular tinha feito isso.</p><p>No ano seguinte, na assembleia, ele vai usar essa fama para convencer Atenas a ir à Sicília.</p>'});
+addPlace({id:'oly_estadio',x:STD.x+STD.len/2+8,z:STD.z-4,t:'O estádio',sub:'Competir nos Jogos Olímpicos',
+  txt:'<p>O <b>estádio</b> tem uns <b>192 metros</b> de comprimento. A palavra vem daí: <b>stádion</b> era uma medida de distância e o nome da corrida mais antiga dos jogos.</p><p>Os juízes de roupa roxa, os <b>helanódicas</b>, vigiam tudo. Quem sai antes do sinal leva <b>chicotada</b>.</p>',
+  act:()=>({l:EXTRA.olimpiadas?'Competir de novo':'Inscrever-se nas provas ▸',f:olympicGames})});
+
+DISCOVERY_ITEMS.push({id:'olimpia',ico:'🏛️',title:'Olímpia',text:'O santuário de Zeus, onde aconteciam os Jogos Olímpicos.'},{id:'jogos',ico:'🏅',title:'Jogos Olímpicos',text:'Corrida, salto e disco; o prêmio era uma coroa de oliveira.'});
+{ const j={t:'Portal para Olímpia',at:[PORTAL_A.x+5,PORTAL_A.z-5],look:[PORTAL_A.x,PORTAL_A.z]};JUMPS.push(j);const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);}
+
+// ---------- as provas ----------
+const RACE={on:false};
+function athletes(n){const out=[];const cols=[0xe4dac4,0x985c44,0x58627a,0x76764f,0xb99a68];
+  for(let i=0;i<n;i++){const f=makeFigure({tunic:cols[i%5],short:true,beard:i%2===0});f.driven=true;oAdd(f.g);out.push(f);}return out;}
+let OLY_RUNNERS=null;
+function olyCam(px,pz,lookX,lookZ,h=6){S.inRow=true;ROWCAM.want.set(px,H(px,pz)+h,pz);ROWCAM.look.set(lookX,H(lookX,lookZ)+1.2,lookZ);}
+function olympicGames(){
+  P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;markDiscovery('jogos');player.g.visible=false;
+  if(!OLY_RUNNERS)OLY_RUNNERS=athletes(6);
+  const y=H(STD.x,STD.z),x0=STD.x+STD.len/2-3,x1=STD.x-STD.len/2+3;
+  const res={corrida:null,salto:null,disco:null};
+  const lanes=OLY_RUNNERS.map((f,i)=>STD.z-STD.w/2+(i+.5)*STD.w/6);
+  const place=(dx)=>OLY_RUNNERS.forEach((f,i)=>{f.g.position.set(x0-dx[i],y,lanes[i]);f.g.rotation.y=-Math.PI/2;f.g.visible=true;});
+  const finish=()=>{stopTiming();RACE.on=false;S.inRow=false;player.g.visible=true;OLY_RUNNERS.forEach(f=>f.g.visible=false);hideDlg();P.locked=false;$('joy').hidden=false;
+    P.x=STD.x+STD.len/2+8;P.z=STD.z-6;P.a=Math.PI/2;collide();EXTRA.olimpiadas=res;};
+  // corrida: largada com sinal (sem sair antes!) e depois apertar rápido
+  const race=()=>{place([0,0,0,0,0,0]);olyCam(x0+9,STD.z-6.8,x0-10,STD.z+1,4.2);let fase='espera',sinal=0;
+    dlg('Prova 1 de 3 · O estádio','A corrida de um estádio','<section><span class="mgp">Os corredores estão na linha de pedra. Espere o arauto gritar <b>"Apíte!"</b> (Partam!). Quem sair antes leva chicotada dos juízes!</span><span class="tapcount" id="raceInfo">Prepare-se...</span></section>',
+      [{t:'Correr! 🏃',main:true,f:()=>{if(fase==='espera'){$('raceInfo').innerHTML='⚠️ Saída antes do sinal! O juiz ergue o chicote. Volte para a linha e espere.';clearTimeout(sinal);sinal=setTimeout(go,1800+Math.random()*1500);return;}
+        if(fase==='corre'){RACE.v=Math.min(RACE.v+1.15,10.5);}}}]);
+    const go=()=>{fase='corre';$('raceInfo').innerHTML='<b>APÍTE!</b> Aperte o botão bem rápido!';RACE.on=true;RACE.v=0;RACE.d=OLY_RUNNERS.map(()=>0);RACE.t=0;
+      RACE.sp=[0,6.9,7.5,6.4,7.9,7.2];RACE.ft=OLY_RUNNERS.map(()=>null);};
+    sinal=setTimeout(go,2200+Math.random()*1800);
+    RACE.end=(pos)=>{fase='fim';res.corrida=pos;
+      dlg('Prova 1 de 3 · Resultado',pos===1?'Vitória!':'Chegada',pos===1?'<p>Nikos cruza a linha <b>em primeiro</b>! O arauto anuncia o nome dele, o do pai e o da cidade: <b>Atenas</b>.</p><p>Na corrida de um estádio, o vencedor era tão famoso que a Olimpíada inteira levava o nome dele.</p>':'<p>Nikos chegou em <b>'+pos+'º lugar</b>. Em Olímpia, só o <b>primeiro</b> ganhava prêmio. Não havia medalha de prata nem de bronze, e quem perdia voltava para casa envergonhado.</p>',
+        [{t:'Próxima prova ▸',main:true,f:next}]);};};
+  RACE.tick=raceTick;if(!RACE.hooked){RACE.hooked=true;EXTRA_TICKS.push(dt=>RACE.tick&&RACE.tick(dt));}
+  function raceTick(dt){if(!RACE.on)return;RACE.t+=dt;RACE.v=Math.max(0,RACE.v-dt*3.2);const L=x0-x1;
+    RACE.d=RACE.d.map((d,i)=>{const done=d>=L;const v=done?0:(i===0?RACE.v:RACE.sp[i]*(1+Math.sin(RACE.t*2+i)*.05));const nd=Math.min(L,d+v*dt);
+      if(nd>=L&&RACE.ft[i]===null)RACE.ft[i]=RACE.t;const f=OLY_RUNNERS[i];f.g.position.x=x0-nd;f.anim(dt,v);return nd;});
+    const lead=Math.max(...RACE.d);olyCam(x0-lead+9,STD.z-6.8,x0-lead-10,STD.z+1,4.2);
+    if(RACE.ft[0]!==null||RACE.t>40){RACE.on=false;const me=RACE.ft[0]===null?1e9:RACE.ft[0];const pos=1+RACE.ft.filter((t,i)=>i>0&&t!==null&&t<me).length;RACE.end(pos);}}
+  // salto em distância com halteres
+  const jump=()=>{const f=OLY_RUNNERS[0];OLY_RUNNERS.forEach((g,i)=>g.g.visible=i===0);f.g.position.set(STD.x+20,y,STD.z);f.g.rotation.y=-Math.PI/2;olyCam(STD.x+16,STD.z-6.8,STD.x+3,STD.z,3.6);
+    dlg('Prova 2 de 3 · Pentatlo','O salto com halteres',timingHTML('O atleta segura dois <b>halteres</b> de pedra e balança os braços para ganhar impulso. Um tocador de <b>aulo</b> marca o ritmo. Solte no momento certo: na <b>faixa verde</b>!','Botão, espaço ou Enter.'),
+      [{t:'Saltar! 🦘',main:true,f:()=>{const T=TIMING;if(!T)return;const acc=1-Math.min(1,Math.abs(T.pos-.5)*2);stopTiming();const dist=(9+acc*7).toFixed(1);res.salto=+dist;
+        const sx=f.g.position.x;let k=0;const anim=()=>{k+=.03;f.g.position.x=sx-dist*Math.min(1,k);f.g.position.y=y+Math.sin(Math.min(1,k)*Math.PI)*1.6;f.anim(.016,4);if(k<1)requestAnimationFrame(anim);};anim();
+        $('tInfo').innerHTML='Salto de <b>'+dist.toString().replace('.',',')+' metros</b>! '+(acc>.8?'Excelente impulso.':acc>.5?'Bom salto.':'Faltou ritmo nos braços.');
+        const B=$('dBtns');B.innerHTML='';const b=document.createElement('button');b.textContent='Próxima prova ▸';b.dataset.main='1';b.onclick=next;B.appendChild(b);}}]);
+    startTiming({speed:1.25,zone:.2});};
+  // lançamento de disco
+  const disc=()=>{const f=OLY_RUNNERS[0];f.g.position.set(STD.x+30,y,STD.z);olyCam(STD.x+38,STD.z-6.8,STD.x+14,STD.z,4);
+    const d=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,.03,18),new THREE.MeshStandardMaterial({color:0x9a7a3a,metalness:.6,roughness:.35}));d.visible=false;oAdd(d);
+    dlg('Prova 3 de 3 · Pentatlo','O lançamento de disco',timingHTML('O <b>disco</b> é de bronze e pesa uns 2 quilos. O atleta gira o corpo e solta. Acerte a <b>faixa verde</b>!','Botão, espaço ou Enter.'),
+      [{t:'Lançar! 🥏',main:true,f:()=>{const T=TIMING;if(!T)return;const acc=1-Math.min(1,Math.abs(T.pos-.5)*2);stopTiming();const dist=Math.round(18+acc*20);res.disco=dist;
+        d.visible=true;let k=0;const sx=f.g.position.x;const anim=()=>{k+=.012;const t=Math.min(1,k);d.position.set(sx-dist*t,y+1.4+Math.sin(t*Math.PI)*7*(dist/38),STD.z);d.rotation.y+=.4;if(k<1)requestAnimationFrame(anim);};anim();
+        $('tInfo').innerHTML='Lançamento de <b>'+dist+' metros</b>! '+(acc>.8?'Os juízes marcam com uma estaca.':'');
+        const B=$('dBtns');B.innerHTML='';const b=document.createElement('button');b.textContent='Ver o resultado ▸';b.dataset.main='1';b.onclick=()=>{d.visible=false;next();};B.appendChild(b);}}]);
+    startTiming({speed:1.45,zone:.18});};
+  runSeq([
+   ()=>{olyCam(STD.x+STD.len/2+14,STD.z-10,STD.x,STD.z,7);dlg('Antes das provas','O juramento','<p>Antes dos jogos, os atletas juram diante de Zeus que treinaram por <b>10 meses</b> e que vão competir sem trapaça. Eles também passaram <b>um mês</b> treinando em <b>Élida</b>, a cidade que organiza os jogos.</p><p>Só podiam competir <b>homens gregos livres</b>. As mulheres casadas eram proibidas até de assistir. As moças tinham uma festa própria, os <b>Jogos de Hera</b>, com corridas só para elas.</p><p class="src">Os atletas competiam <b>sem roupa</b>. No jogo, eles aparecem de túnica curta.</p>');},
+   race,jump,disc,
+   ()=>{const won=res.corrida===1;const good=res.salto>=14&&res.disco>=32;
+     if(won){window.__kotinos.position.set(0,1.92,0);OLY_RUNNERS[0].g.add(window.__kotinos);}
+     dlg('Cerimônia','O prêmio',(won?'<p>Um menino corta um ramo da <b>oliveira sagrada</b> com uma faca de ouro, e o juiz coloca a <b>coroa de oliveira</b> na cabeça de Nikos!</p>':'<p>Nikos não ganhou a corrida, mas viu de perto como é competir em Olímpia.</p>')+
+      '<p>Em Olímpia, o prêmio era só uma <b>coroa de oliveira</b>. Mas, em casa, o campeão virava herói: Atenas dava a ele <b>refeições de graça no Pritaneu pelo resto da vida</b>, e poetas como <b>Píndaro</b> escreviam canções sobre ele.</p><p>Seus resultados: corrida, <b>'+res.corrida+'º lugar</b> · salto, <b>'+String(res.salto).replace('.',',')+' m</b> · disco, <b>'+res.disco+' m</b>'+(good?' (ótimo pentatleta!)':'')+'.</p>');},
+   ()=>quiz('Pergunta','O que o vencedor ganhava em Olímpia?',{q:'Qual era o prêmio do vencedor <b>em Olímpia</b>?',o:['Uma medalha de ouro','Uma coroa de folhas de oliveira','Um saco de moedas de prata'],c:1,
+     e:'Em Olímpia, o prêmio era só a coroa de oliveira. A medalha de ouro só aparece nos Jogos Olímpicos modernos. O dinheiro e os privilégios vinham depois, da cidade do atleta.'}),
+   ()=>{olyCam(HIP.x+HIP.rx+10,HIP.z+22,HIP.x,HIP.z,9);dlg('Enquanto isso, no hipódromo','A corrida de carros','<p>No hipódromo, as <b>quadrigas</b> fazem a curva no marco de pedra. Os carros de <b>Alcibíades</b> estão na frente.</p><p>Ele inscreveu <b>sete carros</b>, e ficou com o <b>1º, o 2º e o 4º lugar</b>. Toda a Grécia falou disso.</p><p>No ano seguinte, na assembleia, Alcibíades vai lembrar essa vitória: se ele foi capaz de tanto em Olímpia, por que não poderia comandar a conquista da Sicília?</p>',
+     [{t:'Sair do estádio ▸',main:true,f:finish}]);},
+  ]);
+}
+
+
+// =====================================================================
+// MAPA DA GRÉCIA e o CAMPO DA ÁTICA: olivais, trigais e vinhas fora dos muros
+// =====================================================================
+// ---------- botão do mapa ----------
+{ const st=document.createElement('style');st.textContent=`
+#greeceMap{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(20,14,10,.78);padding:16px}
+#greeceMap[hidden]{display:none!important}
+#greeceMap .box{max-width:min(980px,100%);max-height:100%;overflow:auto;padding:0 16px 14px}
+#greeceMap img{display:block;width:100%;height:auto;max-height:72vh;object-fit:contain;border-radius:6px;border:2px solid var(--clay);background:#bcdcec}
+#greeceMap p{font-size:19px;margin:8px 0 10px}`;document.head.appendChild(st);
+  const ov=document.createElement('div');ov.id='greeceMap';ov.hidden=true;
+  ov.innerHTML='<div class="box panel"><div class="meander"></div><h3 style="font-size:28px;color:var(--clay-lt);margin:2px 0 8px">O mundo de Nikos</h3><img src="imagens/mapa-grecia.svg" alt="Mapa da Grécia antiga com Atenas, Esparta, Olímpia, as ilhas do mar Egeu e o caminho da frota para a Sicília"><p><b>Atenas</b> fica na <b>Ática</b>. O porto do <b>Pireu</b> está ao lado. <b>Esparta</b>, a grande rival, fica no <b>Peloponeso</b>, como <b>Olímpia</b>. A linha tracejada mostra o caminho da frota para a <b>Sicília</b>. Nas minas de prata de <b>Laurion</b> trabalhavam pessoas escravizadas.</p><button id="gmClose">Fechar o mapa ✕</button></div>';
+  document.body.appendChild(ov);
+  const b=document.createElement('button');b.id='btnGreece';b.title='Ver o mapa da Grécia';b.textContent='🗺️ Mapa da Grécia';$('btnLost').before(b);
+  const open=v=>{ov.hidden=!v;};b.onclick=()=>open(true);$('gmClose').onclick=()=>open(false);ov.onclick=e=>{if(e.target===ov)open(false);};
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&!ov.hidden)open(false);});
+}
+
+// ---------- o campo ----------
+const FIELDS=[];
+function fieldFree(x,z,w,d,rot){const c=Math.cos(rot),s=Math.sin(rot);
+  for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const lx=i*w/2*.9,lz=j*d/2*.9,px=x+lx*c+lz*s,pz=z-lx*s+lz*c;
+    if(Math.abs(px)>325||pz>140||pz<-330)return false;
+    if(px<-172&&pz>-128)return false;                                   // serra e Olímpia
+    if(!freeAt(px,pz,3.2,{outside:true}))return false;
+    if(FIELDS.some(f=>Math.hypot(f.x-px,f.z-pz)<Math.max(f.w,f.d)/2+4))return false;}
+  return true;}
+function placeFields(kind,n,w,d){let k=0;for(let t=0;t<900&&k<n;t++){const a=rnd()*Math.PI*2,r=1.12+rnd()*.55;
+    const x=CW.cx+Math.cos(a)*CW.rx*r,z=CW.cz+Math.sin(a)*CW.rz*r,rot=rnd()*Math.PI;
+    if(!fieldFree(x,z,w,d,rot))continue;const f={kind,x,z,w,d,rot};FIELDS.push(f);addCollider(x,z,w/2,d/2,rot);k++;}}
+const nF=window.__atenasQuality==='leve'?.6:1;
+placeFields('olival',Math.round(6*nF),34,26);
+placeFields('trigo',Math.round(6*nF),30,22);
+placeFields('vinha',Math.round(5*nF),26,18);
+// solo arado de cada campo, seguindo o relevo
+function soil(f,col){const g=new THREE.PlaneGeometry(f.w,f.d,8,6);g.rotateX(-Math.PI/2);g.rotateY(f.rot);const p=g.attributes.position;
+  for(let k=0;k<p.count;k++){const x=p.getX(k)+f.x,z=p.getZ(k)+f.z;p.setY(k,H(x,z)+.06);p.setX(k,x);p.setZ(k,z);}g.computeVertexNormals();
+  const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({map:col,roughness:1}));m.receiveShadow=true;scene.add(m);}
+const SOIL={olival:canvasTex(128,128,c=>{c.fillStyle='#a88f62';c.fillRect(0,0,128,128);for(let i=0;i<500;i++){c.fillStyle=`rgba(${80+Math.random()*60|0},${70+Math.random()*40|0},40,.35)`;c.fillRect(Math.random()*128,Math.random()*128,3,2);}}),
+  trigo:canvasTex(128,128,c=>{c.fillStyle='#7f8a46';c.fillRect(0,0,128,128);for(let y=0;y<128;y+=8){c.fillStyle='rgba(70,60,30,.45)';c.fillRect(0,y,128,3);}}),
+  vinha:canvasTex(128,128,c=>{c.fillStyle='#9b7c55';c.fillRect(0,0,128,128);for(let y=0;y<128;y+=16){c.fillStyle='rgba(90,64,40,.5)';c.fillRect(0,y,128,5);}})};
+for(const f of FIELDS)soil(f,SOIL[f.kind]);
+// pontos em fileiras dentro de um campo
+function rows(f,dx,dz,cb){const c=Math.cos(f.rot),s=Math.sin(f.rot);
+  for(let lx=-f.w/2+dx/2;lx<f.w/2;lx+=dx)for(let lz=-f.d/2+dz/2;lz<f.d/2;lz+=dz){const x=f.x+lx*c+lz*s,z=f.z-lx*s+lz*c;cb(x,z,lx,lz);}}
+// olivais: oliveiras em fileiras, com muretas de pedra
+{ const pts=[];for(const f of FIELDS)if(f.kind==='olival')rows(f,6.5,6.5,(x,z)=>pts.push([x+(rnd()-.5)*.8,z+(rnd()-.5)*.8]));
+  const tm=new THREE.InstancedMesh(OLIVE_TRUNK,new THREE.MeshStandardMaterial({color:0x5b4a3a,roughness:1}),pts.length),cm=new THREE.InstancedMesh(OLIVE_CROWN,new THREE.MeshStandardMaterial({color:0x7a8455,roughness:.95}),pts.length);
+  const c=new THREE.Color();pts.forEach(([x,z],i)=>{const s=.8+rnd()*.45,M=trs(x,H(x,z)-.1,z,rnd()*6,s,s*(.85+rnd()*.3),s);tm.setMatrixAt(i,M);cm.setMatrixAt(i,M);c.setHSL(.2+rnd()*.03,.22,.38+rnd()*.06);cm.setColorAt(i,c);colliders.push({x,z,r:.45});});
+  tm.castShadow=cm.castShadow=window.__atenasQuality==='alto';cm.receiveShadow=true;scene.add(tm,cm);}
+// muretas de pedra seca em volta dos campos
+{ const segs=[];for(const f of FIELDS){const c=Math.cos(f.rot),s=Math.sin(f.rot);
+    for(const [lx,lz,len,r] of [[0,-f.d/2,f.w,0],[0,f.d/2,f.w,0],[-f.w/2,0,f.d,Math.PI/2],[f.w/2,0,f.d,Math.PI/2]]){
+      const x=f.x+lx*c+lz*s,z=f.z-lx*s+lz*c;if(lz>0&&f.kind!=='olival'){/* entrada aberta */segs.push([x+c*(len*.3),z-s*(len*.3),f.rot+r,len*.4]);segs.push([x-c*(len*.3),z+s*(len*.3),f.rot+r,len*.4]);continue;}
+      segs.push([x,z,f.rot+r,len]);}}
+  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1,.7,.55),M.stone,segs.length);segs.forEach(([x,z,r,len],i)=>im.setMatrixAt(i,trs(x,H(x,z)+.25,z,r,len,1,1)));im.receiveShadow=true;scene.add(im);}
+// trigais (em março o trigo ainda está verde e alto, quase espigando)
+{ const pts=[];for(const f of FIELDS)if(f.kind==='trigo')rows(f,.62,.62,(x,z)=>pts.push([x+(rnd()-.5)*.4,z+(rnd()-.5)*.4]));
+  const g=new THREE.ConeGeometry(.15,1.05,4,1,true);g.translate(0,.52,0);
+  const im=new THREE.InstancedMesh(g,new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,side:THREE.DoubleSide}),pts.length),c=new THREE.Color();
+  pts.forEach(([x,z],i)=>{const s=.8+rnd()*.5;im.setMatrixAt(i,trs(x,H(x,z),z,rnd()*6,s,s*(.8+rnd()*.5),s));c.setHSL(.19+rnd()*.04,.42,.36+rnd()*.1);im.setColorAt(i,c);});
+  im.receiveShadow=true;scene.add(im);window.__wheat=im;}
+// vinhas: estacas com a videira podada e os primeiros brotos (é março)
+{ const pts=[];for(const f of FIELDS)if(f.kind==='vinha')rows(f,2.2,1.6,(x,z)=>pts.push([x,z]));
+  const post=new THREE.InstancedMesh(new THREE.CylinderGeometry(.04,.05,1.5,5).translate(0,.75,0),M.wood,pts.length);
+  const stock=new THREE.InstancedMesh(new THREE.CylinderGeometry(.06,.09,.8,6).translate(0,.4,0),lam(0x4a3626),pts.length);
+  const leaf=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.32,0).scale(1.3,.7,1.1).translate(0,.95,0),new THREE.MeshStandardMaterial({color:0x8fae4a,roughness:.9,flatShading:true}),pts.length);
+  pts.forEach(([x,z],i)=>{const y=H(x,z),r=rnd()*6;post.setMatrixAt(i,trs(x+.12,y,z,0,1,1,1));stock.setMatrixAt(i,trs(x,y,z,r,1,.9+rnd()*.3,1));const s=.6+rnd()*.5;leaf.setMatrixAt(i,trs(x,y,z,r,s,s,s));});
+  scene.add(post,stock,leaf);}
+// gente trabalhando no campo
+{ const jobs={olival:[0x76764f,0x8a7a62],trigo:[0x985c44,0xb99a68],vinha:[0x6a6a64,0x8c6c4e]};
+  const done={};for(const f of FIELDS){done[f.kind]=(done[f.kind]||0)+1;if(done[f.kind]>2)continue;
+    for(let k=0;k<2;k++){const lx=(k?-1:1)*f.w*.18,lz=f.d*.15*(k?1:-1),c=Math.cos(f.rot),s=Math.sin(f.rot),x=f.x+lx*c+lz*s,z=f.z-lx*s+lz*c;
+      const fem=f.kind==='vinha'&&k===1;const p=placeFig(makeFigure(fem?{dress:true,tunic:jobs[f.kind][k],veil:0xd8c6a4}:{tunic:jobs[f.kind][k],short:true,beard:k===0,cap:0x8c6c4e}),x,z,rnd()*6);
+      if(k===1&&f.kind!=='olival'){p.kneel=true;p.legs.forEach(l=>l.visible=false);p.g.position.y-=.3;}else p.gesture=5;statics.push(p);colliders.push({x,z,r:.35});}}}
+// pontos de leitura (um de cada tipo)
+const FIELD_TXT={
+ olival:{t:'Um olival',sub:'O presente de Atena',txt:'<p>Segundo o mito, a deusa <b>Atena</b> deu a <b>oliveira</b> aos atenienses. Algumas oliveiras eram <b>sagradas</b>: quem cortasse uma podia ser julgado.</p><p>O <b>azeite</b> servia para cozinhar, para acender as <b>lamparinas</b>, para os atletas passarem no corpo e para vender a outras cidades em <b>ânforas</b>.</p><p>Uma oliveira demora muitos anos para dar bastante fruto. Por isso, quando os espartanos invadiam a Ática, eles <b>cortavam e queimavam</b> os olivais: era uma forma de ferir Atenas por muitos anos.</p>'},
+ trigo:{t:'Um campo de cereais',sub:'Trigo e cevada',txt:'<p>Em março, o <b>trigo</b> e a <b>cevada</b> ainda estão <b>verdes</b>. A colheita é no fim da primavera, com <b>foice</b>. Depois, os bois pisam as espigas na eira para separar os grãos.</p><p>A terra da Ática é seca e pedregosa, melhor para a <b>cevada</b> do que para o trigo. A cidade não produzia cereal suficiente para todos: por isso o <b>trigo chegava de navio</b> pelo Pireu.</p>'},
+ vinha:{t:'Uma vinha',sub:'As uvas de Dioniso',txt:'<p>As videiras foram <b>podadas</b> no inverno e agora, em março, aparecem os <b>primeiros brotos</b>. As uvas só serão colhidas no fim do verão.</p><p>Na colheita, as uvas são <b>pisadas com os pés</b> num tanque, e o suco fermenta em grandes jarros. Os gregos bebiam o vinho <b>misturado com água</b>.</p><p>O vinho é presente de <b>Dioniso</b>, o mesmo deus do <b>teatro</b>: neste mês acontece a festa das Grandes Dionísias.</p>'}};
+const seenKind={};
+for(const f of FIELDS){if(seenKind[f.kind])continue;const c=Math.cos(f.rot),s=Math.sin(f.rot);
+  // o lado mais livre do campo (longe de casas e sítios)
+  let x=null,z=null;for(const [lx,lz] of [[0,f.d/2+3],[0,-f.d/2-3],[f.w/2+3,0],[-f.w/2-3,0]]){const px=f.x+lx*c+lz*s,pz=f.z-lx*s+lz*c;
+    if(freeAt(px,pz,4,{outside:true})&&freeAt(px+(px-f.x)*.25,pz+(pz-f.z)*.25,4,{outside:true})){x=px;z=pz;break;}}
+  if(x===null)continue;seenKind[f.kind]=1;addPlace({id:'campo_'+f.kind,x,z,...FIELD_TXT[f.kind]});
+  const j={t:FIELD_TXT[f.kind].t+' (fora dos muros)',at:[x+(x-f.x)*.2,z+(z-f.z)*.2],look:[f.x,f.z]};JUMPS.push(j);
+  const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);}
+DISCOVERY_ITEMS.push({id:'campo_olival',ico:'🫒',title:'Olival',text:'Azeite para comer, iluminar e vender.'},{id:'campo_trigo',ico:'🌾',title:'Cereais',text:'Cevada e trigo; o que faltava vinha pelo mar.'},{id:'campo_vinha',ico:'🍇',title:'Vinha',text:'Uvas de Dioniso, vinho misturado com água.'});
+window.__nFields=FIELDS.length;
+
+
+// =====================================================================
+// DENTRO DO PARTENON: a Atena Pártenos de ouro e marfim, à luz das lamparinas
+// =====================================================================
+const PIN=(()=>{const g=new THREE.Group();g.visible=false;PARTENON.add(g);
+  const D=20.4,W=9.8,FL=1.2,CH=8.06,TOP=FL+CH;
+  const wallM=new THREE.MeshStandardMaterial({color:0x5e5240,roughness:.9,side:THREE.DoubleSide});
+  const floorM=new THREE.MeshStandardMaterial({color:0x6e6452,roughness:.45,metalness:.1});
+  const gold=new THREE.MeshStandardMaterial({color:0xe2b04a,metalness:.85,roughness:.28});
+  const ivory=new THREE.MeshStandardMaterial({color:0xf1e2c4,roughness:.38});
+  const darkGold=new THREE.MeshStandardMaterial({color:0xb5862e,metalness:.8,roughness:.35});
+  const add=(m,x,y,z)=>{m.position.set(x,y,z);g.add(m);return m;};
+  add(new THREE.Mesh(new THREE.PlaneGeometry(D,W).rotateX(-Math.PI/2),floorM),0,FL+.01,0);
+  for(const s of[-1,1]){add(new THREE.Mesh(new THREE.PlaneGeometry(D,CH),wallM),0,FL+CH/2,s*W/2);add(new THREE.Mesh(new THREE.PlaneGeometry(W,CH),wallM).rotateY(Math.PI/2),s*D/2,FL+CH/2,0);}
+  // teto de caixotões, azul com estrelas douradas
+  const ceil=canvasTex(256,128,(c,w,h)=>{c.fillStyle='#1d3a7a';c.fillRect(0,0,w,h);c.strokeStyle='#c9a24a';c.lineWidth=3;for(let x=0;x<w;x+=32)for(let y=0;y<h;y+=32){c.strokeRect(x+2,y+2,28,28);c.fillStyle='#e3c060';c.beginPath();c.arc(x+16,y+16,3,0,7);c.fill();}},6);
+  add(new THREE.Mesh(new THREE.PlaneGeometry(D,W).rotateX(Math.PI/2),new THREE.MeshStandardMaterial({map:ceil,roughness:.8,color:0x6a6a6a})),0,TOP-.02,0);
+  // colunata interna de dois andares, em forma de U em volta da estátua
+  const colGeo=new THREE.CylinderGeometry(.24,.28,3.8,12),colGeo2=new THREE.CylinderGeometry(.18,.22,3.4,12),colM=new THREE.MeshStandardMaterial({color:0x8f8670,roughness:.6});
+  const cols=[];for(let i=0;i<8;i++){const x=-8.6+i*2.2;for(const s of[-1,1])cols.push([x,s*3.4]);}for(const z of[-2.2,0,2.2])cols.push([-8.6,z]);
+  for(const [x,z] of cols){add(new THREE.Mesh(colGeo,colM),x,FL+1.9,z);add(new THREE.Mesh(new THREE.BoxGeometry(.7,.16,.7),colM),x,FL+3.88,z);add(new THREE.Mesh(colGeo2,colM),x,FL+5.66,z);}
+  for(const s of[-1,1]){add(new THREE.Mesh(new THREE.BoxGeometry(17.6,.3,.6),colM),-.9,FL+3.95,s*3.4);}
+  // espelho d'água raso na frente da estátua (umidade para o marfim e reflexo da luz)
+  const pool=add(new THREE.Mesh(new THREE.BoxGeometry(5.2,.06,4.2),new THREE.MeshStandardMaterial({color:0x1c2f3a,metalness:.6,roughness:.08})),-2.2,FL+.02,0);
+  add(new THREE.Mesh(new THREE.BoxGeometry(5.6,.14,.2),new THREE.MeshStandardMaterial({color:0x2a2420})),-2.2,FL+.07,2.2);add(new THREE.Mesh(new THREE.BoxGeometry(5.6,.14,.2),new THREE.MeshStandardMaterial({color:0x2a2420})),-2.2,FL+.07,-2.2);
+  // ----- a estátua -----
+  const st=new THREE.Group();st.position.set(-6.4,FL,0);st.rotation.y=Math.PI/2;g.add(st);   // olha para a porta (leste)
+  const P=(geo,mat,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);st.add(m);return m;};
+  P(new THREE.BoxGeometry(3.4,1.1,2.4),new THREE.MeshStandardMaterial({color:0x3a3a40,roughness:.5}),0,.55,0);   // base escura
+  P(new THREE.BoxGeometry(3.42,.32,2.42),gold,0,.86,0);                                                           // relevo dourado (o nascimento de Pandora)
+  const B=1.1;
+  // vestido (peplos) de ouro, com pregas
+  const prof=[[1.05,0],[1.0,.6],[.85,1.8],[.72,2.9],[.62,3.5],[.66,3.95],[.58,4.25],[.32,4.45]].map(([r,y])=>new THREE.Vector2(r,y));
+  const robe=P(new THREE.LatheGeometry(prof,36),gold,0,B,0);robe.scale.z=.78;
+  const fold=new THREE.CylinderGeometry(.05,.07,2.8,6);for(let i=0;i<14;i++){const a=-1.1+i*.17;P(fold,darkGold,Math.sin(a)*.95,B+1.4,Math.cos(a)*.74);}
+  // égide no peito, com a cabeça da Medusa
+  P(new THREE.SphereGeometry(.62,20,12,0,Math.PI*2,0,Math.PI/2).scale(1,.5,.82),darkGold,0,B+3.9,0);
+  P(new THREE.CircleGeometry(.16,16),ivory,0,B+3.95,.53);
+  // pescoço, rosto e braços de marfim
+  P(new THREE.CylinderGeometry(.17,.2,.35,12),ivory,0,B+4.55,0);
+  P(new THREE.SphereGeometry(.34,20,16).scale(.9,1.12,.95),ivory,0,B+4.95,.02);
+  // elmo de ouro com três cristas (uma esfinge e dois cavalos alados)
+  P(new THREE.SphereGeometry(.38,20,12,0,Math.PI*2,0,Math.PI*.55),gold,0,B+5.05,-.02);
+  P(new THREE.BoxGeometry(.05,.28,.7),gold,0,B+5.25,0).rotation.x=.1;
+  for(const s of[-1,1]){const c=P(new THREE.BoxGeometry(.04,.22,.5),gold,s*.2,B+5.22,0);c.rotation.z=s*.35;}
+  for(const s of[-1,1])P(new THREE.BoxGeometry(.06,.3,.32),gold,s*.34,B+4.85,.02);   // abas do elmo
+  // braço direito estendido, segurando a Nice (vitória alada)
+  const ra=P(new THREE.CylinderGeometry(.13,.15,1.5,10),ivory,.72,B+3.55,.55);ra.rotation.x=Math.PI/2.4;ra.rotation.z=-.25;
+  P(new THREE.SphereGeometry(.14,10,8),ivory,.86,B+3.3,1.2);
+  P(new THREE.CylinderGeometry(.12,.14,3.0,10),new THREE.MeshStandardMaterial({color:0xd8cbb0,roughness:.5}),.9,B+1.65,1.25);  // coluna de apoio
+  const nike=new THREE.Group();nike.position.set(.86,B+3.45,1.25);st.add(nike);
+  const nk=(geo,mat,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);nike.add(m);return m;};
+  nk(new THREE.ConeGeometry(.13,.5,10),gold,0,.25,0);nk(new THREE.SphereGeometry(.07,8,6),ivory,0,.56,0);
+  for(const s of[-1,1]){const w=nk(new THREE.PlaneGeometry(.38,.22),new THREE.MeshStandardMaterial({color:0xe8c060,metalness:.8,roughness:.3,side:THREE.DoubleSide}),s*.18,.4,-.06);w.rotation.z=s*.5;w.rotation.y=s*.4;}
+  // braço esquerdo apoiado no escudo; a lança encostada no ombro
+  const la=P(new THREE.CylinderGeometry(.13,.15,1.4,10),ivory,-.78,B+3.4,.1);la.rotation.z=.35;
+  const shield=P(new THREE.CylinderGeometry(1.35,1.35,.12,32),gold,-1.55,B+1.45,.1);shield.rotation.z=Math.PI/2;shield.rotation.y=.25;
+  P(new THREE.TorusGeometry(1.2,.06,6,32),darkGold,-1.62,B+1.45,.1).rotation.y=Math.PI/2+.25;
+  // a serpente sagrada, enrolada por dentro do escudo
+  const snake=P(new THREE.TorusKnotGeometry(.32,.08,64,8,2,3),new THREE.MeshStandardMaterial({color:0x4f6b3a,roughness:.5,metalness:.2}),-.95,B+.55,.25);snake.scale.y=.6;
+  const spear=P(new THREE.CylinderGeometry(.04,.04,6.4,8),gold,-1.1,B+3.2,-.35);spear.rotation.z=.1;
+  P(new THREE.ConeGeometry(.08,.4,8),gold,-1.42,B+6.5,-.35).rotation.z=.1;
+  // estátua escaneada (Atena Varvakeion, Scan-the-World, CC BY-NC-SA 4.0): troca a versão simples quando carregar
+  // coordenadas do scan: x 0..52.7, y 0..125, z -49.8..0, frente = +z
+  const athenaPart=(x,y,z)=>{
+    if(y<14.6)return 2;                                   // base de pedra
+    if(x<10.5&&y<75)return 3;                             // coluna sob a mão direita
+    if(y>96.5&&y<110&&x>20.5&&x<31.5&&z>-21.5)return 1;   // rosto
+    if(y>91&&y<97.5&&x>21.5&&x<30.5&&z>-26)return 1;      // pescoço
+    if(y>76&&y<91.5&&x>11.5&&x<19.5)return 1;             // braço direito (segura a Nike)
+    if(y>67&&y<91&&x>33.5&&x<43.5&&z>-30)return 1;        // braço esquerdo (sobre o escudo)
+    return 0;};
+  if(typeof glb==='function')glb('estatuas/athena-varvakeion.glb').then(gl=>{
+    const src=gl.scene.getObjectByProperty('isMesh',true);if(!src)return;
+    const gg=src.geometry.index?src.geometry.toNonIndexed():src.geometry,p=gg.attributes.position.array,parts=[[],[],[],[]];
+    for(let i=0;i<p.length;i+=9){const a=parts[athenaPart((p[i]+p[i+3]+p[i+6])/3,(p[i+1]+p[i+4]+p[i+7])/3,(p[i+2]+p[i+5]+p[i+8])/3)];for(let k=0;k<9;k++)a.push(p[i+k]);}
+    const mats=[gold,new THREE.MeshStandardMaterial({color:0xd6bf98,roughness:.5}),new THREE.MeshStandardMaterial({color:0x2c2c32,roughness:.5}),new THREE.MeshStandardMaterial({color:0xd8cbb0,roughness:.5})];
+    const sc=7.6/125,real=new THREE.Group();real.scale.setScalar(sc);real.position.set(-26.36*sc,0,24.9*sc);
+    parts.forEach((a,i)=>{if(!a.length)return;const b=new THREE.BufferGeometry();b.setAttribute('position',new THREE.Float32BufferAttribute(a,3));b.computeVertexNormals();real.add(new THREE.Mesh(b,mats[i]));});
+    st.children.forEach(c=>c.visible=false);st.add(real);
+  }).catch(e=>console.warn('Atena escaneada não carregou; fica a versão simples.',e));
+  // lamparinas no chão e duas luzes quentes, só ligadas quando Nikos está lá dentro
+  const lampM=new THREE.MeshBasicMaterial({color:0xffb040});const lamps=[];
+  for(const [x,z] of [[-3.8,1.6],[-3.8,-1.6],[1,2.6],[1,-2.6],[5,2.6],[5,-2.6]]){add(new THREE.Mesh(new THREE.CylinderGeometry(.12,.08,.9,8),M.wood),x,FL+.45,z);
+    const fl=add(new THREE.Mesh(new THREE.ConeGeometry(.06,.18,6),lampM),x,FL+1.0,z);lamps.push(fl);}
+  const L1=new THREE.PointLight(0xffa860,0,30,1.3);L1.position.set(-2,FL+2.6,0);g.add(L1);
+  const L2=new THREE.PointLight(0xffc890,0,22,1.8);L2.position.set(3,FL+4,0);g.add(L2);
+  // o guarda do templo
+  const guard=makeFigure({tunic:0x7a2f2f,himation:0xcfc0a0,beard:true,hair:0x6a6a64});guard.g.position.set(6.6,FL,-3);guard.g.rotation.y=-Math.PI/2-.4;g.add(guard.g);statics.push(guard);
+  box(.04,2.3,.04,M.wood,.28,1.15,.15,guard.g);
+  return {g,L1,L2,lamps,FL,cella:PARTENON.children.find(c=>c.geometry&&c.geometry.type==='BoxGeometry'&&Math.abs(c.geometry.parameters.width-20.4)<.01)};})();
+let pinOld=null;
+EXTRA_TICKS.push(()=>{if(!S.inParth)return;const k=1+Math.sin(t0*9)*.05+Math.sin(t0*23)*.03;PIN.L1.intensity=3.2*k;PIN.L2.intensity=2.2*k;PIN.lamps.forEach((l,i)=>l.scale.y=1+Math.sin(t0*11+i)*.2);});
+function pinCam(lx,ly,lz,tx,ty,tz){const a=PARTENON.localToWorld(new THREE.Vector3(lx,ly,lz)),b=PARTENON.localToWorld(new THREE.Vector3(tx,ty,tz));ROWCAM.want.copy(a);ROWCAM.look.copy(b);}
+function enterParthenon(custom){
+  P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;markDiscovery('dentro_partenon');
+  S.inParth=true;S.inRow=true;player.g.visible=false;PIN.g.visible=true;if(PIN.cella)PIN.cella.visible=false;
+  pinOld=duskT;duskT=2;dusk=2;PIN.hemi=hemi.intensity;
+  pinCam(9.2,3.2,1.2,-6.4,5.4,0);camPos.copy(ROWCAM.want);camLook.copy(ROWCAM.look);
+  const leave=()=>{S.inParth=false;S.inRow=false;PIN.g.visible=false;if(PIN.cella)PIN.cella.visible=true;PIN.L1.intensity=PIN.L2.intensity=0;duskT=pinOld;
+    player.g.visible=true;hideDlg();P.locked=false;$('joy').hidden=false;P.x=PARTH.x+15;P.z=PARTH.z;P.a=-Math.PI/2;collide();EXTRA.partenon=true;};
+  if(custom){runSeq(custom(leave));return;}
+  runSeq([
+   ()=>dlg('Dentro do Partenon · meia-noite','O guarda do templo','<p>O guarda abre a grande porta de bronze. Lá dentro, só a luz das <b>lamparinas de azeite</b>. A sombra da deusa dança nas paredes.</p><p>"Fale baixo, rapaz. Você está diante de <b>Atena Pártenos</b>, a Virgem, a protetora da cidade."</p>'),
+   ()=>{pinCam(2.5,2.4,2.2,-6.4,5.8,0);dlg('A estátua','Ouro e marfim','<p>A estátua tem uns <b>12 metros</b> de altura. Foi feita pelo escultor <b>Fídias</b>, há mais ou menos 20 anos.</p><p>Por dentro ela é de <b>madeira</b>. Por fora, o rosto e os braços são de <b>marfim</b>, e o vestido, o elmo e o escudo são cobertos por placas de <b>ouro</b>.</p><p>Na mão direita, Atena segura uma pequena <b>Nice</b>, a Vitória alada. Ao lado do escudo, a <b>serpente</b> lembra o rei mítico de Atenas, Erictônio.</p>');},
+   ()=>{pinCam(4,1.8,-2.6,-2.2,1.2,0);dlg('O espelho d’água','Por que essa água aqui?','<p>Na frente da estátua há um tanque raso de água. A Acrópole é muito seca, e o <b>marfim racha</b> quando fica seco demais. A água deixa o ar úmido.</p><p>À noite, a água também <b>reflete a luz</b> das lamparinas e faz a deusa brilhar.</p>');},
+   ()=>{pinCam(7,2.4,2.8,-6.4,4.6,0);const Q={q:'O ouro da estátua foi colocado em <b>placas que podem ser tiradas</b>. Para que servia isso?',o:['Para limpar e polir o ouro mais fácil','Para a cidade poder usar o ouro numa emergência, como uma guerra','Para trocar a cor da estátua nas festas'],c:1,
+      e:'Segundo o historiador Tucídides, o ouro pesava cerca de <b>40 talentos</b>, mais de uma tonelada. Péricles disse que, se Atenas precisasse, poderia usar esse ouro e devolver depois. O Partenon também guardava o <b>tesouro</b> da cidade e da liga de cidades aliadas.'};
+     dlg('Pergunta do guarda','Um tesouro escondido?','<p>'+Q.q+'</p>',Q.o.map((t,i)=>({t,f:()=>{const ok=i===Q.c;
+       $('dTxt').innerHTML='<div class="fb '+(ok?'ok':'no')+'"><b>'+(ok?'Isso mesmo.':'Não era isso.')+'</b> '+(ok?'':'A resposta é: <b>'+Q.o[Q.c]+'</b>. ')+Q.e+'<p class="hoje" style="margin-top:8px">A estátua original <b>desapareceu</b>. Conhecemos a Atena Pártenos por <b>cópias pequenas</b> feitas pelos romanos e pela descrição de viajantes antigos. Em Nashville, nos Estados Unidos, há uma réplica em tamanho real.</p><p class="hoje">A Atena deste jogo foi feita a partir do <b>escaneamento 3D</b> de uma dessas cópias, a <b>Atena Varvakeion</b>, que está no Museu Arqueológico Nacional de Atenas (Scan-the-World, CC BY-NC-SA 4.0).</p></div>';
+       const B=$('dBtns');B.innerHTML='';const b=document.createElement('button');b.textContent='Sair do templo ▸';b.dataset.main='1';b.onclick=leave;B.appendChild(b);}})));},
+  ]);
+}
+addPlace({id:'dentro_partenon',x:PARTH.x+15.2,z:PARTH.z+1.6,t:'A porta do Partenon',sub:'Entrar no templo de Atena',
+  txt:'<p>A entrada principal do Partenon fica do lado <b>leste</b>, de frente para o nascer do sol. Lá dentro está a estátua mais famosa da cidade.</p>',
+  act:()=>({l:EXTRA.partenon?'Entrar de novo no Partenon':'Entrar no Partenon ▸',f:enterParthenon})});
+DISCOVERY_ITEMS.push({id:'dentro_partenon',ico:'🏛️',title:'Atena Pártenos',text:'A estátua de ouro e marfim de Fídias, dentro do Partenon.'});
+{ const j={t:'Porta do Partenon',at:[PARTH.x+19,PARTH.z+2],look:[PARTH.x,PARTH.z]};JUMPS.push(j);const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);}
+
+// =====================================================================
+// O MENSAGEIRO (hemeródromo) que corre até Esparta
+// =====================================================================
+{ const R=[[-4,26],[-12,34],[-24,52],[-30,66],[-34,78],[-38,90],[-44,106],[-52,124]];
+  const f=makeFigure({tunic:0xd8c6a4,short:true,beard:true,hair:0x3b2a1e,cap:0x8c6c4e});f.driven=true;scene.add(f.g);
+  const run={f,i:0,x:R[0][0],z:R[0][1],wait:14,sp:5.2};f.g.position.set(run.x,H(run.x,run.z),run.z);
+  EXTRA_TICKS.push(dt=>{if(!f.g.visible&&run.wait<=0){/* fora de vista, segue o percurso */}
+    if(run.wait>0){run.wait-=dt;f.anim&&f.anim(dt,0);return;}
+    const [tx,tz]=R[run.i+1];const dx=tx-run.x,dz=tz-run.z,d=Math.hypot(dx,dz);
+    if(d<.4){run.i++;if(run.i>=R.length-1){run.i=0;run.x=R[0][0];run.z=R[0][1];run.wait=20;f.g.position.set(run.x,H(run.x,run.z),run.z);}return;}
+    run.x+=dx/d*run.sp*dt;run.z+=dz/d*run.sp*dt;f.g.position.set(run.x,H(run.x,run.z),run.z);f.g.rotation.y=Math.atan2(dx,dz);f.anim&&f.anim(dt,run.sp);});
+  addPlace({id:'mensageiro',x:R[0][0]+2.2,z:R[0][1]-1.2,t:'Um mensageiro de longa distância',sub:'Hemeródromo',
+    txt:'<p>Este homem é um <b>hemeródromo</b>, que quer dizer "corredor de um dia inteiro". A cidade paga corredores assim para levar mensagens urgentes a outras cidades, a pé.</p><p>Hoje ele leva uma mensagem até <b>Esparta</b>, a uns <b>240 km</b> daqui. O mais famoso deles, <b>Fidípides</b>, fez esse caminho em cerca de <b>dois dias</b> para pedir ajuda contra os persas, antes da batalha de <b>Maratona</b>.</p><p class="hoje">Desde 1983 existe uma ultramaratona de Atenas a Esparta, o <b>Espartatlo</b>, em homenagem a ele. E a nossa <b>maratona</b>, de 42 km, também lembra essa história.</p><p class="src">Ele sai daqui de tempos em tempos e corre pela estrada do Dípilo.</p>'});
+  DISCOVERY_ITEMS.push({id:'mensageiro',ico:'🏃',title:'Hemeródromo',text:'Corredores levavam mensagens a pé entre as cidades.'});
+}
+
+// =====================================================================
+// A TAVERNA (kapeleion), num bairro perto da ágora
+// =====================================================================
+if(SPOTS.tavern&&SPOTS.tavern[0]){const T=SPOTS.tavern[0];const g=groupAt(T.x,T.z,T.rot);
+  const Wd=8,Dp=6;
+  // três paredes e um telhado; a frente fica aberta para a rua, com um toldo
+  box(Wd,3.2,.3,M.plaster,0,1.6,-Dp/2,g);for(const s of[-1,1])box(.3,3.2,Dp,M.plaster,s*Wd/2,1.6,0,g);
+  const roof=box(Wd+.6,.25,Dp+.6,M.tile,0,3.35,0,g);const aw=box(Wd,.08,2.2,lam(0x9a5a38),0,2.7,Dp/2+1,g);aw.rotation.x=.2;
+  for(const s of[-1,1])box(.14,2.7,.14,M.wood,s*(Wd/2-.2),1.35,Dp/2+2,g);
+  box(Wd-.6,.12,.12,lam(0x5a3a22),0,.06,Dp/2,g);
+  // balcão e prateleira de ânforas (o vinho fica em grandes jarros enterrados no balcão)
+  box(3,1,.7,M.wood,-1.5,.5,-1.6,g);box(3.1,.1,.8,lam(0x6b4a2a),-1.5,1.05,-1.6,g);
+  for(let i=0;i<3;i++)mesh(new THREE.CylinderGeometry(.22,.18,.2,12),lam(0x8a4e30),-2.4+i*.9,1.12,-1.6,g);
+  for(let i=0;i<5;i++)softPut('gregos/classical-pottery-set.glb',{parent:g,node:i%2?'Amphora_Lidded':'Amphora_Tall',x:-3.4+i*.75,z:-2.6,y:0,s:.15,rot:i});
+  // mesas, banquinhos e os dados (astrágalos)
+  const tables=[[1.6,-.6],[2.2,1.6],[-1.2,1.2]];
+  for(const [x,z] of tables){mesh(new THREE.CylinderGeometry(.55,.55,.06,16),M.wood,x,.72,z,g);box(.08,.7,.08,M.wood,x,.35,z,g);
+    for(let k=0;k<4;k++)mesh(new THREE.BoxGeometry(.05,.05,.05),lam(0xe8e0d0),x-.15+k*.1,.78,z+((k*7)%3-1)*.08,g);
+    softPut('lowpoly/kylix_cup.glb',{parent:g,x:x+.25,z:z-.2,y:.75,s:.28});}
+  const pals=[];
+  for(const [x,z,a,o] of [[1.6,-1.35,0,{tunic:0x76764f,beard:true}],[1.6,.15,Math.PI,{tunic:0x985c44,short:true}],[2.95,1.6,-Math.PI/2,{tunic:0x58627a,beard:true,cap:0x6a6a64}],[1.45,1.6,Math.PI/2,{tunic:0x8a7a62,beard:true}],[-1.2,.45,0,{tunic:0x6a6a64,beard:true,hair:0x9a948a}]]){
+    const f=makeFigure(o);f.seated=true;f.legs.forEach(l=>l.visible=false);f.g.position.set(x,.46-.72,z);f.g.rotation.y=a;g.add(f.g);statics.push(f);f.gesture=(pals.length%2)?1:0;pals.push(f);
+    mesh(new THREE.CylinderGeometry(.2,.18,.42,10),M.wood,x,.21,z,g);}
+  const host=makeFigure({dress:true,tunic:0x7a2f5a,veil:0xd8c6a4});host.g.position.set(-1.5,0,-2.3);g.add(host.g);statics.push(host);host.gesture=2;
+  // lamparinas penduradas
+  const fl=[];for(const x of[-2,1.5]){const l=mesh(new THREE.SphereGeometry(.09,8,6),new THREE.MeshBasicMaterial({color:0xffb040}),x,2.5,0,g);fl.push(l);box(.02,.6,.02,lam(0x2a2a2a),x,2.85,0,g);}
+  const tl=new THREE.PointLight(0xffa050,0,12,1.8);tl.position.set(0,2.4,.5);g.add(tl);
+  EXTRA_TICKS.push(()=>{const k=TOD.lampK;tl.intensity=k*1.6*(1+Math.sin(t0*9)*.06);fl.forEach(l=>l.visible=k>.05);pals.forEach((f,i)=>{if(f.arms)f.arms[1].rotation.x=-.4-Math.max(0,Math.sin(t0*1.7+i))*.6;});});
+  addCollider(T.x,T.z,Wd/2+.3,Dp/2+.3,T.rot);
+  // a frente aberta: tira a parte da colisão que cobre a entrada
+  colliders.pop();for(const [lx,lz,hw,hd] of [[0,-Dp/2,Wd/2,.3],[-Wd/2,0,.3,Dp/2],[Wd/2,0,.3,Dp/2],[-1.5,-1.6,1.5,.4]]){const[x,z]=atLocal(T.x,T.z,T.rot,lx,lz);addCollider(x,z,hw,hd,T.rot);}
+  for(const [x,z] of tables){const[px,pz]=atLocal(T.x,T.z,T.rot,x,z);colliders.push({x:px,z:pz,r:1});}
+  cutaway(g,3.0,Wd/2,Dp/2);
+  const front=atLocal(T.x,T.z,T.rot,0,Dp/2+3.2);
+  addPlace({id:'taverna',x:front[0],z:front[1],t:'A taverna do bairro',sub:'O kapeleion',
+    txt:'<p>Esta é uma <b>taverna</b>, o <b>kapeleion</b>. Aqui se compra vinho para levar ou para beber na hora, e às vezes um prato de comida quente. Muitas tavernas eram de <b>mulheres</b> ou de <b>metecos</b>.</p><p>O vinho fica em jarros grandes enterrados no balcão. Como em casa, ele é bebido <b>misturado com água</b>.</p><p>Os fregueses jogam <b>astrágalos</b>, pequenos ossos de carneiro usados como dados, e discutem política em voz alta. Os ricos achavam esses lugares mal frequentados: eles bebiam em casa, nos <b>banquetes</b>.</p>',
+    act:()=>({l:'Jogar astrágalos ▸',f:knucklebones})});
+  DISCOVERY_ITEMS.push({id:'taverna',ico:'🎲',title:'Taverna',text:'Vinho com água, astrágalos e conversa sobre política.'});
+  const j={t:'Taverna do bairro',at:atLocal(T.x,T.z,T.rot,0,Dp/2+6),look:[T.x,T.z]};JUMPS.push(j);const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);
+}
+// o jogo de astrágalos: 4 ossinhos, cada um cai num de 4 lados (valem 1, 3, 4 ou 6)
+function knucklebones(){
+  P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;markDiscovery('taverna');
+  const FACES=[1,3,4,6],roll=()=>[0,0,0,0].map(()=>FACES[Math.floor(Math.random()*4)]);
+  const name=r=>{const u=new Set(r);if(u.size===4)return 'o lance de Afrodite!';if(r.every(v=>v===1))return 'o "cão"! (o pior lance)';return null;};
+  const score=r=>{if(new Set(r).size===4)return 100;if(r.every(v=>v===1))return 0;return r.reduce((a,b)=>a+b,0);};
+  let me=0,him=0,round=0;const show=r=>r.map(v=>'<b style="display:inline-block;min-width:34px;text-align:center;border:2px solid var(--clay);border-radius:6px;margin:2px;font-size:24px">'+v+'</b>').join('');
+  const finish=()=>{hideDlg();P.locked=false;$('joy').hidden=false;};
+  const turn=()=>{round++;const a=roll(),b=roll(),sa=score(a),sb=score(b);if(sa>sb)me++;else if(sb>sa)him++;
+    dlg('Astrágalos · rodada '+round+' de 3','Os ossinhos rolam na mesa','<section><span class="mgp">Nikos: '+show(a)+(name(a)?' <b>'+name(a)+'</b>':'')+'</span><span class="mgp">O remador: '+show(b)+(name(b)?' <b>'+name(b)+'</b>':'')+'</span><span class="mgp">Placar: Nikos <b>'+me+'</b> × <b>'+him+'</b> remador</span></section>',
+      [{t:round<3?'Jogar de novo 🎲':'Ver o resultado ▸',main:true,f:round<3?turn:end}]);};
+  const end=()=>dlg('Na taverna','Fim do jogo',(me>him?'<p>Nikos ganhou! O remador paga a próxima rodada de vinho... bem misturado com água.</p>':me<him?'<p>O remador ganhou e ri alto. "Na assembleia você pode até ter sorte, rapaz, mas nos ossinhos, não!"</p>':'<p>Empate! Os dois brindam e voltam a discutir sobre a Sicília.</p>')+
+    '<p>Cada <b>astrágalo</b> tem quatro lados que valem <b>1, 3, 4 e 6</b>. O melhor lance era o de <b>Afrodite</b>, com os quatro lados diferentes. O pior era o <b>cão</b>, com quatro uns.</p><p class="hoje">Muitas crianças brasileiras jogam <b>cinco-marias</b> (ou <b>saquinhos</b>), um jogo que vem desses ossinhos antigos.</p>',[{t:'Sair da taverna ▸',main:true,f:finish}]);
+  dlg('Na taverna','Um desafio','<p>Um remador da frota chama Nikos para a mesa: "Uma partida de <b>astrágalos</b>? Três rodadas, quem somar mais ganha!"</p>',[{t:'Jogar 🎲',main:true,f:turn},{t:'Agora não',ghost:true,f:finish}]);
+}
+
+
+// =====================================================================
+// MODO MISSÃO · Capítulo 1 "Minha cidade": o Livro dos Deuses (Héstia, Atena, Hermes)
+// =====================================================================
+const MIS={on:false,s:0,got:[],right:0,total:0,items:{},KEY:'atenas-nikos-missao-v1'};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const GODS=[
+ {id:'hestia',n:'Héstia',sym:'🔥',rw:'Chama de Héstia',d:'Deusa do <b>fogo do lar</b>. Irmã mais velha de Zeus.',
+  m:'Pediu a Zeus para nunca se casar e ficar cuidando do fogo. Por isso, recebia a <b>primeira oferenda</b> em cada casa.',l:'A cozinha da casa de Nikos',
+  r:{q:'Onde Héstia era honrada todos os dias?',o:['No fogo de cada casa','Só no alto da Acrópole','No porto do Pireu'],c:0,e:'Cada família tinha o seu fogo, e cada fogo era de Héstia.'}},
+ {id:'atena',n:'Atena',sym:'🦉',rw:'Coruja de Atena',d:'Deusa da <b>sabedoria</b> e da <b>estratégia</b> na guerra. Protetora de Atenas.',
+  m:'Disputou a cidade com Poseidon. Ele fez brotar água salgada da rocha; ela deu a <b>oliveira</b>, e venceu.',l:'A Acrópole, o Partenon e os olivais',
+  r:{q:'Que presente Atena deu à cidade?',o:['A oliveira','Um cavalo','Uma fonte de água salgada'],c:0,e:'A oliveira dava azeitonas, azeite e madeira.'}},
+ {id:'hermes',n:'Hermes',sym:'⚚',rw:'Caduceu de Hermes',d:'<b>Mensageiro</b> dos deuses. Protege os <b>viajantes</b> e os <b>comerciantes</b>.',
+  m:'No dia em que nasceu, fez a primeira <b>lira</b> com o casco de uma tartaruga e roubou as vacas de Apolo, fazendo-as andar de costas.',l:'A ágora e as hermas',
+  r:{q:'Quem Hermes protegia?',o:['Viajantes e comerciantes','Só os soldados','Os peixes do mar'],c:0,e:'Por isso havia hermas nas portas, nas ruas e nos caminhos.'}},
+ {id:'hefesto',n:'Hefesto',sym:'🔨',p:'Onde o fogo e o martelo trabalham o bronze.'},
+ {id:'dionisio',n:'Dionísio',sym:'🎭',p:'Onde se usam máscaras para contar histórias.'},
+ {id:'zeus',n:'Zeus',sym:'⚡',p:'O rei dos deuses tem um grande altar e jogos famosos.'},
+ {id:'poseidon',n:'Poseidon',sym:'🔱',p:'Onde ficam os navios e o cheiro de mar.'},
+ {id:'hera',n:'Hera',sym:'👑',p:'A rainha dos deuses protege o casamento.'},
+ {id:'apolo',n:'Apolo',sym:'🎵',p:'Ouça a lira e procure quem prevê o futuro.'},
+ {id:'artemis',n:'Ártemis',sym:'🏹',p:'Siga as pegadas dos animais, longe da cidade.'},
+ {id:'demeter',n:'Deméter',sym:'🌾',p:'No trigal, uma mãe procura a filha.'},
+ {id:'afrodite',n:'Afrodite',sym:'🍎',p:'Uma maçã de ouro causou uma grande briga.'},
+ {id:'ares',n:'Ares',sym:'🛡️',p:'Onde os soldados treinam em formação.'},
+ {id:'asclepio',n:'Asclépio',sym:'🐍',p:'Um bastão com uma serpente cura os doentes.'},
+ {id:'hades',n:'Hades',sym:'🗝️',p:'No Cerâmico, onde ficam os túmulos.'},
+];
+// ---------- estilos ----------
+{ const st=document.createElement('style');st.textContent=`
+.mis-entry{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px;padding:10px 12px;border:2px solid var(--olive);border-radius:8px;background:rgba(159,174,92,.12)}
+.mis-entry b{flex:1 1 100%;font-size:19px;color:var(--olive)}
+.mis-entry span{flex:1 1 100%;font-size:16px;opacity:.9;margin-top:-4px}
+.mis-entry button{flex:1 1 auto}
+#godBook{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(20,14,10,.82);padding:12px}
+#godBook[hidden]{display:none!important}
+#godBook .box{width:min(900px,100%);max-height:100%;overflow:auto;padding:0 14px 14px}
+#godBook .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:8px 0 10px}
+#godBook .g{min-height:96px;border-radius:8px;border:2px solid #5a3f2e;background:rgba(0,0,0,.28);padding:6px 4px;text-align:center;font:700 16px var(--f-body);color:var(--bone);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+#godBook .g .s{font-size:34px;line-height:1.1;font-family:"Segoe UI Emoji","Noto Color Emoji","Segoe UI Symbol","Noto Sans Symbols 2",sans-serif}
+#godBook .g.off .s{filter:grayscale(1) brightness(.25)}
+#godBook .g.off{color:#9b8a78;font-weight:600;font-size:14px}
+#godBook .g.on{border-color:var(--olive);cursor:pointer}
+#godBook .g.on:hover,#godBook .g.on:focus{background:rgba(159,174,92,.18)}
+#godBook .card{border:2px solid var(--olive);border-radius:8px;padding:10px 12px;background:rgba(0,0,0,.25);font-size:18px}
+#godBook .card h4{font-size:24px;margin:0 0 4px;color:var(--clay-lt)}
+#godBook .card p{margin:6px 0}
+#godBook .fb{margin:8px 0}
+.mis-sym{font-family:"Segoe UI Emoji","Noto Color Emoji","Segoe UI Symbol","Noto Sans Symbols 2",sans-serif}
+.mis-reward{display:block;text-align:center;font-size:64px;margin:4px 0}
+.mis-list{display:block;margin:6px 0;padding:0}.mis-list span{display:block;padding:3px 0}
+.mis-done{color:var(--olive)}
+#guideDock .mis-row{display:flex;gap:6px}#guideDock .mis-row button{flex:1}
+#guideDock .mis-row button.ghost{flex:0 0 auto}
+@media (max-width:600px){#godBook .grid{grid-template-columns:repeat(3,1fr)}#godBook .g{min-height:84px}}`;document.head.appendChild(st);}
+// ---------- livro dos deuses ----------
+const book=document.createElement('div');book.id='godBook';book.hidden=true;document.body.appendChild(book);
+function openBook(sel){book.hidden=false;const got=new Set(MIS.got);
+  book.innerHTML='<div class="box panel"><div class="meander"></div><h3 style="font-size:28px;color:var(--clay-lt);margin:2px 0 4px">Livro dos Deuses</h3><p style="font-size:18px;margin:0">Descobertos: <b>'+got.size+' de 15</b>. Toque num deus que você já encontrou para relembrar.</p><div class="grid">'+
+   GODS.map(g=>got.has(g.id)?'<button class="g on" data-g="'+g.id+'"><span class="s">'+g.sym+'</span>'+g.n+'</button>':'<div class="g off" title="'+(g.p||'')+'"><span class="s">'+g.sym+'</span>???</div>').join('')+
+   '</div><div id="gbCard"></div><button id="gbClose">Fechar o livro ✕</button></div>';
+  book.querySelectorAll('.g.on').forEach(b=>b.onclick=()=>bookCard(b.dataset.g));
+  $('gbClose').onclick=()=>{book.hidden=true;canvas.focus();};
+  if(sel)bookCard(sel);else{const off=GODS.find(g=>!got.has(g)&&!got.has(g.id));$('gbCard').innerHTML=off?'<div class="card"><b>Próxima pista:</b> '+(off.p||'Siga a missão.')+'</div>':'';}
+}
+function bookCard(id){const g=GODS.find(x=>x.id===id),i=GODS.indexOf(g)+1,R=g.r;
+  const opts=shuffle(R.o.map((t,k)=>({t,ok:k===R.c})));
+  $('gbCard').innerHTML='<div class="card"><h4><span class="mis-sym">'+g.sym+'</span> '+g.n.toUpperCase()+' · descoberta '+i+' de 15</h4><p>'+g.d+'</p><p><b>Mito:</b> '+g.m+'</p><p><b>Onde Nikos encontrou:</b> '+g.l+'</p><p><b>Recompensa:</b> '+g.rw+'</p><p><b>Relembre:</b> '+R.q+'</p><div class="row" id="gbOpts"></div><div id="gbFb"></div></div>';
+  opts.forEach(o=>{const b=document.createElement('button');b.className='ghost';b.textContent=o.t;b.onclick=()=>{$('gbFb').innerHTML='<div class="fb '+(o.ok?'ok':'no')+'"><b>'+(o.ok?'Isso mesmo!':'Ainda não. Tente outra.')+'</b> '+(o.ok?R.e:'')+'</div>';};$('gbOpts').appendChild(b);});
+  $('gbCard').scrollIntoView({block:'nearest'});}
+book.onclick=e=>{if(e.target===book){book.hidden=true;}};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!book.hidden)book.hidden=true;});
+const btnBook=document.createElement('button');btnBook.id='btnBook';btnBook.textContent='📖 Livro dos Deuses';btnBook.hidden=true;btnBook.onclick=()=>openBook();
+$('btnLost').before(btnBook);
+
+// ---------- ajudas de diálogo ----------
+function lockUI(focus,lift=0){P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;if(focus)talkCam(focus,lift);}
+// câmera de conversa: fica entre Nikos e quem fala, olhando para o rosto
+function talkCam(f,lift=0){let dx=P.x-f[0],dz=P.z-f[1],d=Math.hypot(dx,dz);if(d<.3){dx=Math.sin(P.a+Math.PI);dz=Math.cos(P.a+Math.PI);d=1;}dx/=d;dz/=d;
+  const cx=f[0]+dx*3.4-dz*1.1,cz=f[1]+dz*3.4+dx*1.1,fy=H(f[0],f[1])+lift;
+  ROWCAM.want.set(cx,Math.max(fy,H(cx,cz)+lift)+2.0,cz);ROWCAM.look.set(f[0],fy+1.35,f[1]);S.inRow=true;player.g.visible=false;}
+function freeUI(){hideDlg();if(!S.inParth){S.inRow=false;player.g.visible=true;}P.locked=false;$('joy').hidden=false;canvas.focus();}
+function setBtns(list){const B=$('dBtns');B.innerHTML='';list.forEach(b=>{const e=document.createElement('button');e.textContent=b.t;if(b.ghost)e.className='ghost';if(b.main)e.dataset.main='1';e.onclick=b.f;B.appendChild(e);});}
+// perguntas: alternativas embaralhadas; errar dá dica e nova tentativa, sem perder nada
+function mQuiz(role,qs,after){let i=0;
+  const ask=first=>{const Q=qs[i];const opts=shuffle(Q.o.map((t,k)=>({t,k})));
+    dlg(role+' · pergunta '+(i+1)+' de '+qs.length,Q.who||'O que você descobriu?','<p>'+Q.q+'</p>',opts.map(o=>({t:o.t,f:()=>{
+      const ok=o.k===Q.c;if(first){MIS.total++;if(ok)MIS.right++;}
+      if(ok){$('dTxt').innerHTML='<div class="fb ok"><b>Isso mesmo!</b> '+Q.e+'</div>';setBtns([{t:'Continuar ▸',main:true,f:()=>{i++;if(i<qs.length)ask(true);else after();}}]);}
+      else{$('dTxt').innerHTML='<div class="fb no"><b>Ainda não.</b> '+((Q.w&&Q.w[o.k])||'')+' <b>Dica:</b> '+Q.h+'</div>';setBtns([{t:'Tentar de novo ↺',main:true,f:()=>ask(false)}]);}
+      MSAVE.save();}})));};
+  ask(true);}
+// pôr etapas em ordem: errar não apaga o que já está certo
+function orderTask(role,who,intro,steps,after){const done=[];
+  const draw=msg=>{const left=shuffle(steps.filter(s=>!done.includes(s)));
+    dlg(role,who,'<section><span class="mgp">'+intro+'</span><span class="mis-list">'+steps.map((s,k)=>'<span>'+(k+1)+'. '+(done[k]?'<b class="mis-done">'+done[k]+' ✓</b>':'...')+'</span>').join('')+'</span><span class="src mgp" id="ordInfo">'+(msg||'Toque na etapa que vem agora.')+'</span></section>',
+      left.map(s=>({t:s,f:()=>{if(s===steps[done.length]){done.push(s);if(done.length===steps.length){toast('Tudo na ordem certa!');after();}else draw('Certo! E depois?');}else{$('ordInfo').innerHTML='<b>Ainda não.</b> Pense no que precisa acontecer <b>antes</b> disso.';}}})));};
+  draw();}
+
+// ---------- figuras da missão (só aparecem no Modo Missão) ----------
+const MNPC=[];
+function mFig(o,x,z,face,yOff=0){const f=makeFigure(o);placeFig(f,x,z,Math.atan2(face[0]-x,face[1]-z));f.g.position.y+=yOff;statics.push(f);f.hide=true;f.g.visible=false;f.col={x,z,r:.4};MNPC.push(f);return f;}
+const AVO_W=[HOUSE.x+3.2,HOUSE.z-1.6];
+const avo=mFig({tunic:0xcfc0a0,himation:0x6a6a64,beard:true,hair:0xbdb6aa},AVO_W[0],AVO_W[1],[HOUSE.x+9,HOUSE.z],window.__house.position.y+.29-H(AVO_W[0],AVO_W[1]));
+const STORY_W=[-16.8,44.6];
+const contador=mFig({tunic:0x8c6c4e,himation:0x4f5a6a,beard:true,hair:0x9a948a},STORY_W[0],STORY_W[1],[-15,43]);
+const PRI_W=[53.6,-69.4];
+const sacerdotisa=mFig({dress:true,tunic:0xefe6d2,veil:0xd8c6a4,hair:0x2e2018},PRI_W[0],PRI_W[1],[56.5,-67.8]);
+const OIL_W=[0,0];let oleiro=null;   // o vendedor de azeite fica junto do olival (posição definida abaixo)
+// a oliveira sagrada de Atena, ao lado do Erecteion
+const sacredOlive=new THREE.Group();{const y=H(54.8,-65.6);sacredOlive.position.set(54.8,y,-65.6);scene.add(sacredOlive);
+  const bark=lam(0x6b5a46),leaf=lam(0x7d8a5a),leaf2=lam(0x9aa274);
+  for(let i=0;i<3;i++){const t=mesh(new THREE.CylinderGeometry(.14,.24,2.2,7),bark,(i-1)*.18,1.1,(i%2)*.15,sacredOlive);t.rotation.z=(i-1)*.22;}
+  for(const [x,yy,z,r,m] of [[0,2.6,0,1.3,leaf],[.9,2.3,.3,.9,leaf2],[-.8,2.4,-.2,1,leaf2],[.2,3.1,-.5,.8,leaf]])mesh(new THREE.DodecahedronGeometry(r,0),m,x,yy,z,sacredOlive).scale.y=.7;
+  for(let i=0;i<10;i++){const a=i/10*Math.PI*2;box(.1,.5,.1,M.wood,Math.cos(a)*1.4,.25,Math.sin(a)*1.4,sacredOlive);}
+  colliders.push({x:54.8,z:-65.6,r:1.5});}
+
+// ---------- objetos para recolher na casa (Héstia) ----------
+const PICK=[];
+function pickup(name,lx,lz,build){const g=new THREE.Group();g.position.set(lx,.3,lz);window.__house.add(g);build(g);
+  const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xfff0b0,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));gl.scale.setScalar(1.4);gl.position.y=.5;g.add(gl);
+  g.visible=false;const p={name,g,gl,x:HOUSE.x+lx,z:HOUSE.z+lz};PICK.push(p);return p;}
+pickup('lenha',7.0,-2.7,g=>{for(let i=0;i<4;i++){const c=mesh(new THREE.CylinderGeometry(.07,.08,.9,6),lam(0x6b4a2e),(i%2)*.14-.07,.1+Math.floor(i/2)*.13,0,g);c.rotation.z=Math.PI/2;}});
+pickup('a hídria com água',1.7,2.7,g=>{mesh(G.amph,M.clay,0,0,0,g,.75);});
+pickup('a panela de barro',-1.7,-2.4,g=>{mesh(new THREE.CylinderGeometry(.28,.22,.32,12),lam(0x8a4e2e),0,.16,0,g);mesh(new THREE.TorusGeometry(.27,.03,6,16).rotateX(Math.PI/2),lam(0x6e3c22),0,.32,0,g);});
+const KITCHEN_W=[HOUSE.x+2.6,HOUSE.z-5.4];
+
+// ---------- o farol dourado sobre o destino e a seta acima de Nikos ----------
+const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,26,16,1,true),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:.22,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));
+beacon.visible=false;scene.add(beacon);
+const arrow=new THREE.Group();{const a=new THREE.Mesh(new THREE.ConeGeometry(.28,.75,4).rotateX(Math.PI/2),new THREE.MeshBasicMaterial({color:0xffd27a}));a.scale.y=.35;arrow.add(a);}arrow.visible=false;scene.add(arrow);
+
+// ---------- etapas do capítulo 1 ----------
+const fireStoryQs=[
+ {q:'Quem era <b>Héstia</b>?',o:['A deusa do fogo do lar e da casa','A deusa da caça','O deus do mar'],c:0,h:'Lembre do lugar onde o avô contou a história.',e:'Héstia protegia o <b>fogo</b> que ficava no centro de cada casa.'},
+ {q:'Por que o fogo do lar era tão importante para a família?',o:['Servia para cozinhar e aquecer, e era o centro da casa','Só servia para iluminar as ruas','Era aceso apenas nas grandes festas da cidade'],c:0,h:'Pense no que você acabou de fazer na cozinha.',e:'Sem o fogo, não havia comida quente. Por isso ele era <b>sagrado</b>.'},
+ {q:'O que a família fazia antes de comer?',o:['Dava um pouco de comida ou vinho a Héstia, no fogo','Apagava o fogo para economizar lenha','Ia até o Partenon pedir licença'],c:0,h:'O avô jogou uma coisa no fogo antes da refeição.',e:'Essa pequena oferenda se chama <b>libação</b> quando é feita com vinho.'},
+];
+const STEPS=[
+ // ---------- 0. o avô e o livro ----------
+ {m:'intro',title:'O presente do avô',desc:'Fale com o avô, no pátio de casa.',at:()=>AVO_W,r:2.6,run(){lockUI(AVO_W,window.__house.position.y+.29-H(HOUSE.x,HOUSE.z));avo.gesture=1;runSeq([
+   ()=>dlg('Em casa, no Cerâmico','O avô de Nikos','<p>De manhã cedo, o avô chama Nikos no pátio. Ele segura um livro feito de folhas de <b>papiro</b>, ainda em branco.</p><p>"Nikos, você conhece <b>todos</b> os nossos deuses? Explore Atenas, descubra as histórias deles e complete este livro."</p>'),
+   ()=>dlg('O Livro dos Deuses','Como funciona','<p>Em cada missão, siga a <b>luz dourada</b> e a <b>seta</b> sobre a cabeça de Nikos. O painel mostra o que fazer agora.</p><p>Ao terminar uma missão, uma página do <b>Livro dos Deuses</b> fica pronta. Abra o livro no botão 📖 para relembrar.</p><p class="hoje">Os gregos não tinham um livro assim: ele é uma ideia do jogo para guardar o que você aprende.</p>'),
+   ()=>dlg('O avô de Nikos','A primeira pista','<p>"Comece por quem cuida da nossa própria casa. Procure o lugar onde a família <b>prepara a comida</b>... Mas antes, traga o que falta: a <b>lenha</b>, a <b>água</b> e a <b>panela</b>."</p>',[{t:'Procurar ▸',main:true,f:()=>{avo.gesture=0;freeUI();MIS.adv();}}]),
+ ]);}},
+ // ---------- 1. Héstia ----------
+ {m:'hestia',title:'Héstia · o fogo do lar',desc:'Recolha a lenha, a água e a panela no pátio.',collect:true},
+ {m:'hestia',title:'Héstia · o fogo do lar',desc:'Leve tudo para a cozinha e acenda o fogo.',at:()=>KITCHEN_W,r:2.2,run(){lockUI([HOUSE.x+5.3,HOUSE.z-6.2],window.__house.position.y+.29-H(HOUSE.x,HOUSE.z)-.5);let hits=0,miss=0;
+   runSeq([
+    ()=>{dlg('Na cozinha','Acender o fogo',timingHTML('Nikos coloca a lenha sobre as brasas da noite. Sopre na hora certa: toque quando o marcador estiver na <b>faixa verde</b>. <b id="fireN">0 de 3</b>','Botão, barra de espaço ou Enter.'),
+      [{t:'Soprar! 💨',main:true,f:()=>{const ok=hitTiming();if(ok){hits++;$('fireN').textContent=hits+' de 3';toast('A brasa ficou mais vermelha!');if(hits>=3){stopTiming();next();}}
+        else{miss++;$('tInfo').textContent=miss<3?'Quase! Espere o marcador chegar no verde.':'O avô sopra junto com você. Agora fica mais fácil.';if(miss>=3&&TIMING){TIMING.speed=.6;TIMING.zone=.32;const z=document.querySelector('#dTxt .tz');z.style.left='34%';z.style.width='32%';}}}}]);
+     startTiming({speed:1,zone:.22});},
+    ()=>{avo.gesture=1;dlg('O fogo pegou!','O avô conta uma história','<p>"Muito bem. Agora escute. <b>Héstia</b> é a filha mais velha de Cronos e Reia, irmã de Zeus. Ela pediu a Zeus para <b>nunca se casar</b> e ficar cuidando do fogo."</p><p>"Por isso, em toda casa, o fogo do centro é dela. E ela recebe a <b>primeira oferenda</b>: antes de comer, damos um pouco a Héstia."</p>');},
+    ()=>dlg('O avô de Nikos','O fogo da família','<p>O avô joga um pedaço de pão e algumas gotas de vinho no fogo.</p><p>"Quando um bebê nasce, alguns dias depois nós o levamos <b>em volta do fogo</b>. É assim que ele passa a fazer parte da família."</p><p>"A cidade também tem um fogo comum, que nunca se apaga. Quem parte para fundar uma cidade nova leva uma chama dele."</p>'),
+    ()=>mQuiz('Missão de Héstia',fireStoryQs,()=>{avo.gesture=0;MIS.reward('hestia');}),
+   ]);}},
+ // ---------- 2. Atena: o mito, na Acrópole ----------
+ {m:'atena',title:'Atena · a disputa pela cidade',desc:'Suba à Acrópole e encontre a sacerdotisa ao lado do Erecteion.',at:()=>[56.2,-68.2],r:2.8,run(){lockUI(PRI_W);sacerdotisa.gesture=1;runSeq([
+   ()=>dlg('Acrópole · ao lado do Erecteion','A sacerdotisa de Atena','<p>Uma sacerdotisa cuida de uma oliveira cercada por uma grade de madeira.</p><p>"Você procura Atena? Então ouça como ela ganhou a nossa cidade. Há muito tempo, <b>Atena</b> e <b>Poseidon</b>, o deus do mar, queriam ser os protetores desta terra."</p>'),
+   ()=>dlg('A sacerdotisa de Atena','A disputa','<p>"Poseidon bateu o <b>tridente</b> na rocha, e dela brotou uma fonte de <b>água salgada</b>. Atena tocou o chão e fez nascer uma <b>oliveira</b>."</p><p>"Os juízes escolheram a oliveira: ela dava comida, azeite e madeira. Por isso a cidade tem o nome de Atena."</p>'),
+   ()=>dlg('A sacerdotisa de Atena','A oliveira sagrada','<p>"Esta é a <b>oliveira sagrada</b>. Dentro do templo novo, que ainda está em obras, mostramos a marca do tridente na rocha."</p><p>"Quando os persas queimaram a Acrópole, há 65 anos, contam que a oliveira brotou de novo <b>no dia seguinte</b>."</p><p class="src">Essa história foi contada pelo historiador Heródoto.</p>'),
+   ()=>mQuiz('Missão de Atena',[{who:'A sacerdotisa pergunta',q:'Na disputa, que presente Atena deu à cidade?',o:['Uma oliveira','Um cavalo','Uma fonte de água salgada'],c:0,w:{2:'A água salgada foi o presente de <b>Poseidon</b>.'},h:'Olhe a árvore cercada ao lado da sacerdotisa.',e:'A <b>oliveira</b> venceu, e Atena virou a protetora da cidade.'}],
+     ()=>{sacerdotisa.gesture=0;dlg('A sacerdotisa de Atena','Próxima pista','<p>"Agora vá ver a deusa. Entre no grande templo, o <b>Partenon</b>. A porta fica do lado do <b>nascer do sol</b>."</p>',[{t:'Ir ao Partenon ▸',main:true,f:()=>{freeUI();MIS.adv();}}]);}),
+ ]);}},
+ // ---------- 3. Atena: dentro do Partenon ----------
+ {m:'atena',title:'Atena · dentro do Partenon',desc:'Vá até a porta do Partenon, do lado leste.',at:()=>[PARTH.x+15.2,PARTH.z+1.6],r:2.6,run(){lockUI();
+   const look=(Q,cam,after,first=true)=>{pinCam(...cam);const opts=shuffle(Q.o.map((t,k)=>({t,k})));
+     dlg('Dentro do Partenon','Observe a estátua','<p>'+Q.q+'</p>',opts.map(o=>({t:o.t,f:()=>{const ok=o.k===0;if(first){MIS.total++;if(ok)MIS.right++;}
+       if(ok){$('dTxt').innerHTML='<div class="fb ok"><b>Achou!</b> '+Q.e+'</div>';setBtns([{t:'Continuar ▸',main:true,f:after}]);}
+       else{$('dTxt').innerHTML='<div class="fb no"><b>Olhe de novo.</b> '+Q.h+'</div>';setBtns([{t:'Tentar de novo ↺',main:true,f:()=>look(Q,cam,after,false)}]);}}})));};
+   enterParthenon(leave=>[
+    ()=>dlg('Dentro do Partenon','O guarda do templo','<p>O guarda abre a grande porta. Lá dentro, só a luz das <b>lamparinas</b>. No fundo, a deusa brilha: <b>Atena Pártenos</b>, de ouro e marfim, com uns <b>12 metros</b> de altura.</p><p>"Observe bem. Você consegue achar os três sinais da deusa?"</p>'),
+    ()=>look({q:'<b>1 de 3.</b> O que Atena segura na <b>mão direita</b>?',o:['Uma pequena Nike, a Vitória com asas','Uma coruja','Uma tocha acesa'],h:'Procure uma figura pequena com asas, em cima da mão.',e:'A <b>Nike</b> mostra que Atena dá a <b>vitória</b> à cidade.'},[-2.2,4.4,3.4,-6.3,5.9,1.2],next),
+    ()=>look({q:'<b>2 de 3.</b> O que está apoiado no chão, do lado <b>esquerdo</b> da deusa?',o:['Um grande escudo redondo','Um tear','Uma lira'],h:'É redondo e serve para proteger o corpo na guerra.',e:'No <b>escudo</b> havia batalhas esculpidas: gregos contra amazonas e deuses contra gigantes.'},[-2.4,2.6,-3.2,-6,3.2,-1.1],next),
+    ()=>look({q:'<b>3 de 3.</b> O que se esconde atrás do escudo?',o:['Uma serpente','Um cão de guarda','Um golfinho'],h:'É um animal comprido, enrolado perto do chão.',e:'A <b>serpente</b> lembra <b>Erictônio</b>, um rei antigo de Atenas que, segundo o mito, foi criado por Atena.'},[-3.2,1.9,-1.6,-5.9,2,-.9],next),
+    ()=>{pinCam(4,2.4,2.8,-6.4,4.6,0);dlg('Muito bem!','O guarda do templo','<p>"Você tem olhos de coruja! A <b>coruja</b> também é ave de Atena: está até nas nossas moedas."</p><p>"Agora vá ver o presente da deusa de perto. Lá fora dos muros há <b>olivais</b>. Hoje estão colhendo azeitonas."</p>',[{t:'Sair do templo ▸',main:true,f:()=>{leave();MIS.adv();}}]);},
+   ]);}},
+ // ---------- 4. Atena: o olival ----------
+ {m:'atena',title:'Atena · o presente da deusa',desc:'Saia da cidade e encontre o olival.',at:()=>{const p=PLACES.find(q=>q.id==='campo_olival');return p?[p.x,p.z]:[0,0];},r:3,run(){const f=FIELDS.find(q=>q.kind==='olival'),p=PLACES.find(q=>q.id==='campo_olival');lockUI(f&&p?[p.x+(f.x-p.x)*.35,p.z+(f.z-p.z)*.35]:null);let hits=0,miss=0;
+   runSeq([
+    ()=>dlg('No olival','A colheita','<p>Um agricultor acena: "Veio ajudar? Para colher, a gente <b>bate nos galhos com varas</b>, e as azeitonas caem em panos estendidos no chão."</p><p class="src">Vasos pintados em Atenas mostram exatamente essa cena.</p>'),
+    ()=>{dlg('No olival','Bater nos galhos',timingHTML('Toque quando o marcador estiver na <b>faixa verde</b> para acertar o galho. <b id="olN">0 de 4</b>','Botão, barra de espaço ou Enter.'),
+      [{t:'Bater! 🫒',main:true,f:()=>{const ok=hitTiming();if(ok){hits++;$('olN').textContent=hits+' de 4';toast('Choveram azeitonas no pano!');if(hits>=4){stopTiming();next();}}
+        else{miss++;$('tInfo').textContent=miss<3?'A vara passou longe. Tente de novo.':'O agricultor mostra o jeito. Agora fica mais fácil.';if(miss>=3&&TIMING){TIMING.speed=.6;TIMING.zone=.32;const z=document.querySelector('#dTxt .tz');z.style.left='34%';z.style.width='32%';}}}}]);
+     startTiming({speed:1.2,zone:.2});},
+    ()=>orderTask('No olival','Como se faz o azeite?','As azeitonas foram colhidas. Agora coloque o resto do trabalho na ordem certa.',
+      ['Amassar as azeitonas na mó de pedra','Pôr a massa em cestos e prensar','Esperar o azeite subir e separar da água','Guardar o azeite em ânforas'],next),
+    ()=>dlg('No olival','Para que serve o azeite?','<p>"O azeite é a riqueza de Atena! Serve para <b>cozinhar</b>, para acender as <b>lamparinas</b> e para os atletas passarem no corpo."</p><p>"Nos jogos da grande festa de Atena, o prêmio é <b>azeite das oliveiras sagradas</b>, dentro de ânforas pintadas."</p>'),
+    ()=>mQuiz('Missão de Atena',[
+      {who:'O agricultor pergunta',q:'Para que os atenienses usavam o azeite?',o:['Para cozinhar, acender lamparinas e cuidar do corpo','Só para pintar vasos','Para fazer moedas'],c:0,h:'Lembre da lamparina do Partenon e da comida da sua casa.',e:'O azeite estava em <b>quase tudo</b> na vida dos atenienses.'},
+      {who:'Relembre',q:'O que Atena segura na mão direita, no Partenon?',o:['A Nike, a Vitória com asas','Uma lira','Um tridente'],c:0,w:{2:'O tridente é de <b>Poseidon</b>, o rival de Atena.'},h:'Era uma figura pequena com asas.',e:'Atena dá a <b>vitória</b> aos atenienses.'},
+     ],()=>MIS.reward('atena')),
+   ]);}},
+ // ---------- 5. Hermes: o contador de histórias junto das hermas ----------
+ {m:'hermes',title:'Hermes · o mensageiro',desc:'Volte à cidade e procure as hermas, ao norte da ágora.',at:()=>[-15.2,44.8],r:2.6,run(){lockUI(STORY_W);contador.gesture=1;runSeq([
+   ()=>dlg('Junto das hermas','Um velho contador de histórias','<p>Ao lado dos pilares com a cabeça de Hermes, um velho conta histórias para quem passa.</p><p>"Sabe quem é esse? É <b>Hermes</b>, filho de Zeus. Ele protege os <b>viajantes</b>, os <b>caminhos</b> e os <b>comerciantes</b>. Por isso as hermas ficam nas portas e nas ruas."</p>'),
+   ()=>dlg('O contador de histórias','O bebê mais esperto do Olimpo','<p>"No dia em que nasceu, Hermes saiu do berço e achou uma <b>tartaruga</b>. Com o casco dela, fez a primeira <b>lira</b>!"</p><p>"À noite, roubou cinquenta vacas do deus <b>Apolo</b> e as fez andar <b>de costas</b>, para as pegadas enganarem quem as procurasse."</p>'),
+   ()=>dlg('O contador de histórias','Amigos pela música','<p>"Apolo descobriu tudo e ficou furioso. Mas, quando ouviu a lira, quis o instrumento para ele. Hermes deu a lira, e os dois ficaram amigos."</p><p>"Zeus gostou da esperteza do filho e fez dele o <b>mensageiro dos deuses</b>."</p>'),
+   ()=>dlg('O contador de histórias','Seja um mensageiro','<p>"Você tem pernas boas. Que tal ser mensageiro como Hermes? Leve <b>três recados</b> no mercado: para o <b>oleiro</b>, para o <b>padeiro</b> e para o <b>vendedor de peixe</b>. Depois eu pago você."</p>',[{t:'Aceitar ▸',main:true,f:()=>{contador.gesture=0;freeUI();MIS.adv();}}]),
+ ]);}},
+ {m:'hermes',title:'Hermes · recado 1 de 3',desc:'Leve o recado ao oleiro, na barraca de vasos do mercado.',at:()=>[12,23.6],r:2.6,run(){lockUI([12,27]);
+   dlg('Recado 1 de 3','O oleiro','<p>Nikos dá o recado: "Um navio de <b>Corinto</b> chega amanhã ao Pireu e quer <b>vinte ânforas</b>."</p><p>O oleiro sorri: "Ótimo! As ânforas levam o nosso <b>azeite</b> e o nosso <b>vinho</b> pelo mar para outras cidades."</p>',[{t:'Próximo recado ▸',main:true,f:()=>{freeUI();MIS.adv();}}]);}},
+ {m:'hermes',title:'Hermes · recado 2 de 3',desc:'Agora leve o recado ao padeiro.',at:()=>[14.2,16],r:2.6,run(){lockUI([11,16]);
+   dlg('Recado 2 de 3','O padeiro','<p>"O trigo do <b>mar Negro</b> chegou ao Pireu."</p><p>O padeiro respira aliviado: "Que bom! A terra da Ática é seca e não dá trigo para todo mundo. Muito do nosso pão vem de <b>trigo comprado</b> de longe."</p>',[{t:'Próximo recado ▸',main:true,f:()=>{freeUI();MIS.adv();}}]);}},
+ {m:'hermes',title:'Hermes · recado 3 de 3',desc:'Por fim, leve o recado ao vendedor de peixe.',at:()=>[21.6,12.4],r:2.6,run(){lockUI([19,13]);
+   dlg('Recado 3 de 3','O vendedor de peixe','<p>"Guarde <b>peixe salgado</b> para a festa de amanhã."</p><p>O vendedor ri: "Salgado dura muitos dias! O peixe fresco tem de ser vendido logo, antes que estrague."</p>',[{t:'Voltar ao contador ▸',main:true,f:()=>{freeUI();MIS.adv();}}]);}},
+ {m:'hermes',title:'Hermes · o pagamento',desc:'Volte ao contador de histórias, junto das hermas.',at:()=>[-15.2,44.8],r:2.6,run(){lockUI(STORY_W);contador.gesture=1;
+   dlg('Junto das hermas','O contador de histórias','<p>"Três recados, e bem rápido! Hermes ficaria orgulhoso."</p><p>Ele põe uma moeda de prata na mão de Nikos: <b>1 dracma</b>. Uma dracma vale <b>6 óbolos</b>.</p><p>"Agora vá à barraca de <b>figos e azeitonas</b> e compre o que o seu avô pediu para o jantar."</p>',[{t:'Ir às compras ▸',main:true,f:()=>{contador.gesture=0;freeUI();MIS.adv();}}]);}},
+ {m:'hermes',title:'Hermes · as compras',desc:'Compre o jantar na barraca de figos e azeitonas.',at:()=>[17.4,2.2],r:2.6,run(){lockUI([15,4]);
+   const items=[['Azeitonas',1],['Figos secos',2],['Queijo',3],['Cebolas',1]],need=['Azeitonas','Figos secos'],sel=new Set();
+   const draw=msg=>{const tot=[...sel].reduce((s,n)=>s+items.find(i=>i[0]===n)[1],0);
+     dlg('Na barraca','A vendedora de figos','<section><span class="mgp">O avô pediu: <b>azeitonas</b> e <b>figos secos</b>. Você tem <b>1 dracma = 6 óbolos</b>. Toque para escolher.</span><span class="mis-list">'+items.map(i=>'<span>'+(sel.has(i[0])?'✅ ':'⬜ ')+i[0]+' · '+i[1]+' óbolo'+(i[1]>1?'s':'')+'</span>').join('')+'</span><span class="tapcount">Total: '+tot+' óbolo'+(tot===1?'':'s')+'</span><span class="src mgp" id="shopInfo">'+(msg||'Os preços são do jogo, só para fazer as contas.')+'</span></section>',
+      [...items.map(i=>({t:(sel.has(i[0])?'Tirar ':'Pôr ')+i[0],ghost:true,f:()=>{sel.has(i[0])?sel.delete(i[0]):sel.add(i[0]);draw();}})),
+       {t:'Pagar 🪙',main:true,f:()=>{const ok=need.every(n=>sel.has(n))&&sel.size===need.length;
+         if(!ok){draw(sel.size>need.length?'<b>Ainda não.</b> Você pegou coisas que o avô não pediu. Confira a lista.':'<b>Ainda não.</b> Falta alguma coisa da lista do avô.');return;}
+         mQuiz('Na barraca',[{who:'A vendedora pergunta',q:'Você pagou com <b>6 óbolos</b> e gastou <b>3</b>. Quanto ela devolve de troco?',o:['3 óbolos','2 óbolos','4 óbolos'],c:0,h:'Faça 6 menos 3.',e:'Troco: <b>3 óbolos</b>. Os óbolos eram tão pequenos que muita gente guardava as moedinhas <b>na boca</b>!'},
+           {who:'Relembre',q:'Na moeda de prata de Atenas há uma <b>coruja</b>. Ela lembra qual divindade?',o:['Atena','Héstia','Hermes'],c:0,h:'É a mesma deusa do Partenon.',e:'A coruja é a ave de <b>Atena</b>, a protetora da cidade.'}],next);}}]);};
+   runSeq([()=>draw(),
+    ()=>mQuiz('Missão de Hermes',[
+      {who:'O que você descobriu?',q:'Por que os comerciantes e viajantes honravam Hermes?',o:['Porque ele protegia os caminhos, as viagens e o comércio','Porque ele era o deus do fogo','Porque ele mandava na assembleia'],c:0,h:'Pense em onde ficam as hermas: nas portas e nas ruas.',e:'Hermes era o deus dos <b>caminhos</b> e das <b>trocas</b>.'},
+      {who:'O que você descobriu?',q:'O que Hermes fez com o casco da tartaruga?',o:['A primeira lira','Um escudo','Uma panela'],c:0,h:'Ele deu esse objeto a Apolo para fazer as pazes.',e:'A <b>lira</b> virou o instrumento de Apolo, o deus da música.'}],()=>MIS.reward('hermes')),
+   ]);}},
+ // ---------- 6. fim do capítulo: de volta ao avô ----------
+ {m:'fim',title:'De volta para casa',desc:'Mostre o livro ao avô, no pátio de casa.',at:()=>AVO_W,r:2.6,run(){lockUI(AVO_W,window.__house.position.y+.29-H(HOUSE.x,HOUSE.z));avo.gesture=1;runSeq([
+   ()=>dlg('Em casa','O avô de Nikos','<p>O avô folheia o livro devagar. "Héstia, Atena e Hermes... Três deuses num só dia! Antes de descansar, vamos ver se você lembra."</p>'),
+   ()=>mQuiz('Desafio do capítulo',shuffle([
+     {who:'O avô pergunta',q:'Qual deus combina com cada lugar? Onde você encontrou <b>Hermes</b>?',o:['Nas hermas e no mercado','Na cozinha de casa','Dentro do Partenon'],c:0,h:'Lembre dos recados que você levou.',e:'Hermes protege as <b>ruas</b> e o <b>comércio</b>.'},
+     {who:'O avô pergunta',q:'O que Poseidon fez brotar da rocha na disputa com Atena?',o:['Uma fonte de água salgada','Uma oliveira','Uma lira'],c:0,w:{1:'A oliveira foi o presente de <b>Atena</b>.'},h:'Poseidon é o deus do mar.',e:'Água <b>salgada</b>, como a do mar. A oliveira foi mais útil.'},
+     {who:'O avô pergunta',q:'Por que a família dá a primeira oferenda a Héstia?',o:['Porque ela protege o fogo e a casa','Porque ela é a deusa da guerra','Porque ela cuida dos navios'],c:0,h:'Lembre do fogo da cozinha.',e:'O fogo é o <b>coração da casa</b>.'}]),()=>next()),
+   ()=>{avo.gesture=0;const pct=MIS.total?Math.round(MIS.right/MIS.total*100):0;
+     dlg('Capítulo 1 concluído','Minha cidade','<p>Você descobriu <b>3 de 15</b> deuses: Héstia, Atena e Hermes.</p><p><b>Acertos de primeira:</b> '+MIS.right+' de '+MIS.total+' ('+pct+'%). Errar faz parte: o importante é tentar de novo.</p><p>O avô fecha o livro: "Amanhã tem mais. Ainda faltam doze deuses... e a cidade inteira para entender."</p><p class="hoje">O <b>capítulo 2</b> ainda está sendo construído. Enquanto isso, passeie à vontade e abra o Livro dos Deuses para relembrar.</p>',
+      [{t:'Passear por Atenas ▸',main:true,f:()=>{freeUI();MIS.adv();}},{t:'📖 Abrir o livro',ghost:true,f:()=>{freeUI();MIS.adv();openBook();}}]);},
+ ]);}},
+];
+const MNAME={intro:'Começo',hestia:'Missão 1 de 3',atena:'Missão 2 de 3',hermes:'Missão 3 de 3',fim:'Fim do capítulo'};
+
+// ---------- motor ----------
+const MSAVE={
+  has(){try{return !!localStorage.getItem(MIS.KEY);}catch(e){return false;}},
+  wipe(){try{localStorage.removeItem(MIS.KEY);}catch(e){}},
+  save(){if(!MIS.on)return;try{localStorage.setItem(MIS.KEY,JSON.stringify({v:1,s:MIS.s,got:MIS.got,right:MIS.right,total:MIS.total,P:{x:P.x,z:P.z,a:P.a}}));}catch(e){}},
+  read(){try{return JSON.parse(localStorage.getItem(MIS.KEY));}catch(e){return null;}}};
+SAVE.save=(orig=>function(){if(MIS.on)return;return orig.call(this);})(SAVE.save);
+MIS.step=()=>STEPS[MIS.s]||null;
+MIS.enter=()=>{const st=MIS.step();PICK.forEach(p=>{p.g.visible=!!(st&&st.collect);p.got=false;});MSAVE.save();renderDock();};
+MIS.adv=()=>{MIS.s++;MIS.enter();};
+MIS.reward=id=>{if(!MIS.got.includes(id))MIS.got.push(id);const g=GODS.find(x=>x.id===id);MSAVE.save();
+  dlg('Página do livro','Descoberta '+MIS.got.length+' de 15','<section><span class="mis-reward mis-sym">'+g.sym+'</span><span class="mgp">Você encontrou <b>'+g.n+'</b> e recebeu: <b>'+g.rw+'</b>.</span><span class="mgp">'+g.d+'</span></section>',
+    [{t:'Continuar ▸',main:true,f:()=>{freeUI();MIS.adv();}},{t:'📖 Ver a página',ghost:true,f:()=>{freeUI();MIS.adv();openBook(id);}}]);};
+function misTarget(){const st=MIS.step();if(!st)return null;
+  if(st.collect){let best=null,bd=1e9;for(const p of PICK)if(!p.got){const d=Math.hypot(P.x-p.x,P.z-p.z);if(d<bd){bd=d;best=[p.x,p.z];}}return best||KITCHEN_W;}
+  return st.at?st.at():null;}
+target=(orig=>function(){if(MIS.on&&!chosenDestination)return misTarget();return orig();})(target);
+function renderDock(){const el=$('guideDock');if(!MIS.on)return;const st=MIS.step();
+  if(!st){el.hidden=true;return;}
+  const left=st.collect?PICK.filter(p=>!p.got).length:0;
+  $('guideCounter').textContent='CAPÍTULO 1 · '+(MNAME[st.m]||'')+'  ·  LIVRO: '+MIS.got.length+' DE 15';
+  $('guideFill').style.width=Math.round(MIS.got.length/3*100)+'%';
+  $('guideTitle').textContent=st.title;
+  $('guideDesc').textContent=st.collect?st.desc+' Faltam '+left+'.':st.desc;
+}
+// o botão do painel vira "levar-me até lá" + livro
+{ const row=document.createElement('div');row.className='mis-row';row.hidden=true;row.id='misRow';
+  const go=document.createElement('button');go.textContent='Mostrar o caminho';go.className='ghost';go.title='Levar Nikos para perto do destino';
+  const bk=document.createElement('button');bk.textContent='📖';bk.className='ghost';bk.title='Livro dos Deuses';bk.onclick=()=>openBook();
+  go.onclick=()=>{const t=misTarget();if(!t||P.locked)return;const d=Math.hypot(P.x-t[0],P.z-t[1]);
+    if(d<12){toast('Você já está pertinho. Siga a luz dourada!');return;}
+    const ux=(P.x-t[0])/d,uz=(P.z-t[1])/d;P.x=t[0]+ux*5;P.z=t[1]+uz*5;P.a=Math.atan2(t[0]-P.x,t[1]-P.z);collide();
+    const y=H(P.x,P.z);camPos.set(P.x-Math.sin(P.a)*7.5,y+3.6,P.z-Math.cos(P.a)*7.5);camLook.set(P.x,y+1.7,P.z);canvas.focus();};
+  row.append(go,bk);$('guideContinue').after(row);}
+// ---------- a cada quadro ----------
+EXTRA_TICKS.push(()=>{if(!MIS.on){beacon.visible=arrow.visible=false;return;}
+  const busy=!$('dlg').hidden||P.locked||!$('start').hidden;
+  $('guideDock').hidden=busy||!MIS.step()||!book.hidden;
+  const st=MIS.step(),t=st&&!busy?misTarget():null;
+  for(const p of PICK)if(p.g.visible){p.g.position.y=.3+Math.sin(t0*3)*.06;p.g.rotation.y+=.02;}
+  if(!t){beacon.visible=arrow.visible=false;return;}
+  const d=Math.hypot(P.x-t[0],P.z-t[1]),py=H(P.x,P.z);
+  beacon.visible=!S.inParth;beacon.position.set(t[0],H(t[0],t[1])+13,t[1]);beacon.material.opacity=.16+Math.sin(t0*3)*.06;
+  arrow.visible=d>7&&!S.inParth;arrow.position.set(P.x,py+2.75+Math.sin(t0*4)*.06,P.z);arrow.rotation.y=Math.atan2(t[0]-P.x,t[1]-P.z);
+  if(st.collect){for(const p of PICK)if(p.g.visible&&!p.got&&Math.hypot(P.x-p.x,P.z-p.z)<1.4){p.got=true;p.g.visible=false;toast('Nikos pegou '+p.name+'.');
+      if(PICK.every(q=>q.got)){toast('Tudo pronto! Agora leve para a cozinha.');MIS.adv();}else renderDock();}return;}
+  if(d<st.r)st.run();
+});
+// ---------- começar e continuar ----------
+function misStart(load){const d=load?MSAVE.read():null;
+  MIS.on=true;MIS.s=0;MIS.got=[];MIS.right=0;MIS.total=0;
+  begin(false);MNPC.forEach(f=>{f.hide=false;if(!colliders.includes(f.col))colliders.push(f.col);});btnBook.hidden=false;$('misRow').hidden=false;$('guideContinue').hidden=true;
+  if(d){MIS.s=Math.min(d.s|0,STEPS.length);MIS.got=d.got||[];MIS.right=d.right|0;MIS.total=d.total|0;}
+  const st=STEPS[MIS.s];
+  if(d&&d.P&&isFinite(d.P.x)&&st&&st.m!=='intro'&&!(st.m==='hestia')){P.x=d.P.x;P.z=d.P.z;P.a=d.P.a;}
+  else{P.x=HOUSE.x+12.5;P.z=HOUSE.z;P.a=-Math.PI/2;quiet=PLACES.find(q=>q.id==='casa')||null;}
+  collide();const y=H(P.x,P.z);camPos.set(P.x-Math.sin(P.a)*7.5,y+3.6,P.z-Math.cos(P.a)*7.5);camLook.set(P.x,y+1.7,P.z);
+  MIS.enter();if(d)toast('Missão retomada: '+MIS.got.length+' de 15 deuses no livro.');else toast('Fale com o avô, no pátio de casa.');
+}
+setInterval(()=>{if(MIS.on&&!P.locked)MSAVE.save();},4000);
+// botão na tela inicial
+renderIntro=(orig=>function(){orig();const nav=$('intro').querySelector('.mode-choice');const box=document.createElement('div');box.className='mis-entry';
+  box.innerHTML='<b>📜 Modo Missão: o Livro dos Deuses</b><span>Encontre os deuses de Atenas, descubra suas histórias e complete o livro. Capítulo 1: Héstia, Atena e Hermes.</span>'+
+   (MSAVE.has()?'<button id="misLoad">⟳ Continuar a missão</button><button id="misNew" class="ghost">Recomeçar a missão</button>':'<button id="misNew">Começar o Modo Missão ▸</button>');
+  if(nav)nav.after(box);else $('intro').prepend(box);
+  if($('misLoad'))$('misLoad').onclick=()=>misStart(true);
+  $('misNew').onclick=()=>{MSAVE.wipe();misStart(false);};})(renderIntro);
 
 renderIntro();
 function begin(skip){
