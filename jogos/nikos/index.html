@@ -4024,7 +4024,7 @@ function applyTOD(d,py){
   stars.visible=night>.02;stars.material.opacity=night;stars.position.copy(camera.position);
   moon.visible=night>.02;moon.position.set(camera.position.x-180,camera.position.y+300,camera.position.z-260);
   for(const m of CLOUD_MATS){m.emissive.setScalar(.54*(1-night*.85));m.color.setScalar(1-night*.75);}
-  if(S.inParth){hemi.intensity=.08;sun.intensity=.02;}   // dentro do templo, só a luz das lamparinas
+  if(S.inParth){hemi.intensity=.32;sun.intensity=.08;}   // luz de apoio para enxergar Atena, inclusive no celular
 }
 
 // ---------- lamparinas e tochas ----------
@@ -4943,16 +4943,29 @@ const PIN=(()=>{const g=new THREE.Group();g.visible=false;PARTENON.add(g);
   const guard=makeFigure({tunic:0x7a2f2f,himation:0xcfc0a0,beard:true,hair:0x6a6a64});guard.g.position.set(6.6,FL,-3);guard.g.rotation.y=-Math.PI/2-.4;g.add(guard.g);statics.push(guard);
   box(.04,2.3,.04,M.wood,.28,1.15,.15,guard.g);
   return {g,L1,L2,lamps,FL,cella:PARTENON.children.find(c=>c.geometry&&c.geometry.type==='BoxGeometry'&&Math.abs(c.geometry.parameters.width-20.4)<.01)};})();
-let pinOld=null;
+let pinOld=null,leaveParthenon=null;
+const parthExit=document.createElement('button');
+parthExit.id='parthExit';parthExit.textContent='Sair do Partenon';parthExit.hidden=true;
+parthExit.style.cssText='position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:10000;padding:12px 18px;max-width:90vw;background:#f5dfad;color:#302012;border:2px solid #9e612d;border-radius:8px;font-weight:bold;cursor:pointer';
+parthExit.onclick=()=>{if(leaveParthenon)leaveParthenon();};document.body.appendChild(parthExit);
+addEventListener('keydown',e=>{if(e.key==='Escape'&&S.inParth&&leaveParthenon){e.preventDefault();leaveParthenon();}});
+const lostOutsideParthenon=$('btnLost').onclick;
+$('btnLost').onclick=()=>{if(S.inParth&&leaveParthenon)leaveParthenon();else lostOutsideParthenon();};
 EXTRA_TICKS.push(()=>{if(!S.inParth)return;const k=1+Math.sin(t0*9)*.05+Math.sin(t0*23)*.03;PIN.L1.intensity=3.2*k;PIN.L2.intensity=2.2*k;PIN.lamps.forEach((l,i)=>l.scale.y=1+Math.sin(t0*11+i)*.2);});
-function pinCam(lx,ly,lz,tx,ty,tz){const a=PARTENON.localToWorld(new THREE.Vector3(lx,ly,lz)),b=PARTENON.localToWorld(new THREE.Vector3(tx,ty,tz));ROWCAM.want.copy(a);ROWCAM.look.copy(b);}
+function pinCam(lx,ly,lz,tx,ty,tz){PARTENON.updateWorldMatrix(true,false);const a=PARTENON.localToWorld(new THREE.Vector3(lx,ly,lz)),b=PARTENON.localToWorld(new THREE.Vector3(tx,ty,tz));ROWCAM.want.copy(a);ROWCAM.look.copy(b);if(S.inParth){camPos.copy(a);camLook.copy(b);camera.position.copy(a);camera.lookAt(b);}}
 function enterParthenon(custom){
+  // Os botões entregam um PointerEvent; só uma função define uma missão personalizada.
+  if(typeof custom!=='function')custom=null;
+  if(S.inParth)return;
   P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;markDiscovery('dentro_partenon');
   S.inParth=true;S.inRow=true;player.g.visible=false;PIN.g.visible=true;if(PIN.cella)PIN.cella.visible=false;
   pinOld=duskT;duskT=2;dusk=2;PIN.hemi=hemi.intensity;
   pinCam(9.2,3.2,1.2,-6.4,5.4,0);camPos.copy(ROWCAM.want);camLook.copy(ROWCAM.look);
-  const leave=()=>{S.inParth=false;S.inRow=false;PIN.g.visible=false;if(PIN.cella)PIN.cella.visible=true;PIN.L1.intensity=PIN.L2.intensity=0;duskT=pinOld;
-    player.g.visible=true;hideDlg();P.locked=false;$('joy').hidden=false;P.x=PARTH.x+15;P.z=PARTH.z;P.a=-Math.PI/2;collide();EXTRA.partenon=true;};
+  const leave=()=>{S.inParth=false;S.inRow=false;PIN.g.visible=false;if(PIN.cella)PIN.cella.visible=true;PIN.L1.intensity=PIN.L2.intensity=0;duskT=dusk=pinOld;
+    parthExit.hidden=true;leaveParthenon=null;seq=[];si=0;
+    player.g.visible=true;hideDlg();P.locked=false;$('joy').hidden=false;P.x=PARTH.x+20;P.z=PARTH.z+1.6;P.a=-Math.PI/2;collide();EXTRA.partenon=true;
+    nearPlace=null;quiet=null;$('card').hidden=true;const y=H(P.x,P.z);camPos.set(P.x+7.5,y+3.6,P.z);camLook.set(P.x,y+1.7,P.z);camera.position.copy(camPos);camera.lookAt(camLook);canvas.focus();};
+  leaveParthenon=leave;parthExit.hidden=false;
   if(custom){runSeq(custom(leave));return;}
   runSeq([
    ()=>dlg('Dentro do Partenon · meia-noite','O guarda do templo','<p>O guarda abre a grande porta de bronze. Lá dentro, só a luz das <b>lamparinas de azeite</b>. A sombra da deusa dança nas paredes.</p><p>"Fale baixo, rapaz. Você está diante de <b>Atena Pártenos</b>, a Virgem, a protetora da cidade."</p>'),
@@ -4967,7 +4980,7 @@ function enterParthenon(custom){
 }
 addPlace({id:'dentro_partenon',x:PARTH.x+15.2,z:PARTH.z+1.6,t:'A porta do Partenon',sub:'Entrar no templo de Atena',
   txt:'<p>A entrada principal do Partenon fica do lado <b>leste</b>, de frente para o nascer do sol. Lá dentro está a estátua mais famosa da cidade.</p>',
-  act:()=>({l:EXTRA.partenon?'Entrar de novo no Partenon':'Entrar no Partenon ▸',f:enterParthenon})});
+  act:()=>({l:EXTRA.partenon?'Ver Atena de novo no Partenon':'Entrar e ver a estátua de Atena ▸',f:()=>enterParthenon()})});
 DISCOVERY_ITEMS.push({id:'dentro_partenon',ico:'🏛️',title:'Atena Pártenos',text:'A estátua de ouro e marfim de Fídias, dentro do Partenon.'});
 { const j={t:'Porta do Partenon',at:[PARTH.x+19,PARTH.z+2],look:[PARTH.x,PARTH.z]};JUMPS.push(j);const b=document.createElement('button');b.className='ghost';b.textContent=j.t;b.onclick=()=>jumpTo(j);$('jump').appendChild(b);}
 
