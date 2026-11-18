@@ -12642,13 +12642,24 @@ setTimeout(function(){
   /* ---------- 5. quiz a cada 3 minutos de jogo em cada época ---------- */
   function banco(e){const B=[];const add=(q,o,a,ex)=>{if(q&&Array.isArray(o)&&o.length>=2)B.push({q,o,a,e:ex||''});};
     try{const arr=e===1?quiz:e===2?quiz2:e===3?quiz3:quiz4;for(const x of arr)add(x.q,x.o,x.a,x.e);}catch(_){}
-    return B;}
-  function quiz3min(e){const B=banco(e);if(B.length<5)return false;const qs=B.slice().sort(()=>Math.random()-.5).slice(0,5);let i=0,ac=0;
+    /* perguntas das conversas e missões que o jogador já ouviu nesta época */
+    try{for(const m of ENT){if(m.ok&&m.era===e&&m.mc&&Q[m.k]&&Q[m.k].done)add(m.mc[0],m.mc[1],m.mc[2],m.mc[3]);}}catch(_){}
+    try{for(const c of (window.__cvOuvidas?window.__cvOuvidas(e):[]))add(c[0],c[1],c[2],c[3]);}catch(_){}
+    for(const b of B)b.era=e;return B;}
+  /* revisão espaçada: 3 perguntas da época atual + 2 de épocas já visitadas; errada volta logo, certa volta mais tarde */
+  const REV=(()=>{try{return JSON.parse(localStorage.getItem('pira_quizrev')||'{}');}catch(_){return {};}})();if(!REV.q)REV.q={};if(!REV.n)REV.n=0;
+  const revSalva=()=>{try{localStorage.setItem('pira_quizrev',JSON.stringify(REV));}catch(_){}};
+  function monta(e){REV.n++;const pega=(B,k)=>{const sc=b=>{const r=REV.q[b.q];if(!r)return 2+Math.random();if(r.w)return 5+Math.random();const d=REV.n-(r.n||0);return d<=2?-5+Math.random():Math.min(2,d/3)+Math.random();};
+      return B.map(b=>[sc(b),b]).sort((x,y)=>y[0]-x[0]).slice(0,k).map(x=>x[1]);};
+    const atual=banco(e);let ant=[];for(let k=1;k<e;k++)ant=ant.concat(banco(k));
+    let qs=ant.length>=2?pega(atual,3).concat(pega(ant,2)):pega(atual,5);if(qs.length<5)qs=qs.concat(pega(atual.filter(b=>!qs.includes(b)),5-qs.length));
+    return qs.length>=5?qs.sort(()=>Math.random()-.5):null;}
+  function quiz3min(e){const qs=monta(e);if(!qs)return false;let i=0,ac=0;
     ovMapa.hidden=true;ovDiario.hidden=true;mcqOpen=true;ovQuiz.hidden=false;const box=$('quizBox');box.style.overflowY='auto';box.style.maxHeight='92%';
     const fecha=()=>{ovQuiz.hidden=true;mcqOpen=false;};
-    const tela=()=>{box.innerHTML='';const k=document.createElement('div');k.className='kicker';k.textContent='Quiz de '+ANO[e]+' · pergunta '+(i+1)+' de 5';const h=document.createElement('h2');h.textContent=qs[i].q;const list=document.createElement('div');list.className='opts';
+    const tela=()=>{box.innerHTML='';const k=document.createElement('div');k.className='kicker';k.textContent='Quiz de '+ANO[e]+' · pergunta '+(i+1)+' de 5'+(qs[i].era&&qs[i].era!==e?' · revisão de '+ANO[qs[i].era]:'');const h=document.createElement('h2');h.textContent=qs[i].q;const list=document.createElement('div');list.className='opts';
       const ord=qs[i].o.map((t,j)=>[t,j]).sort(()=>Math.random()-.5);
-      ord.forEach(([t,j])=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=t;b.onclick=()=>{const certo=j===qs[i].a;if(certo)ac++;try{sfx(certo?'blip':'bump');}catch(_){}
+      ord.forEach(([t,j])=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=t;b.onclick=()=>{const certo=j===qs[i].a;if(certo)ac++;try{REV.q[qs[i].q]={w:certo?0:1,n:REV.n};revSalva();}catch(_){}try{sfx(certo?'blip':'bump');}catch(_){}
           [...list.children].forEach((c,n)=>{c.disabled=true;if(ord[n][1]===qs[i].a)c.style.outline='3px solid #2e6a4a';});if(!certo)b.style.outline='3px solid #b0553a';
           const r=document.createElement('p');r.style.cssText='margin:10px 0 6px;font:600 clamp(16px,4.2vw,18px)/1.45 system-ui,sans-serif';r.textContent=(certo?'Isso mesmo! ':'Ainda não. ')+qs[i].e;
           const n=document.createElement('button');n.type='button';n.className='btn';n.textContent=i<4?'Próxima pergunta':'Ver o resultado';n.onclick=()=>{i++;if(i<5)tela();else fim();};box.append(r,n);n.focus();};list.appendChild(b);});
@@ -12656,7 +12667,7 @@ setTimeout(function(){
     const fim=()=>{box.innerHTML='';const k=document.createElement('div');k.className='kicker';k.textContent='Quiz de '+ANO[e];const h=document.createElement('h2');h.textContent='Você acertou '+ac+' de 5.';const p=document.createElement('p');p.style.cssText='font:400 clamp(16px,4.2vw,18px)/1.45 system-ui,sans-serif';p.textContent=ac>=4?'Muito bem! Continue explorando a cidade.':'Continue explorando: as pessoas e as placas da cidade têm as respostas.';
       const f=document.createElement('button');f.type='button';f.className='btn';f.textContent='Voltar ao jogo';f.onclick=fecha;box.append(k,h,p,f);f.focus();try{addDiary('Quiz','Quiz de '+ANO[e]+': '+ac+' de 5.');}catch(_){}};
     /* tela de entrada */
-    box.innerHTML='';const k=document.createElement('div');k.className='kicker';k.textContent='Quiz de '+ANO[e];const h=document.createElement('h2');h.textContent='Hora do quiz! São 5 perguntas sobre São Paulo em '+ANO[e]+'.';
+    box.innerHTML='';const k=document.createElement('div');k.className='kicker';k.textContent='Quiz de '+ANO[e];const h=document.createElement('h2');h.textContent=e>1?'Hora do quiz! São 5 perguntas: 3 sobre São Paulo em '+ANO[e]+' e 2 de revisão das épocas que você já visitou.':'Hora do quiz! São 5 perguntas sobre São Paulo em '+ANO[e]+'.';
     const a=document.createElement('button');a.type='button';a.className='btn';a.textContent='Começar';a.onclick=tela;const d=document.createElement('button');d.type='button';d.className='btn';d.style.marginLeft='8px';d.textContent='Agora não (volta em 1 minuto)';d.onclick=()=>{fecha();acc=120;};
     const row=document.createElement('div');row.style.marginTop='12px';row.append(a,d);box.append(k,h,row);a.focus();return true;}
   let acc=0,eraAnt=null;window.__quiz3=(e)=>quiz3min(e||era);window.__quiz3acc=(v)=>{if(v!=null)acc=v;return acc;};
@@ -12761,7 +12772,7 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
 
 /* ===== AJUSTE DE TELAS: celular em pé e deitado ===== */
 (function(){try{const st=document.createElement('style');st.textContent=
- '#ovStart{z-index:60}'+'.toast{white-space:normal;width:max-content;max-width:94%;text-align:center;box-sizing:border-box}'+
+ '.toast{white-space:normal;width:max-content;max-width:94%;text-align:center;box-sizing:border-box}'+
  '@media (orientation:landscape) and (max-height:520px){'+
  '#mapCv:not(.zoom){width:auto;max-width:100%;max-height:calc(100vh - 118px);max-height:calc(100dvh - 118px);margin:0 auto}'+
  '#ovStart .card{max-width:96vw;padding:8px 12px;gap:5px}#ovStart .card h2{margin:0;font-size:19px}#ovStart .card p{margin:0;font-size:13px;line-height:1.25}'+
@@ -13303,7 +13314,7 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   const poe=(o,st)=>{if(!st||!IM[st]||String(o.spr||'').indexOf('n22_')===0)return false;const k='n22_'+st+'~'+(o.spr||o.id||'');ORIG[k]=o.spr||o.id;o.spr=k;return true;};
   const esc=o=>{if(NPC[o.id])return NPC[o.id];if(!GER.test(String(o.id||'')))return null;return CROWD[o.spr+'|'+o.name]||CROWD[base(o.spr)+'|'+o.name]||UNI[o.name]||TIPO[o.spr]||TIPO[base(o.spr)]||null;};
   const aplica=()=>{let a=0,b=0;
-    for(const n of npcs){try{if(eraOf(n.scene||'pira')!==4)continue;if(poe(n,esc(n)||((n.piada||String(n.scene).indexOf('m_q')===0||/^(profNormal22|normalistaB22|br_.*)$/.test(n.id))?(UNI[n.name]||TIPO[n.spr]||TIPO[base(n.spr)]):null)))a++;}catch(_){}}
+    for(const n of npcs){try{if(eraOf(n.scene||'pira')!==4)continue;if(poe(n,esc(n)||((n.piada||String(n.scene).indexOf('m_q')===0||/^(profNormal22|normalistaB22|br_.*|parteira22|paiParto22|paiCortico22|caixeiroArm22|operariaMarmita22)$/.test(n.id))?(UNI[n.name]||TIPO[n.spr]||TIPO[base(n.spr)]):null)))a++;}catch(_){}}
     for(const w of walkers){try{if(eraOf(w.scene)!==4||!w.spr||VEI.test(w.spr))continue;if(poe(w,esc(w)||CROWD[base(w.spr)+'|'+w.name]||UNI[w.name]||TIPO[w.spr]||TIPO[base(w.spr)]))b++;}catch(_){}}
     return [a,b];};
   aplica();setTimeout(aplica,0);setTimeout(()=>{window.__n22.postos=aplica();},1500);
@@ -13409,6 +13420,237 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   let n=0;for(const e of M){if(Q[e.k]||!npcs.some(x=>x.id===e.giver)||e.st.some(s=>!npcs.some(x=>x.id===s.n)))continue;ENT.push(e);e.ok=true;Q[e.k]={era:4,title:e.title,where:e.where,steps:e.st.map(s=>s.d),step:null,count:0,done:false};(GIVER[e.giver]=GIVER[e.giver]||[]).push(e.k);QE4.push(e.k);setTimeout(()=>{QT[e.k]={giver:'n:'+e.giver,steps:e.st.map(s=>'n:'+s.n)};},0);n++;}
   window.__brimos=n;
 }catch(e){console.warn('brimos',e);}})();
+
+/* =========================================================
+   CIDADE VIVA v3 — PILOTO (lote 0 + lote 1: Brás e Bexiga, 1922)
+   Fichas 6, 1, 53 (1A) · 14, 13, 47 (1B) · 50, 73 (1C). Só o texto das fichas.
+   ========================================================= */
+(function(){try{
+  if(!SCN.sp22||typeof ENT==='undefined')return;
+  /* ---- lote 0.3: embaralhamento de verdade nas perguntas de missão ---- */
+  {const am=askMC;askMC=function(title,q,opts,a,expl,after){try{const o=opts.map((t,i)=>({t,i}));for(let k=o.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[o[k],o[j]]=[o[j],o[k]];}
+      return am.call(this,title,q,o.map(x=>x.t),o.findIndex(x=>x.i===a),expl,after);}catch(_){return am.apply(this,arguments);}};}
+  /* ---- lote 0.4: rotina por faixa do dia (manhã, tarde, noite) ---- */
+  const faixa=()=>{const h=((hourNow()%24)+24)%24;return h>=5&&h<12?'manha':h>=12&&h<18?'tarde':'noite';};
+  const livre=(sc,x,y)=>{try{return freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y)&&!ITEMS.some(i=>i.scene===sc&&i.x===x&&i.y===y);}catch(_){return false;}};
+  const acha=(sc,cx,cy,rr)=>{for(let r=0;r<=(rr||8);r++)for(let y=cy-r;y<=cy+r;y++)for(let x=cx-r;x<=cx+r;x++){if(Math.max(Math.abs(x-cx),Math.abs(y-cy))!==r)continue;
+      if(livre(sc,x,y)&&[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]].filter(([a,b])=>livre(sc,x+a,y+b)).length>=6)return [x,y];}return null;};
+  const ROTINA={};   // id -> {manha:[x,y]|null, tarde:..., noite:...}; null = não aparece
+  const emMissao=id=>{try{return ENT.some(e=>e.ok&&Q[e.k]&&!Q[e.k].done&&Q[e.k].step!==null&&(e.giver===id||e.st.some(s=>s.n===id)));}catch(_){return false;}};
+  const rotinaTick=(forca)=>{try{const f=faixa();for(const id in ROTINA){const n=npcs.find(n=>n.id===id);if(!n)continue;const R=ROTINA[id];let alvo=R[f];if(emMissao(id))alvo=R.encontro||R.manha||alvo;
+        const fora=n.scene==='__fora';const noLugar=alvo?(!fora&&n.x===alvo[0]&&n.y===alvo[1]):fora;if(noLugar)continue;
+        const visivel=!fora&&n.scene===cur&&Math.abs(n.x-player.x)<=13&&Math.abs(n.y-player.y)<=9;const chegaVisivel=alvo&&cur===R.cena&&Math.abs(alvo[0]-player.x)<=13&&Math.abs(alvo[1]-player.y)<=9;
+        if(!forca&&(visivel||chegaVisivel||dialog))continue;
+        if(!alvo){n.scene='__fora';}else if(!npcs.some(q=>q!==n&&q.scene===R.cena&&q.x===alvo[0]&&q.y===alvo[1])){n.scene=R.cena;n.x=alvo[0];n.y=alvo[1];if('px' in n){n.px=n.x*16;n.py=n.y*16;}}}}catch(_){}};
+  setInterval(()=>rotinaTick(false),2000);
+  {const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);return r;};}
+  /* ---- checagem logo depois da conversa (personagem sem missão) ---- */
+  const FEITAS=(()=>{try{return JSON.parse(localStorage.getItem('pira_cv_mc')||'{}');}catch(_){return {};}})();
+  const CHECA={};  // id -> [pergunta, [certa, errada, errada], 0, explicação]
+  window.__cvOuvidas=e=>e===4?Object.keys(CHECA).filter(id=>FEITAS[id]).map(id=>CHECA[id]):[];
+  {const tt=talkTo;talkTo=function(n){const mc=n&&CHECA[n.id];if(!mc||FEITAS[n.id]||emMissao(n.id))return tt.apply(this,arguments);
+      const r=tt.apply(this,arguments);try{if(dialog&&!dialog.__cv){const d=dialog,fim=d.onEnd;d.__cv=1;d.onEnd=function(){try{if(fim)fim.apply(this,arguments);}catch(_){}
+            setTimeout(()=>{try{if(dialog||mcqOpen||FEITAS[n.id])return;askMC(n.name,mc[0],mc[1],mc[2],mc[3],()=>{FEITAS[n.id]=1;try{localStorage.setItem('pira_cv_mc',JSON.stringify(FEITAS));}catch(_){}});}catch(_){}} ,60);};}}catch(_){}
+      return r;};}
+  /* ---- missão sem pergunta (fichas 13 e 50): termina direto ---- */
+  {const fm=finishMission;finishMission=function(k,title,q){if(q)return fm.apply(this,arguments);try{const qq=Q[k];qq.step=null;qq.done=true;updQuest();addDiary('Missão',arguments[6]);save();toast('Missão concluída: '+title);}catch(_){}};}
+
+  const INV='[Personagem inventado para o jogo.]';
+  const novo=(id,spr,cena,x,y,name,lines,diary)=>{if(npcs.some(n=>n.id===id))return npcs.find(n=>n.id===id);addNPCs([{id,spr,x,y,dir:'down',name,lines:lines.concat([INV]),diary}],cena);return npcs.find(n=>n.id===id);};
+  /* ================= 1A · moradia e água ================= */
+  /* ficha 6 — Dormir apertado (no quarto do cortiço novo) */
+  if(SCN.m_qcortico){const C='m_qcortico';const p=livre(C,2,5)?[2,5]:acha(C,2,5,3);
+    if(p)novo('paiCortico22','ferreiro',C,p[0],p[1],'Pai de família',["Somos seis neste quarto. O aluguel não dá para mais.","A bica e a latrina ficam no pátio, para todos os vizinhos."],'Cortiço: quartos alugados em volta de um pátio; uma família inteira em cada quarto.');
+    CHECA.paiCortico22=['Como morava uma família operária no cortiço?',['Em um quarto só, com bica e latrina divididas com os vizinhos.','Em uma casa com um quarto para cada filho.','Em um apartamento com água quente e elevador.'],0,'Cortiço: vários quartos alugados em volta de um pátio, uma família em cada um.'];
+    /* à noite, a família dormindo (vultos cobertos, sem rosto detalhado) */
+    const dorme=(x,y,cor,h)=>({id:'cvDorme'+x+'_'+y,scene:C,x,y,w:1,h:1,__noite:1,draw:function(c,X,Y){const hh=((hourNow()%24)+24)%24;if(!(hh>=20||hh<5))return;c.fillStyle='#141b1b';c.fillRect(X+3,Y+2,10,h);c.fillStyle=cor;c.fillRect(X+4,Y+7,8,h-6);c.fillStyle='#c89870';c.fillRect(X+5,Y+3,6,4);c.fillStyle='#3a2a20';c.fillRect(X+5,Y+3,6,2);}});
+    /* desenhados por cima da cama e da esteira que já estão no quarto, sem criar bloqueio novo */
+    const cama=objects.find(o=>o.scene===C&&o.x===1&&o.y===3),est=objects.find(o=>o.scene===C&&o.x===3&&o.y===3);
+    for(const [o,lista] of [[cama,[[2,8,'#8a6a9a'],[9,8,'#7a8a6a']]],[est,[[1,7,'#b0553a'],[8,7,'#5a8ab0'],[15,7,'#c8a040']]]]){if(!o)continue;const d0=o.draw;o.draw=function(c,X,Y){d0.call(this,c,X,Y);const hh=((hourNow()%24)+24)%24;if(!(hh>=20||hh<5))return;
+        for(const [dy,w,cor] of lista){c.fillStyle='#141b1b';c.fillRect(X+3,Y+2+dy,10,w);c.fillStyle=cor;c.fillRect(X+4,Y+5+dy,8,w-4);c.fillStyle='#c89870';c.fillRect(X+5,Y+3+dy,5,3);c.fillStyle='#3a2a20';c.fillRect(X+5,Y+3+dy,5,1);}};}}
+  /* ficha 1 — Banho de bacia */
+  const M=[];
+  if(npcs.some(n=>n.id==='mae22')&&npcs.some(n=>n.id==='aguadeira'))M.push({k:'banho22',era:4,giver:'mae22',title:'Banho de bacia',where:'Fale com a mãe operária, no Brás.',
+    start:["Hoje é dia de banho. Busca água na bica com a menina da lata?"],
+    st:[{n:'aguadeira',d:'Busque água na bica, com a menina da lata d\'água (Bexiga)',pages:["Cada lata pesa muito. Para encher a bacia são várias viagens."]},
+        {n:'mae22',d:'Volte à mãe operária',pages:["Esquento no fogão. Um usa a água depois do outro, os menores primeiro."]}],
+    mc:['Por que um banho dava tanto trabalho no cortiço?',['A água era carregada da bica e esquentada no fogão.','A água quente saía da torneira, mas custava caro.','Só era permitido tomar banho no rio.'],0,'No cortiço a bica era de todos. Água em casa mudava o dia inteiro de uma família.'],
+    diary:'Cortiço: a água vinha da bica do pátio; para o banho, era carregada e esquentada no fogão.'});
+  /* ficha 53 — operária almoçando perto da fábrica, só à tarde, sem missão */
+  {const cr=objects.find(o=>o.scene==='sp22'&&o.id==='crespi');if(cr){const p=acha('sp22',cr.x+cr.w-2,cr.y+cr.h+1,6);if(p){const n=novo('operariaMarmita22','cesteira#1','sp22',p[0],p[1],'Operária na hora do almoço',["(Ela come da marmita, sentada perto do portão da fábrica.)"],null);if(n){n.talked=true;ROTINA.operariaMarmita22={cena:'sp22',manha:null,tarde:p,noite:null};}}}}
+  /* ================= 1B · nascimento e vizinhança ================= */
+  /* ficha 14 — A parteira */
+  {const casa=acha('sp22',160,106,6),outro=acha('sp22',146,107,6);if(casa){novo('parteira22','dona','sp22',casa[0],casa[1],'Dona Rosália, parteira',["Já ajudei a nascer mais criança do que tem gente nesta rua.","Aprendi com minha mãe. Hoje há parteira de diploma: a Escola de Parteiras abriu em 1912.","Maternidade a cidade tem desde 1894. Mas aqui no Brás quase todo mundo ainda nasce em casa."],'Parto: em 1922 muita gente nascia em casa, com parteira; a Maternidade é de 1894 e a Escola de Parteiras, de 1912.');
+      CHECA.parteira22=['Como nasciam muitos bebês dos bairros operários em 1922?',['Em casa, com parteira, embora já existisse maternidade.','Sempre no hospital, com médico.','As parteiras tinham sido proibidas em 1912.'],0,'A mudança foi lenta: maternidade e escola de parteiras (1912) conviveram com o parto em casa.'];
+      ROTINA.parteira22={cena:'sp22',manha:casa,tarde:outro||casa,noite:casa,encontro:casa};}}
+  /* ficha 13 — Parto em casa */
+  {const p=acha('sp22',157,105,5);if(p&&npcs.some(n=>n.id==='parteira22')){novo('paiParto22','ferreiro','sp22',p[0],p[1],'Pai à porta do cortiço',["O bebê vai nascer! Chama a dona Rosália, a parteira, na rua de trás?"],'Nascimento: no começo do século XX, quase todos os partos eram em casa, com parteira.');
+      M.push({k:'parto22',era:4,giver:'paiParto22',title:'Parto em casa',where:'Fale com o pai à porta do cortiço, no Brás.',
+        start:["O bebê vai nascer! Chama a dona Rosália, a parteira, na rua de trás?"],
+        st:[{n:'parteira22',d:'Chame a parteira, dona Rosália',pages:["Já ajudei a nascer mais criança do que tem gente nesta rua."]},
+            {n:'paiParto22',d:'Volte ao pai, à porta do cortiço',pages:["(A porta do quarto está fechada. Lá de dentro vem um choro de bebê.)","É uma menina! Nasceu aqui mesmo, como eu e meus irmãos."]}],
+        mc:[null,[],0,''],diary:'Nascimento: no começo do século XX, quase todos os partos eram em casa, com parteira.'});}}
+  /* ficha 47 — Ajuda entre vizinhos (com os vizinhos que já moram perto da nonna) */
+  if(['nonna','sapateiroBix','costureiraBix'].every(id=>npcs.some(n=>n.id===id)))M.push({k:'vizinhos22',era:4,giver:'nonna',title:'Ajuda entre vizinhos',where:'Fale com a nonna, no Bexiga.',
+    start:["Uma família da rua está doente. Aqui ninguém fica sem comer: passa nos vizinhos!"],
+    st:[{n:'sapateiroBix',d:'Passe no sapateiro',pages:["(O sapateiro separa um pouco de comida para a família doente.)"]},
+        {n:'costureiraBix',d:'Passe na costureira',pages:["(A costureira embrulha um pouco de comida para a família doente.)"]},
+        {n:'nonna',d:'Leve tudo à nonna',pages:["(A nonna deixa a comida à porta fechada da família.)","Italiano, sírio, português... Nesta cidade, de cada três pessoas, uma veio de outro país."]}],
+    mc:['O que a rua da nonna mostra sobre a São Paulo de 1922?',['Era uma cidade de imigrantes: 35 de cada 100 moradores eram estrangeiros.','Quase todos os moradores tinham nascido na própria cidade.','Os imigrantes viviam só nas fazendas de café.'],0,'Em 1920, 35% dos paulistanos tinham nascido em outro país. Vizinhança nem sempre era paz, mas ajuda havia.'],
+    diary:'Imigração: em 1920, 35 de cada 100 moradores de São Paulo eram estrangeiros.'});
+  /* ================= 1C · armazém e fábrica ================= */
+  /* ficha 50 — Compra no armazém */
+  {const v=objects.find(o=>o.scene==='sp22'&&o.id==='n1022');const p=v?acha('sp22',v.x+1,v.y+(v.h||1)+0,5):acha('sp22',147,113,5);
+    if(p&&npcs.some(n=>n.id==='mae22')){novo('caixeiroArm22','caixeiro','sp22',p[0],p[1],'Caixeiro do armazém',["Feijão, farinha e banha. Aqui no Brás, fábrica, casa e venda ficam na mesma rua."],'Brás: bairro operário onde fábricas, moradias e pequeno comércio ficavam lado a lado.');
+      M.push({k:'compras22',era:4,giver:'mae22',title:'Compra no armazém',where:'Fale com a mãe operária, no Brás.',
+        start:["Busca a encomenda no armazém? Já está anotado na caderneta."],
+        st:[{n:'caixeiroArm22',d:'Busque a encomenda com o caixeiro do armazém',pages:["Feijão, farinha e banha. Aqui no Brás, fábrica, casa e venda ficam na mesma rua."]},
+            {n:'mae22',d:'Volte à mãe operária',pages:["(A mãe guarda a encomenda.)"]}],
+        mc:[null,[],0,''],diary:'Brás: bairro operário onde fábricas, moradias e pequeno comércio ficavam lado a lado.'});}}
+  let n=0;for(const e of M){if(Q[e.k])continue;if(!npcs.some(x=>x.id===e.giver)||e.st.some(s=>!npcs.some(x=>x.id===s.n)))continue;ENT.push(e);e.ok=true;Q[e.k]={era:4,title:e.title,where:e.where,steps:e.st.map(s=>s.d),step:null,count:0,done:false};(GIVER[e.giver]=GIVER[e.giver]||[]).push(e.k);QE4.push(e.k);setTimeout(()=>{QT[e.k]={giver:'n:'+e.giver,steps:e.st.map(s=>'n:'+s.n)};},0);n++;}
+  /* rotina de teste do lote 0: dois moradores do Brás, sem missão, dois pontos cada */
+  for(const [id,dx,dy] of [['telefonista22',-4,3],['padeiro22',5,-3]]){const q=npcs.find(x=>x.id===id&&x.scene==='sp22');if(!q||ENT.some(e=>e.giver===id||e.st.some(s=>s.n===id)))continue;const a=[q.x,q.y],b=acha('sp22',q.x+dx,q.y+dy,5);if(b)ROTINA[id]={cena:'sp22',manha:a,tarde:b,noite:a};}
+  setTimeout(()=>rotinaTick(true),200);
+  /* ficha 73 — aviso do apito, uma vez por faixa do dia, só na cidade de 1922 */
+  {let ult='';setInterval(()=>{try{if(!started||cur!=='sp22'||dialog||mcqOpen||isPaused())return;const k=(typeof gday==='number'?gday:0)+':'+faixa();if(k===ult)return;const primeiro=ult==='';ult=k;if(!primeiro)toast('O apito da fábrica tocou.');}catch(_){}} ,3000);}
+  window.__cv={ROTINA,CHECA,FEITAS,faixa,rotinaTick,missoes:n};
+}catch(e){console.warn('cidade viva',e);}})();
+
+/* =========================================================
+   1922 · BRIMOS, parte 2 — a rua com as seis lojas, missões 2 e 4, vida na rua, humor,
+   cartões de fato e do futuro, e as ligações (Ipiranga, Arcadas, trem, fazenda, Bananal).
+   Pessoas reais, falas imaginadas. Fonte do roteiro: Diogo Bercito, "Brimos" (2021) e "Brimos à mesa" (2025).
+   ========================================================= */
+(function(){try{
+  if(!SCN.sp22||typeof ENT==='undefined')return;
+  const REAL='[Pessoa real, fala imaginada. Fonte: Diogo Bercito, Brimos (2021).]',INVB='[Personagem inventado para o jogo.]';
+  const K='#1a1612';const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
+  /* ---------- 7. a rua: seis lojas reais do registro comercial de 1917 ---------- */
+  for(const id of ['tecidos0','tecidos1','banca22_12']){const i=objects.findIndex(o=>o.scene==='sp22'&&o.id===id);if(i>=0)objects.splice(i,1);}
+  {const p=objects.find(o=>o.scene==='sp22'&&o.id==='placaPortoGeral22');if(p){p.x=129;p.y=74;}const q=objects.find(o=>o.scene==='sp22'&&o.id==='placa25');if(q){q.x=128;q.y=81;}}
+  const sobrado=(c,X,Y,o)=>{const W=32,H=o.h*16,alto=o.h>=3;R(c,X+2,Y+H-1,W-4,3,'rgba(20,14,8,.25)');
+    /* corpo */R(c,X,Y+(alto?4:2),W,H-(alto?4:2),K);R(c,X+1,Y+(alto?5:3),W-2,H-(alto?6:4),o.cor);
+    /* telhado */R(c,X-1,Y+(alto?0:-2),W+2,6,K);R(c,X,Y+(alto?1:-1),W,4,'#a8502e');for(let i=0;i<W;i+=4)R(c,X+i,Y+(alto?1:-1),1,4,'#7a3620');
+    if(alto){/* andar de cima: a casa da família */for(const x of [5,19]){R(c,X+x,Y+9,8,10,K);R(c,X+x+1,Y+10,6,8,'#b8d8e8');R(c,X+x+4,Y+10,1,8,'#e8e0d0');R(c,X+x+1,Y+14,6,1,'#e8e0d0');}
+      /* roupa no varal entre as janelas */R(c,X+4,Y+21,24,1,'#e8e0d0');const cs=['#e8e0d0','#c0503a','#5a8ab0','#e8c060'];for(let i=0;i<4;i++)R(c,X+6+i*6,Y+22,4,4,cs[i]);
+      R(c,X+1,Y+27,W-2,1,'rgba(0,0,0,.25)');}
+    /* térreo: a loja */const ty=Y+H-20;R(c,X+1,ty,W-2,6,K);R(c,X+2,ty+1,W-4,4,o.toldo);for(let i=2;i<W-4;i+=6)R(c,X+i,ty+1,3,4,'#f4efe4');
+    R(c,X+12,Y+H-13,8,13,K);R(c,X+13,Y+H-12,6,12,'#5e3c20');R(c,X+17,Y+H-6,1,2,'#e8c060');
+    for(const x of [2,22]){R(c,X+x,Y+H-12,8,8,K);R(c,X+x+1,Y+H-11,6,6,'#f0e4c0');(o.vit||[]).forEach((cc,i)=>R(c,X+x+1+(i%3)*2,Y+H-8+(i>2?-3:0),2,3,cc));}
+    /* placa com o número */R(c,X+9,ty-7,14,7,K);R(c,X+10,ty-6,12,5,'#f4efe4');c.fillStyle='#8a2a1a';c.font='bold 6px sans-serif';c.textAlign='center';c.fillText(String(o.num),X+16,ty-2);c.textAlign='left';
+    if(o.chamine){R(c,X+24,Y-8,5,10,K);R(c,X+25,Y-7,3,9,'#8a4e34');}
+    /* mercadoria na calçada */(o.calc||[]).forEach(([dx,cc])=>{R(c,X+dx,Y+H-6,6,6,K);R(c,X+dx+1,Y+H-5,4,4,cc);});};
+  const LOJAS=[
+   ['br_loja2',124,75,2,2,2,'Botequim de Calil Najar (nº 2)','#d8c8a0','#7a3a2a',['#7a5a2a','#3a2a20'],null,["Botequim de Calil Najar, no número 2. No registro comercial de 1917, a rua 25 de Março está cheia de nomes árabes."]],
+   ['br_loja56',126,75,2,2,56,'Doces e frutas de Jorge Pedro e Habib Jabour (nº 56)','#e0c8a8','#3a7a4a',['#e2602e','#e8c060','#c0503a','#7aa648'],[[26,'#e2602e']],["Doces e frutas de Jorge Pedro e Habib Jabour, no número 56."]],
+   ['br_loja187',124,79,2,3,187,'Tecidos de Tawfiq Qasma e irmãos (nº 187)','#d8d0e0','#5a5a9a',['#c0503a','#5a8ab0','#e8c060','#8a6a9a'],[[1,'#c0503a']],["Loja de tecidos de Tawfiq Qasma e irmãos, no número 187. A família veio de Homs, na Síria.","Loja embaixo, casa da família em cima: é assim em quase toda a rua."]],
+   ['br_loja72',126,79,2,3,72,'Padaria de Abrahão Buaheb (nº 72)','#e8d8b8','#a8502e',['#c89858','#d8a868','#b88848'],null,["Padaria de Abrahão Buaheb, no número 72, com forno a lenha. As famílias trazem a massa de casa para assar."],1],
+   ['br_loja50',124,83,2,3,50,'Armazém de João Zarzur (nº 50)','#d8e0c8','#2e6a4a',['#d8c8a0','#b8a070','#e8dcc0'],[[1,'#d8c8a0'],[25,'#8a5a30']],["Armazém de João Zarzur, no número 50: trigo, grão-de-bico, lentilha. Barricas e sacos na calçada."]],
+   ['br_loja52',126,83,2,3,52,'Comidas de Elias Tabach (nº 52)','#e8c8b8','#8a2a1a',['#c86a5a','#e8c060','#7aa648'],null,["Casa de comidas de Elias Tabach, no número 52, parede com parede com o armazém do Zarzur."]]];
+  for(const [id,x,y,w,h,num,name,cor,toldo,vit,calc,text,cham] of LOJAS){if(objects.some(o=>o.id===id))continue;const o={id,scene:'sp22',x,y,w,h,num,cor,toldo,vit,calc,chamine:cham,name,text};o.draw=function(c,X,Y){sobrado(c,X,Y,o);};objects.push(o);}
+  objects.push({id:'br_cartazSyrio',scene:'sp22',x:128,y:79,w:1,h:1,name:'Cartaz do Sport Club Syrio',text:['Um cartaz do Sport Club Syrio, fundado em 1917. A comunidade já tem clube, igreja, escola e jornais.'],
+    draw:function(c,X,Y){R(c,X+7,Y+6,2,10,'#5e3c20');R(c,X+2,Y-4,12,12,K);R(c,X+3,Y-3,10,10,'#f4efe4');R(c,X+4,Y-2,8,2,'#8a2a1a');R(c,X+5,Y+2,6,1,'#6a6a6a');R(c,X+5,Y+4,6,1,'#6a6a6a');}});
+  const livre=(sc,x,y)=>{try{return freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y)&&!ITEMS.some(i=>i.scene===sc&&i.x===x&&i.y===y)&&!objects.some(o=>o.scene===sc&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));}catch(_){return false;}};
+  const acha=(sc,cx,cy,rr)=>{for(let r=0;r<=(rr||7);r++)for(let y=cy-r;y<=cy+r;y++)for(let x=cx-r;x<=cx+r;x++){if(Math.max(Math.abs(x-cx),Math.abs(y-cy))!==r)continue;if(livre(sc,x,y)&&[[1,0],[-1,0],[0,1],[0,-1]].filter(([a,b])=>livre(sc,x+a,y+b)).length>=2)return [x,y];}return null;};
+  /* quem estava onde agora há loja sai da frente; os donos vão para a porta */
+  const leva=(id,x,y)=>{const n=npcs.find(n=>n.id===id&&n.scene==='sp22');if(!n)return;const p=livre('sp22',x,y)?[x,y]:acha('sp22',x,y,5);if(p){n.x=p[0];n.y=p[1];if('px' in n){n.px=n.x*16;n.py=n.y*16;}}};
+  for(const n of npcs.filter(n=>n.scene==='sp22'&&n.x>=124&&n.x<=127&&((n.y>=75&&n.y<=76)||(n.y>=79&&n.y<=81)||(n.y>=83&&n.y<=85)))){const p=acha('sp22',128,n.y,6);if(p){n.x=p[0];n.y=p[1];if('px' in n){n.px=n.x*16;n.py=n.y*16;}}}
+  const poeNaPorta=()=>{for(const [id,x,y] of [['br_calilNajar',125,77],['br_tawfiqQasma',125,82],['br_abrahaoBuaheb',128,83],['br_joaoZarzur',125,86],['br_eliasTabach',127,86]]){const n=npcs.find(n=>n.id===id);if(!n||(n.x===x&&n.y===y))continue;const q=npcs.find(q=>q!==n&&q.scene==='sp22'&&q.x===x&&q.y===y);if(q){const p=acha('sp22',x+3,y,6);if(p){q.x=p[0];q.y=p[1];if('px' in q){q.px=q.x*16;q.py=q.y*16;}}}
+      n.x=x;n.y=y;if('px' in n){n.px=x*16;n.py=y*16;}}};poeNaPorta();setTimeout(poeNaPorta,300);
+  const novo=(id,spr,sc,x,y,name,lines,diary,fecho)=>{if(npcs.some(n=>n.id===id))return;const p=livre(sc,x,y)?[x,y]:acha(sc,x,y,7);if(!p)return;addNPCs([{id,spr,x:p[0],y:p[1],dir:'down',name,lines:lines.concat([fecho||REAL]),diary}],sc);};
+  /* ---------- vida na rua ---------- */
+  novo('br_jorgePedro','caixeiro#2','sp22',127,77,'Jorge Pedro, doces e frutas (nº 56)',["Doce de damasco, tâmara, fruta fresca! O sócio, Habib Jabour, cuida do balcão."],'25 de Março: doces e frutas também lembravam a terra de origem.');
+  novo('br_padreSaliba','padre','sp22',128,73,'Padre Yacoub Saliba',["Cuido dos maronitas de São Paulo desde 1897. Ao lado da igreja funciona a Escola Chidiák.","Na escola, as crianças aprendem a escrever em árabe: da direita para a esquerda."],'Comunidade: igreja e escola próprias ajudavam a manter a língua e os costumes.');
+  novo('br_nagibHankach','caixeiro#1','sp22',128,88,'Nagib Hankach, cantor',["Cheguei este ano. Canto nas festas do Club Homs, fundado em 1920.","Sabe do que eu mais sinto falta? Das frutas de Zahlé."],'Club Homs: fundado em 1920, reunia a comunidade em festas, poesia e música.');
+  novo('br_salimMaria','caixeiro#3','sp22',128,90,'Salim Farah Maluf e Maria Estefno',["Casamos no ano passado, em 1921. Hoje é dia de arrumar a vitrine da loja.","Vim de Hadath em 1910. Comecei como todo mundo: do zero."],'Imigração: muitos casais tocavam juntos a loja da família.');
+  novo('br_eliasMadalena','caixeiro#5','sp22',130,97,'Elias e Madalena Maluf, de mudança',["Vamos sair da 25. Os filhos vão estudar em colégio bom!"],'Imigração: quando enriqueciam, as famílias mudavam de bairro e punham os filhos em bons colégios.');
+  novo('br_mussaChacur','caixeiro#4','sp22',122,78,'Mussa Chacur',["Na guerra me obrigaram a cortar árvores para as trincheiras. Quando acabou, em 1920, eu vim embora."],'Imigração: a Primeira Guerra trouxe fome e trabalho forçado; muitos saíram depois dela.');
+  /* ---------- humor de situação (nunca de sotaque) ---------- */
+  novo('br_recemChegado','caixeiro','sp22',123,77,'Recém-chegado',["Onde fica a ponte de ferro para ir a pé até os Estados Unidos? O agente da viagem jurou que existia.","(Foi um golpe real: agentes de viagem contavam isso aos imigrantes.)"],'Imigração: agentes de viagem enganavam imigrantes com promessas falsas.',INVB);
+  novo('br_mustaphaRajab','caixeiro#2','sp22',128,94,'Mustapha Rajab',["Para entrar no Brasil, eu disse que era sapateiro.","(Alguém entrega um sapato para ele consertar.) ...De sapato eu não entendo nada!"],'Imigração: alguns declaravam um ofício que não tinham para conseguir entrar no país.');
+  {let v=0,ult=0;const F=[['João Zarzur','Mais barato que o vizinho!'],['Elias Tabach','Mais barato que o vizinho do vizinho!'],['João Zarzur','Pela metade!'],['Elias Tabach','Pela metade da metade!'],['Zarzur e Tabach','De graça! (Os dois gritam ao mesmo tempo, se olham e desistem, rindo.)']];
+    setInterval(()=>{try{if(!started||cur!=='sp22'||dialog||mcqOpen||!window.__piadas)return;const perto=Math.abs(player.x-126)<=2&&Math.abs(player.y-86)<=1;if(!perto){if(ult===1)ult=0;return;}if(ult===1||v>=F.length)return;ult=1;window.__piadas.mostra(F[v][0],[F[v][1]]);v++;}catch(_){}} ,400);}
+  /* ---------- itens da rua, para a mochila ---------- */
+  for(const [id,i,x,y,name,text] of [['i22_alafkar',19,128,74,'Jornal Al-Afkar','Um jornal em árabe, impresso em São Paulo. Achado na 25 de Março.'],['i22_cartaArabe',57,128,92,'Carta em árabe','Uma carta escrita em árabe, com o endereço da 25 de Março. Metade da família aqui, metade lá.'],
+     ['i22_fiado',21,125,87,'Caderno de fiado','O caderno onde o mascate anota quem comprou e ainda vai pagar.'],['i22_chita',63,126,82,'Corte de chita e linha','Tecido de algodão estampado e linha: mercadoria leve, boa para a caixa do mascate.'],['i22_graobico',11,127,87,'Saco de grão-de-bico','Grão-de-bico do armazém do Zarzur, para a cozinha de casa.']]){
+    if(ITEMS.some(q=>q.id===id))continue;const p=livre('sp22',x,y)?[x,y]:acha('sp22',x,y,5);if(p)ITEMS.push({id,i,scene:'sp22',x:p[0],y:p[1],name,text:[text],got:false});}
+  /* ---------- missões ---------- */
+  const mist=(q,certa,e1,e2,expl)=>[q,[certa,e1,e2],0,expl];
+  const CART={};   // cartões que aparecem quando a missão termina
+  novo('br_mascateHoms','caixeiro#3','sp22',123,82,'Mascate do Club Homs',["Ninguém chega rico. A gente compra a mercadoria fiado do patrício, vende fiado ao freguês e paga quando recebe."],'Mascates: vendiam de porta em porta, comprando e vendendo fiado.',INVB);
+  novo('br_freguesaPente','dona#3','sp22',119,79,'Freguesa',["Quando o mascate passa tocando a matraca, a rua inteira vem ver a caixa."],'Mascates: anunciavam a chegada com a matraca.',INVB);
+  novo('br_freguesChita','caixeiro','sp22',117,86,'Freguês',["Loja fica longe e é cara. O mascate traz a mercadoria até a porta."],'Mascates: levavam mercadoria a quem morava longe das lojas.',INVB);
+  novo('br_wadihCury','caixeiro#4','sp22',129,89,'Wadih Cury, barraca de frutas',["Cheguei de Zahlé faz pouco tempo. Vendo frutas, mas quero abrir um empório. Só não sei o que vender."],'Imigração: muitos começavam com uma barraca e sonhavam com a loja própria.');
+  novo('br_fregA','dona#1','sp22',129,84,'Freguesa da feira',["Procuro zátar e tahine. Aqui não se acha em lugar nenhum."],'Comida: os imigrantes sentiam falta dos temperos de casa.',INVB);
+  novo('br_fregB','dona#4','sp22',130,92,'Freguesa da feira',["Eu queria sumagre e gergelim. Minha mãe não cozinha sem eles."],'Comida: os imigrantes sentiam falta dos temperos de casa.',INVB);
+  novo('br_fregC','caixeiro#1','sp22',130,80,'Freguês da feira',["Água de rosas e água de flor de laranjeira: sem isso, o doce não fica igual ao de casa."],'Comida: os imigrantes sentiam falta dos sabores de casa.',INVB);
+  /* Ipiranga */
+  novo('br_benjaminJafet','caixeiro#5','sp22',197,188,'Benjamin Jafet',["Cheguei em 1887 com camisas, pentes e perfumes que comprei em Marselha. Vendi de fazenda em fazenda.","Hoje meus irmãos e eu temos esta fábrica."],'Jafet: de mascates a industriais, com fábricas no Ipiranga.');
+  novo('br_alexios','crianca','sp22',184,189,'Alexios, o menino Jafet',["Eu nasci aqui no Ipiranga! Vou correr atrás daquele carro de boi."],'Ipiranga: em 1922 ainda tinha capim alto e carro de boi, ao lado das fábricas.');
+  novo('br_admaJafet','dona#2','sp22',169,183,'Adma Jafet',["Os portugueses têm hospital, os italianos têm, os alemães têm. Nós também vamos ter, e vamos atender quem precisar."],'Hospital: em 1921, Adma Jafet reuniu senhoras da comunidade para criar um hospital.');
+  novo('br_violetaAngela','dona#3','sp22',171,183,'Violeta e Ângela Jafet',["Mamãe lê umas oito horas por dia, jornais do mundo inteiro!"],'Adma Jafet: leitora de jornais de muitos países, liderou as senhoras da comunidade.');
+  const SEN=[['br_senMaluf','Senhora da família Maluf',165,184],['br_senMattar','Senhora da família Mattar',173,185],['br_senSalem','Senhora da família Salem',163,181],['br_senGebara','Senhora da família Gebara',175,182],['br_senSiria','Senhora síria',167,186]];
+  SEN.forEach(([id,name,x,y],k)=>novo(id,'dona#'+(1+k%4),'sp22',x,y,name,["A dona Adma já falou comigo. Um hospital da comunidade, aberto a quem precisar."],'Hospital: as doações foram organizadas por um grupo de senhoras.',INVB));
+  /* Arcadas */
+  {const sf=objects.find(o=>o.scene==='sp22'&&o.id==='saofrancisco');const bx=sf?sf.x+4:95,by=sf?sf.y+sf.h+1:95;
+   novo('br_farisAnsarah','estudante','sp22',bx,by,'Faris Nicolau Ansarah',["Fui o primeiro de família árabe a me formar aqui nas Arcadas, em 1917."],'Arcadas: em 1917 formou-se o primeiro advogado de família árabe.');
+   novo('br_sadNeme','caixeiro#3','sp22',bx+3,by,'Sad Neme',["Dois filhos no balcão, dois na faculdade. Um dia vão me chamar de pai dos médicos!"],'Imigração: as famílias punham os filhos na faculdade para subir na vida.');}
+  /* trem, fazenda, Bananal */
+  if(SCN.m_campinas){novo('br_nicolauTuma','crianca','m_campinas',14,8,'Nicolau Tuma, 11 anos',["Meu pai é caixeiro-viajante. Vive no trem e quase nunca está em casa."],'Caixeiros-viajantes: passavam a vida nas estradas de ferro, vendendo no interior.');
+    novo('br_familiaCps','dona#1','m_campinas',11,6,'Família de Campinas',["Na roça o trabalho é muito e o dinheiro é pouco."],'Fábricas: buscavam trabalhadores no interior, oferecendo salário e casa.',INVB);}
+  if(SCN.m_ribeirao)novo('br_antonioMussi','caixeiro#4','m_ribeirao',52,26,'Antonio Mussi, mascate',["Ando de fazenda em fazenda com a caixa nas costas. Paguei minha própria passagem: vou e volto quando quero."],'Mascates: sem contrato com fazenda, circulavam livres pelo interior.');
+  if(SCN.m_bananal)novo('br_mascateBananal','caixeiro#2','m_bananal',24,22,'Mascate sírio',["Cidade parada, pouco freguês. Mas não importa o tamanho da vila: sempre tem um de nós com uma caixa nas costas."],'Mascates: chegavam até as cidades pequenas e em decadência.',INVB);
+  const M=[
+   {k:'brMascate',era:4,giver:'br_mascateHoms',title:'Tem coisa boa!',where:'Fale com o mascate do Club Homs, perto da loja de tecidos, na 25 de Março.',
+    start:["Leve a caixa de mascate e a matraca. Na rua, é só oferecer: \"Quer comprar alguma coisa? Tem coisa boa!\""],
+    st:[{n:'br_freguesaPente',d:'Ofereça a mercadoria à freguesa',pages:["Quero o pente! Mas hoje não tenho dinheiro.","(Você anota o nome dela no caderno de fiado.)"]},
+        {n:'br_freguesChita',d:'Ofereça a mercadoria ao freguês',pages:["Um corte de chita para a patroa e um perfume. Este eu pago agora."]},
+        {n:'br_freguesaPente',d:'Volte à freguesa para receber o fiado',pages:["Recebi ontem. Aqui está o do pente. Pode riscar meu nome do caderno!"]},
+        {n:'br_mascateHoms',d:'Volte ao mascate',pages:["Viu? Vendeu, anotou, recebeu. É assim que a gente começa."]}],
+    mc:mist('O que era vender fiado?','Vender e receber o pagamento depois','Vender só para parentes','Dar a mercadoria de presente','Fiado: o freguês leva hoje e paga depois. O mascate também comprava fiado do patrício da loja.'),
+    diary:'Mascates: vendiam fiado, anotando no caderno, e recebiam depois.'},
+   {k:'brEmporio',era:4,giver:'br_wadihCury',title:'A barraca do Wadih Cury',where:'Fale com Wadih Cury, na barraca de frutas perto do Mercado.',
+    start:["Pergunte aos fregueses o que eles procuram e não acham. Depois me conte."],
+    st:[{n:'br_fregA',d:'Pergunte à freguesa o que ela não acha',pages:["Zátar e tahine. Anote aí!"]},{n:'br_fregB',d:'Pergunte à outra freguesa',pages:["Sumagre e gergelim. Anotou?"]},{n:'br_fregC',d:'Pergunte ao freguês',pages:["Água de rosas e água de flor de laranjeira."]},
+        {n:'br_wadihCury',d:'Conte a Wadih Cury',pages:["Todo mundo aqui sente falta dos sabores de casa. Quem trouxer esses produtos vai ter fila na porta!"]}],
+    mc:[null,[],0,''],diary:'Comida: os imigrantes procuravam os temperos e sabores da terra de origem.'},
+   {k:'brJafet',era:4,giver:'br_benjaminJafet',title:'De mascate a industrial',where:'Fale com Benjamin Jafet, na fábrica do Ipiranga.',
+    start:["Preciso de trabalhadores. Leve este aviso de trem até Campinas e entregue a uma família.","\"Emprego na fábrica! Salário melhor que o da roça. Quem trouxer a família paga menos aluguel.\""],
+    st:[{n:'br_familiaCps',d:'Leve o aviso de trem até Campinas e entregue à família',pages:["Emprego na fábrica, com casa? Vamos conversar em casa. Obrigada por trazer o aviso."]}],
+    mc:mist('Onde os Jafet montaram suas fábricas?','No Ipiranga','Em Santos','Na 25 de Março','Os Jafet começaram como mascates, abriram loja e montaram fábricas de tecidos no Ipiranga.'),
+    diary:'Jafet: família de mascates que montou fábricas de tecidos no Ipiranga.'},
+   {k:'brHospital',era:4,giver:'br_admaJafet',title:'O hospital das senhoras',where:'Fale com Adma Jafet, perto do palacete, no Ipiranga.',
+    start:["Quero um hospital da nossa comunidade. Visite as senhoras e peça a ajuda de cada uma."],
+    st:SEN.map(([id,name])=>({n:id,d:'Visite a '+name.toLowerCase(),pages:["Um hospital que atenda quem precisar? Pode contar com a nossa família."]})).concat([{n:'br_admaJafet',d:'Volte a Adma Jafet',pages:["Todas vão ajudar! Agora é juntar o dinheiro e procurar o terreno."]}]),
+    mc:mist('Quem organizou as doações para o hospital?','Um grupo de senhoras liderado por Adma Jafet','O governo de São Paulo','Os médicos italianos','Em 1921, Adma Jafet reuniu senhoras da comunidade para criar o hospital.'),
+    diary:'Hospital Sírio-Libanês: nasceu de um grupo de senhoras liderado por Adma Jafet, em 1921.'},
+   {k:'brDoutores',era:4,giver:'br_farisAnsarah',title:'Os filhos doutores',where:'Fale com Faris Nicolau Ansarah, no Largo de São Francisco.',
+    start:["Meu pai vendia de porta em porta. Eu virei advogado. Converse com o senhor Sad Neme, ali: ele explica melhor."],
+    st:[{n:'br_sadNeme',d:'Converse com Sad Neme',pages:["Dois filhos no balcão, dois na faculdade. Um dia vão me chamar de pai dos médicos!"]}],
+    mc:mist('Por que as famílias queriam filhos advogados e médicos?','Para subir na vida e ganhar respeito','Porque era obrigatório','Para voltar ao Líbano','O diploma dava respeito e abria portas. Muitas famílias puseram parte dos filhos no balcão e parte na faculdade.'),
+    diary:'Imigração: famílias de comerciantes puseram os filhos na faculdade para subir na vida.'},
+   {k:'brFazenda',era:4,giver:'br_antonioMussi',title:'Paga quando puder',where:'Fale com o mascate Antonio Mussi, na fazenda de Ribeirão Preto.',
+    start:["Vou oferecer mercadoria ao fazendeiro. Venha comigo ouvir a resposta."],
+    st:[{n:'fazendeiroRP',d:'Ouça o fazendeiro',pages:["Mercadoria boa. Mas só tenho dinheiro depois da colheita."]},{n:'br_antonioMussi',d:'Volte a Antonio Mussi',pages:["Paga quando puder. Eu volto depois da colheita.","O colono italiano tem contrato com a fazenda e fica. Eu não tenho contrato com ninguém."]}],
+    mc:mist('Por que o mascate podia ir e vir e o colono italiano ficava na fazenda?','O italiano tinha contrato com a fazenda, e o mascate pagou a própria passagem','O italiano não gostava de viajar','O mascate era fazendeiro','O colono vinha com passagem paga e contrato com a fazenda. O mascate pagava a própria viagem e não devia nada a ninguém.'),
+    diary:'Mascates: sem contrato com fazenda, podiam circular pelo interior; o colono ficava preso ao contrato.'}];
+  CART.brMascate=['Cartão de fato','Nos anos 1890, mais de 9 em cada 10 mascates da cidade de São Paulo eram sírios ou libaneses.'];
+  CART.brEmporio=['Cartão do futuro','Em 1924, Wadih Cury abriu o Empório Syrio. Ele existe até hoje.'];
+  CART.brHospital=['Cartão do futuro','Terreno comprado em 1923. Pedra fundamental em 1931. O Hospital Sírio-Libanês só abriu em 1965.'];
+  let n=0;for(const e of M){if(Q[e.k]||!npcs.some(x=>x.id===e.giver)||e.st.some(s=>!npcs.some(x=>x.id===s.n)))continue;ENT.push(e);e.ok=true;Q[e.k]={era:4,title:e.title,where:e.where,steps:e.st.map(s=>s.d),step:null,count:0,done:false};(GIVER[e.giver]=GIVER[e.giver]||[]).push(e.k);QE4.push(e.k);setTimeout(()=>{QT[e.k]={giver:'n:'+e.giver,steps:e.st.map(s=>'n:'+s.n)};},0);n++;}
+  /* cartões: aparecem uma vez, logo depois de a missão terminar */
+  {const visto={};for(const k in CART)visto[k]=!!(Q[k]&&Q[k].done);setInterval(()=>{try{if(dialog||mcqOpen)return;for(const k in CART){if(!Q[k])continue;if(Q[k].done&&!visto[k]){visto[k]=true;say(CART[k][0],[CART[k][1]],null,'player');try{addDiary('Informação',CART[k][0]+': '+CART[k][1]);}catch(_){}return;}if(!Q[k].done)visto[k]=false;}}catch(_){}} ,700);}
+  /* banco do quiz de 1922: as perguntas do roteiro (as alternativas erradas são minhas) */
+  try{const B=[["De onde vinha a maioria dos imigrantes árabes de São Paulo?","Do Líbano e da Síria","Do Egito e do Marrocos","Da Turquia e da Grécia"],["Qual foi o primeiro trabalho de muitos sírios e libaneses em São Paulo?","Mascate, vendendo de porta em porta","Operário nas fábricas de tecidos","Colono nas fazendas de café"],
+     ["Qual rua de São Paulo virou o centro do comércio árabe?","A 25 de Março","A Rua Direita","A Avenida Paulista"],["Como eram os sobrados da 25 de Março?","Loja embaixo, casa em cima","Só moradia, sem comércio","Fábrica embaixo, escritório em cima"],
+     ["Que família de antigos mascates montou fábricas no Ipiranga?","Os Jafet","Os Matarazzo","Os Crespi"],["O que muitas famílias sírias e libanesas faziam quando enriqueciam?","Punham os filhos na faculdade e mudavam de bairro","Voltavam todas para o Líbano","Compravam fazendas de café"]];
+    for(const [q,c,e1,e2] of B){if(quiz4.some(x=>x.q===q))continue;quiz4.push({q,o:[c,e1,e2],a:0,e:c+'.'});}}catch(_){}
+  window.__brimos2=n;
+}catch(e){console.warn('brimos2',e);}})();
+
+/* tela inicial: enquanto o cartão de começo está aberto, o controle de setas não fica por cima dos botões */
+(function(){try{const st=document.createElement('style');st.textContent='body.pira-inicio .pad{visibility:hidden!important;pointer-events:none!important}';document.head.appendChild(st);
+  const t=()=>{try{const o=document.getElementById('ovStart');document.body.classList.toggle('pira-inicio',!!(o&&!o.hidden));}catch(_){}};t();setInterval(t,250);}catch(_){}})();
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
