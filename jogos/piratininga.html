@@ -12642,24 +12642,13 @@ setTimeout(function(){
   /* ---------- 5. quiz a cada 3 minutos de jogo em cada época ---------- */
   function banco(e){const B=[];const add=(q,o,a,ex)=>{if(q&&Array.isArray(o)&&o.length>=2)B.push({q,o,a,e:ex||''});};
     try{const arr=e===1?quiz:e===2?quiz2:e===3?quiz3:quiz4;for(const x of arr)add(x.q,x.o,x.a,x.e);}catch(_){}
-    /* perguntas das conversas e missões que o jogador já ouviu nesta época */
-    try{for(const m of ENT){if(m.ok&&m.era===e&&m.mc&&Q[m.k]&&Q[m.k].done)add(m.mc[0],m.mc[1],m.mc[2],m.mc[3]);}}catch(_){}
-    try{for(const c of (window.__cvOuvidas?window.__cvOuvidas(e):[]))add(c[0],c[1],c[2],c[3]);}catch(_){}
-    for(const b of B)b.era=e;return B;}
-  /* revisão espaçada: 3 perguntas da época atual + 2 de épocas já visitadas; errada volta logo, certa volta mais tarde */
-  const REV=(()=>{try{return JSON.parse(localStorage.getItem('pira_quizrev')||'{}');}catch(_){return {};}})();if(!REV.q)REV.q={};if(!REV.n)REV.n=0;
-  const revSalva=()=>{try{localStorage.setItem('pira_quizrev',JSON.stringify(REV));}catch(_){}};
-  function monta(e){REV.n++;const pega=(B,k)=>{const sc=b=>{const r=REV.q[b.q];if(!r)return 2+Math.random();if(r.w)return 5+Math.random();const d=REV.n-(r.n||0);return d<=2?-5+Math.random():Math.min(2,d/3)+Math.random();};
-      return B.map(b=>[sc(b),b]).sort((x,y)=>y[0]-x[0]).slice(0,k).map(x=>x[1]);};
-    const atual=banco(e);let ant=[];for(let k=1;k<e;k++)ant=ant.concat(banco(k));
-    let qs=ant.length>=2?pega(atual,3).concat(pega(ant,2)):pega(atual,5);if(qs.length<5)qs=qs.concat(pega(atual.filter(b=>!qs.includes(b)),5-qs.length));
-    return qs.length>=5?qs.sort(()=>Math.random()-.5):null;}
-  function quiz3min(e){const qs=monta(e);if(!qs)return false;let i=0,ac=0;
+    return B;}
+  function quiz3min(e){const B=banco(e);if(B.length<5)return false;const qs=B.slice().sort(()=>Math.random()-.5).slice(0,5);let i=0,ac=0;
     ovMapa.hidden=true;ovDiario.hidden=true;mcqOpen=true;ovQuiz.hidden=false;const box=$('quizBox');box.style.overflowY='auto';box.style.maxHeight='92%';
     const fecha=()=>{ovQuiz.hidden=true;mcqOpen=false;};
-    const tela=()=>{box.innerHTML='';const k=document.createElement('div');k.className='kicker';k.textContent='Quiz de '+ANO[e]+' · pergunta '+(i+1)+' de 5'+(qs[i].era&&qs[i].era!==e?' · revisão de '+ANO[qs[i].era]:'');const h=document.createElement('h2');h.textContent=qs[i].q;const list=document.createElement('div');list.className='opts';
+    const tela=()=>{box.innerHTML='';const k=document.createElement('div');k.className='kicker';k.textContent='Quiz de '+ANO[e]+' · pergunta '+(i+1)+' de 5';const h=document.createElement('h2');h.textContent=qs[i].q;const list=document.createElement('div');list.className='opts';
       const ord=qs[i].o.map((t,j)=>[t,j]).sort(()=>Math.random()-.5);
-      ord.forEach(([t,j])=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=t;b.onclick=()=>{const certo=j===qs[i].a;if(certo)ac++;try{REV.q[qs[i].q]={w:certo?0:1,n:REV.n};revSalva();}catch(_){}try{sfx(certo?'blip':'bump');}catch(_){}
+      ord.forEach(([t,j])=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=t;b.onclick=()=>{const certo=j===qs[i].a;if(certo)ac++;try{sfx(certo?'blip':'bump');}catch(_){}
           [...list.children].forEach((c,n)=>{c.disabled=true;if(ord[n][1]===qs[i].a)c.style.outline='3px solid #2e6a4a';});if(!certo)b.style.outline='3px solid #b0553a';
           const r=document.createElement('p');r.style.cssText='margin:10px 0 6px;font:600 clamp(16px,4.2vw,18px)/1.45 system-ui,sans-serif';r.textContent=(certo?'Isso mesmo! ':'Ainda não. ')+qs[i].e;
           const n=document.createElement('button');n.type='button';n.className='btn';n.textContent=i<4?'Próxima pergunta':'Ver o resultado';n.onclick=()=>{i++;if(i<5)tela();else fim();};box.append(r,n);n.focus();};list.appendChild(b);});
@@ -12667,7 +12656,7 @@ setTimeout(function(){
     const fim=()=>{box.innerHTML='';const k=document.createElement('div');k.className='kicker';k.textContent='Quiz de '+ANO[e];const h=document.createElement('h2');h.textContent='Você acertou '+ac+' de 5.';const p=document.createElement('p');p.style.cssText='font:400 clamp(16px,4.2vw,18px)/1.45 system-ui,sans-serif';p.textContent=ac>=4?'Muito bem! Continue explorando a cidade.':'Continue explorando: as pessoas e as placas da cidade têm as respostas.';
       const f=document.createElement('button');f.type='button';f.className='btn';f.textContent='Voltar ao jogo';f.onclick=fecha;box.append(k,h,p,f);f.focus();try{addDiary('Quiz','Quiz de '+ANO[e]+': '+ac+' de 5.');}catch(_){}};
     /* tela de entrada */
-    box.innerHTML='';const k=document.createElement('div');k.className='kicker';k.textContent='Quiz de '+ANO[e];const h=document.createElement('h2');h.textContent=e>1?'Hora do quiz! São 5 perguntas: 3 sobre São Paulo em '+ANO[e]+' e 2 de revisão das épocas que você já visitou.':'Hora do quiz! São 5 perguntas sobre São Paulo em '+ANO[e]+'.';
+    box.innerHTML='';const k=document.createElement('div');k.className='kicker';k.textContent='Quiz de '+ANO[e];const h=document.createElement('h2');h.textContent='Hora do quiz! São 5 perguntas sobre São Paulo em '+ANO[e]+'.';
     const a=document.createElement('button');a.type='button';a.className='btn';a.textContent='Começar';a.onclick=tela;const d=document.createElement('button');d.type='button';d.className='btn';d.style.marginLeft='8px';d.textContent='Agora não (volta em 1 minuto)';d.onclick=()=>{fecha();acc=120;};
     const row=document.createElement('div');row.style.marginTop='12px';row.append(a,d);box.append(k,h,row);a.focus();return true;}
   let acc=0,eraAnt=null;window.__quiz3=(e)=>quiz3min(e||era);window.__quiz3acc=(v)=>{if(v!=null)acc=v;return acc;};
@@ -13314,7 +13303,7 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   const poe=(o,st)=>{if(!st||!IM[st]||String(o.spr||'').indexOf('n22_')===0)return false;const k='n22_'+st+'~'+(o.spr||o.id||'');ORIG[k]=o.spr||o.id;o.spr=k;return true;};
   const esc=o=>{if(NPC[o.id])return NPC[o.id];if(!GER.test(String(o.id||'')))return null;return CROWD[o.spr+'|'+o.name]||CROWD[base(o.spr)+'|'+o.name]||UNI[o.name]||TIPO[o.spr]||TIPO[base(o.spr)]||null;};
   const aplica=()=>{let a=0,b=0;
-    for(const n of npcs){try{if(eraOf(n.scene||'pira')!==4)continue;if(poe(n,esc(n)||((n.piada||String(n.scene).indexOf('m_q')===0||/^(profNormal22|normalistaB22|br_.*|parteira22|paiParto22|paiCortico22|caixeiroArm22|operariaMarmita22)$/.test(n.id))?(UNI[n.name]||TIPO[n.spr]||TIPO[base(n.spr)]):null)))a++;}catch(_){}}
+    for(const n of npcs){try{if(eraOf(n.scene||'pira')!==4)continue;if(poe(n,esc(n)||((n.piada||String(n.scene).indexOf('m_q')===0||/^(profNormal22|normalistaB22|br_.*)$/.test(n.id))?(UNI[n.name]||TIPO[n.spr]||TIPO[base(n.spr)]):null)))a++;}catch(_){}}
     for(const w of walkers){try{if(eraOf(w.scene)!==4||!w.spr||VEI.test(w.spr))continue;if(poe(w,esc(w)||CROWD[base(w.spr)+'|'+w.name]||UNI[w.name]||TIPO[w.spr]||TIPO[base(w.spr)]))b++;}catch(_){}}
     return [a,b];};
   aplica();setTimeout(aplica,0);setTimeout(()=>{window.__n22.postos=aplica();},1500);
@@ -13420,101 +13409,6 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   let n=0;for(const e of M){if(Q[e.k]||!npcs.some(x=>x.id===e.giver)||e.st.some(s=>!npcs.some(x=>x.id===s.n)))continue;ENT.push(e);e.ok=true;Q[e.k]={era:4,title:e.title,where:e.where,steps:e.st.map(s=>s.d),step:null,count:0,done:false};(GIVER[e.giver]=GIVER[e.giver]||[]).push(e.k);QE4.push(e.k);setTimeout(()=>{QT[e.k]={giver:'n:'+e.giver,steps:e.st.map(s=>'n:'+s.n)};},0);n++;}
   window.__brimos=n;
 }catch(e){console.warn('brimos',e);}})();
-
-/* =========================================================
-   CIDADE VIVA v3 — PILOTO (lote 0 + lote 1: Brás e Bexiga, 1922)
-   Fichas 6, 1, 53 (1A) · 14, 13, 47 (1B) · 50, 73 (1C). Só o texto das fichas.
-   ========================================================= */
-(function(){try{
-  if(!SCN.sp22||typeof ENT==='undefined')return;
-  /* ---- lote 0.3: embaralhamento de verdade nas perguntas de missão ---- */
-  {const am=askMC;askMC=function(title,q,opts,a,expl,after){try{const o=opts.map((t,i)=>({t,i}));for(let k=o.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[o[k],o[j]]=[o[j],o[k]];}
-      return am.call(this,title,q,o.map(x=>x.t),o.findIndex(x=>x.i===a),expl,after);}catch(_){return am.apply(this,arguments);}};}
-  /* ---- lote 0.4: rotina por faixa do dia (manhã, tarde, noite) ---- */
-  const faixa=()=>{const h=((hourNow()%24)+24)%24;return h>=5&&h<12?'manha':h>=12&&h<18?'tarde':'noite';};
-  const livre=(sc,x,y)=>{try{return freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y)&&!ITEMS.some(i=>i.scene===sc&&i.x===x&&i.y===y);}catch(_){return false;}};
-  const acha=(sc,cx,cy,rr)=>{for(let r=0;r<=(rr||8);r++)for(let y=cy-r;y<=cy+r;y++)for(let x=cx-r;x<=cx+r;x++){if(Math.max(Math.abs(x-cx),Math.abs(y-cy))!==r)continue;
-      if(livre(sc,x,y)&&[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]].filter(([a,b])=>livre(sc,x+a,y+b)).length>=6)return [x,y];}return null;};
-  const ROTINA={};   // id -> {manha:[x,y]|null, tarde:..., noite:...}; null = não aparece
-  const emMissao=id=>{try{return ENT.some(e=>e.ok&&Q[e.k]&&!Q[e.k].done&&Q[e.k].step!==null&&(e.giver===id||e.st.some(s=>s.n===id)));}catch(_){return false;}};
-  const rotinaTick=(forca)=>{try{const f=faixa();for(const id in ROTINA){const n=npcs.find(n=>n.id===id);if(!n)continue;const R=ROTINA[id];let alvo=R[f];if(emMissao(id))alvo=R.encontro||R.manha||alvo;
-        const fora=n.scene==='__fora';const noLugar=alvo?(!fora&&n.x===alvo[0]&&n.y===alvo[1]):fora;if(noLugar)continue;
-        const visivel=!fora&&n.scene===cur&&Math.abs(n.x-player.x)<=13&&Math.abs(n.y-player.y)<=9;const chegaVisivel=alvo&&cur===R.cena&&Math.abs(alvo[0]-player.x)<=13&&Math.abs(alvo[1]-player.y)<=9;
-        if(!forca&&(visivel||chegaVisivel||dialog))continue;
-        if(!alvo){n.scene='__fora';}else if(!npcs.some(q=>q!==n&&q.scene===R.cena&&q.x===alvo[0]&&q.y===alvo[1])){n.scene=R.cena;n.x=alvo[0];n.y=alvo[1];if('px' in n){n.px=n.x*16;n.py=n.y*16;}}}}catch(_){}};
-  setInterval(()=>rotinaTick(false),2000);
-  {const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);return r;};}
-  /* ---- checagem logo depois da conversa (personagem sem missão) ---- */
-  const FEITAS=(()=>{try{return JSON.parse(localStorage.getItem('pira_cv_mc')||'{}');}catch(_){return {};}})();
-  const CHECA={};  // id -> [pergunta, [certa, errada, errada], 0, explicação]
-  window.__cvOuvidas=e=>e===4?Object.keys(CHECA).filter(id=>FEITAS[id]).map(id=>CHECA[id]):[];
-  {const tt=talkTo;talkTo=function(n){const mc=n&&CHECA[n.id];if(!mc||FEITAS[n.id]||emMissao(n.id))return tt.apply(this,arguments);
-      const r=tt.apply(this,arguments);try{if(dialog&&!dialog.__cv){const d=dialog,fim=d.onEnd;d.__cv=1;d.onEnd=function(){try{if(fim)fim.apply(this,arguments);}catch(_){}
-            setTimeout(()=>{try{if(dialog||mcqOpen||FEITAS[n.id])return;askMC(n.name,mc[0],mc[1],mc[2],mc[3],()=>{FEITAS[n.id]=1;try{localStorage.setItem('pira_cv_mc',JSON.stringify(FEITAS));}catch(_){}});}catch(_){}} ,60);};}}catch(_){}
-      return r;};}
-  /* ---- missão sem pergunta (fichas 13 e 50): termina direto ---- */
-  {const fm=finishMission;finishMission=function(k,title,q){if(q)return fm.apply(this,arguments);try{const qq=Q[k];qq.step=null;qq.done=true;updQuest();addDiary('Missão',arguments[6]);save();toast('Missão concluída: '+title);}catch(_){}};}
-
-  const INV='[Personagem inventado para o jogo.]';
-  const novo=(id,spr,cena,x,y,name,lines,diary)=>{if(npcs.some(n=>n.id===id))return npcs.find(n=>n.id===id);addNPCs([{id,spr,x,y,dir:'down',name,lines:lines.concat([INV]),diary}],cena);return npcs.find(n=>n.id===id);};
-  /* ================= 1A · moradia e água ================= */
-  /* ficha 6 — Dormir apertado (no quarto do cortiço novo) */
-  if(SCN.m_qcortico){const C='m_qcortico';const p=livre(C,2,5)?[2,5]:acha(C,2,5,3);
-    if(p)novo('paiCortico22','ferreiro',C,p[0],p[1],'Pai de família',["Somos seis neste quarto. O aluguel não dá para mais.","A bica e a latrina ficam no pátio, para todos os vizinhos."],'Cortiço: quartos alugados em volta de um pátio; uma família inteira em cada quarto.');
-    CHECA.paiCortico22=['Como morava uma família operária no cortiço?',['Em um quarto só, com bica e latrina divididas com os vizinhos.','Em uma casa com um quarto para cada filho.','Em um apartamento com água quente e elevador.'],0,'Cortiço: vários quartos alugados em volta de um pátio, uma família em cada um.'];
-    /* à noite, a família dormindo (vultos cobertos, sem rosto detalhado) */
-    const dorme=(x,y,cor,h)=>({id:'cvDorme'+x+'_'+y,scene:C,x,y,w:1,h:1,__noite:1,draw:function(c,X,Y){const hh=((hourNow()%24)+24)%24;if(!(hh>=20||hh<5))return;c.fillStyle='#141b1b';c.fillRect(X+3,Y+2,10,h);c.fillStyle=cor;c.fillRect(X+4,Y+7,8,h-6);c.fillStyle='#c89870';c.fillRect(X+5,Y+3,6,4);c.fillStyle='#3a2a20';c.fillRect(X+5,Y+3,6,2);}});
-    /* desenhados por cima da cama e da esteira que já estão no quarto, sem criar bloqueio novo */
-    const cama=objects.find(o=>o.scene===C&&o.x===1&&o.y===3),est=objects.find(o=>o.scene===C&&o.x===3&&o.y===3);
-    for(const [o,lista] of [[cama,[[2,8,'#8a6a9a'],[9,8,'#7a8a6a']]],[est,[[1,7,'#b0553a'],[8,7,'#5a8ab0'],[15,7,'#c8a040']]]]){if(!o)continue;const d0=o.draw;o.draw=function(c,X,Y){d0.call(this,c,X,Y);const hh=((hourNow()%24)+24)%24;if(!(hh>=20||hh<5))return;
-        for(const [dy,w,cor] of lista){c.fillStyle='#141b1b';c.fillRect(X+3,Y+2+dy,10,w);c.fillStyle=cor;c.fillRect(X+4,Y+5+dy,8,w-4);c.fillStyle='#c89870';c.fillRect(X+5,Y+3+dy,5,3);c.fillStyle='#3a2a20';c.fillRect(X+5,Y+3+dy,5,1);}};}}
-  /* ficha 1 — Banho de bacia */
-  const M=[];
-  if(npcs.some(n=>n.id==='mae22')&&npcs.some(n=>n.id==='aguadeira'))M.push({k:'banho22',era:4,giver:'mae22',title:'Banho de bacia',where:'Fale com a mãe operária, no Brás.',
-    start:["Hoje é dia de banho. Busca água na bica com a menina da lata?"],
-    st:[{n:'aguadeira',d:'Busque água na bica, com a menina da lata d\'água (Bexiga)',pages:["Cada lata pesa muito. Para encher a bacia são várias viagens."]},
-        {n:'mae22',d:'Volte à mãe operária',pages:["Esquento no fogão. Um usa a água depois do outro, os menores primeiro."]}],
-    mc:['Por que um banho dava tanto trabalho no cortiço?',['A água era carregada da bica e esquentada no fogão.','A água quente saía da torneira, mas custava caro.','Só era permitido tomar banho no rio.'],0,'No cortiço a bica era de todos. Água em casa mudava o dia inteiro de uma família.'],
-    diary:'Cortiço: a água vinha da bica do pátio; para o banho, era carregada e esquentada no fogão.'});
-  /* ficha 53 — operária almoçando perto da fábrica, só à tarde, sem missão */
-  {const cr=objects.find(o=>o.scene==='sp22'&&o.id==='crespi');if(cr){const p=acha('sp22',cr.x+cr.w-2,cr.y+cr.h+1,6);if(p){const n=novo('operariaMarmita22','cesteira#1','sp22',p[0],p[1],'Operária na hora do almoço',["(Ela come da marmita, sentada perto do portão da fábrica.)"],null);if(n){n.talked=true;ROTINA.operariaMarmita22={cena:'sp22',manha:null,tarde:p,noite:null};}}}}
-  /* ================= 1B · nascimento e vizinhança ================= */
-  /* ficha 14 — A parteira */
-  {const casa=acha('sp22',160,106,6),outro=acha('sp22',146,107,6);if(casa){novo('parteira22','dona','sp22',casa[0],casa[1],'Dona Rosália, parteira',["Já ajudei a nascer mais criança do que tem gente nesta rua.","Aprendi com minha mãe. Hoje há parteira de diploma: a Escola de Parteiras abriu em 1912.","Maternidade a cidade tem desde 1894. Mas aqui no Brás quase todo mundo ainda nasce em casa."],'Parto: em 1922 muita gente nascia em casa, com parteira; a Maternidade é de 1894 e a Escola de Parteiras, de 1912.');
-      CHECA.parteira22=['Como nasciam muitos bebês dos bairros operários em 1922?',['Em casa, com parteira, embora já existisse maternidade.','Sempre no hospital, com médico.','As parteiras tinham sido proibidas em 1912.'],0,'A mudança foi lenta: maternidade e escola de parteiras (1912) conviveram com o parto em casa.'];
-      ROTINA.parteira22={cena:'sp22',manha:casa,tarde:outro||casa,noite:casa,encontro:casa};}}
-  /* ficha 13 — Parto em casa */
-  {const p=acha('sp22',157,105,5);if(p&&npcs.some(n=>n.id==='parteira22')){novo('paiParto22','ferreiro','sp22',p[0],p[1],'Pai à porta do cortiço',["O bebê vai nascer! Chama a dona Rosália, a parteira, na rua de trás?"],'Nascimento: no começo do século XX, quase todos os partos eram em casa, com parteira.');
-      M.push({k:'parto22',era:4,giver:'paiParto22',title:'Parto em casa',where:'Fale com o pai à porta do cortiço, no Brás.',
-        start:["O bebê vai nascer! Chama a dona Rosália, a parteira, na rua de trás?"],
-        st:[{n:'parteira22',d:'Chame a parteira, dona Rosália',pages:["Já ajudei a nascer mais criança do que tem gente nesta rua."]},
-            {n:'paiParto22',d:'Volte ao pai, à porta do cortiço',pages:["(A porta do quarto está fechada. Lá de dentro vem um choro de bebê.)","É uma menina! Nasceu aqui mesmo, como eu e meus irmãos."]}],
-        mc:[null,[],0,''],diary:'Nascimento: no começo do século XX, quase todos os partos eram em casa, com parteira.'});}}
-  /* ficha 47 — Ajuda entre vizinhos (com os vizinhos que já moram perto da nonna) */
-  if(['nonna','sapateiroBix','costureiraBix'].every(id=>npcs.some(n=>n.id===id)))M.push({k:'vizinhos22',era:4,giver:'nonna',title:'Ajuda entre vizinhos',where:'Fale com a nonna, no Bexiga.',
-    start:["Uma família da rua está doente. Aqui ninguém fica sem comer: passa nos vizinhos!"],
-    st:[{n:'sapateiroBix',d:'Passe no sapateiro',pages:["(O sapateiro separa um pouco de comida para a família doente.)"]},
-        {n:'costureiraBix',d:'Passe na costureira',pages:["(A costureira embrulha um pouco de comida para a família doente.)"]},
-        {n:'nonna',d:'Leve tudo à nonna',pages:["(A nonna deixa a comida à porta fechada da família.)","Italiano, sírio, português... Nesta cidade, de cada três pessoas, uma veio de outro país."]}],
-    mc:['O que a rua da nonna mostra sobre a São Paulo de 1922?',['Era uma cidade de imigrantes: 35 de cada 100 moradores eram estrangeiros.','Quase todos os moradores tinham nascido na própria cidade.','Os imigrantes viviam só nas fazendas de café.'],0,'Em 1920, 35% dos paulistanos tinham nascido em outro país. Vizinhança nem sempre era paz, mas ajuda havia.'],
-    diary:'Imigração: em 1920, 35 de cada 100 moradores de São Paulo eram estrangeiros.'});
-  /* ================= 1C · armazém e fábrica ================= */
-  /* ficha 50 — Compra no armazém */
-  {const v=objects.find(o=>o.scene==='sp22'&&o.id==='n1022');const p=v?acha('sp22',v.x+1,v.y+(v.h||1)+0,5):acha('sp22',147,113,5);
-    if(p&&npcs.some(n=>n.id==='mae22')){novo('caixeiroArm22','caixeiro','sp22',p[0],p[1],'Caixeiro do armazém',["Feijão, farinha e banha. Aqui no Brás, fábrica, casa e venda ficam na mesma rua."],'Brás: bairro operário onde fábricas, moradias e pequeno comércio ficavam lado a lado.');
-      M.push({k:'compras22',era:4,giver:'mae22',title:'Compra no armazém',where:'Fale com a mãe operária, no Brás.',
-        start:["Busca a encomenda no armazém? Já está anotado na caderneta."],
-        st:[{n:'caixeiroArm22',d:'Busque a encomenda com o caixeiro do armazém',pages:["Feijão, farinha e banha. Aqui no Brás, fábrica, casa e venda ficam na mesma rua."]},
-            {n:'mae22',d:'Volte à mãe operária',pages:["(A mãe guarda a encomenda.)"]}],
-        mc:[null,[],0,''],diary:'Brás: bairro operário onde fábricas, moradias e pequeno comércio ficavam lado a lado.'});}}
-  let n=0;for(const e of M){if(Q[e.k])continue;if(!npcs.some(x=>x.id===e.giver)||e.st.some(s=>!npcs.some(x=>x.id===s.n)))continue;ENT.push(e);e.ok=true;Q[e.k]={era:4,title:e.title,where:e.where,steps:e.st.map(s=>s.d),step:null,count:0,done:false};(GIVER[e.giver]=GIVER[e.giver]||[]).push(e.k);QE4.push(e.k);setTimeout(()=>{QT[e.k]={giver:'n:'+e.giver,steps:e.st.map(s=>'n:'+s.n)};},0);n++;}
-  /* rotina de teste do lote 0: dois moradores do Brás, sem missão, dois pontos cada */
-  for(const [id,dx,dy] of [['telefonista22',-4,3],['padeiro22',5,-3]]){const q=npcs.find(x=>x.id===id&&x.scene==='sp22');if(!q||ENT.some(e=>e.giver===id||e.st.some(s=>s.n===id)))continue;const a=[q.x,q.y],b=acha('sp22',q.x+dx,q.y+dy,5);if(b)ROTINA[id]={cena:'sp22',manha:a,tarde:b,noite:a};}
-  setTimeout(()=>rotinaTick(true),200);
-  /* ficha 73 — aviso do apito, uma vez por faixa do dia, só na cidade de 1922 */
-  {let ult='';setInterval(()=>{try{if(!started||cur!=='sp22'||dialog||mcqOpen||isPaused())return;const k=(typeof gday==='number'?gday:0)+':'+faixa();if(k===ult)return;const primeiro=ult==='';ult=k;if(!primeiro)toast('O apito da fábrica tocou.');}catch(_){}} ,3000);}
-  window.__cv={ROTINA,CHECA,FEITAS,faixa,rotinaTick,missoes:n};
-}catch(e){console.warn('cidade viva',e);}})();
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
