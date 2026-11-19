@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=137"></script>
+<script src="arte/arte_comum.js?v=139"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=137"></script>
+<script src="arte/arte_1554.js?v=139"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=137"></script>
+<script src="arte/arte_1830.js?v=139"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=137"></script>
+<script src="arte/arte_1888.js?v=139"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=137"></script>
+<script src="arte/arte_1922.js?v=139"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -12246,6 +12246,65 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
     if(fadeA>0){c.fillStyle=`rgba(20,27,27,${fadeA})`;c.fillRect(0,0,VW,H);}
     c.restore();return true;};
 })();
+
+/* =========================================================
+   v139 · porcos no chiqueiro (1830 e 1888) e o cemitério certo em 1888
+   - os porcos não andam mais soltos pela rua: ficam num chiqueiro de pau a pique,
+     com lama, cocho e um telheiro; desenho novo do porco (malhado, de lado);
+   - em 1888 o cemitério do mapa é o da Consolação (aberto em 1858), não o dos Aflitos.
+   ========================================================= */
+(function(){try{
+  const K='#30222a',PAL={K,P:'#e8a09c',L:'#f8c8c0',D:'#c47676',S:'#463438',N:'#d68084',E:'#141b1b',H:'#463028',W:'#fff0ec'};
+  const CORPO=["...................KK...","..................KDDK..","......KKKKKKKKKKKKDDDK..","....KKLLLLLLLLLLLKDDDK..","...KLLLSSSLLLLLLLLKDK...","K.KPLSSSSSLLLLLLLLLKK...","KDKPPPSSSPPPPPPPPPPWEK..",".KKPPPPPPPPPPPPPPPPPPKKK","..KDPPPPPPPPPPPPPPPPKNNK","..KDPPPPPPPPPPPPPPPPKNKK","..KDDPPPPPPPPPPPPPPDKKK.","...KKDDDDDDDDDDDDDDDK...",".....KKKKKKKKKKKKKKK...."];
+  const PERNA=[["....KH..KH....KH..KH....","....KK..KK....KK..KK...."],["...KH....KH..KH....KH...","...KK....KK..KK....KK..."]];
+  const SP={};const porcoImg=(f,esq)=>{const k=f+'_'+esq;if(SP[k])return SP[k];const rows=CORPO.concat(PERNA[f]),cv=document.createElement('canvas');cv.width=24;cv.height=rows.length;const g=cv.getContext('2d');
+    rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(PAL[ch]){g.fillStyle=PAL[ch];g.fillRect(esq?23-x:x,y,1,1);}}));return SP[k]=cv;};
+  const rnd=n=>{const v=Math.sin(n*127.1+311.7)*43758.5453;return v-Math.floor(v);};
+  /* posição de um porco: anda até um ponto, para, fuça o chão, anda de novo */
+  const porcoEm=(seed,tm,W,H)=>{const D=3.2,n=Math.floor(tm/D+seed*7),f=(tm/D+seed*7)-n;
+    const pt=i=>[rnd(i*3+seed*91)*W,rnd(i*5+seed*53)*H];const a=pt(n),b=pt(n+1),m=Math.min(1,f/.55),e=m*m*(3-2*m);
+    return {x:a[0]+(b[0]-a[0])*e,y:a[1]+(b[1]-a[1])*e,anda:m<1,esq:b[0]<a[0],fuca:m>=1&&rnd(n*7+seed)<.6};};
+  function desenhaChiqueiro(c,X,Y){const w=this.w*16,h=this.h*16,tm=performance.now()/1000,sd=this.seed||1;
+    c.save();c.imageSmoothingEnabled=false;
+    /* chão de lama */
+    c.fillStyle='#6a4a2e';c.fillRect(X+2,Y+8,w-4,h-10);c.fillStyle='#7c5836';c.fillRect(X+4,Y+10,w-8,h-14);
+    c.fillStyle='#5a3c24';for(let i=0;i<14;i++)c.fillRect(X+6+rnd(i+sd)*(w-14),Y+12+rnd(i*9+sd)*(h-20),3,1);
+    c.fillStyle='#4e6a7a';c.fillRect(X+w*.55,Y+h-20,18,5);c.fillStyle='#6a8a96';c.fillRect(X+w*.55+2,Y+h-19,8,1);/* poça */
+    /* telheiro no fundo, à esquerda */
+    c.fillStyle=K;c.fillRect(X+3,Y-2,28,16);c.fillStyle='#a8552e';c.fillRect(X+4,Y-1,26,8);c.fillStyle='#c2683a';for(let i=0;i<26;i+=4)c.fillRect(X+4+i,Y-1,2,8);
+    c.fillStyle='#3a2a1e';c.fillRect(X+4,Y+7,26,6);c.fillStyle='#7a5230';c.fillRect(X+5,Y+7,2,6);c.fillRect(X+27,Y+7,2,6);
+    /* cerca do fundo */
+    const cerca=(y0,frente)=>{c.fillStyle=K;c.fillRect(X,y0+2,w,7);c.fillStyle='#8a5c34';c.fillRect(X+1,y0+3,w-2,2);c.fillRect(X+1,y0+6,w-2,2);c.fillStyle='#a8743e';c.fillRect(X+1,y0+3,w-2,1);
+      for(let x=0;x<=w-4;x+=12){c.fillStyle=K;c.fillRect(X+x,y0-2,5,frente?13:12);c.fillStyle='#7a5230';c.fillRect(X+x+1,y0-1,3,frente?11:10);c.fillStyle='#a8743e';c.fillRect(X+x+1,y0-1,1,frente?11:10);}};
+    cerca(Y+2,false);
+    /* laterais */
+    c.fillStyle=K;c.fillRect(X,Y+4,4,h-6);c.fillRect(X+w-4,Y+4,4,h-6);c.fillStyle='#7a5230';c.fillRect(X+1,Y+5,2,h-8);c.fillRect(X+w-3,Y+5,2,h-8);
+    /* porcos */
+    const ps=[0,1,2].slice(0,this.n||2).map(i=>{const q=porcoEm(sd*3+i,tm,w-38,h-30);q.i=i;return q;}).sort((a,b)=>a.y-b.y);
+    for(const q of ps){const f=q.anda?Math.floor(tm*6+q.i)%2:0,im=porcoImg(f,q.esq),px=Math.round(X+6+q.x),py=Math.round(Y+10+q.y+(q.fuca&&Math.floor(tm*3+q.i)%2?1:0));
+      c.fillStyle='rgba(20,27,27,.3)';c.fillRect(px+3,py+14,18,2);c.drawImage(im,px,py);}
+    /* cocho na frente, à direita */
+    c.fillStyle=K;c.fillRect(X+w-30,Y+h-14,24,8);c.fillStyle='#8a5c34';c.fillRect(X+w-29,Y+h-13,22,6);c.fillStyle='#c8a868';c.fillRect(X+w-28,Y+h-13,20,2);
+    /* cerca da frente */
+    cerca(Y+h-9,true);
+    c.restore();}
+  const TXT=["Um chiqueiro de madeira, com lama, um cocho e um telheiro para a chuva. Óinc, óinc!","Quase toda casa e chácara cria porcos no quintal. Eles comem os restos de comida.","Do porco se aproveita tudo: carne, linguiça, toucinho e a banha, que é a gordura usada para cozinhar."];
+  const poe=(sc,cx,cy,id,txt,n,seed)=>{if(!SCN[sc])return;const p=findFreeRect(sc,cx,cy,5,3,14);if(!p)return;
+    objects.push({id,scene:sc,x:p[0],y:p[1],w:5,h:3,n,seed,draw:desenhaChiqueiro,name:'Chiqueiro',text:txt});
+    for(let i=walkers.length-1;i>=0;i--)if(walkers[i].spr==='porco'&&walkers[i].scene===sc)walkers.splice(i,1);
+    (window.__chiq=window.__chiq||[]).push([sc,p[0],p[1]]);};
+  poe('sp',73,49,'chiqueiro30',TXT,2,3);
+  poe('sp88',103,82,'chiqueiro88',[TXT[0],"Ainda há porcos e galinhas nos quintais, mesmo com a cidade crescendo.",TXT[2]],2,5);
+  /* os porcos que andavam soltos nos quintais e terrenos também vão para chiqueiros pequenos */
+  const LEI="A Câmara proíbe porco solto na rua: quem deixar o porco escapar do chiqueiro leva multa!";
+  let nq=0;for(let i=animals.length-1;i>=0;i--){const a=animals[i];if(a.name!=='Porco'||(a.scene!=='sp'&&a.scene!=='sp88'))continue;
+    animals.splice(i,1);const p=findFreeRect(a.scene,a.x,a.y,4,3,8);if(!p)continue;
+    objects.push({id:'chiqueiroQ'+(nq++),scene:a.scene,x:p[0],y:p[1],w:4,h:3,n:1,seed:7+i,draw:desenhaChiqueiro,name:'Chiqueiro',
+      text:[a.scene==='sp'?"Um chiqueiro no fundo do quintal, com um porco fuçando a lama.":"Um chiqueiro num quintal. Mesmo com a cidade crescendo, muita gente ainda cria porco em casa.",LEI]});
+    window.__chiq.push([a.scene,p[0],p[1]]);}
+  /* 1888: o cemitério desenhado no mapa é o da Consolação */
+  const x0=TILE_INFO.X;TILE_INFO.X=(x,y)=>cur==='sp88'?{name:'Cemitério da Consolação',text:["Túmulos e cruzes do Cemitério da Consolação, aberto em 1858.","Antes, os mortos eram enterrados dentro das igrejas, e os pobres e escravizados no Cemitério dos Aflitos, que foi fechado.","Os médicos diziam que enterrar dentro das igrejas espalhava doenças. Por isso o cemitério novo ficou longe do centro."]}:x0(x,y);
+}catch(e){console.warn('v139 chiqueiro',e);}})();
 
 /* =========================================================
    IPIRANGA 1922 — setor monumental (Museu, jardim, Monumento, riacho),
