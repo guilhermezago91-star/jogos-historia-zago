@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=126"></script>
+<script src="arte/arte_comum.js?v=127"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=126"></script>
+<script src="arte/arte_1554.js?v=127"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=126"></script>
+<script src="arte/arte_1830.js?v=127"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=126"></script>
+<script src="arte/arte_1888.js?v=127"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=126"></script>
+<script src="arte/arte_1922.js?v=127"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -15726,6 +15726,58 @@ setTimeout(function(){try{const S='sp';const M=SCN[S].map,H=M.length,W=M[0].leng
   const w=walkers.find(w=>w.id==='tropaCarmo30');if(w&&modelo){w.mules=[];for(let i=0;i<10;i++)w.mules.push(Object.assign({},modelo.mules[0],{hidden:true,x:w.x,y:w.y,fx:w.x,fy:w.y,px:w.x*T,py:w.y*T,dir:'right'}));}
   window.__tropaCarmo=w?w.mules.length:0;
 }catch(e){console.warn('tropa carmo',e);}},3900);
+
+/* v127: interiores das igrejas de 1830 que não tinham porta, e o rancho dos tropeiros com cangalhas, bruacas e arreios.
+   Nada de luz elétrica: castiçais, velas e candeias. */
+setTimeout(function(){try{const K=window.__kit;if(!K||!K.sala)return;const D=K.D;const S='sp';
+  const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};const KK='#1c1418';
+  const box=(c,x,y,w,h,a,b)=>{R(c,x,y,w,h,KK);R(c,x+1,y+1,w-2,h-2,a);if(b)R(c,x+1,y+1,w-2,2,b);};
+  const sh=(c,X,Y,w)=>{c.fillStyle='rgba(20,27,27,.22)';c.fillRect(X+2,Y+13,w-4,3);};
+  const chama=(c,x,y)=>{const f=Math.floor(performance.now()/160+x)%2;R(c,x,y-2-f,2,2+f,'#f1c471');R(c,x,y-1,2,1,'#e8822a');};
+  Object.assign(D,{
+    castical:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);R(c,X+7,Y-2,2,14,'#c8a040');R(c,X+5,Y+11,6,2,'#c8a040');R(c,X+7,Y-6,2,4,'#f4efe4');chama(c,X+7,Y-6);}},
+    velas:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+1,Y+6,14,8,'#6a4424');for(let i=0;i<4;i++){R(c,X+3+i*3,Y+1+(i%2)*2,2,5-(i%2)*2,'#f4efe4');chama(c,X+3+i*3,Y+1+(i%2)*2);}}},
+    andor:{w:2,h:1,d(c,X,Y){sh(c,X,Y,32);R(c,X+1,Y+8,30,3,'#6a4424');R(c,X+2,Y+11,2,4,KK);R(c,X+28,Y+11,2,4,KK);box(c,X+8,Y-6,16,14,'#c8a040','#e8c060');R(c,X+13,Y-4,6,4,'#e0b890');R(c,X+12,Y,8,7,'#3a4a8a');R(c,X+4,Y+5,4,3,'#e86a9a');R(c,X+24,Y+5,4,3,'#f4efe4');}},
+    exvotos:{w:2,h:1,wall:1,d(c,X,Y){box(c,X+1,Y-12,30,20,'#7a5030');const cs=['#e0b890','#f4efe4','#c8a040'];for(let i=0;i<6;i++)R(c,X+3+i*4.5,Y-9+(i%2)*7,3,5,cs[i%3]);}},
+    cangalha:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);R(c,X+2,Y+2,12,3,'#8a5a30');R(c,X+3,Y,2,12,'#6a4424');R(c,X+11,Y,2,12,'#6a4424');R(c,X+2,Y+9,12,2,'#7a4a24');R(c,X+6,Y+5,4,4,'#c8a060');}},
+    bruacas:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+1,Y+2,7,12,'#7a4a24','#9a6a3a');box(c,X+8,Y+2,7,12,'#6a3e1e','#8a5a30');R(c,X+3,Y+6,3,1,'#c8a060');R(c,X+10,Y+6,3,1,'#c8a060');R(c,X+4,Y,8,2,'#5a3a1a');}},
+    arreios:{w:1,h:1,wall:1,d(c,X,Y){R(c,X+3,Y-12,10,2,'#6a4424');R(c,X+4,Y-10,2,10,'#5a3a1a');R(c,X+10,Y-10,2,8,'#5a3a1a');R(c,X+5,Y-2,6,2,'#c8c8c0');R(c,X+7,Y-8,3,3,'#c8a040');}},
+    fardos:{w:2,h:1,d(c,X,Y){sh(c,X,Y,32);for(let i=0;i<3;i++){box(c,X+1+i*10,Y+4,10,10,'#c8a060','#d8b070');R(c,X+3+i*10,Y+8,6,1,'#8a6a40');}box(c,X+6,Y-3,10,8,'#b89050','#c8a060');}},
+    fogaoChao:{w:1,h:1,d(c,X,Y){for(const [a,b] of [[2,10],[10,10],[6,6]]){R(c,X+a,Y+b,4,4,'#6a6a62');}R(c,X+4,Y+9,8,3,'#3a2a1a');chama(c,X+6,Y+9);chama(c,X+9,Y+9);R(c,X+4,Y+2,8,6,'#2a2a2a');R(c,X+5,Y+3,6,1,'#5a5a5a');}}
+  });
+  const IGR={carmo:['Convento do Carmo','Nossa Senhora do Carmo','#e0d4b8',[['freiCarmo30','padreBan88',6,5,'Frei carmelita',['Os carmelitas estão em São Paulo desde 1594. O convento fica na beira da colina, na Esplanada do Carmo.','Daqui de cima se vê a várzea e a Ladeira do Carmo, sempre cheia de tropas.'],'O Convento do Carmo foi fundado em São Paulo no século XVI, na borda leste da colina.']]],
+    stifigenia:['Igreja de Santa Ifigênia','Santa Ifigênia','#e8dcc0',[['devotaSI30','irma88|2',6,5,'Devota',['Santa Ifigênia é uma santa africana. Muitas pessoas negras, escravizadas e libertas, são devotas dela.'],'A devoção a Santa Ifigênia era forte entre a população negra, como a de Nossa Senhora do Rosário e de São Benedito.']]],
+    luz:['Mosteiro da Luz','Nossa Senhora da Luz','#e8e0cc',[['freiraLuz30','freira',6,5,'Irmã do Recolhimento da Luz',['Frei Galvão ajudou a construir este mosteiro, de taipa de pilão. Aqui vivem as irmãs recolhidas.'],'O Mosteiro da Luz foi construído no fim do século XVIII com a participação de Frei Galvão.']]],
+    bras:['Igreja do Bom Jesus do Brás','Bom Jesus','#e0d8c0',[['sacrBras30','n88_hospedaria|2',6,5,'Sacristão do Brás',['O Brás ainda é quase só chácaras. Quem passa pela estrada da Penha para aqui para rezar.'],'']]],
+    santoantonio:['Igreja de Santo Antônio','Santo Antônio','#e8dcc0',[['mocaSA30','n88_casa|3',6,5,'Moça rezando',['Santo Antônio é o santo casamenteiro. Não conte para ninguém que eu vim pedir!'],'Santo Antônio é popularmente conhecido como santo casamenteiro.']]],
+    misericordia:['Igreja da Misericórdia','Nossa Senhora da Misericórdia','#e0d4c0',[['irmaoMis30','quintino|2',6,5,'Irmão da Misericórdia',['A Irmandade da Misericórdia cuida dos doentes pobres na Santa Casa e enterra os mortos que não têm família.'],'As Santas Casas de Misericórdia eram mantidas por irmandades e cuidavam de doentes pobres.']]],
+    saogoncalo:['Igreja de São Gonçalo','São Gonçalo','#e8dcc0',[['devotaSG30','beneditaRes|2',6,5,'Devota',['A igreja fica no Largo de São Gonçalo, bem em frente à Casa de Câmara e Cadeia. Daqui se ouve tudo.'],'']]],
+    boamorte:['Igreja da Boa Morte','Nossa Senhora da Boa Morte','#e0d4c0',[['sacrBM30','n88_loja|3',6,5,'Sacristão',['Quando um condenado vai para a forca, o cortejo passa por aqui. O sino da Boa Morte toca.'],'O cortejo dos condenados à forca passava pela Igreja da Boa Morte a caminho do Largo da Forca.']]],
+    aflitos:['Capela dos Aflitos','Nossa Senhora dos Aflitos','#dcd0b8',[['devotaAfl30','irma88|3',6,5,'Devota dos Aflitos',['A capela fica junto do cemitério dos enforcados e dos pobres. Acendo vela para o Chaguinhas.'],'A Capela dos Aflitos ficava junto ao cemitério dos Aflitos, onde eram enterrados enforcados, indigentes e escravizados.']]],
+    remedios:['Igreja dos Remédios','Nossa Senhora dos Remédios','#e0d4c0',[['devotaRem30','pop_21',6,5,'Senhora a caminho da missa',['A missa das sete é a mais cheia. Depois todo mundo conversa no largo.'],'']]],
+    capelaMooca:['Capela da Mooca','Senhor Bom Jesus','#d8ccb0',[['chacMooca30','pop_19|1',6,5,'Chacareiro da Mooca',['A capela é pequena, mas é nossa. Aos domingos vem gente de todas as chácaras.'],'']]]};
+  const rel=window.__igrejas30={};
+  for(const id in IGR){const o=objects.find(o=>o.id===id&&o.scene===S);if(!o){rel[id]='não achei';continue;}const [lab,santo,par,gente]=IGR[id];const key='i_ig30_'+id;
+    if(!SCN[key])K.sala(key,{W:18,H:12,sx:8,label:lab,parede:par,piso:()=> 'ladrilho',
+      obj:[['altar',7,3,'Altar','O altar, com toalha branca de renda e castiçais.'],['bancoIgreja',3,6,'Bancos'],['bancoIgreja',10,6],['bancoIgreja',3,8],['bancoIgreja',10,8],
+        ['santo',3,2,santo,'Imagem de '+santo+', de madeira pintada.'],['cruz',13,2,'Crucifixo'],['castical',5,3,'Castiçal'],['castical',12,3],['velas',14,5,'Velas acesas','Velas de sebo e de cera, acesas pelos devotos.'],['exvotos',1,2,'Ex-votos','Pequenas pinturas e figuras de cera em agradecimento por uma graça alcançada.'],['andor',1,9,'Andor','O andor que sai na procissão, carregado nos ombros pelos irmãos.'],['pia',15,9,'Pia de água benta']],
+      gente:gente.map(g=>{const [gid,k,x,y,nm,ln,dia]=g;const [kk,v]=k.split('|');return [gid,'h22_n|'+kk+'|'+(v||0),x,y,nm,ln,dia];})});
+    const R0=SCN[key];if(!R0){rel[id]='sem sala';continue;}R0.parent=S;
+    let d=null;for(const dx of [Math.floor(o.w/2),Math.floor(o.w/2)-1,Math.floor(o.w/2)+1,0,o.w-1]){if(dx<0||dx>=o.w)continue;try{if(walkable(o.x+dx,o.y+o.h)||freeAt(S,o.x+dx,o.y+o.h)){d=dx;break;}}catch(_){}}
+    if(d==null){rel[id]='sem calçada';continue;}o.door=d;o.enter='kit';o.room=key;o.__rotulo=lab;rel[id]='porta '+d;}
+  /* rancho dos tropeiros */
+  const poe=(key,tipo,x,y,name,text)=>{const s=SCN[key];if(!s)return;const d=D[tipo];const M=s.map,H=M.length,W=M[0].length;let p=null;
+    for(let r=0;r<6&&!p;r++)for(let yy=Math.max(d.wall?2:3,y-r);yy<=Math.min(d.wall?2:H-2,y+r)&&!p;yy++)for(let xx=Math.max(1,x-r);xx<=Math.min(W-1-d.w,x+r)&&!p;xx++){let ok=true;
+      for(let i=0;i<d.w&&ok;i++){const X=xx+i,Y=yy;if(!d.wall&&M[Y][X]!=='.')ok=false;if(objects.some(o=>o.scene===key&&X>=o.x&&X<o.x+(o.w||1)&&Y>=o.y&&Y<o.y+(o.h||1)))ok=false;if(npcs.some(n=>n.scene===key&&n.x===X&&n.y===Y))ok=false;}
+      if(!d.wall&&yy>=H-3&&xx<=8&&xx+d.w>=6)ok=false;if(ok)p=[xx,yy];}
+    if(!p)return;const ob={id:key+'_'+tipo+'_'+x+'_127',scene:key,x:p[0],y:p[1],w:d.w,h:d.h,name,text:text?[].concat(text):null};ob.draw=function(c,X,Y){d.d(c,X,Y,ob);};objects.push(ob);};
+  const RK='i_hospedaria';if(SCN[RK]&&!SCN[RK].__r127){SCN[RK].__r127=1;
+    poe(RK,'cangalha',2,4,'Cangalhas','A cangalha é a armação de madeira que vai no lombo da mula. Nela se penduram as cargas.');poe(RK,'cangalha',3,4);
+    poe(RK,'bruacas',12,4,'Bruacas','Sacos de couro cru para levar açúcar, sal e toucinho. Uma em cada lado da mula, sempre com o mesmo peso.');poe(RK,'bruacas',13,5);
+    poe(RK,'arreios',6,2,'Arreios','Cabrestos, rédeas e o sino da mula madrinha, que vai na frente da tropa.');poe(RK,'arreios',9,2);
+    poe(RK,'fardos',10,7,'Fardos de carga','Fardos de algodão e sacos de sal, prontos para a viagem.');poe(RK,'fogaoChao',5,7,'Fogo de chão','Os tropeiros cozinham feijão com toucinho e farinha no fogo de chão. Daí vem o feijão tropeiro.');}
+  window.__igrejas30.rancho=SCN[RK]&&SCN[RK].__r127?'ok':'—';
+}catch(e){console.warn('igrejas 1830 interiores',e);}},3500);
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
