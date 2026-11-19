@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=119"></script>
+<script src="arte/arte_comum.js?v=120"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=119"></script>
+<script src="arte/arte_1554.js?v=120"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=119"></script>
+<script src="arte/arte_1830.js?v=120"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=119"></script>
+<script src="arte/arte_1888.js?v=120"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=119"></script>
+<script src="arte/arte_1922.js?v=120"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -14202,12 +14202,33 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
       const w=m[1]/2,h=m[2]/2,top=Y+this.h*16-h;c.fillStyle='rgba(20,14,8,.25)';c.fillRect(X+1,Y+this.h*16-1,w-2,2);c.drawImage(im,X,top,w,h);
       if(rot&&m[3]>=0){c.save();c.font=F;c.textAlign='center';c.textBaseline='middle';c.fillStyle='#f6f0d8';let t=rot;while(t.length>3&&c.measureText(t).width>w-6)t=t.slice(0,-1);c.fillText(t,X+w/2,top+m[3]/2+2.5);c.restore();}};
   /* volume provisório visto de cima: telhado, com a frente marcada no lado da rua */
-  const telhado=(cor,or,num)=>function(c,X,Y){const w=this.w*16,h=this.h*16;const esc={t:['#a8452c','#c0563a','#7a2e1c'],z:['#6b7078','#858a92','#4a4e55'],p:['#b9a67a','#d0c098','#8a7a52']}[cor];
-      c.fillStyle='#2a2420';c.fillRect(X,Y-4,w,h+4);c.fillStyle=esc[0];c.fillRect(X+1,Y-3,w-2,h+1);c.fillStyle=esc[1];for(let j=Y-2;j<Y+h-3;j+=3)c.fillRect(X+1,j,w-2,1);
-      c.fillStyle=esc[2];if(this.w>=this.h)c.fillRect(X+2,Y-3+Math.floor((h+1)/2),w-4,1);else c.fillRect(X+Math.floor(w/2),Y-2,1,h-1);
-      c.fillStyle='#e9e2d0';c.fillRect(X+1,Y+h-3,w-2,3);c.fillStyle='#2a2420';c.fillRect(X+1,Y+h-4,w-2,1);
-      c.fillStyle='#f1c471';if(or==='norte')c.fillRect(X+w/2-3,Y-4,6,2);else if(or==='leste')c.fillRect(X+w-2,Y+h/2-5,2,6);else if(or==='oeste')c.fillRect(X,Y+h/2-5,2,6);
-      if(num){c.save();c.font='700 6px "DejaVu Sans",sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#141b1b';c.fillRect(X+w/2-8,Y+h/2-7,16,8);c.fillStyle='#fff';c.fillText(num,X+w/2,Y+h/2-2.5);c.restore();}};
+  /* v120: telhados de verdade (duas águas com cumeeira, telhas capa-e-canal, zinco com emendas, terraço com platibanda), sem os números de lote. */
+  const telhado=(cor,or,num)=>function(c,X,Y){const w=this.w*16,h=this.h*16;let sd=(this.x*73856093^this.y*19349663)>>>0;const rr=()=>((sd=(sd*1103515245+12345)>>>0)>>>16)/65536;
+      const K='#2a2420';c.fillStyle=K;c.fillRect(X,Y-4,w,h+4);
+      if(cor==='p'){/* terraço com platibanda (prédio novo) */
+        c.fillStyle='#cdbb90';c.fillRect(X+1,Y-3,w-2,h);c.fillStyle='#b6a476';for(let j=Y-1;j<Y+h-4;j+=4)for(let i=X+2+((j>>2)%2)*3;i<X+w-2;i+=6)c.fillRect(i,j,4,1);
+        c.fillStyle='#e6d9b4';c.fillRect(X+1,Y-3,w-2,2);c.fillRect(X+1,Y-3,2,h);c.fillStyle='#9a8a5e';c.fillRect(X+w-3,Y-3,2,h);
+        if(rr()<.6){const bx=X+4+Math.floor(rr()*(w-18)),by=Y+1+Math.floor(rr()*Math.max(1,h-16));c.fillStyle=K;c.fillRect(bx-1,by-1,12,10);c.fillStyle='#8a8a82';c.fillRect(bx,by,10,8);c.fillStyle='#a8a8a0';c.fillRect(bx,by,10,2);}
+        if(rr()<.5){const bx=X+w-12,by=Y+h-14;c.fillStyle=K;c.fillRect(bx-1,by-1,7,7);c.fillStyle='#cfe4ee';c.fillRect(bx,by,5,5);c.fillStyle='#8ab0c8';c.fillRect(bx,by+3,5,2);}
+      }else if(cor==='z'){/* zinco: chapas com emendas, uma água */
+        c.fillStyle='#7c8189';c.fillRect(X+1,Y-3,w-2,h);for(let i=X+3;i<X+w-2;i+=5){c.fillStyle='#9aa0a8';c.fillRect(i,Y-3,1,h);c.fillStyle='#5a5e66';c.fillRect(i+1,Y-3,1,h);}
+        c.fillStyle='#a8adb4';c.fillRect(X+1,Y-3,w-2,2);c.fillStyle='rgba(0,0,0,.18)';c.fillRect(X+1,Y+h-8,w-2,4);
+        if(rr()<.35){const bx=X+5+Math.floor(rr()*(w-16)),by=Y+2;c.fillStyle=K;c.fillRect(bx-1,by-1,9,7);c.fillStyle='#cfe4ee';c.fillRect(bx,by,7,5);}
+      }else{/* telhas de barro, duas águas: luz de cima e da esquerda */
+        const hor=this.w>=this.h;const base=['#b4502f','#a8452c','#bc5a36'][Math.floor(rr()*3)];
+        const claro='#cf6a44',escuro='#8a3520',linha='#6e2a18';
+        if(hor){const m=Y-3+Math.floor(h/2);c.fillStyle=claro;c.fillRect(X+1,Y-3,w-2,m-(Y-3));c.fillStyle=base;c.fillRect(X+1,m,w-2,Y+h-3-m);
+          for(let j=Y-1;j<Y+h-4;j+=3){c.fillStyle=j<m?'#b8553a':linha;c.fillRect(X+1,j,w-2,1);for(let i=X+2+((j/3|0)%2)*2;i<X+w-2;i+=4){c.fillStyle=j<m?'#e07c52':escuro;c.fillRect(i,j-1,1,1);}}
+          c.fillStyle=K;c.fillRect(X+1,m-1,w-2,3);c.fillStyle='#d88a62';c.fillRect(X+1,m-1,w-2,1);
+          if(this.h>=3){c.fillStyle=escuro;c.fillRect(X+1,Y-3,2,h);c.fillStyle='#d2724a';c.fillRect(X+w-3,Y-3,2,h);}}
+        else{const m=X+Math.floor(w/2);c.fillStyle=claro;c.fillRect(X+1,Y-3,m-X-1,h);c.fillStyle=escuro;c.fillRect(m,Y-3,X+w-1-m,h);
+          for(let j=Y-1;j<Y+h-4;j+=3){c.fillStyle=linha;c.fillRect(X+1,j,w-2,1);for(let i=X+2+((j/3|0)%2)*2;i<X+w-2;i+=4){c.fillStyle=i<m?'#e07c52':'#6a2614';c.fillRect(i,j-1,1,1);}}
+          c.fillStyle=K;c.fillRect(m-1,Y-3,3,h);c.fillStyle='#d88a62';c.fillRect(m-1,Y-3,1,h);}
+        if(rr()<.45){const bx=X+4+Math.floor(rr()*(w-12)),by=Y-2+Math.floor(rr()*Math.max(1,h-12));c.fillStyle=K;c.fillRect(bx-1,by-4,7,10);c.fillStyle='#9a4a2e';c.fillRect(bx,by-3,5,8);c.fillStyle='#c86a44';c.fillRect(bx,by-3,5,2);c.fillStyle='#3a2a20';c.fillRect(bx+1,by-3,3,1);}
+        if(rr()<.25&&w>=48){const bx=X+w-16,by=Y+2;c.fillStyle=K;c.fillRect(bx-1,by-1,8,6);c.fillStyle='#cfe4ee';c.fillRect(bx,by,6,4);}
+      }
+      /* beiral e parede de baixo */
+      c.fillStyle='#e9e2d0';c.fillRect(X+1,Y+h-3,w-2,3);c.fillStyle=K;c.fillRect(X+1,Y+h-4,w-2,1);c.fillStyle='rgba(0,0,0,.25)';c.fillRect(X+1,Y+h-1,w-2,1);};
   const LOTES=[];
   const setor=(x,y)=>x>=132?'25 de Março / Porto Geral':x<40?(y<30?'Paissandu / São João':y<56?'República / Consolação':'República / Consolação (sul)'):x<68?(y<72?'Anhangabaú / Líbero Badaró':'Anhangabaú (sul)'):y<30?'São Bento / Florêncio':y<64?(x>=106?(y<42?'XV de Novembro':'Sé / Pátio do Colégio'):(y<42?'São Bento / XV':'Direita / Patriarca')):'João Mendes / Liberdade';
   /* 1) limpa as casinhas copiadas do mapa antigo e as igrejas antigas */
