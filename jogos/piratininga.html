@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=128"></script>
+<script src="arte/arte_comum.js?v=129"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=128"></script>
+<script src="arte/arte_1554.js?v=129"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=128"></script>
+<script src="arte/arte_1830.js?v=129"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=128"></script>
+<script src="arte/arte_1888.js?v=129"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=128"></script>
+<script src="arte/arte_1922.js?v=129"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -15848,6 +15848,60 @@ setTimeout(function(){try{const K=window.__kit;if(!K)return;const D=K.D;const S=
       R(ctx,X+13,Y-22,1,22,'#5a3a1a');const b=Math.sin(performance.now()/300)*1.5;R(ctx,X+14,Y-22,9,7+b,'#c0302a');R(ctx,X+17,Y-20,3,2,'#f4efe4');R(ctx,X+16,Y-19,1,1,'#f4efe4');R(ctx,X+20,Y-19,1,1,'#f4efe4');R(ctx,X+14,Y-15+b,9,1,'#f1c471');}}catch(_){}return r;};
   window.__v128={jardim:jl,canoas:nc,folia:fol};try{if(cur===S){buildStatic();buildOcc();}}catch(_){}
 }catch(e){console.warn('1830 v128',e);}},4200);
+
+/* v129: AS FESTAS de 1830. Festa do Divino no largo (império, mastro, mesa da distribuição, imperador menino) e
+   Congada na porta da Igreja do Rosário (rei, rainha, tambores e dançadores). As duas aparecem juntas no jogo
+   para o aluno conhecer, mesmo não sendo no mesmo mês: os textos avisam quando cada uma acontecia. */
+setTimeout(function(){try{const S='sp';const M=SCN[S].map,H=M.length,W=M[0].length;
+  const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};const KK='#1c1418';
+  const box=(c,x,y,w,h,a,b)=>{R(c,x,y,w,h,KK);R(c,x+1,y+1,w-2,h-2,a);if(b)R(c,x+1,y+1,w-2,2,b);};
+  const tt=()=>performance.now()/1000;
+  const caminho=new Set();for(const w of walkers){if(w.scene!==S||!w.path)continue;const P=w.path;for(let i=0;i+1<P.length;i++){const [x0,y0]=P[i],[x1,y1]=P[i+1];for(let x=Math.min(x0,x1);x<=Math.max(x0,x1);x++)for(let y=Math.min(y0,y1);y<=Math.max(y0,y1);y++)caminho.add(x+','+y);}}
+  const livre=(x,y)=>{try{return x>0&&y>0&&x<W-1&&y<H-1&&!SOLID.includes(M[y][x])&&!'BRSfD'.includes(M[y][x])&&!caminho.has(x+','+y)&&!objects.some(o=>(o.scene||'pira')===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)&&!ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);}catch(_){return false;}};
+  const livreG=(x,y)=>{try{return x>0&&y>0&&x<W-1&&y<H-1&&!SOLID.includes(M[y][x])&&!'BRSf'.includes(M[y][x])&&!objects.some(o=>(o.scene||'pira')===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&n.x===x&&n.y===y);}catch(_){return false;}};
+  const areaG=(ax,ay,w,h,maxr)=>{for(let r=0;r<(maxr||8);r++)for(let y=ay-r;y<=ay+r;y++)for(let x=ax-r;x<=ax+r;x++){if(Math.max(Math.abs(x-ax),Math.abs(y-ay))!==r)continue;let ok=true;for(let j=0;j<h&&ok;j++)for(let i=0;i<w&&ok;i++)if(!livreG(x+i,y+j))ok=false;if(ok)return [x,y];}return null;};
+  const perto1=(ax,ay,w)=>{for(let r=0;r<6;r++)for(let y=ay-r;y<=ay+r;y++)for(let x=ax-r;x<=ax+r;x++){let ok=true;for(let i=0;i<(w||1);i++)if(!livre(x+i,y))ok=false;if(ok)return [x,y];}return null;};
+  const area=(ax,ay,w,h,maxr)=>{for(let r=0;r<(maxr||14);r++)for(let y=ay-r;y<=ay+r;y++)for(let x=ax-r;x<=ax+r;x++){if(Math.max(Math.abs(x-ax),Math.abs(y-ay))!==r)continue;let ok=true;for(let j=0;j<h&&ok;j++)for(let i=0;i<w&&ok;i++)if(!livre(x+i,y+j))ok=false;if(ok)return [x,y];}return null;};
+  const AVISO_D='A Festa do Divino Espírito Santo acontecia no Pentecostes, em maio ou junho. No jogo ela aparece agora para você conhecer.';
+  const AVISO_C='A congada saía nas festas de Nossa Senhora do Rosário e de São Benedito, organizadas pela Irmandade do Rosário dos Homens Pretos. No jogo ela aparece agora para você conhecer.';
+  const ob=(id,x,y,w,h,name,text,draw)=>{const o={id,scene:S,x,y,w,h,name,text};o.draw=draw;objects.push(o);return o;};
+  const npc=(id,k,x,y,dir,name,lines,diary,extra)=>{addNPCs([Object.assign({id,spr:'h22_n|'+k,x,y,dir,name,lines,diary},extra||{})],S);return npcs.find(n=>n.id===id);};
+  const rel=window.__festas30={};const DANCA=[];
+  /* ---------- FESTA DO DIVINO ---------- */
+  const se=objects.find(o=>o.id==='se'&&o.scene===S);const p=se&&area(se.x+se.w+1,se.y+se.h+1,6,4,16);
+  if(p){const [x0,y0]=p;
+    ob('imperioDivino30',x0,y0,3,2,'Império do Divino',['O Império do Divino: um palanque enfeitado com toalhas vermelhas, flores e a coroa de prata do Divino.','O imperador da festa, às vezes um menino, senta aqui com a coroa e o cetro.',AVISO_D],function(c,X,Y){
+      box(c,X+1,Y+4,46,26,'#e8e0d0');R(c,X+2,Y+5,44,4,'#c0302a');for(let i=0;i<8;i++)R(c,X+3+i*5.5,Y+9,3,4,'#c0302a');R(c,X+4,Y+14,40,14,'#f4efe4');R(c,X+4,Y+26,40,2,'#c8a040');
+      R(c,X+22,Y-10,2,16,'#c8a040');R(c,X+18,Y-14,10,5,'#e8d070');R(c,X+19,Y-17,2,3,'#e8d070');R(c,X+22,Y-18,2,4,'#e8d070');R(c,X+25,Y-17,2,3,'#e8d070');
+      for(const [a,b,cl] of [[6,0,'#e86a9a'],[40,0,'#f1c471'],[10,-2,'#f4efe4'],[36,-2,'#e86a9a']]){R(c,X+a,Y+b,4,4,cl);}});
+    ob('mastroDivino30',x0+4,y0,1,1,'Mastro do Divino',['O mastro com a bandeira do Divino: fundo vermelho e a pomba branca. Ele é levantado no começo da festa, com fogos e foguetes.',AVISO_D],function(c,X,Y){
+      R(c,X+7,Y-44,2,58,'#8a5a30');const b=Math.sin(tt()*2)*2;R(c,X+9,Y-44,12,9+b,'#c0302a');R(c,X+13,Y-41,4,2,'#f4efe4');R(c,X+12,Y-40,1,1,'#f4efe4');R(c,X+17,Y-40,1,1,'#f4efe4');R(c,X+9,Y-35+b,12,1,'#f1c471');
+      for(let i=0;i<5;i++)R(c,X+3+i*2,Y-46+i*2,1,1,['#e86a9a','#f1c471','#7ab0e0'][i%3]);R(c,X+5,Y+12,6,2,'#5a3a1a');});
+    ob('mesaDivino30',x0,y0+3,3,1,'Mesa da distribuição',['Na Festa do Divino, os festeiros distribuem carne, pão e doces para todo mundo, ricos e pobres. É a "função do Divino".',AVISO_D],function(c,X,Y){
+      box(c,X+1,Y+2,46,12,'#e8e0d0','#f4efe4');for(let i=0;i<6;i++){R(c,X+4+i*7,Y+3,5,4,i%2?'#c8905a':'#e8c060');}R(c,X+3,Y+14,2,2,KK);R(c,X+43,Y+14,2,2,KK);});
+    const imp=npc('imperadorDivino30','criancasBx|3',x0+1,y0+2,'down','Imperador do Divino',['Hoje eu sou o imperador do Divino! Ganho a coroa, o cetro e todo mundo me cumprimenta.','Amanhã volto a ser menino comum e vou buscar água no chafariz.','[Personagem inventado para o jogo.]'],'Na Festa do Divino, um imperador (às vezes uma criança) era coroado e presidia a festa.',{__coroa:1});
+    npc('festeiroDivino30','baraoBan|2',x0+3,y0+2,'down','Festeiro do Divino',['Eu sou o festeiro deste ano: pago a festa, a comida e os fogos. É uma honra e uma despesa enorme!','A folia passou o ano pedindo esmolas pelas fazendas e pelas ruas para juntar tudo isto.','[Personagem inventado para o jogo.]'],'O festeiro, escolhido a cada ano, organizava e pagava boa parte da Festa do Divino.');
+    npc('doceiraDivino30','beneditaRes|1',x0+4,y0+3,'left','Doceira da festa',['Pé-de-moleque, cocada, bolo de fubá e arroz-doce. Na festa todo mundo come de graça!','[Personagem inventada para o jogo.]'],'');
+    npc('violeiroDivino30','tropeiroBan|2',x0+5,y0+1,'left','Violeiro da folia',['A folia canta versos para o Divino, com viola, caixa e pandeiro. Cada casa que recebe a bandeira ganha uma bênção.','[Personagem inventado para o jogo.]'],'As folias do Divino percorriam casas e fazendas com a bandeira, cantando e recolhendo esmolas para a festa.');
+    DANCA.push('violeiroDivino30');rel.divino='ok @'+x0+','+y0;}else rel.divino='sem espaço';
+  /* ---------- CONGADA ---------- */
+  const ros=objects.find(o=>o.id==='rosario'&&o.scene===S);const q=ros&&(areaG(ros.x-1,ros.y+ros.h,7,3,6)||area(ros.x-1,ros.y+ros.h+1,7,3,14));
+  if(q){const [x0,y0]=q;
+    {const tp=perto1(x0,y0)||[x0,y0];if(!livreG(tp[0],tp[1]))return;}
+    ob('tambores30',(perto1(x0,y0)||[x0,y0])[0],(perto1(x0,y0)||[x0,y0])[1],1,1,'Tambores da congada',['Tambores, caixas, chocalhos e reco-recos marcam o ritmo da congada.',AVISO_C],function(c,X,Y){
+      const b=Math.abs(Math.sin(tt()*6))*1.5;for(const [a,cl] of [[0,'#8a5a30'],[8,'#7a4a24']]){box(c,X+a,Y+4-b*(a?0:1),8,10,cl);R(c,X+a+1,Y+4-b*(a?0:1),6,2,'#e8e0d0');R(c,X+a+2,Y+8,4,1,'#c8a060');}});
+    const rei=npc('reiCongada30','quintino|3',x0+3,y0,'down','Rei Congo',['Sou o Rei Congo, eleito pela Irmandade do Rosário. Hoje a rua é nossa!','A congada lembra os reis do Congo, na África. Cantamos, dançamos e homenageamos Nossa Senhora do Rosário e São Benedito.','[Personagem inventado para o jogo.]'],'Nas irmandades de pessoas negras, eram eleitos um rei e uma rainha do Congo, que saíam em cortejo nas festas.',{__coroa:1});
+    npc('rainhaCongada30','festaR2|2',x0+4,y0,'down','Rainha Conga',['A Rainha Conga vai ao lado do rei, com manto e coroa. O povo da irmandade nos acompanha até a igreja.','[Personagem inventada para o jogo.]'],'A coroação de reis e rainhas negros nas festas do Rosário era uma forma de afirmar identidade e memória africana.',{__coroa:1});
+    const D=[['dancCongo1','festaR1',x0+1,y0+1,'right'],['dancCongo2','libertoGama|1',x0+1,y0+2,'right'],['dancCongo3','festaR1|2',x0+6,y0+1,'left'],['dancCongo4','barbeiroBan|1',x0+6,y0+2,'left'],['caixeiroCongo','bandaLuz|3',x0+1,y0,'down']];
+    for(const [id,k,x,y,dir] of D){npc(id+'30',k,x,y,dir,id==='caixeiroCongo'?'Tocador de caixa':'Dançador da congada',
+      id==='caixeiroCongo'?['Tum, tum, tum! A caixa chama o povo para a rua.','[Personagem inventado para o jogo.]']:['Na congada, dois grupos dançam e se enfrentam, como uma embaixada entre reinos. Ninguém se machuca: é dança!','[Personagem inventado para o jogo.]'],'A congada encenava cortejos e embaixadas de reis africanos, com dança, canto e tambores.');DANCA.push(id+'30');}
+    rel.congada='ok @'+x0+','+y0;}else rel.congada='sem espaço';
+  /* dança: os dançadores pulam e viram de um lado para o outro; coroas em cima do rei, da rainha e do imperador */
+  setInterval(()=>{if(cur!==S)return;const t2=tt();for(const id of DANCA){const n=npcs.find(n=>n.id===id);if(!n||n.talking)continue;n.__oy=-Math.round(Math.abs(Math.sin(t2*4+id.length))*2);if(Math.floor(t2*1.5+id.length)%4===0)n.__dir=n.dir==='left'?'down':n.dir;else n.__dir=null;n.__fr=Math.floor(t2*6)%4;}},90);
+  const lo=lifeOverlay;lifeOverlay=function(camX,camY){const r=lo.apply(this,arguments);try{if(cur===S){for(const n of npcs){if(n.scene!==S||!n.__coroa)continue;const X=n.x*16-camX+(n.__ox||0),Y=n.y*16-camY+(n.__oy||0);
+      R(ctx,X+4,Y-20,8,3,'#e8c040');R(ctx,X+4,Y-22,2,2,'#e8c040');R(ctx,X+7,Y-23,2,3,'#e8c040');R(ctx,X+10,Y-22,2,2,'#e8c040');R(ctx,X+7,Y-19,2,1,'#c0302a');}}}catch(_){}return r;};
+  try{if(cur===S)buildOcc();}catch(_){}
+}catch(e){console.warn('festas 1830',e);}},4500);
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
