@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=125"></script>
+<script src="arte/arte_comum.js?v=126"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=125"></script>
+<script src="arte/arte_1554.js?v=126"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=125"></script>
+<script src="arte/arte_1830.js?v=126"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=125"></script>
+<script src="arte/arte_1888.js?v=126"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=125"></script>
+<script src="arte/arte_1922.js?v=126"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -15672,6 +15672,60 @@ setTimeout(function(){try{const S='sp';const IA=__lazyArt('A22_');const G=window
         ctx.fillStyle='rgba(20,20,20,.12)';ctx.fillRect(x-3,y+44,6,1);}}}catch(_){}return r;};
   window.__fauna30={cav:L.filter(w=>w.id.startsWith('cav')).length,anim:L.length};
 }catch(e){console.warn('fauna 1830',e);}},3000);
+
+/* v126: rios de 1830 com curvas (Anhangabaú e Tamanduateí deixam de ser canais retos) e barranco da colina desenhado
+   como barranco de terra. As pontes ficam onde estavam; nada que já existe fica embaixo d'água. */
+(function(){try{const S='sp';const sc0=SCN[S];if(!sc0)return;const M=sc0.map,H=M.length,W=M[0].length;const rel=window.__rios30={};
+  const ocup=new Set();const k=(x,y)=>x+','+y;
+  const marca=()=>{ocup.clear();for(const o of objects)if((o.scene||'pira')===S)for(let y=o.y;y<o.y+(o.h||1);y++)for(let x=o.x;x<o.x+(o.w||1);x++)ocup.add(k(x,y));
+    for(const n of npcs)if(n.scene===S)ocup.add(k(n.x,n.y));for(const i of ITEMS)if(i.scene===S)ocup.add(k(i.x,i.y));
+    for(const a of animals)if(a.scene===S)ocup.add(k(a.x,a.y));
+    for(const w of walkers){if(w.scene!==S)continue;const P=w.path||[];for(let i=0;i+1<P.length;i++){const [x0,y0]=P[i],[x1,y1]=P[i+1];for(let x=Math.min(x0,x1);x<=Math.max(x0,x1);x++)for(let y=Math.min(y0,y1);y<=Math.max(y0,y1);y++)ocup.add(k(x,y));}
+      if(w.wander){const [a,b,c,d]=w.wander;for(let x=a;x<=c;x++)for(let y=b;y<=d;y++)ocup.add(k(x,y));}}};
+  /* acha a faixa do rio (B W..W B) de cada linha, perto da coluna dada */
+  const faixa=(y,cx)=>{const r=M[y];let a=cx,b=cx;if(r[cx]!=='W')return null;while(a>0&&r[a-1]==='W')a--;while(b<W-1&&r[b+1]==='W')b++;if(r[a-1]!=='B'||r[b+1]!=='B')return null;return [a-1,b+1];};
+  const curva=(nome,cx,A,lam,fase)=>{const f=[];for(let y=0;y<H;y++)f.push(faixa(y,cx));
+    /* linhas com ponte ou sem faixa normal ficam paradas, e as vizinhas vão chegando aos poucos */
+    const fixo=f.map(v=>!v);const alvo=[];for(let y=0;y<H;y++){let d=99;for(let j=0;j<H;j++)if(fixo[j])d=Math.min(d,Math.abs(j-y));const amp=Math.min(A,Math.max(0,d-1));alvo.push(fixo[y]?0:Math.round(amp*Math.sin(y/lam+fase)));}
+    for(let y=1;y<H;y++){if(alvo[y]-alvo[y-1]>1)alvo[y]=alvo[y-1]+1;if(alvo[y-1]-alvo[y]>1)alvo[y]=alvo[y-1]-1;}
+    let mov=0;const terra=(y,lado)=>{const r=M[y];const v=f[y];const c=lado<0?r[v[0]-1]:r[v[1]+1];return c==='V'||c==='.'||c===','?c:'.';};
+    for(let y=0;y<H;y++){const v=f[y];if(!v)continue;let d=alvo[y];
+      const pode=dd=>{if(!dd)return true;const a=v[0]+dd,b=v[1]+dd;for(let x=a;x<=b;x++){if(x<1||x>=W-1)return false;if(x>=v[0]&&x<=v[1])continue;if(ocup.has(k(x,y)))return false;if(!'.,VTb'.includes(M[y][x]))return false;}return true;};
+      while(d&&!pode(d))d+=d>0?-1:1;if(!d)continue;
+      const seg=M[y].slice(v[0],v[1]+1);const lado=d>0?-1:1;const t0=terra(y,d>0?1:-1);
+      for(let x=v[0];x<=v[1];x++)M[y][x]=t0;for(let i=0;i<seg.length;i++)M[y][v[0]+d+i]=seg[i];mov++;}
+    rel[nome]=mov;};
+  const roda=()=>{if(sc0.__curvas)return;sc0.__curvas=1;marca();curva('Anhangabaú',21,2,5.5,0.4);curva('Tamanduateí',68,3,4.2,1.7);
+    try{if(cur===S){buildStatic();buildOcc();}}catch(_){}};
+  setTimeout(roda,3700);
+  /* barranco: terra com camadas, capim na beirada de cima e sombra embaixo */
+  const bs=buildStatic;buildStatic=function(){const r=bs.apply(this,arguments);try{if(cur===S&&!SCN[cur].room){const c=sc;
+      for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(M[y][x]!=='C')continue;const X=x*16,Y=y*16;const h=((x*73856093)^(y*19349663))>>>0;
+        const vert=(M[y-1]&&M[y-1][x]==='C')||(M[y+1]&&M[y+1][x]==='C');
+        c.fillStyle='#8a5a32';c.fillRect(X,Y,16,16);c.fillStyle='#a8743e';
+        if(vert){c.fillRect(X+2,Y,6,16);c.fillStyle='#6e4426';c.fillRect(X+11,Y,5,16);for(let j=0;j<16;j+=4){c.fillStyle='#b88450';c.fillRect(X+3,Y+j+(h>>j&1),4,1);}c.fillStyle='#4f8a3a';c.fillRect(X,Y,2,16);c.fillStyle='#3c6e2c';for(let j=1;j<16;j+=5)c.fillRect(X+1,Y+j,2,2);}
+        else{c.fillRect(X,Y+2,16,6);c.fillStyle='#6e4426';c.fillRect(X,Y+11,16,5);for(let i=0;i<16;i+=4){c.fillStyle='#b88450';c.fillRect(X+i+(h>>i&1),Y+4,2,1);}c.fillStyle='#4f8a3a';c.fillRect(X,Y,16,2);c.fillStyle='#3c6e2c';for(let i=1;i<16;i+=5)c.fillRect(X+i,Y+1,2,2);}
+        if(h%5===0){c.fillStyle='#7a7a72';c.fillRect(X+5+(h%4),Y+6+(h%3),3,2);c.fillStyle='#9a9a90';c.fillRect(X+5+(h%4),Y+6+(h%3),2,1);}}}}catch(_){}return r;};
+}catch(e){console.warn('rios 1830',e);}})();
+
+/* v126b: como na pintura de Debret (São Paulo, 1827): tropa descendo a Ladeira do Carmo, ao lado do Convento do Carmo,
+   e um viajante de poncho montado numa mula. */
+setTimeout(function(){try{const S='sp';const M=SCN[S].map,H=M.length,W=M[0].length;
+  const rua=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&'DdRS'.includes(M[y][x]);
+  const perto=(x,y)=>{for(let r=0;r<8;r++)for(let yy=y-r;yy<=y+r;yy++)for(let xx=x-r;xx<=x+r;xx++)if(rua(xx,yy))return [xx,yy];return null;};
+  const bfs=(a,b)=>{const prev=new Int32Array(W*H).fill(-1),q=[a[0]+a[1]*W];prev[q[0]]=q[0];for(let h=0;h<q.length;h++){const c=q[h],x=c%W,y=(c/W)|0;if(x===b[0]&&y===b[1]){const P=[];for(let kk=c;;kk=prev[kk]){P.push([kk%W,(kk/W)|0]);if(kk===prev[kk])break;}return P.reverse();}
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(!rua(nx,ny))continue;const n=nx+ny*W;if(prev[n]<0){prev[n]=c;q.push(n);}}}return null;};
+  const quinas=P=>{const L=[P[0]];for(let i=1;i<P.length-1;i++){const a=P[i-1],b=P[i],c=P[i+1];if((b[0]-a[0])!==(c[0]-b[0])||(b[1]-a[1])!==(c[1]-b[1]))L.push(b);}L.push(P[P.length-1]);return L;};
+  const carmo=objects.find(o=>o.id==='carmo'&&o.scene===S);if(!carmo)return;
+  const a=perto(carmo.x+2,carmo.y+carmo.h+1),b=perto(92,43);if(!a||!b)return;const P=bfs(a,b);if(!P)return;const Q=quinas(P);
+  const modelo=walkers.find(w=>w.scene===S&&w.mules&&w.mules.length&&!w.mules[0].spr);
+  addWalkers(S,[{id:'tropaCarmo30',spr:'h22_n|tropeiroBan|1',name:'Tropeiro na Ladeira do Carmo',path:Q.concat(Q.slice(1,-1).reverse()),speed:.9,
+      lines:['Desço a Ladeira do Carmo com a tropa. Lá embaixo é a várzea e a ponte do Carmo; depois, o caminho para o Rio de Janeiro.','O pintor francês Debret desenhou esta ladeira em 1827, cheia de tropas como a minha.','[Personagem inventado para o jogo.]']},
+    {id:'mulaCarmo30',spr:'cav30|mula_hd|tropeiroBan',name:'Viajante montado numa mula',path:Q.slice().reverse().concat(Q.slice(1,-1)),speed:1.1,
+      lines:['Mula é mais firme que cavalo na serra e nas ladeiras. Por isso quase todo mundo viaja de mula.','[Personagem inventado para o jogo.]']}]);
+  const w=walkers.find(w=>w.id==='tropaCarmo30');if(w&&modelo){w.mules=[];for(let i=0;i<10;i++)w.mules.push(Object.assign({},modelo.mules[0],{hidden:true,x:w.x,y:w.y,fx:w.x,fy:w.y,px:w.x*T,py:w.y*T,dir:'right'}));}
+  window.__tropaCarmo=w?w.mules.length:0;
+}catch(e){console.warn('tropa carmo',e);}},3900);
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
