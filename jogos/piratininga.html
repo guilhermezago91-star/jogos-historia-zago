@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=120"></script>
+<script src="arte/arte_comum.js?v=121"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=120"></script>
+<script src="arte/arte_1554.js?v=121"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=120"></script>
+<script src="arte/arte_1830.js?v=121"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=120"></script>
+<script src="arte/arte_1888.js?v=121"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=120"></script>
+<script src="arte/arte_1922.js?v=121"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -14686,7 +14686,7 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   const limpa=()=>{let c=0;return 0;try{for(const n of npcs){if(eraOf(n.scene||'pira')!==4)continue;if(troca(n))c++;}for(const w of walkers){if(eraOf(w.scene||'pira')!==4||!w.spr)continue;if(troca(w))c++;}}catch(_){}return c;};
   /* 1830: os que ainda usavam boneco antigo ganham o boneco alto do mesmo ofício */
   const P30={quitandeira:['quitandeira','quit2','quit3'],cesteira:['lavadeira','quit2'],aguadeiro:['aguadeiro'],vereador:['vereador2'],irmao:['irmao'],tropeiro:['tropeiro'],estudante:['estudante'],mestre:['professor'],caixeiro:['caixeiro'],dona:['dona'],padre:['padre'],fazendeiro:['fazendeiro'],soldado:['sargento'],colono:['chacareiro'],lavadeira:['lavadeira'],ferreiro:['ferreiro'],tipografo:['tipografo'],funcionario:['funcionario'],crianca:['estEntrudo']};
-  const troca30=o=>{try{const s=String(o.spr||o.id||'');if(/^(n30_|z54_|rt_)/.test(s)||VEI.test(s))return false;const b=tipoDe(s);const L=P30[b]||['viajante30'];const k=L[hash(o.id||s)%L.length];
+  const troca30=o=>{try{const s=String(o.spr||o.id||'');if(/^(n30_|z54_|rt_|h22_|x22_)/.test(s)||VEI.test(s))return false;const b=tipoDe(s);const L=P30[b]||['viajante30'];const k=L[hash(o.id||s)%L.length];
       if(typeof A['N30_'+k]!=='string')return false;o.spr='n30_'+k;return true;}catch(_){return false;}};
   const limpa30=()=>{let c=0;try{for(const n of npcs){if(eraOf(n.scene||'pira')!==2)continue;if(troca30(n))c++;}}catch(_){}return c;};
   /* poses paradas: plateia nos cinemas, crianças na aula prática da Escola Normal, músicos da Semana */
@@ -15530,6 +15530,40 @@ setTimeout(function(){try{
   /* mensagem do código, como no combinado */
   try{const ok=$$('codOk'),inp=$$('codIn'),msg=$$('codMsg');if(ok&&inp&&msg){inp.maxLength=20;const tr=()=>{if(/existe/.test(msg.textContent))msg.textContent='Esse código não funcionou. Confira se copiou certinho.';};ok.addEventListener('click',()=>setTimeout(tr,0));inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')setTimeout(tr,0);});}}catch(_){}
 }catch(e){console.warn('recursos',e);}},0);
+
+/* =========================================================
+   v121: BONECOS HD DE 1830. As pessoas de 1830 trocam o boneco antigo (cabeçudo) por bonecos HD do pacote de 1888,
+   escolhidos só entre roupas que também existiam em 1830 (sem chapéu-coco, sem anquinha marcada, sem uniforme de bonde
+   ou de ferrovia). As cores variam um pouco de pessoa para pessoa; a cor da pele não muda.
+   ========================================================= */
+setTimeout(function(){try{const G=window.__grupoB;if(!G)return;
+  const N={estudante:'fotografo',quitandeira:'beneditaRes',aguadeiro:'colhedorRes',tropeiro:'tropeiroBan',lavadeira:'festaR2',jardineiro:'pop_19',
+    padre:'padreSe88',lente:'lente88',funcionario:'caixeiroFin',irmao:'quintino',caixeiro:'n88_loja',tipografo:'redator',dona:'n88_casa',atriz:'atorSJ',
+    vereador2:'conservador',medico:'pop_10',boticario:'n88_botica',ferreiro:'n88_ferreiro',padeiro:'pop_30',taverneiro:'n88_taverna',professor:'livreiroIn',
+    fazendeiro:'baraoBan',carteiro2:'caixeiroFin|1',sargento:'permanente',sapateiro:'n88_sapataria',alfaiate:'n88_alfaiataria',barbeiro:'barbeiroBan',
+    carpinteiro:'n88_carpintaria',acougueiro:'n88_acougue',oleiro:'n88_olaria',monge:'salesiano',hospedeiro:'n88_hospedaria',liberta:'beneditaRes|1',
+    chacareiro:'pop_19|2',naturalista:'livreiroIn|1',mSantana:'liberto',mO:'padreBan88',mPinheiros:'exesc',mSantoAmaro:'alemao',mIpiranga:'tropeiroBan|2',
+    mMooca:'n88_casa|2',mPenha:'pop_21',acendedor:'exesc|3',badaro:'comissarioN',reiCongo:'quintino|3',rainhaCongo:'festaR2|2',quit2:'irma88',quit3:'fugida',
+    estEntrudo:'orador',presidente:'banqueiro',preso:'exesc|4',mae:'n88_casa|1',liberta2:'irma88|1',ourives:'barbeiroBan|2',escrivao30:'caixeiroFin|2',
+    viajante30:'comissarioN|2',mina30:'beneditaRes|3',lavCarmo30:'irma88|2',carregMar30:'carregaArm1',devota30:'irma88|3',irmaoRos30:'quintino|1',
+    fiscal30:'liberal',quitPonte30:'fugida|1',sacristao30:'n88_hospedaria|1',terceiro30:'pastor',velhoPiques30:'libertoGama',piada15:'tropeiroBan|1',
+    piada16:'conservador|1',piada17:'exesc|1',piada18:'n88_loja|2',piada19:'orador|1',piada20:'lente88|1',piada21:'liberal|1',piada22:'tropeiroBan|3',
+    piada23:'fotografo|2',piada25:'n88_loja|1'};
+  const W={crianca:['molequeRes','criancasBx','pop_33','seg_crianca'],aguadeiro:['colhedorRes','exesc','liberto','carregaArm2','carregadorS'],
+    cesteira:['fugida','colona','beneditaRes','festaR2'],colono:['pop_32','liberto','exesc','fiscal'],tropeiro:['tropeiroBan'],caixeiro:['n88_loja','caixeiroFin','pop_01'],
+    estudante:['fotografo','orador','comissarioN'],padre:['padreSe88','pop_08','padreBan88'],mestre:['pop_19'],lavadeira:['festaR2','irma88','italiana2'],
+    vereador:['orador'],soldado:['permanente'],dona:['n88_casa'],irmao:['quintino'],quitandeira:['beneditaRes','fugida']};
+  const hs=s=>{let h=0;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))>>>0;return h;};
+  const era2=o=>{try{return eraOf(o.scene||'pira')===2;}catch(_){return false;}};
+  const rel=window.__hd1830={npcs:0,andando:0,sem:[]};
+  const roda=()=>{
+    for(const n of npcs){if(!era2(n)||String(n.spr||'').indexOf('h22_')===0)continue;const m=N[n.id];if(!m){rel.sem.push(n.id);continue;}
+      const [k,v]=m.split('|');n.__spr30=n.spr;n.spr='h22_n|'+k+'|'+(v||0);rel.npcs++;}
+    for(const w of walkers){if(!era2(w)||!w.spr||String(w.spr).indexOf('h22_')===0)continue;const L=W[w.spr];if(!L)continue;const h=hs(w.id||w.name);
+      w.__spr30=w.spr;w.spr='h22_n|'+L[h%L.length]+'|'+(h>>4)%4;rel.andando++;}};
+  roda();setTimeout(roda,4000);
+  window.__hd1830.N=N;window.__hd1830.W=W;
+}catch(e){console.warn('hd 1830',e);}},2500);
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
