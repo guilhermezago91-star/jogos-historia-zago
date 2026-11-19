@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=140"></script>
+<script src="arte/arte_comum.js?v=141"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=140"></script>
+<script src="arte/arte_1554.js?v=141"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=140"></script>
+<script src="arte/arte_1830.js?v=141"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=140"></script>
+<script src="arte/arte_1888.js?v=141"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=140"></script>
+<script src="arte/arte_1922.js?v=141"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -12371,6 +12371,16 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
   }catch(_){}},600);
   window.__fotos88={ty,ponte:[px,py],pT,pP};
 }catch(e){console.warn('rios 1888',e);}})();
+
+/* ===== v141 — ANTARCTICA 1888 COM FACHADA DA FOTO E TELHADO NATURAL (pedido do professor, 19/11/2026) ===== */
+(function(){try{
+  const im=new Image();im.src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABcCAYAAAC2jjEGAAAJpElEQVR4Xu2dTWhUVxTHbyXIIBJEioQgQUKRIFKClK6KiyIiXZTSRSlSxEURyUJcSCmlSOiiFOkiuAgiXYiIiy5EXBQR6UJcSBGRUKSIhDDIIEGGEEIYRLT8Z3JmzrtzP855My++F+8PgjMv55137j1zzj33I+MHJjFUpicPvD0wXgvqfNJomceLTz4YxoNHhqEkkQUO2iyG8ilIZEEUnvqoZurNNTOxe2f7l/T68rPhRR8YOAJhbHKgG3Ie4K95nw2aSgdyIAy5fmJ/8p/F8atPg33C++z4VfN2ECfmdiA5b+lp0zSbzbbBq63XZrSWVTmMa/+OjZuDLxqFPaO+b6KrH/DnEZp2GLPNmT6JRw+etfW1VpvmxC5jzOSB3E7MNQaS8xYWlts2kQO1oOPa6WWprr21FMB+l+2X69sMxkAXGANPTbxp/2p5udN/4GZrLFc6zR2BgKLtdW3ETO7bbRaXOpFIn2Bcu9WqZT7dXI6ianJqT/degsuV9droUsMYlnF6Nncc5GN6o70tnq1yFq7qCOSp8972mjn8qmWWGsuFpE6OJoW50jilSfpwDaovNFT8/vRNNwLtSvR2c8Sc278tE4Fky9WVD9VRmDsC8dDp1ppZ3ehlvLdTCq4Bfj10zXaYDd2bRw6pDrbSv770Zz9DKgd693YcBPoq0WarK8ef5WqbBJUDKfquLq2bwxvhj7Tx8FHHje2UaKVTuk5pkiIAssNKndAJvqy1vKmYFyaw2Z/+emjkaPjoEE6hFL1IoXyoOFF7qS5oeh8VBUib9InLGt75FIau8WpSey9hPwM6EVnS52JcJqfzdriu2dEes5nrQPok+GtfO/IgHgN59E2v9gwDoSrUl4K6DfNUcmXBZ1/Ibk0V2vr0E1P752GmuZqKVJVCQTv6rNBHFQpclSPS2i1rnsWrU1/a9emLVacoIEJQAUHE9EmGBQ70mfrLoA1IoZB7sNo0owuPu5Vs1xZFRSqKQF55UsrhVRgiMG9Vh5SD9DfoAgA57u9714Kd9/nh79q/P3Z4b/C5gywewJZju1/3rYMCmgeivXweaPeftCJVRaCvaqLreSo4mggPUp2iw2KOI0gOjjw1wSvHHrCFqlVCVwFv866Dcn22TtczYkQdyKOPQt8eyCc8E3FJpUeDPhU3vurUlqMUO3PnpdN5X5+9kmn7jbmTmfdwJJzIU2osndpp165se/0iq0Lrn35i9iw8dj53duqNmTXxJTZxFYpJu6/CXKHJ4AYuOTTWVcHBYeQ8Ss9SOZ/zKE1yXNfgREq9serZbpudYm2bCV8livQJ57meu/zxtFefTXAMtNc8fWAMtKuyoqtLVHqhtBmLQNu5tD45DDRVaAhUqLfvPQ+uzngdaBcuofTCpxHaNMSR3qsZ86Ro0qk/dXbgS2k2KGIobe/c0T9ndvVBqKARpdBYeqHxKSYXSrF0L3SF9BXhPCBJp1gAALHFCAnUXqTLWL+EcEagNHUSebeTgDbVfnvtuqR/cnPh5x+dW0QaO5FCQ9AUhk8jYvgm98Eq1K46UciAk+M7MoOsvZ1ESFKidk0UqW5+/odYe3MxM3PBzB/90Cxam9LaNdFz7JCCsw+wZlsbyWwnRfvKM7nvi0A+9kkm5+RUXkmC2L2ubZ1Lzzu7F1Xg9F73yQM+PsZ29ikCY31FuMZCbwT6JufkHAJbSu2VGEevhya/fKLskis7tILEsRcAfFtXrr6VLhTYZBzIF6xPeibnVxrr3d0IgAg8uJ51XzQdbNAv14vAu3+dMUe+uNiWxGtgv7ev+eRtHaSP7rff+55J+gGtkYJYe33rqfZ2kr9fOs8YXerfbnKOttht8G2b0FYSwKeGvwe+CXtsG4ZDzvN1NHUkdxhe++RJn32f770t77KHGLTyfjDaORek1Ud0I9CuPKUhDTkua68hcsNsQqmTO0OCLc8jeBjY+n3rwtr2YivJHn5Cff9V7UVm07cvAnHgBtUn/xnmNZTjPn0cnq4k2PJ2RA6KrR/9k7dfQn0g6XtO24F87LNTHcY4SfrDp4YmuqF0ENs5LwJypi+q6Tofa/E6lAUGSZ3SPrCfgUk/rp3Y9bJ7urs9jSjL8fidO8Kr+GVibV20iFUoONHdnQcenZp853/jsD6yvdAGD5Mdr18NU52aO/8ttn0X3Q/cTCSdsvyqFtyFGASs8uzZrjjPUAK6DoRHkUqLWqYaFljuKpLZufNFqh8YtJ//Mcy7T+SJgehLoWPjnUOyLxoNM3Xw44GUD4uVZueUF2wqmqq1P0VgxUkOrDjRKtR1GIjgZ1KkckAjqyWkG4TO0fjQ2FuUrA9RBLZ2T7R/Lv0x233tQioHNLJaSLfEZikae4uSdRGNQDC2b7/55uRxHIBovwYrzf6/qpXKaXTmgez480rn+EXIZilFtU2j14UoAgF1RgypnEZnHjR2SNHoLErWRuzARDkRpdDfZj7rWk+vT39/t69FUjmgkdXCdfNnuWyWorG3KFkXIgf+OH+/2xH02oVUDmhktXAb0Zkhm6Vo7C1K1kVKoRUnObDiJAdWHNEYuPKoU7DEigCpHNDIaiHdEpulaOwtSjZXEfPPwh1vG9dWel8VJZUDGlktId2A2yxFY29Rsj6iEShtsFQubydK0dghRaOzKFkfaQysOMmBFSeYQmNbM5vFjZtzm/WoDFVof9CBsYJgs3i++GSzHpWhCu1PKbTiBCPw4f3+Bet3AR002myq0P6gA8t2Kk2DPX7lOUpRhfZH54FVgxw3NZb9Owu6nseRZWZLjYFwEhxnOw/Q9bJUlsNCHIHSlCSVAxrZMqCxtyhZG5EDYcyuQ0f65kh2OpLKkfMkOqVQ9Nk8b66ZvRv//Q1FImS1qbSotmn0uoimUNcDADqff8qkcj7nuXSWhaLaptHrI+pAG/u8iQ+pHNDIlgGNvUXJEmIHds6FxpHKAY1sGdDYW5SsjdiB0nOOUjmgkS0DGnuLks3twEQ5EUdgopxsWQeeP3so0+P2+63ClnXgL3OPMj6y328VtqwD3xeSAytOcmDFSQ6sOJmvXMYX/dABIv41I74tGNditgvXwrFUJ+BfM4IvuvEtREu3ikL3u9oPNPYOW9ZuP/+iH9FuhHTlXioHNLJSitBJaHQXJesipdCKkxxYcZIDK05yYMVJDqw4yYEVJzmw4iQHVpzkwIqTHFhxkgMrTnJgxenbjahie2Yv/JTL7Nkffs1137uG70ZkHDh/8fe39XrdTExk/0s0UObr4+Njufq00XhR6nZxeP/PnDnX9ZtoO6nswBHvKymFVhCeQv8HjIPC9XU3rtoAAAAASUVORK5CYII=";
+  const o=objects.find(q=>q.id==='antarctica'&&q.scene==='sp88');if(!o)return;
+  const d0=o.draw;o.door=Math.floor((o.w||7)/2);
+  o.draw=function(c,X,Y){if(!(im.complete&&im.naturalWidth))return d0.call(this,c,X,Y);const w=(o.w||7)*16,h=(o.h||4)*16;
+    c.fillStyle='rgba(20,27,27,.25)';c.fillRect(X+4,Y+h-2,w-8,4);
+    c.drawImage(im,X+Math.round((w-im.width)/2),Y+h-im.height+2);};
+}catch(e){console.warn('antarctica 1888',e);}})();
 
 /* =========================================================
    IPIRANGA 1922 — setor monumental (Museu, jardim, Monumento, riacho),
