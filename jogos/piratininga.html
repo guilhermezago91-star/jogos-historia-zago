@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=117"></script>
+<script src="arte/arte_comum.js?v=118"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=117"></script>
+<script src="arte/arte_1554.js?v=118"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=117"></script>
+<script src="arte/arte_1830.js?v=118"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=117"></script>
+<script src="arte/arte_1888.js?v=118"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=117"></script>
+<script src="arte/arte_1922.js?v=118"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -15347,6 +15347,71 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   setTimeout(()=>{try{roda();}catch(e){console.warn('sobrados',e);}},3300);
   window.__sobrados={CIMA,LOJAS};
 }catch(e){console.warn('sobrados',e);}})();
+
+/* v118: igrejas que estavam no miolo da quadra (sem calçada até a porta) vão para a frente da rua.
+   Trocam de lugar com um prédio comum vizinho, do mesmo tamanho, que vai para o fundo do quarteirão. */
+(function(){try{const S='m_centro22',C=window.__centro22||{};
+  const IG={pc_3_ig_boa_morte:'m_ig_boamorte',pc_5_ig_santo_antonio:'m_ig_santoantonio',pc_7_ig_santa_ifigenia:'m_ig_santaifigenia',pc_8_ig_sao_francisco:'m_ig_saofrancisco'};
+  const MARCO=/igreja|capela|convento|teatro|theatro|cinema|banco|palácio|palacete|faculdade|catedral|mosteiro|mappin|martinico|correio|secretaria|câmara|prefeitura|hotel|pathé|jornal|redação|bolsa/i;
+  const rel=window.__igPortas={};
+  const porta=o=>{for(const dx of [Math.floor(o.w/2),Math.floor(o.w/2)-1,Math.floor(o.w/2)+1,0,o.w-1,1,o.w-2]){if(dx<0||dx>=o.w)continue;const X=o.x+dx,Y=o.y+o.h;try{if(freeAt(S,X,Y)&&C.naRede(X,Y))return dx;}catch(_){}}return null;};
+  const roda=()=>{if(!C.naRede)return;for(const id in IG){const g=objects.find(o=>o.id===id&&o.scene===S);if(!g)continue;
+      if(porta(g)!=null){g.door=porta(g);g.enter='kit';g.room=IG[id];rel[id]='já tinha calçada';continue;}
+      const cx=g.x+g.w/2,cy=g.y+g.h/2;
+      const cand=objects.filter(o=>o.scene===S&&o!==g&&/^p[ct]_/.test(o.id)&&(o.h||1)===g.h&&o.w>=g.w&&o.w<=g.w+2&&!MARCO.test(o.name||'')&&porta(o)!=null)
+        .map(o=>[o,Math.abs(o.x+o.w/2-cx)+Math.abs(o.y+o.h/2-cy)]).filter(a=>a[1]<=26).sort((a,b)=>a[1]-b[1]);
+      if(!cand.length){/* abre um adro: caminho até a rua passando só por fundos de quadra */
+        const M=SCN[S].map,W=M[0].length,H=M.length;const FIL=o=>/^pt_/.test(o.id)&&/fundos de quadra|frente para a rua ao lado/i.test(o.name||'');
+        const em=(x,y)=>objects.filter(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+        const passa=(x,y)=>{if(x<1||y<1||x>=W-1||y>=H-1)return false;if(!'p.DdS,'.includes(M[y][x]))return false;return em(x,y).every(FIL);};
+        const prev=new Map(),q=[];for(let dx=0;dx<g.w;dx++){const k=(g.x+dx)+','+(g.y+g.h);if(passa(g.x+dx,g.y+g.h)){prev.set(k,null);q.push([g.x+dx,g.y+g.h]);}}
+        let fim=null;for(let i=0;i<q.length&&!fim;i++){const [x,y]=q[i];for(const [a,b] of [[0,1],[1,0],[-1,0],[0,-1]]){const nx=x+a,ny=y+b,k=nx+','+ny;if(prev.has(k))continue;
+          if(C.naRede(nx,ny)&&em(nx,ny).length===0){prev.set(k,x+','+y);fim=k;break;}if(!passa(nx,ny))continue;prev.set(k,x+','+y);q.push([nx,ny]);}}
+        if(!fim){rel[id]='sem caminho';continue;}
+        const tira=new Set();let k=prev.get(fim),porta0=null;while(k){const [x,y]=k.split(',').map(Number);em(x,y).forEach(o=>tira.add(o));porta0=[x,y];k=prev.get(k);}
+        tira.forEach(o=>{o.scene='__fora';});const d=Math.min(g.w-1,Math.max(0,porta0[0]-g.x));
+        g.door=d;g.enter='kit';g.room=IG[id];g.__rotulo=g.name;rel[id]='adro aberto ('+tira.size+' fundos tirados)';continue;}
+      const f=cand[0][0];const gx=g.x,gy=g.y;
+      g.x=f.x+Math.floor((f.w-g.w)/2);g.y=f.y;f.x=gx;f.y=gy;
+      f.door=null;f.enter=null;f.room=null;f.__semPorta=1;
+      const d=porta(g);if(d!=null){g.door=d;g.enter='kit';g.room=IG[id];g.__rotulo=g.name;rel[id]='trocou com '+f.id+' ('+(f.name||'')+') → '+g.x+','+g.y;}else rel[id]='trocou mas sem porta';}
+    try{if(cur===S&&typeof buildOcc==='function')buildOcc();}catch(_){}};
+  setTimeout(()=>{try{roda();}catch(e){console.warn('igrejas portas',e);}},3500);
+}catch(e){console.warn('igrejas portas',e);}})();
+
+/* v118: dá para entrar no prédio novo da Bolsa Oficial de Café, em Santos (últimos acabamentos; inauguração em setembro de 1922) */
+(function(){try{const K=window.__kit;if(!K||!K.sala)return;const D=K.D;
+  const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};const KK='#1c1418';
+  const box=(c,x,y,w,h,a,b)=>{R(c,x,y,w,h,KK);R(c,x+1,y+1,w-2,h-2,a);if(b)R(c,x+1,y+1,w-2,2,b);};
+  const sh=(c,X,Y,w)=>{c.fillStyle='rgba(20,27,27,.22)';c.fillRect(X+2,Y+13,w-4,3);};
+  Object.assign(D,{
+    cotacoes:{w:3,h:1,wall:1,d(c,X,Y){box(c,X+1,Y-13,46,22,'#5e3c20');R(c,X+3,Y-11,42,18,'#1e2a24');c.fillStyle='#e8e0d0';c.font='5px monospace';c.textAlign='left';
+      c.fillText('SANTOS TIPO 4',X+5,Y-5);c.fillText('10 KG  ...  ?$???',X+5,Y+1);R(c,X+5,Y+3,30,1,'#8a8a82');}},
+    telegrafo:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+1,Y+3,14,11,'#6a4424','#8a5a30');R(c,X+4,Y,8,4,'#3a3a3a');R(c,X+5,Y-2,6,2,'#c8a040');const t=Math.floor(performance.now()/180)%2;R(c,X+10,Y-3+t,3,2,'#1a1a1a');R(c,X+3,Y+5,10,2,'#f4efe4');}},
+    andaime:{w:2,h:2,d(c,X,Y){for(const x of [2,28])R(c,X+x,Y-14,2,44,'#8a6a40');for(let i=0;i<4;i++)R(c,X+1,Y-12+i*11,30,2,'#a07a48');R(c,X+4,Y+8,10,3,'#c8c8c0');R(c,X+18,Y-2,6,5,'#e8e0d0');}},
+    vitral:{w:4,h:1,wall:1,d(c,X,Y){box(c,X+2,Y-14,60,20,'#3a2a1a');const cs=['#2a6aa0','#c8a040','#a03a2a','#3a8a4a','#e8d8a0'];for(let i=0;i<14;i++)for(let j=0;j<4;j++)R(c,X+4+i*4,Y-12+j*4,3,3,cs[(i*3+j*2)%5]);R(c,X+2,Y-14,30,20,'rgba(30,20,10,.35)');}}
+  });
+  const KEY='m_bolsa22';
+  const faz=()=>{const o=objects.find(o=>o.id==='bolsaCafe');if(!o||!SCN.m_santos22)return;
+    if(!SCN[KEY])K.sala(KEY,{W:20,H:12,sx:9,label:'Bolsa Oficial de Café: salão do pregão',parede:'#d8c8a0',piso:()=> 'ladrilho',
+      obj:[['vitral',8,2,'Vitral do teto (sendo montado)','O grande vitral foi desenhado por Benedito Calixto. Os vidraceiros montam peça por peça para a inauguração.'],
+        ['cotacoes',2,2,'Quadro das cotações','Aqui se escreve o preço do café, todos os dias. Ele vai pelo telégrafo para o interior, para o Rio e para o exterior.'],
+        ['cotacoes',15,2,'Quadro das cotações','Preços de Nova York e do Havre, que chegam pelo cabo submarino.'],
+        ['mesaLonga',6,5,'Mesa do pregão','No pregão, os corretores gritam as ofertas de compra e venda. Quem dá o melhor preço fecha o negócio.',{w:7}],
+        ['telegrafo',2,5,'Telégrafo','Tec-tec-tec: o preço do dia sai daqui para o mundo.'],['telegrafo',3,5],
+        ['telefone',13,2,'Telefone','Linha direta com os escritórios dos exportadores.'],
+        ['mesa',15,6,'Mesa de classificação','Os classificadores provam o café e dão a nota: tipo 4, tipo 7, bebida mole, bebida dura.',{w:3}],
+        ['saco',17,8,'Sacas de amostra','Amostras de café vindas das fazendas, para classificar.'],['saco',18,8],
+        ['andaime',1,8,'Andaime','Os pintores ainda estão terminando as paredes.'],['relogio',11,2],['banco',7,9,'Banco',null,{w:3}]],
+      gente:[['pregoeiro22','colono',9,6,'Funcionário da Bolsa',['O prédio só inaugura em setembro, no Centenário da Independência. Mas a Bolsa já existe desde 1914, e o preço do café sai todo dia.','Escrevo a cotação no quadro e o telegrafista manda para todo lado.'],'A Bolsa Oficial de Café de Santos foi criada em 1914. O palácio da Rua XV de Novembro foi inaugurado em 7 de setembro de 1922.'],
+        ['classificador22b','colono',16,7,'Classificador de café',['Sinta o cheiro: bebida mole, café bom! Este aqui é duro, vale menos.','Cada saca tem tipo e bebida. É isso que faz o preço.'],'A classificação do café por tipo e bebida definia o preço de cada lote.'],
+        ['telegrafista22b','colono',4,6,'Telegrafista',['Ponto, traço, ponto... Em minutos, o preço de Santos chega a São Paulo.'],'O telégrafo e o cabo submarino ligavam o porto de Santos aos mercados do mundo.'],
+        ['vidraceiro22','colono',3,9,'Vidraceiro',['Cada pedacinho do vitral tem uma cor. Juntando tudo, aparece a história dos bandeirantes.','Se eu quebrar um, o mestre me mata de bronca!'],'']]});
+    const R2=SCN[KEY];R2.parent='m_santos22';
+    if(!o.room){let d=null;for(const dx of [4,3,5,2,6]){if(freeAt('m_santos22',o.x+dx,o.y+o.h)){d=dx;break;}}if(d!=null){o.door=d;o.enter='kit';o.room=KEY;o.__rotulo='Bolsa Oficial de Café';
+      o.text=o.text.concat(['A porta está aberta: dá para entrar e ver o salão do pregão.']);}}};
+  setTimeout(()=>{try{faz();}catch(e){console.warn('bolsa',e);}},3000);
+}catch(e){console.warn('bolsa',e);}})();
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
