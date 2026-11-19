@@ -13415,7 +13415,7 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   const dc=drawChar;drawChar=function(id,X,Y,dir,frame){
     if(typeof id==='string'&&id.indexOf('n22_')===0){const i=IM[id.slice(4).split('~')[0]];
       if(!window.__n22Off&&i&&i.complete&&i.naturalWidth){ctx.fillStyle='rgba(20,27,27,.28)';ctx.fillRect(X+3,Y+13,10,3);ctx.fillRect(X+4,Y+16,8,1);
-        const sx=((B[dir]||0)+((frame||0)%4))*16; /* Encosta a cabeca no tronco: remove as duas linhas de pescoco da arte N22, sem interpolacao. */ ctx.drawImage(i,sx,0,16,15,X,Y-15,16,15);ctx.drawImage(i,sx,17,16,15,X,Y,16,15);return;}
+        const sx=((B[dir]||0)+((frame||0)%4))*16; /* Encosta a cabeca no tronco: remove as tres linhas de pescoco da arte N22, sem interpolacao. */ ctx.drawImage(i,sx,0,16,16,X,Y-14,16,16);ctx.drawImage(i,sx,19,16,13,X,Y+2,16,13);return;}
       return dc(ORIG[id]||'colono',X,Y,dir,frame);}
     return dc(id,X,Y,dir,frame);};
   window.__n22={IM,ORIG,faltam:()=>({npcs:npcs.filter(n=>eraOf(n.scene||'pira')===4&&String(n.spr||'').indexOf('n22_')!==0).map(n=>n.id),passantes:[...new Set(walkers.filter(w=>eraOf(w.scene)===4&&w.spr&&String(w.spr).indexOf('n22_')!==0&&!VEI.test(w.spr)).map(w=>w.spr+'|'+w.name))]})};
