@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=123"></script>
+<script src="arte/arte_comum.js?v=125"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=123"></script>
+<script src="arte/arte_1554.js?v=125"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=123"></script>
+<script src="arte/arte_1830.js?v=125"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=123"></script>
+<script src="arte/arte_1888.js?v=125"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=123"></script>
+<script src="arte/arte_1922.js?v=125"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -15609,8 +15609,69 @@ setTimeout(function(){try{
     return di.apply(this,arguments);};
   /* mais mulas nas tropas */
   for(const w of walkers){if(!w.mules||!w.mules.length)continue;let e=0;try{e=eraOf(w.scene);}catch(_){}if(e!==2||!/Tropeiro/.test(w.name||''))continue;if(w.mules[0].spr)continue;
-    const alvo=/com a tropa/.test(w.name)?5:3;while(w.mules.length<alvo){const m0=w.mules[w.mules.length-1];w.mules.push(Object.assign({},m0,{hidden:true,x:w.x,y:w.y,fx:w.x,fy:w.y,px:w.x*T,py:w.y*T}));}}
+    const alvo=/com a tropa/.test(w.name)?14:7;while(w.mules.length<alvo){const m0=w.mules[w.mules.length-1];w.mules.push(Object.assign({},m0,{hidden:true,x:w.x,y:w.y,fx:w.x,fy:w.y,px:w.x*T,py:w.y*T}));}}
 }catch(e){console.warn('mulas 1830',e);}},2600);
+
+/* v124: tropa é muita mula junta. Pouso dos tropeiros com mulas descansando em volta do rancho. */
+setTimeout(function(){try{const S='sp';const r=objects.find(o=>o.scene===S&&/rancho|hospedaria/i.test(o.id+' '+(o.name||''))&&(o.w||1)>=3);if(!r||!window.__mula30)return;
+  const M=SCN[S].map;const livre=(x,y)=>M[y]&&!'DdRWBCSXT'.includes(M[y][x])&&!objects.some(o=>(o.scene||'pira')===S&&x>=o.x-1&&x<o.x+(o.w||1)+1&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&Math.abs(n.x-x)<=1&&n.y===y)&&!ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
+  const DIR=['left','right','down','up','left','right'];let n=0;
+  for(let rr=1;rr<9&&n<12;rr++)for(let y=r.y-rr;y<=r.y+r.h+rr&&n<12;y++)for(let x=r.x-rr;x<=r.x+r.w+rr&&n<12;x+=2){if(Math.max(Math.abs(x-(r.x+r.w/2)),Math.abs(y-(r.y+r.h/2)))<rr)continue;if(!livre(x,y))continue;
+    const d=DIR[(x*7+y*3)%DIR.length],k=n++;const o={id:'mulaPouso'+k,scene:S,x,y,w:1,h:1,name:'Mula da tropa',text:['Uma das mulas da tropa, descansando no pouso. Amanhã cedo ela desce a serra carregada.','Uma tropa tinha dezenas de mulas, divididas em lotes. Cada lote seguia a mula madrinha, que levava um sino no pescoço.']};
+    o.draw=function(c,X,Y){const fr=Math.floor(performance.now()/900+k)%7===0?1:0;window.__mula30(c,X,Y,d,fr);};objects.push(o);}
+  window.__pouso30=n;try{if(cur===S)buildOcc();}catch(_){}
+}catch(e){console.warn('pouso',e);}},3400);
+
+/* v125: como na litografia da chegada a São Paulo: cavaleiros de cartola e de poncho na estrada, cachorros soltos,
+   urubus rodando no céu e galinhas HD. Animais HD do pacote (épocas 1830/1888/1922). */
+setTimeout(function(){try{const S='sp';const IA=__lazyArt('A22_');const G=window.__grupoB;
+  const okI=i=>i&&i.complete&&i.naturalWidth;const ROW={down:0,right:1,up:2,left:3};
+  const e2=()=>{try{return eraOf(cur)===2;}catch(_){return false;}};
+  /* cavaleiro: cavalo HD + metade de cima de um boneco HD */
+  const dc=drawChar;drawChar=function(id,X,Y,dir,fr){
+    if(typeof id==='string'&&id.indexOf('cav30|')===0){const [,hk,rk]=id.split('|');const h=IA[hk];if(!okI(h))return;const r=ROW[dir]??0,q=(fr||0)%4;
+      ctx.imageSmoothingEnabled=false;ctx.fillStyle='rgba(20,27,27,.25)';ctx.fillRect(X-2,Y+13,20,3);
+      const hz=dir==='left'||dir==='right';const drawH=()=>ctx.drawImage(h,(r*4+q)*40,0,40,32,X-12,Y+15-31,40,32);
+      const f=G&&G.folha('n',rk,0);const drawR=()=>{if(!f)return;const b={down:0,up:4,left:8,right:12}[dir]??0;ctx.drawImage(f,b*32,0,32,40,X,Y-(hz?27:24),16,20);};
+      if(dir==='up'){drawR();drawH();}else{drawH();drawR();}return;}
+    if(typeof id==='string'&&id.indexOf('ani30|')===0){const k=id.slice(6);const i=IA[k];if(!okI(i))return;const fw=i.naturalWidth/16,fh=i.naturalHeight;const r=ROW[dir]??0,q=(fr||0)%4;
+      ctx.imageSmoothingEnabled=false;ctx.fillStyle='rgba(20,27,27,.22)';ctx.fillRect(Math.round(X+8-fw/3),Y+13,Math.round(fw*2/3),2);ctx.drawImage(i,(r*4+q)*fw,0,fw,fh,Math.round(X+8-fw/2),Math.round(Y+15-fh),fw,fh);return;}
+    return dc.apply(this,arguments);};
+  /* caminhos pelas estradas (BFS entre pontas de estrada) */
+  const M=SCN[S].map,W=M[0].length,H=M.length;const rua=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&'DdRS'.includes(M[y][x]);
+  const pts=[];for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if(rua(x,y)&&(x<3||y<3||x>W-4||y>H-4))pts.push([x,y]);
+  const bfs=(a,b)=>{const prev=new Int32Array(W*H).fill(-1),q=[a[0]+a[1]*W];prev[q[0]]=q[0];for(let h=0;h<q.length;h++){const c=q[h],x=c%W,y=(c/W)|0;if(x===b[0]&&y===b[1]){const P=[];for(let k=c;;k=prev[k]){P.push([k%W,(k/W)|0]);if(k===prev[k])break;}return P.reverse();}
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(!rua(nx,ny))continue;const n=nx+ny*W;if(prev[n]<0){prev[n]=c;q.push(n);}}}return null;};
+  const quinas=P=>{const L=[P[0]];for(let i=1;i<P.length-1;i++){const a=P[i-1],b=P[i],c=P[i+1];if((b[0]-a[0])!==(c[0]-b[0])||(b[1]-a[1])!==(c[1]-b[1]))L.push(b);}L.push(P[P.length-1]);return L;};
+  const centro=[44,40];let alvo=null;for(let r=0;r<12&&!alvo;r++)for(let y=centro[1]-r;y<=centro[1]+r&&!alvo;y++)for(let x=centro[0]-r;x<=centro[0]+r;x++)if(rua(x,y)){alvo=[x,y];break;}
+  const CAV=[['Viajante a cavalo','cavalo_castanho','baraoBan',['Venho de Santos, pela serra. Três dias de viagem, entre a lama e as pedras da Calçada do Lorena.','Lá de cima do morro já se vê a cidade: as torres das igrejas e os telhados vermelhos.']],
+    ['Fazendeiro a cavalo','cavalo_preto','barao',['Vou à cidade tratar de negócios e ouvir a missa na Sé.','Na minha fazenda planto cana e faço açúcar. O café ainda é pouco por aqui.']],
+    ['Tropeiro montado','cavalo_tordilho','tropeiroBan',['Eu vou na frente, a tropa vem atrás. Mula boa conhece o caminho sozinha.']],
+    ['Estudante chegando a cavalo','cavalo_castanho','lente88',['Vim de Minas estudar na Academia de Direito. Cheguei cansado, empoeirado e com fome!']]];
+  const L=[];CAV.forEach(([nm,hk,rk,lines],i)=>{if(!alvo||!pts.length)return;const QD=[[1,1],[-1,1],[1,-1],[-1,-1]][i%4];const cand=[];for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if(rua(x,y)&&Math.sign(x-alvo[0])===QD[0]&&Math.sign(y-alvo[1])===QD[1]&&Math.abs(x-alvo[0])+Math.abs(y-alvo[1])>28)cand.push([x,y]);if(!cand.length)return;const a=cand[(i*37)%cand.length];const P=bfs(a,alvo);if(!P||P.length<15)return;const Q=quinas(P);
+    L.push({id:'cav30_'+i,spr:'cav30|'+hk+'|'+rk,name:nm,path:Q.concat(Q.slice(1,-1).reverse()),speed:1.6,lines:lines.concat(['[Personagem inventado para o jogo.]'])});});
+  /* cachorros soltos e gatos */
+  const rancho=objects.find(o=>o.scene===S&&/rancho|hospedaria/i.test(o.id+' '+(o.name||''))&&(o.w||1)>=3);
+  const box=(x,y,r)=>[Math.max(1,x-r),Math.max(1,y-r),Math.min(W-2,x+r),Math.min(H-2,y+r)];
+  if(rancho)L.push({id:'cao30_0',spr:'ani30|cachorro',name:'Cachorro do tropeiro',wander:box(rancho.x+2,rancho.y+5,5),speed:1.8,lines:['Au! Au! O cachorro segue a tropa por toda a viagem e vigia as mulas de noite.']});
+  L.push({id:'cao30_1',spr:'ani30|cachorro_preto',name:'Cachorro de rua',wander:box(44,42,8),speed:1.6,lines:['Um cachorro magro procurando restos perto das quitandas.']});
+  L.push({id:'cao30_2',spr:'ani30|cachorro',name:'Cachorro',wander:box(30,60,6),speed:1.5,lines:['O cachorro late para quem passa.']});
+  L.push({id:'gato30_0',spr:'ani30|gato_preto',name:'Gato',wander:box(40,30,4),speed:1.2,lines:['Miau. O gato caça os ratos das casas e dos armazéns.']});
+  try{addWalkers(S,L);}catch(e){console.warn('cav30',e);}
+  /* galinhas HD (no lugar das antigas, linha 5 do AN) */
+  const GAL=['galinha','galinha_branca','galo','pintinho'];const di=ctx.drawImage;
+  ctx.drawImage=function(img,a,b,c2,d,X,Y,w,h){if(arguments.length===9&&img===IMG.AN&&b===80&&c2===16&&e2()){const k=GAL[Math.abs(Math.round(X*7+Y*3))%4],i=IA[k];
+      if(okI(i)){const fw=i.naturalWidth/16;const q=a?1:0;return di.call(this,i,(1*4+q)*fw,0,fw,i.naturalHeight,X,Y+16-i.naturalHeight,fw,i.naturalHeight);}}
+    return di.apply(this,arguments);};
+  /* urubus rodando no céu (desenho em código) */
+  const U=[[30,70,60,0],[34,72,48,2.1],[70,20,55,4],[74,22,40,1.2],[52,8,70,3]];
+  const lo=lifeOverlay;lifeOverlay=function(camX,camY){const r=lo.apply(this,arguments);try{if(cur===S){const tt=performance.now()/1000;
+      for(const [cx,cy,R,ph] of U){const a=tt*.35+ph,x=Math.round(cx*16+Math.cos(a)*R-camX),y=Math.round(cy*16+Math.sin(a)*R*.5-camY-40);if(x<-20||y<-20||x>VW+20||y>VH+20)continue;
+        const f=Math.floor(tt*3+ph)%4===0;ctx.fillStyle='#141414';ctx.fillRect(x-1,y,3,2);if(f){ctx.fillRect(x-5,y+1,4,1);ctx.fillRect(x+2,y+1,4,1);}else{ctx.fillRect(x-5,y-1,2,1);ctx.fillRect(x-3,y,2,1);ctx.fillRect(x+2,y,2,1);ctx.fillRect(x+4,y-1,2,1);}
+        ctx.fillStyle='#c8b0a0';ctx.fillRect(x+1,y,1,1);
+        ctx.fillStyle='rgba(20,20,20,.12)';ctx.fillRect(x-3,y+44,6,1);}}}catch(_){}return r;};
+  window.__fauna30={cav:L.filter(w=>w.id.startsWith('cav')).length,anim:L.length};
+}catch(e){console.warn('fauna 1830',e);}},3000);
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
