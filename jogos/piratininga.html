@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=130"></script>
+<script src="arte/arte_comum.js?v=131"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=130"></script>
+<script src="arte/arte_1554.js?v=131"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=130"></script>
+<script src="arte/arte_1830.js?v=131"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=130"></script>
+<script src="arte/arte_1888.js?v=131"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=130"></script>
+<script src="arte/arte_1922.js?v=131"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -6455,7 +6455,7 @@ function tapGo(tx,ty,retry){
    const r=cv.getBoundingClientRect(),sx=(e.clientX-r.left)*VW/r.width,sy=(e.clientY-r.top)*VH/r.height;
    const cwid=MW*T,chei=MH*T;
    const camX=cwid<=VW?Math.round((cwid-VW)/2):Math.round(Math.max(0,Math.min(cwid-VW,player.px+8-VW/2)));
-   const camY=chei<=VH?Math.round((chei-VH)/2):Math.round(Math.max(0,Math.min(chei-VH,player.py+8-VH*(cur==='m_centro22'?.7:.5))));
+   const camY=chei<=VH?Math.round((chei-VH)/2):Math.round(Math.max(0,Math.min(chei-VH,player.py+8-VH/2)));
    const tx=Math.floor((sx+camX)/T),ty=Math.floor((sy+camY)/T);if(tx<0||ty<0||tx>=MW||ty>=MH)return;
    if(tx===player.x&&ty===player.y){action();return;}
    tapGo(tx,ty,false);});
@@ -6539,7 +6539,7 @@ function findFreeRect(sc,cx,cy,w,h,R){for(let r=0;r<=(R||20);r++)for(let y=cy-r;
   for(const o of objects){if((o.scene||'pira')!==cur||!o.enter||o.door==null)continue;const dx=o.x+o.door,dy=o.y+o.h-1;
     if(Math.abs(dx-player.x)>12||Math.abs(dy-player.y)>9)continue;const X=dx*T-camX,Y=dy*T-camY;if(X<-16||Y<-30||X>VW||Y>VH)continue;
     ctx.fillStyle='rgba(20,27,27,.55)';ctx.fillRect(X+1,Y+16,14,4);ctx.fillStyle='#3f8a4a';ctx.fillRect(X+2,Y+16,12,3);ctx.fillStyle='#f1c471';ctx.fillRect(X+3,Y+17,10,1);
-    const b=Math.round(Math.sin(t*4+dx)*2),ax=X+8,ay=Y-(o.__jm?-3:10)+b;ctx.fillStyle='#141b1b';ctx.beginPath();ctx.moveTo(ax-6,ay-2);ctx.lineTo(ax+6,ay-2);ctx.lineTo(ax,ay+6);ctx.fill();
+    const b=Math.round(Math.sin(t*4+dx)*2),ax=X+8,ay=Y-10+b;ctx.fillStyle='#141b1b';ctx.beginPath();ctx.moveTo(ax-6,ay-2);ctx.lineTo(ax+6,ay-2);ctx.lineTo(ax,ay+6);ctx.fill();
     ctx.fillStyle='#7ee08a';ctx.beginPath();ctx.moveTo(ax-4,ay-1);ctx.lineTo(ax+4,ay-1);ctx.lineTo(ax,ay+4);ctx.fill();}};}
 
 /* ---------- 3) mais gente nos bairros de 1922 ---------- */
@@ -6743,7 +6743,7 @@ function touchDir(){if(!touchHold||dialog||hold||isPaused())return null;if(perfo
   touchUsed=true;tapPath=null;tapMark=null;
   const r=cv.getBoundingClientRect(),cwid=MW*T,chei=MH*T;
   const camX=cwid<=VW?Math.round((cwid-VW)/2):Math.round(Math.max(0,Math.min(cwid-VW,player.px+8-VW/2)));
-  const camY=chei<=VH?Math.round((chei-VH)/2):Math.round(Math.max(0,Math.min(chei-VH,player.py+8-VH*(cur==='m_centro22'?.7:.5))));
+  const camY=chei<=VH?Math.round((chei-VH)/2):Math.round(Math.max(0,Math.min(chei-VH,player.py+8-VH/2)));
   const px=r.left+(player.px+8-camX)*r.width/VW,py=r.top+(player.py+8-camY)*r.height/VH,dx=touchHold.x-px,dy=touchHold.y-py;
   if(Math.hypot(dx,dy)<r.width/VW*10)return null;return Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');}
 cv.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;touchHold={x:e.clientX,y:e.clientY,t0:performance.now(),id:e.pointerId};touchUsed=false;try{cv.setPointerCapture(e.pointerId);}catch(_){}});
@@ -15902,6 +15902,71 @@ setTimeout(function(){try{const S='sp';const M=SCN[S].map,H=M.length,W=M[0].leng
       R(ctx,X+4,Y-20,8,3,'#e8c040');R(ctx,X+4,Y-22,2,2,'#e8c040');R(ctx,X+7,Y-23,2,3,'#e8c040');R(ctx,X+10,Y-22,2,2,'#e8c040');R(ctx,X+7,Y-19,2,1,'#c0302a');}}}catch(_){}return r;};
   try{if(cur===S)buildOcc();}catch(_){}
 }catch(e){console.warn('festas 1830',e);}},4500);
+
+/* v130: LAVADEIRAS nos rios de 1830 (até o fim do século elas lavavam roupa em todos os rios da cidade),
+   VIAJANTES nas estradas de saída (Rio, Santos, Sorocaba, Minas, Goiás) e, em 1554, gente subindo a trilha da serra
+   e a floresta mais fechada. */
+setTimeout(function(){try{
+  const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};const KK='#1c1418';
+  const caminhos=S=>{const s=new Set();for(const w of walkers){if(w.scene!==S)continue;const P=w.path||[];for(let i=0;i+1<P.length;i++){const [x0,y0]=P[i],[x1,y1]=P[i+1];for(let x=Math.min(x0,x1);x<=Math.max(x0,x1);x++)for(let y=Math.min(y0,y1);y<=Math.max(y0,y1);y++)s.add(x+','+y);}
+    if(w.wander){const [a,b,c,d]=w.wander;for(let x=a;x<=c;x++)for(let y=b;y<=d;y++)s.add(x+','+y);}}return s;};
+  const ocupado=(S,x,y)=>objects.some(o=>(o.scene||'pira')===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y)||animals.some(a=>a.scene===S&&a.x===x&&a.y===y);
+  const INV='[Personagem inventado para o jogo.]';
+  /* ---------- 1830: lavadeiras ---------- */
+  {const S='sp',M=SCN[S].map,H=M.length,W=M[0].length;const cam=caminhos(S);const LAV=[];
+   const K=['beneditaRes|0','festaR2|0','irma88|0','beneditaRes|2','festaR2|3','irma88|2','fugida|0','italiana2|1','beneditaRes|3','festaR2|1','irma88|3','fugida|2','colona|1','beneditaRes|1'];
+   const FAL=[['Lavo roupa para fora: das famílias ricas, dos estudantes, dos padres. Pago no fim da semana.','A roupa branca fica estendida no capim, no sol, para quarar. Depois volta a ser molhada e batida na pedra.'],
+     ['Sou escravizada de ganho: lavo roupa e entrego quase todo o dinheiro ao meu senhor. O que sobra eu guardo para comprar minha liberdade.'],
+     ['A água do rio é limpa aqui em cima. Mais para baixo, perto da cidade, já vem suja. Por isso a gente sobe o rio.'],
+     ['Aqui na beira do rio a gente conversa, canta e fica sabendo de tudo o que acontece na cidade.'],
+     ['Trouxa na cabeça, tina, sabão de cinza e muita força no braço. Volto para casa só no fim da tarde.'],
+     ['Quando o rio enche, a várzea vira lagoa e a gente perde roupa na correnteza. Já vi trouxa descendo o Tamanduateí!']];
+   let n=0,ult=[];for(let y=2;y<H-2&&n<K.length;y++)for(let x=1;x<W-1&&n<K.length;x++){if(M[y][x]!=='B')continue;
+     if(!(M[y][x-1]==='W'||M[y][x+1]==='W'))continue;if(['R'].includes(M[y-1][x])||M[y+1][x]==='R'||M[y-2]&&M[y-2][x]==='R'||M[y+2]&&M[y+2][x]==='R')continue;
+     if(cam.has(x+','+y)||ocupado(S,x,y))continue;if(ult.some(([a,b])=>Math.abs(a-x)+Math.abs(b-y)<6))continue;
+     const k=K[n].split('|');const id='lavadeira30_'+n;const dir=M[y][x-1]==='W'?'left':'right';
+     addNPCs([{id,spr:'h22_n|'+k[0]+'|'+k[1],x,y,dir,name:'Lavadeira',lines:FAL[n%FAL.length].concat([INV]),diary:'Lavadeiras, muitas delas escravizadas ou libertas, lavavam roupa nos rios de São Paulo até o fim do século XIX.'}],S);
+     LAV.push(id);ult.push([x,y]);
+     /* roupa estendida no capim, ao lado */
+     const lado=dir==='left'?1:-1;for(const [dx,dy] of [[lado,0],[lado*2,0],[lado,1]]){const X=x+dx,Y=y+dy;if(M[Y]&&'.,V'.includes(M[Y][X])&&!cam.has(X+','+Y)&&!ocupado(S,X,Y)){const cs=['#f4efe4','#e8e0d0','#c8d8e8','#f0d8c0'][n%4];
+         const o={id:'roupaCapim30_'+n,scene:S,x:X,y:Y,w:1,h:1,name:'Roupa quarando',text:['Roupa branca estendida no capim, no sol, para quarar e ficar bem clara.']};o.draw=function(c,XX,YY){R(c,XX+1,YY+5,14,8,'rgba(20,27,27,.15)');R(c,XX+2,YY+4,6,7,cs);R(c,XX+8,YY+6,6,6,'#f4efe4');R(c,XX+3,YY+5,4,1,'#d8d0c0');R(c,XX+9,YY+7,4,1,'#d8d0c0');};objects.push(o);break;}}
+     n++;}
+   /* batendo roupa: sobe e desce */
+   setInterval(()=>{if(cur!==S)return;const t=performance.now()/1000;for(const id of LAV){const p=npcs.find(q=>q.id===id);if(!p||p.talking)continue;p.__oy=Math.round(Math.max(0,Math.sin(t*5+id.length*1.7))*2);}},100);
+   window.__lav30=n;}
+  /* ---------- 1830: viajantes nas estradas de saída ---------- */
+  {const S='sp',M=SCN[S].map,H=M.length,W=M[0].length;const cam=caminhos(S);const rua=(x,y)=>M[y]&&'Dd'.includes(M[y][x]);
+   const acha=(tx,ty)=>{let best=null,bd=1e9;for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){if(!rua(x,y))continue;const d=Math.abs(x-tx)+Math.abs(y-ty);if(d>=bd)continue;
+       for(const [dx,dy] of [[0,-1],[0,1],[1,0],[-1,0]]){const X=x+dx,Y=y+dy;if(M[Y]&&'.,V'.includes(M[Y][X])&&!cam.has(X+','+Y)&&!ocupado(S,X,Y)){best=[X,Y];bd=d;break;}}}return best;};
+   const V=[[W-2,40,'Viajante que vem da Corte','tropeiroBan|2',['Venho do Rio de Janeiro, a Corte, onde mora o imperador D. Pedro I. Por terra são uns quinze dias a cavalo, pelo Vale do Paraíba: Mogi, Jacareí, Taubaté, Lorena e depois a serra.','Na Corte só se fala da nova imperatriz, D. Amélia, que chegou da Europa no ano passado.','Os jornais do Rio brigam muito: uns defendem o imperador, outros dizem que ele manda demais.'],'Em 1830, a viagem por terra entre São Paulo e o Rio de Janeiro levava cerca de duas semanas, pelo Vale do Paraíba.'],
+     [44,H-2,'Tropeiro que sobe de Santos','tropeiroBan|1',['Subi a serra pela Calçada do Lorena, calçada de pedra, cheia de curvas. Três dias de Santos até aqui.','Levo sal, ferragens e tecidos. Na volta desço com açúcar e toucinho.'],'A Calçada do Lorena, de pedra, ligava Santos ao planalto desde o fim do século XVIII.'],
+     [2,44,'Tropeiro que vai para Sorocaba','tropeiroBan|3',['Vou para Sorocaba, para a feira das mulas. Elas vêm lá do sul, do Rio Grande, pelo caminho de Viamão.','Em Sorocaba se compra mula para as tropas de todo o Brasil.'],'A feira de muares de Sorocaba recebia tropas vindas do sul e abastecia de mulas o centro-sul do Brasil.'],
+     [40,2,'Viajante de Minas, pelo caminho de Atibaia','comissarioN|1',['Venho de Minas Gerais. Passei por Bragança e por Atibaia, onde parei num pouso de tropeiros.','O ouro de Minas já não é como antigamente. Agora muita gente planta, cria gado e manda queijo e toucinho para cá.'],'Caminhos ligavam São Paulo a Minas Gerais passando por Atibaia e Bragança.'],
+     [6,8,'Moço que volta das monções','liberto|2',['Voltei de Cuiabá pelas monções: canoas que saem de Porto Feliz pelo Rio Tietê e levam meses até Mato Grosso.','Muita gente morre no caminho: cachoeiras, febre e fome. Eu voltei, graças a Deus.'],'As monções eram expedições fluviais que partiam de Porto Feliz, pelo Tietê, rumo a Cuiabá.'],
+     [W-2,70,'Estafeta do correio','caixeiroFin|3',['Sou estafeta: levo as malas do correio a cavalo. As cartas da Corte chegam a São Paulo em mais ou menos duas semanas.','Quem escreve para o Rio já sabe: a resposta só vem no mês seguinte.'],'O correio terrestre era levado por estafetas, a pé ou a cavalo, entre as cidades.']];
+   let k=0;for(const [tx,ty,nm,spr,ln,dia] of V){const p=acha(tx,ty);if(!p)continue;const [kk,v]=spr.split('|');
+     addNPCs([{id:'viajante30_'+k,spr:'h22_n|'+kk+'|'+(v||0),x:p[0],y:p[1],dir:'down',name:nm,lines:ln.concat([INV]),diary:dia}],S);k++;}
+   window.__viaj30=k;}
+  /* ---------- 1554: gente subindo a serra e floresta mais fechada ---------- */
+  {const S='serra',sc=SCN[S];if(sc){const M=sc.map,H=M.length,W=M[0].length;const rua=(x,y)=>M[y]&&M[y][x]==='D';
+   const bfs=(a,b)=>{const prev=new Int32Array(W*H).fill(-1),q=[a[0]+a[1]*W];prev[q[0]]=q[0];for(let h=0;h<q.length;h++){const c=q[h],x=c%W,y=(c/W)|0;if(x===b[0]&&y===b[1]){const P=[];for(let kk=c;;kk=prev[kk]){P.push([kk%W,(kk/W)|0]);if(kk===prev[kk])break;}return P.reverse();}
+     for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(!rua(nx,ny))continue;const n=nx+ny*W;if(prev[n]<0){prev[n]=c;q.push(n);}}}return null;};
+   const quinas=P=>{const L=[P[0]];for(let i=1;i<P.length-1;i++){const a=P[i-1],b=P[i],c=P[i+1];if((b[0]-a[0])!==(c[0]-b[0])||(b[1]-a[1])!==(c[1]-b[1]))L.push(b);}L.push(P[P.length-1]);return L;};
+   let a=null,b=null;for(let x=0;x<W;x++){if(!a&&rua(x,H-1))a=[x,H-1];if(!b&&rua(x,0))b=[x,0];}
+   const P=a&&b&&bfs(a,b);if(P){const Q=quinas(P);const ida=Q.concat(Q.slice(1,-1).reverse());const volta=Q.slice().reverse().concat(Q.slice(1,-1));
+     addWalkers(S,[{id:'jesuitaSerra54',spr:'n54_irmaoj~padre',name:'Padre jesuíta subindo a serra',path:ida,speed:.8,lines:['Subimos de São Vicente para Piratininga. A trilha é tão estreita e íngreme que em alguns trechos vamos de quatro, agarrados nas raízes.','Os tupiniquins conhecem cada pedra deste caminho. Sem eles, nos perderíamos na mata.',INV]},
+       {id:'colonoSerra54',spr:'n54_colono~colono',name:'Colono com ferramentas',path:ida.slice(2).concat(ida.slice(0,2)),speed:.7,lines:['Levo machados e enxadas para Piratininga. No alto da serra a terra é boa e o frio lembra Portugal.','Dizem que lá em cima se planta trigo e uva. Vamos ver!',INV]},
+       {id:'carregadoraSerra54',spr:'n54_rocaM~mulher',name:'Mulher tupiniquim com cesto',path:volta,speed:.9,lines:['Desço com o cesto de farinha de mandioca para trocar na vila do mar. Na volta trago sal e anzóis.',INV]},
+       {id:'mamelucoSerra54',spr:'n54_guia~indigena',name:'Guia mameluco',path:volta.slice(3).concat(volta.slice(0,3)),speed:1,lines:['Meu pai é português e minha mãe é tupiniquim. Falo as duas línguas e guio quem sobe e desce a serra.','A trilha é dos índios, muito antiga. Os portugueses só aprenderam a usá-la.',INV]}]);}
+   /* floresta mais fechada: clareiras viram mata, longe da trilha e do que já existe */
+   const cam=caminhos(S);let t=0;for(let y=0;y<H;y++)for(let x=0;x<W;x++){const c=M[y][x];if(c!==','&&c!=='.')continue;let perto=false;for(let dy=-1;dy<=1&&!perto;dy++)for(let dx=-1;dx<=1&&!perto;dx++){const q=M[y+dy]&&M[y+dy][x+dx];if(q==='D'||cam.has((x+dx)+','+(y+dy)))perto=true;}
+     if(perto||ocupado(S,x,y))continue;if(((x*7+y*13)%5)<3){M[y][x]='T';t++;}}window.__mata54=t;}}
+  {const S='pira',sc=SCN[S];if(sc){const M=sc.map,H=M.length,W=M[0].length;const cam=caminhos(S);let t=0;
+   /* fora da colina (onde já há mata ou capim), engrossa a mata; nunca perto de trilha, rio, aldeia ou paliçada */
+   for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(M[y][x]!=='.')continue;let viz=0,proibido=false;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const q=M[y+dy]&&M[y+dy][x+dx];if(q==='T'||q==='b'||q==='Y')viz++;if(q&&!'.TbY,'.includes(q))proibido=true;if(cam.has((x+dx)+','+(y+dy)))proibido=true;}
+     if(proibido||ocupado(S,x,y)||viz<2)continue;if(((x*11+y*5)%4)<3){M[y][x]='T';t++;}}window.__mata54b=t;}}
+  try{if(cur==='serra'||cur==='pira'||cur==='sp'){buildStatic();buildOcc();}}catch(_){}
+}catch(e){console.warn('v130',e);}},4800);
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
