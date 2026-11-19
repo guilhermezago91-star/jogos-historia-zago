@@ -17534,6 +17534,44 @@ window.__paulista82Ready=Promise.all(ready);
   setTimeout(tenta,3600);
 }catch(e){console.warn('quadra de teste JM',e);}})();
 
+/* ===== v135 — MENOS PRETO NA TELA E MENU MAIS LEVE (pedido do professor, 19/11/2026) =====
+   1) Quando o lugar (sala, estação, igreja) é menor que a tela, a tela encolhe até o tamanho dele:
+      em pé encolhe a altura, deitado encolhe a largura. Some a faixa preta (e os pontinhos soltos nela).
+   2) Som, Dicionário, Jogar deitado e Esconder setas saem da barra de cima e vão para o menu ☰.
+      Os botões continuam existindo (escondidos), então tudo que já usava eles segue funcionando. */
+(function(){try{
+  const scr=document.querySelector('.screen');let base=null,mine=null;
+  const deitado=()=>innerWidth>innerHeight&&matchMedia('(hover:none) and (pointer:coarse)').matches;
+  function ajusta(){
+    if(!mine||VW!==mine[0]||VH!==mine[1])base=[VW,VH];
+    let w=base[0],h=base[1];
+    if(!(typeof ride!=='undefined'&&ride)){const cw=MW*T,ch=MH*T;
+      if(deitado()){if(cw<w)w=Math.max(224,cw);if(ch<h){const nh=Math.max(160,ch);if(w/nh<=base[0]/base[1])h=nh;}}else if(ch<h){h=Math.max(144,ch);w=Math.min(w,Math.max(208,cw<w?cw:h));}}
+    mine=[w,h];if(w===VW&&h===VH)return;
+    VW=w;VH=h;cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;if(scr)scr.style.aspectRatio=VW+'/'+VH;
+    try{nightCv.width=VW;nightCv.height=VH;}catch(_){}try{mmDirty=true;}catch(_){}}
+  const r0=render;render=function(){try{ajusta();}catch(e){}return r0.apply(this,arguments);};
+  window.__telaAjuste=()=>({VW,VH,base,MW,MH});
+}catch(e){console.warn('v135 tela',e);}})();
+(function(){try{
+  const st=document.createElement('style');
+  st.textContent='.hud #btnSom,.hud #btnDic,.hud #btnGirar,.hud #btnSetas{display:none!important}'+
+   '@media (hover:none) and (pointer:coarse) and (orientation:portrait){.app{min-height:100vh;min-height:100dvh;box-sizing:border-box}.pad{margin-block:auto}}';
+  document.head.appendChild(st);
+  const btn=id=>document.getElementById(id);
+  const toque=()=>matchMedia('(hover:none) and (pointer:coarse)').matches;
+  const extras=()=>{const L=[['📖 Dicionário','btnDic',true],['🔈 '+((btn('btnSom')||{}).textContent||'Som'),'btnSom',true]];
+    if(toque()){L.push(['📱 '+((btn('btnGirar')||{}).textContent||'Jogar deitado'),'btnGirar',false]);L.push(['✋ '+((btn('btnSetas')||{}).textContent||'Esconder setas'),'btnSetas',false]);}return L;};
+  const poe=()=>{const ov=btn('ovPausa');if(!ov||ov.hidden)return;const lista=ov.querySelector('.lista');if(!lista||lista.dataset.v135)return;lista.dataset.v135='1';
+    const sair=[...lista.children].find(b=>/Sair/.test(b.textContent));
+    for(const [t,id,fecha] of extras()){const o=btn(id);if(!o)continue;const b=document.createElement('button');b.type='button';b.className='btn alt';b.textContent=t;
+      b.onclick=()=>{if(fecha&&window.__pausa)window.__pausa.fecha();o.click();if(!fecha){b.textContent=t.split(' ')[0]+' '+o.textContent;}else if(id==='btnSom'){}};
+      if(id==='btnSom')b.onclick=()=>{o.click();b.textContent='🔈 '+o.textContent;};
+      lista.insertBefore(b,sair||null);}};
+  const liga=()=>{const ov=btn('ovPausa');if(!ov)return false;new MutationObserver(poe).observe(ov,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});return true;};
+  let n=0;const tenta=()=>{if(liga()||++n>30)return;setTimeout(tenta,500);};tenta();
+}catch(e){console.warn('v135 menu',e);}})();
+
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 })();
 </script>
