@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=116"></script>
+<script src="arte/arte_comum.js?v=117"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=116"></script>
+<script src="arte/arte_1554.js?v=117"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=116"></script>
+<script src="arte/arte_1830.js?v=117"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=116"></script>
+<script src="arte/arte_1888.js?v=117"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=116"></script>
+<script src="arte/arte_1922.js?v=117"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -15079,6 +15079,7 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   /* liga um prédio do centro a uma sala */
   const ligaC=(o,key,rot)=>{if(!o||!SCN[key])return false;if(o.room||o.enter)return false;let d=null;const c0=Math.floor(o.w/2);
     for(const dx of [0,-1,1,-2,2,-3,3]){const x=c0+dx;if(x<0||x>=o.w)continue;const X=o.x+x,Y=o.y+o.h;if(freeAt(S,X,Y)&&(!C.naRede||C.naRede(X,Y))){d=x;break;}}
+    if(d==null&&C.naRede)for(const dx of [0,-1,1,-2,2,-3,3]){const x=c0+dx;if(x<0||x>=o.w)continue;const X=o.x+x,Y=o.y+o.h;if(freeAt(S,X,Y)&&[[0,1],[1,0],[-1,0],[0,2]].some(([a,b])=>C.naRede(X+a,Y+b)&&freeAt(S,X+a,Y+b))){d=x;break;}}
     if(d==null)return false;o.door=d;o.enter='kit';o.room=key;o.__rotulo=rot||o.name;return true;};
   const P=(t)=>t;
   /* ---------- salas modelo ---------- */
@@ -15241,9 +15242,111 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
           obj:[['altar',7,3,'Altar','O altar-mor.'],['bancoIgreja',3,6,'Bancos'],['bancoIgreja',10,6],['bancoIgreja',3,8],['bancoIgreja',10,8],['santo',3,2,'Nossa Senhora dos Remédios','Imagem de Nossa Senhora dos Remédios.'],['lampada',13,2],['pia',15,4,'Pia de água benta']],
           gente:[['sacristaoRem22','colono',6,5,'Sacristão dos Remédios',['No tempo da escravidão, os caifazes de Antônio Bento se reuniam aqui. Eles ajudavam escravizados a fugir das fazendas.','A abolição veio em 1888. Mas, para muita gente, a vida continuou difícil.'],'Nos anos 1880, o grupo abolicionista dos caifazes, liderado por Antônio Bento, reunia-se na Igreja dos Remédios.']]});}
         if(SCN.m_ig_remedios){o.enter='kit';o.room='m_ig_remedios';o.__rotulo='Igreja dos Remédios';}}}
+    /* v117: sem Igreja Presbiteriana e sem Igreja Ortodoxa no centro (endereços de 1922 não confirmados). A fé dos sírios e libaneses vira conversa na 25 de Março. */
+    {const pr=ob(S,'pt_47');if(pr&&!pr.__v117){pr.__v117=1;pr.name='Lote 107: Casa';pr.text=['Uma casa de aluguel, como tantas no centro.'];if(SCN.m_t_casa){pr.room='m_t_casa';pr.__rotulo='Casa';if(pr.door==null)pr.door=1;pr.enter=pr.enter||'kit';}}
+     const ort=ob(S,'pc_1_ig_ortodoxa');if(ort&&!ort.__v117&&A.PC_g_loja_2x2_1){ort.__v117=1;const im=new Image();im.src=A.PC_g_loja_2x2_1;
+       ort.name='Armarinho de Elias Haddad';ort.text=['Uma loja de armarinho de uma família síria: botões, linhas, rendas, fitas e tecidos. [Loja inventada para o jogo.]','Na Rua 25 de Março e em volta dela há muitas lojas de imigrantes sírios e libaneses.'];
+       ort.draw=function(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth/2,h=im.naturalHeight/2;for(let i=0;i<2;i++)c.drawImage(im,X+i*32,Y+this.h*16-h,Math.min(w,32),h);};
+       if(SCN.m_t_tecidos){ort.room='m_t_tecidos';ort.__rotulo='Armarinho de Elias Haddad';ort.enter='kit';}
+       if(!npcs.some(n=>n.id==='sirio22')){let p=null;try{p=findFree(S,ort.x+ort.w,ort.y+ort.h,4);}catch(_){}
+         if(p)addNPCs([{id:'sirio22',spr:'colono',x:p[0],y:p[1],dir:'down',name:'Comerciante sírio',lines:['Vim da Síria há vinte anos. Comecei como mascate, vendendo de porta em porta com a mala nas costas. Hoje tenho loja.','Aos domingos vamos à nossa igreja ortodoxa. A missa é em árabe, como na nossa terra.','[Personagem inventado para o jogo.]'],diary:'Muitos imigrantes sírios e libaneses começaram como mascates e depois abriram lojas na região da Rua 25 de Março.'}],S);}}}
     try{if(typeof buildOcc==='function')buildOcc();}catch(_){}};
   window.__igRoda=roda;setTimeout(()=>{try{roda();}catch(e){console.warn('igrejas roda',e);}},2900);
 }catch(e){console.warn('igrejas no lugar',e);}})();
+
+/* v117: chaminé só junto de fábrica. Chaminés soltas no meio das casas saem; se a fábrica perto ficar sem chaminé, a chaminé vai para o lado dela. */
+(function(){try{const FAB=/f[áa]brica|tecelag|cotonif|moinho|cervej|vidra|usina|fundi|olaria|frigor|gasômetro|light|matarazzo|crespi|jafet|fiação/i;
+  const FICA=new Set(['chamine46','chamine70','chamine71','chamine17','chamine34','chamine15']);
+  const rel=window.__chamines={tiradas:[],movidas:[]};
+  const roda=()=>{const sc='sp22';const fab=objects.filter(o=>o.scene===sc&&(o.w||1)>=2&&FAB.test(o.id+' '+(o.name||'')));
+    const dist=(c,f)=>Math.max(Math.max(f.x-c.x,0,c.x-(f.x+(f.w||1)-1)),Math.max(f.y-c.y,0,c.y-(f.y+(f.h||1)-1)));
+    const ch=objects.filter(o=>o.scene===sc&&/^chamine\d+$/.test(o.id));
+    const perto=c=>{let b=null,bd=1e9;for(const f of fab){const d=dist(c,f);if(d<bd){bd=d;b=f;}}return [b,bd];};
+    const boas=ch.filter(c=>FICA.has(c.id)||perto(c)[1]<=1);
+    for(const c of ch){if(boas.includes(c))continue;const [f,d]=perto(c);
+      if(f&&d<=15&&!boas.some(b=>dist(b,f)<=1)){let p=null;for(const [x,y] of [[f.x+f.w,f.y+f.h-1],[f.x-1,f.y+f.h-1],[f.x+f.w,f.y],[f.x-1,f.y]]){try{if(freeAt(sc,x,y)&&!objects.some(o=>o.scene===sc&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))){p=[x,y];break;}}catch(_){}}
+        if(p){c.x=p[0];c.y=p[1];boas.push(c);rel.movidas.push(c.id+'→'+f.id);continue;}}
+      c.scene='__fora';rel.tiradas.push(c.id);}
+    try{if(cur===sc&&typeof buildOcc==='function')buildOcc();}catch(_){}};
+  setTimeout(()=>{try{roda();}catch(e){console.warn('chamines',e);}},3100);
+}catch(e){console.warn('chamines',e);}})();
+
+/* v117: casas e lojas mais mobiliadas + SOBRADOS com escada para o andar de cima (como nas casas do Zelda). */
+(function(){try{const K=window.__kit;if(!K||!K.sala)return;const D=K.D;
+  const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};const KK='#1c1418';
+  const box=(c,x,y,w,h,a,b)=>{R(c,x,y,w,h,KK);R(c,x+1,y+1,w-2,h-2,a);if(b)R(c,x+1,y+1,w-2,2,b);};
+  const sh=(c,X,Y,w)=>{c.fillStyle='rgba(20,27,27,.22)';c.fillRect(X+2,Y+13,w-4,3);};
+  Object.assign(D,{
+    escada:{w:1,h:2,d(c,X,Y){R(c,X,Y-6,16,38,KK);for(let i=0;i<6;i++){R(c,X+1,Y-5+i*6,14,5,i%2?'#8a5a30':'#9a6a3a');R(c,X+1,Y-1+i*6,14,1,'#5e3c20');}R(c,X,Y-6,2,38,'#5e3c20');R(c,X+14,Y-6,2,38,'#5e3c20');R(c,X+3,Y-9,10,3,'#f1c471');}},
+    planta:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+4,Y+6,8,8,'#b4552e','#c86a40');c.fillStyle='#3e7a3a';for(const [a,b,r] of [[8,2,4],[5,4,3],[11,4,3],[8,-1,3]]){c.beginPath();c.arc(X+a,Y+b,r,0,7);c.fill();}c.fillStyle='#5aa04a';c.beginPath();c.arc(X+7,Y+1,2,0,7);c.fill();}},
+    cadeira:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);R(c,X+4,Y-4,8,9,KK);R(c,X+5,Y-3,6,7,'#7a5030');box(c,X+3,Y+4,10,5,'#8a5a30');R(c,X+4,Y+9,1,5,KK);R(c,X+11,Y+9,1,5,KK);}},
+    tapete:{w:2,h:1,d(c,X,Y){R(c,X+2,Y+3,28,11,'#7a2a1c');R(c,X+4,Y+5,24,7,'#a03a2a');R(c,X+8,Y+7,16,3,'#c8a040');for(let i=0;i<7;i++)R(c,X+3+i*4,Y+3,1,1,'#e8e0d0');}},
+    filtro:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);R(c,X+5,Y+8,6,6,'#5e3c20');box(c,X+4,Y-6,8,14,'#c87a4a','#d8905a');R(c,X+5,Y+1,6,1,'#9a5a30');R(c,X+11,Y+2,2,2,'#c8c8c0');}},
+    oratorio:{w:1,h:1,wall:1,d(c,X,Y){box(c,X+3,Y-12,10,16,'#7a5030','#9a6a40');R(c,X+5,Y-9,6,9,'#3a2a5a');R(c,X+7,Y-8,2,3,'#e0b890');R(c,X+6,Y-5,4,5,'#3a4a8a');R(c,X+7,Y-1,2,2,'#f1c471');}},
+    cristaleira:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+1,Y-12,14,26,'#6a4424','#8a5a30');R(c,X+3,Y-10,10,9,'#cfe4ee');R(c,X+3,Y+1,10,9,'#cfe4ee');for(const [a,b] of [[4,-8],[8,-8],[5,3],[9,3]])R(c,X+a,Y+b,2,3,'#f4efe4');}},
+    penteadeira:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+1,Y+2,14,12,'#7a5030','#9a6a40');box(c,X+3,Y-10,10,12,'#c8a040');R(c,X+4,Y-9,8,10,'#cfe4ee');R(c,X+5,Y-8,2,6,'#f4fbff');R(c,X+4,Y+4,3,2,'#e86a9a');}},
+    cesto:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+3,Y+4,10,9,'#c8a060','#d8b070');for(let i=0;i<3;i++)R(c,X+4,Y+6+i*2,8,1,'#a07a40');R(c,X+5,Y+2,6,3,'#e8e0d0');}},
+    bacia:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);R(c,X+4,Y+6,8,8,'#6a4424');c.fillStyle=KK;c.beginPath();c.ellipse(X+8,Y+5,6,3,0,0,7);c.fill();c.fillStyle='#e8e8e0';c.beginPath();c.ellipse(X+8,Y+5,5,2,0,0,7);c.fill();R(c,X+9,Y-2,3,6,'#e8e8e0');}},
+    piano:{w:2,h:1,d(c,X,Y){sh(c,X,Y,32);box(c,X+1,Y-10,30,24,'#2a1a14','#3e2a20');R(c,X+3,Y+2,26,4,'#f4efe4');for(let i=0;i<9;i++)R(c,X+4+i*3,Y+2,1,2,KK);R(c,X+8,Y-7,16,6,'#e8e0d0');}},
+    roupeiro:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+1,Y-14,14,28,'#6a4424','#8a5a30');R(c,X+7,Y-12,1,24,'#3e2814');R(c,X+5,Y-2,1,3,'#c8a040');R(c,X+9,Y-2,1,3,'#c8a040');}}
+  });
+  /* mobília extra conforme o tipo de lugar */
+  const EXTRA={
+    m_t_livraria:[['cadeira',3,7,'Cadeira de leitura'],['tapete',5,8],['planta',12,7],['pilhaJornais',11,7,'Revistas']],
+    m_t_flores:[['planta',2,7],['planta',3,7],['planta',11,7],['cesto',12,7,'Cesto de flores'],['bacia',4,8,'Balde com água']],
+    m_t_padaria:[['cesto',8,7,'Cesto de pães','Pães quentinhos para a entrega.'],['saco',11,7,'Saco de farinha'],['mesaCafe',2,4],['relogio',6,2]],
+    m_t_tabacaria:[['vitrine',9,5,'Vitrine de cachimbos',null,{cs:['#7a4a24','#3a2a1a','#c8a040']}],['cadeira',3,7],['planta',12,7],['relogio',6,2]],
+    m_t_calcados:[['cadeira',4,7],['cadeira',5,7],['tapete',6,8],['planta',12,7],['retrato',6,2,'Propaganda de sapatos']],
+    m_t_relojoaria:[['cadeira',3,7],['planta',12,7],['tapete',5,8],['arquivo',1,4,'Gaveteiro de peças']],
+    m_t_papelaria:[['cadeira',3,7],['planta',12,8],['caixote',2,7],['relogio',11,2]],
+    m_t_tecidos:[['cadeira',11,7],['planta',12,8],['retrato',8,2,'Figurino de moda']],
+    m_t_fotografo:[['planta',4,7],['cadeira',2,7],['tapete',6,8],['retrato',4,2]],
+    m_t_presentes:[['planta',12,7],['cristaleira',12,4,'Cristaleira','Copos e taças de cristal.'],['tapete',6,8]],
+    m_t_bilhar:[['cadeira',14,7],['cadeira',14,8],['mesaCafe',13,4],['relogio',8,2]],
+    m_t_armazem:[['cesto',8,7,'Cesto de ovos'],['barril',9,7],['filtro',1,7,'Filtro de barro']],
+    m_t_casa:[['filtro',8,3,'Filtro de barro','A água do filtro fica fresquinha.'],['oratorio',7,2,'Oratório','O santo da família, com uma vela acesa.'],['tapete',2,8],['cadeira',5,5]],
+    m_t_hotel:[['planta',2,7],['cadeira',4,7],['tapete',6,8]],
+    m_t_escritorio:[['planta',12,7],['cadeira',2,6],['cadeira',5,6],['tapete',7,8]],
+    m_t_reparticao:[['planta',14,8],['cadeira',10,6],['bandeira',2,2]],
+    m_t_tipografia:[['caixote',13,8],['caixote',14,8]]
+  };
+  const poe=(key,lst)=>{const S=SCN[key];if(!S||S.__mob117)return;S.__mob117=1;const M=S.map,H=M.length,W=M[0].length;let k=0;
+    for(const [tipo,x,y,name,text,ex] of lst){const d=D[tipo];if(!d)continue;const w=(ex&&ex.w)||d.w,h=d.h;let p=null;
+      for(let r=0;r<6&&!p;r++)for(let yy=Math.max(d.wall?2:3,y-r);yy<=Math.min(d.wall?2:H-2-h+1,y+r)&&!p;yy++)for(let xx=Math.max(1,x-r);xx<=Math.min(W-1-w,x+r)&&!p;xx++){
+        if(Math.max(Math.abs(xx-x),Math.abs(yy-y))!==r)continue;let ok=true;
+        for(let i=0;i<w&&ok;i++)for(let j=0;j<h&&ok;j++){const X=xx+i,Y=yy+j;if(!d.wall&&M[Y][X]!=='.')ok=false;if(objects.some(o=>o.scene===key&&X>=o.x&&X<o.x+(o.w||1)&&Y>=o.y&&Y<o.y+(o.h||1)))ok=false;if(npcs.some(n=>n.scene===key&&n.x===X&&n.y===Y))ok=false;}
+        if(!d.wall){const SX=(S.__kit&&S.__kit.sx)||0;if(yy+h>=H-2&&xx<=SX+2&&xx+w>=SX-1)ok=false;}
+        if(ok)p=[xx,yy];}
+      if(!p)continue;const o=Object.assign({id:key+'_m117_'+(k++),scene:key,x:p[0],y:p[1],w,h,name:name||null,text:text?[].concat(text):null},ex||{});o.draw=function(c,X,Y){d.d(c,X,Y,o);};objects.push(o);}};
+  /* sobrados: o andar de cima */
+  const CIMA={
+    m_t_casa:['Andar de cima: quartos',[['cama',2,3,'Cama do casal'],['cama',5,3,'Cama das crianças'],['roupeiro',8,3,'Guarda-roupa'],['penteadeira',10,3,'Penteadeira'],['bacia',11,6,'Bacia e jarro','Não há água encanada no quarto: a gente se lava na bacia.'],['oratorio',4,2,'Oratório'],['janela',7,2],['tapete',4,7],['bau',2,7,'Baú','Roupas de cama e o enxoval guardado.']],
+      [['avo22','colono',6,6,'Avó da família',['Moro aqui em cima com meu filho, a nora e os netos. Casa de sobrado: embaixo a sala e a cozinha, em cima os quartos.','Da janela eu vejo a rua inteira. Sei de tudo o que acontece no bairro!'],'Nos sobrados, a família costumava ficar com a parte de cima, mais protegida da rua.']]],
+    loja:['Andar de cima: a casa do comerciante',[['cama',2,3,'Cama'],['roupeiro',5,3,'Guarda-roupa'],['mesa',7,5,'Mesa de jantar',null,{w:3}],['cadeira',7,7],['cadeira',9,7],['cristaleira',11,3,'Cristaleira'],['piano',2,6,'Piano','Ter piano em casa era sinal de família de posses. A filha toma aula duas vezes por semana.'],['oratorio',9,2,'Oratório'],['janela',12,2],['tapete',4,8]],
+      [['filhaLoja22','colono',10,6,'Filha do comerciante',['A família mora em cima da loja. Meu pai desce de manhã, abre as portas, e a gente ouve a freguesia o dia todo.','À tarde estudo piano. Mamãe quer que eu seja professora.'],'No centro, muitos comerciantes moravam no andar de cima da própria loja.']]],
+    m_t_hotel:['Andar de cima: quartos de hóspedes',[['cama',2,3,'Quarto 1'],['cama',5,3,'Quarto 2'],['cama',8,3,'Quarto 3'],['cama',11,3,'Quarto 4'],['bau',3,7,'Mala','Mala de couro de um viajante.'],['bacia',6,7,'Bacia e jarro'],['cadeira',10,7],['janela',13,2]],
+      [['hospede2_22','colono',7,6,'Caixeiro-viajante',['Vendo tecidos pelo interior. Venho a São Paulo uma vez por mês buscar mercadoria e durmo aqui.'],'Os caixeiros-viajantes levavam mercadorias da capital para as cidades do interior, de trem.']]],
+    m_t_escritorio:['Andar de cima: sala do diretor',[['escriv',2,4,'Mesa do diretor'],['cofre',5,3,'Cofre'],['arquivo',10,3,'Arquivo'],['telefoneMesa',3,6,'Telefone','O telefone do diretor tem linha própria.'],['cadeira',7,6],['cadeira',8,6],['retrato',6,2,'Retrato do fundador'],['planta',11,7],['tapete',6,8]],
+      [['diretor22','colono',4,6,'Diretor da firma',['Exportamos café para Nova York e para o Havre. Um telegrama atrasado e perdemos dinheiro!'],'As casas exportadoras de café tinham escritórios no centro de São Paulo.']]]
+  };
+  const LOJAS=['m_t_relojoaria','m_t_papelaria','m_t_tabacaria','m_t_tecidos','m_t_calcados','m_t_livraria','m_t_flores','m_t_presentes','m_t_armazem','m_t_padaria','m_t_fotografo'];
+  const sobrado=(key,cfg)=>{const S=SCN[key];if(!S||S.__esc)return;const up='m_up_'+key.replace(/^m_/,'');
+    if(!SCN[up])K.sala(up,{W:14,H:10,sx:6,label:cfg[0],parede:'#d8c8a8',piso:()=> 'tabua',obj:cfg[1],gente:cfg[2]});
+    SCN[up].parent=key;SCN[up].__cima=1;
+    const M=S.map,H=M.length,W=M[0].length;let p=null;
+    for(const x of [W-2,W-3,1,2,W-4,3])if(!p){for(const y of [3,4]){let ok=true;for(let j=0;j<2;j++){if(M[y+j][x]!=='.')ok=false;if(objects.some(o=>o.scene===key&&x>=o.x&&x<o.x+(o.w||1)&&y+j>=o.y&&y+j<o.y+(o.h||1)))ok=false;if(npcs.some(n=>n.scene===key&&n.x===x&&n.y===y+j))ok=false;}
+      if(ok&&M[y+2]&&M[y+2][x]==='.'&&!objects.some(o=>o.scene===key&&x>=o.x&&x<o.x+(o.w||1)&&y+2>=o.y&&y+2<o.y+(o.h||1))){p=[x,y];break;}}}
+    if(!p)return;S.__esc=1;
+    const o={id:key+'_escada',scene:key,x:p[0],y:p[1],w:1,h:2,door:0,enter:'kit',room:up,__rotulo:cfg[0],name:'Escada',text:['Uma escada de madeira para o andar de cima. O sobrado tem dois andares.']};
+    o.draw=function(c,X,Y){D.escada.d(c,X,Y);};objects.push(o);};
+  const roda=()=>{for(const k in EXTRA)poe(k,EXTRA[k]);
+    sobrado('m_t_casa',CIMA.m_t_casa);sobrado('m_t_hotel',CIMA.m_t_hotel);sobrado('m_t_escritorio',CIMA.m_t_escritorio);for(const k of LOJAS)sobrado(k,CIMA.loja);};
+  /* a saída do andar de cima é uma escada descendo */
+  const wo=window.waterOverlay;if(typeof waterOverlay==='function'){const w0=waterOverlay;waterOverlay=function(camX,camY){const r=w0.apply(this,arguments);try{const S=SCN[cur];if(S&&S.__cima&&S.__kit){const cfg=S.__kit,H=cfg.H,X=cfg.sx*16-camX,Y=(H-2)*16-camY;const c=ctx;
+        c.fillStyle='rgba(20,14,8,.55)';c.fillRect(X,Y+6,32,10);for(let i=0;i<3;i++){c.fillStyle=i%2?'#7a5030':'#8a5a30';c.fillRect(X+2,Y+7+i*3,28,2);}c.fillStyle='#f1c471';c.font='700 6px "Pixelify Sans",sans-serif';c.textAlign='center';c.fillText('▼ desce',X+16,Y+4);}}catch(_){}return r;};}
+  setTimeout(()=>{try{roda();}catch(e){console.warn('sobrados',e);}},3300);
+  window.__sobrados={CIMA,LOJAS};
+}catch(e){console.warn('sobrados',e);}})();
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
