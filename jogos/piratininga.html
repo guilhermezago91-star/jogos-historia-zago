@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=143"></script>
+<script src="arte/arte_comum.js?v=144"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=143"></script>
+<script src="arte/arte_1554.js?v=144"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=143"></script>
+<script src="arte/arte_1830.js?v=144"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=143"></script>
+<script src="arte/arte_1888.js?v=144"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=143"></script>
+<script src="arte/arte_1922.js?v=144"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -17450,7 +17450,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v142) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v144) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -17716,7 +17716,7 @@ window.__paulista82Ready=Promise.all(ready);
             objects.push({id:'jm_tapa_'+x+'_'+y,scene:S,x,y,w,h:1,name:'Telhado',text:['O telhado de um prédio.'],__jm:1,__vol:1,draw(c,X,Y){if(!cv)cv=pinta(w*16,16,tp,tp==='t'?TELHA[ci]:(yy%2?'#7e8a94':'#8492a0'),xx*31+yy*17,false);c.drawImage(cv,X,Y);}});x=x1+1;}else x++;}}
       rel.movidos.push('Triângulo: rua reta e quadra de sobrados no tamanho cheio');rel.r14=1;}}
     /* ===== v142 — CENTRO DE 1922: LOJAS AO NORTE DO PALÁCIO E RUA DO MAPPIN MAIS ESTREITA (pedido do professor, 19/11/2026) ===== */
-    /* 15ª RODADA. (a) Ao norte do Palácio do Governo: Salão de Bilhar e Casa Lombarda no tamanho cheio, na mesma linha do Açougue; sai um imóvel dividido (pt_34).
+    /* 15ª RODADA (publicada na v142). (a) Ao norte do Palácio do Governo: Salão de Bilhar e Casa Lombarda no tamanho cheio, na mesma linha do Açougue; sai um imóvel dividido (pt_34).
        (b) A rua na frente do Mappin (y42-45) perde dois quadradinhos: y44-45 vira fundo de quadra (telhados). */
     if(rel.r14){const GM={"g_sobrado_3x2_1": [3, 96, 70, 40], "g_sobrado_3x2_2": [3, 96, 70, 40], "g_sobrado_3x3_1": [3, 96, 92, 62], "g_sobrado_3x3_2": [3, 96, 92, 62], "g_ecletico_3x3_1": [3, 96, 92, 62], "g_ecletico_3x3_2": [3, 96, 92, 62], "g_ecletico_4x3_1": [4, 128, 92, 62], "g_ecletico_4x3_2": [4, 128, 92, 62], "g_ecletico_3x4_1": [3, 96, 114, 84], "g_ecletico_3x4_2": [3, 96, 114, 84], "g_loja_2x2_1": [2, 64, 70, 40], "g_loja_2x2_2": [2, 64, 70, 40], "g_loja_3x2_1": [3, 96, 70, 40], "g_loja_3x2_2": [3, 96, 70, 40], "g_cafe_3x2_1": [3, 96, 70, 40], "g_cafe_3x2_2": [3, 96, 70, 40], "g_cafe_4x3_1": [4, 128, 92, 62], "g_cafe_4x3_2": [4, 128, 92, 62], "g_livraria_2x3_1": [2, 64, 92, 62], "g_livraria_2x3_2": [2, 64, 92, 62], "g_banco_4x3_1": [4, 128, 98, 68], "g_banco_4x3_2": [4, 128, 98, 68], "g_banco_5x3_1": [5, 160, 98, 68], "g_banco_5x3_2": [5, 160, 98, 68], "g_hotel_4x4_1": [4, 128, 122, 92], "g_hotel_4x4_2": [4, 128, 122, 92], "g_hotel_5x4_1": [5, 160, 122, 92], "g_hotel_5x4_2": [5, 160, 122, 92], "g_escritorio_3x5_1": [3, 96, 136, 106], "g_escritorio_3x5_2": [3, 96, 136, 106], "g_escritorio_4x4_1": [4, 128, 114, 84], "g_escritorio_4x4_2": [4, 128, 114, 84], "g_colonial_3x2_1": [3, 96, 74, 44], "g_colonial_3x2_2": [3, 96, 74, 44], "g_colonial_4x2_1": [4, 128, 74, 44], "g_colonial_4x2_2": [4, 128, 74, 44], "g_colonial_2x1_1": [2, 64, 52, 22], "g_colonial_2x1_2": [2, 64, 52, 22], "g_armazem_4x2_1": [4, 128, 70, 40], "g_armazem_4x2_2": [4, 128, 70, 40], "g_armazem_5x2_1": [5, 160, 70, 40], "g_armazem_5x2_2": [5, 160, 70, 40], "g_armazem_3x1_1": [3, 96, 48, 18], "g_armazem_3x1_2": [3, 96, 48, 18], "g_residencia_2x2_1": [2, 64, 70, 40], "g_residencia_2x2_2": [2, 64, 70, 40], "g_residencia_3x2_1": [3, 96, 70, 40], "g_residencia_3x2_2": [3, 96, 70, 40], "ig_carmo": [6, 192, 136, -1], "ig_santo_antonio": [4, 128, 136, -1], "ig_sao_goncalo": [5, 160, 136, -1], "ig_boa_morte": [4, 128, 136, -1], "ig_remedios": [4, 128, 136, -1], "ig_rosario": [5, 160, 136, -1], "ig_sao_francisco": [7, 224, 120, -1], "ig_santa_ifigenia": [6, 192, 136, -1], "ig_aflitos": [3, 96, 120, -1], "ig_ortodoxa": [4, 128, 136, -1], "m_palacio_justica_obras": [7, 224, 116, -1]};for(const k in GM)if(!MAN[k])MAN[k]=[GM[k][1],GM[k][2],GM[k][3]];
      const marca=new Set(),cx=(x0,y0,x1,y1)=>{for(const o of objects)if(o.scene===S)for(let y=Math.max(y0,o.y);y<Math.min(y1+1,o.y+(o.h||1));y++)for(let x=Math.max(x0,o.x);x<Math.min(x1+1,o.x+(o.w||1));x++)marca.add(x+','+y);};
@@ -17746,6 +17746,45 @@ window.__paulista82Ready=Promise.all(ready);
        try{for(const q of C.P)if(q&&!q.v&&q.x>=71*16&&q.x<=88*16&&q.y>=43.6*16&&q.y<46*16)q.y=43*16;}catch(_){}
        rel.r15b=1;tapa(71,39,87,45);}}
      rel.movidos.push('Norte do Palácio e rua do Mappin: 15ª rodada');}
+    /* ===== v144 — CENTRO DE 1922: SÃO BENTO, ANTÔNIO PRADO E RUA DOS ARMAZÉNS NO TAMANHO CHEIO (pedido do professor, 19/11/2026) ===== */
+    /* 16ª RODADA. (a) Duas fileiras de lojinhas pela metade a oeste do Mosteiro viram duas quadras de fachadas grandes; a rua entre elas cai de 4-5 para 2 quadradinhos.
+       (b) Largo de São Bento: Hotel d'Oeste no tamanho cheio ao lado do Mosteiro; Relojoaria grande do outro lado.
+       (c) Praça Antônio Prado: A Cidade de Londres e a Tabacaria no tamanho cheio.
+       Saem (genéricas ou repetidas): Farmácia, duas Tabacarias, Chapelaria, dois Atacados e Barbeiro. */
+    if(rel.r14){const GM={"g_sobrado_3x2_1": [3, 96, 70, 40], "g_sobrado_3x2_2": [3, 96, 70, 40], "g_sobrado_3x3_1": [3, 96, 92, 62], "g_sobrado_3x3_2": [3, 96, 92, 62], "g_ecletico_3x3_1": [3, 96, 92, 62], "g_ecletico_3x3_2": [3, 96, 92, 62], "g_ecletico_4x3_1": [4, 128, 92, 62], "g_ecletico_4x3_2": [4, 128, 92, 62], "g_ecletico_3x4_1": [3, 96, 114, 84], "g_ecletico_3x4_2": [3, 96, 114, 84], "g_loja_2x2_1": [2, 64, 70, 40], "g_loja_2x2_2": [2, 64, 70, 40], "g_loja_3x2_1": [3, 96, 70, 40], "g_loja_3x2_2": [3, 96, 70, 40], "g_cafe_3x2_1": [3, 96, 70, 40], "g_cafe_3x2_2": [3, 96, 70, 40], "g_cafe_4x3_1": [4, 128, 92, 62], "g_cafe_4x3_2": [4, 128, 92, 62], "g_livraria_2x3_1": [2, 64, 92, 62], "g_livraria_2x3_2": [2, 64, 92, 62], "g_banco_4x3_1": [4, 128, 98, 68], "g_banco_4x3_2": [4, 128, 98, 68], "g_banco_5x3_1": [5, 160, 98, 68], "g_banco_5x3_2": [5, 160, 98, 68], "g_hotel_4x4_1": [4, 128, 122, 92], "g_hotel_4x4_2": [4, 128, 122, 92], "g_hotel_5x4_1": [5, 160, 122, 92], "g_hotel_5x4_2": [5, 160, 122, 92], "g_escritorio_3x5_1": [3, 96, 136, 106], "g_escritorio_3x5_2": [3, 96, 136, 106], "g_escritorio_4x4_1": [4, 128, 114, 84], "g_escritorio_4x4_2": [4, 128, 114, 84], "g_colonial_3x2_1": [3, 96, 74, 44], "g_colonial_3x2_2": [3, 96, 74, 44], "g_colonial_4x2_1": [4, 128, 74, 44], "g_colonial_4x2_2": [4, 128, 74, 44], "g_colonial_2x1_1": [2, 64, 52, 22], "g_colonial_2x1_2": [2, 64, 52, 22], "g_armazem_4x2_1": [4, 128, 70, 40], "g_armazem_4x2_2": [4, 128, 70, 40], "g_armazem_5x2_1": [5, 160, 70, 40], "g_armazem_5x2_2": [5, 160, 70, 40], "g_armazem_3x1_1": [3, 96, 48, 18], "g_armazem_3x1_2": [3, 96, 48, 18], "g_residencia_2x2_1": [2, 64, 70, 40], "g_residencia_2x2_2": [2, 64, 70, 40], "g_residencia_3x2_1": [3, 96, 70, 40], "g_residencia_3x2_2": [3, 96, 70, 40], "ig_carmo": [6, 192, 136, -1], "ig_santo_antonio": [4, 128, 136, -1], "ig_sao_goncalo": [5, 160, 136, -1], "ig_boa_morte": [4, 128, 136, -1], "ig_remedios": [4, 128, 136, -1], "ig_rosario": [5, 160, 136, -1], "ig_sao_francisco": [7, 224, 120, -1], "ig_santa_ifigenia": [6, 192, 136, -1], "ig_aflitos": [3, 96, 120, -1], "ig_ortodoxa": [4, 128, 136, -1], "m_palacio_justica_obras": [7, 224, 116, -1]};for(const k in GM)if(!MAN[k])MAN[k]=[GM[k][1],GM[k][2],GM[k][3]];
+     const marca=new Set(),cx=(x0,y0,x1,y1)=>{for(const o of objects)if(o.scene===S)for(let y=Math.max(y0,o.y);y<Math.min(y1+1,o.y+(o.h||1));y++)for(let x=Math.max(x0,o.x);x<Math.min(x1+1,o.x+(o.w||1));x++)marca.add(x+','+y);};
+     cx(66,10,89,25);cx(98,8,123,25);
+     const ini=n=>objects.find(o=>o.scene===S&&o.id.indexOf('pc_'+n+'_')===0);
+     const tiraT=(x0,y0,x1,y1)=>{for(const q of objects)if(q.scene===S&&/^pt_/.test(q.id)&&!q.enter&&toca(q,x0,y0,x1,y1))q.scene='__fora';};
+     const some=o=>{if(o&&o.scene===S){rel.fora.push(o.id+' '+(o.name||''));o.scene='__fora';}};
+     const ergue=(o,k,x,larg,porta,rot,tel,base)=>{if(!o||!MAN[k]){rel.semArte=(rel.semArte||'')+' '+k;return;}const rows=Math.ceil(MAN[k][1]/16),yT=base-rows;tiraT(x,yT,x+larg-1,base-1);for(let y=yT;y<base;y++)for(let i=0;i<larg;i++)if(M[y]&&M[y][x+i]!==undefined){if(M[y][x+i]!=='p')marca.add((x+i)+','+y);M[y][x+i]='p';}grande(o,k,x,yT,larg,porta,rot,tel,base);o.__gen=1;};
+     const tapa=(X0,Y0,X1,Y1)=>{const agora=new Set();for(const o of objects)if(o.scene===S)for(let y=o.y;y<o.y+(o.h||1);y++)for(let x=o.x;x<o.x+(o.w||1);x++)agora.add(x+','+y);
+       for(let y=Y0;y<=Y1;y++){let x=X0;while(x<=X1){const f=(a)=>M[y][a]==='p'&&!agora.has(a+','+y)&&marca.has(a+','+y);if(f(x)){let x1=x;while(x1+1<=X1&&f(x1+1))x1++;const w=x1-x+1,tp=(x+y)%3?'z':'t',ci=(x*3+y)%4,xx=x,yy=y;let cv=null;
+         objects.push({id:'jm_tapa_'+x+'_'+y,scene:S,x,y,w,h:1,name:'Telhado',text:['O telhado de um prédio.'],__jm:1,__vol:1,draw(c,X,Y){if(!cv)cv=pinta(w*16,16,tp,tp==='t'?TELHA[ci]:(yy%2?'#7e8a94':'#8492a0'),xx*31+yy*17,false);c.drawImage(cv,X,Y);}});x=x1+1;}else x++;}}};
+     const lou=ini(140),farm=ini(141),secos=ini(142),tab2=ini(143),tec=ini(144),chap=ini(145),arm=ini(132),at1=ini(133),ferr=ini(134),tab1=ini(135),at2=ini(136);
+     /* (a) rua dos armazéns */
+     if(lou&&secos&&tec&&arm&&ferr&&tab1&&lou.x===68&&arm.x===71){
+      [farm,tab2,chap,at1,at2].forEach(some);
+      ergue(lou,'g_loja_2x2_1',68,4,2,'LOUÇAS',['t',TELHA[0]],20);
+      ergue(secos,'g_armazem_3x1_1',72,6,3,'SECOS E MOLHADOS',['z','#7e8a94'],20);
+      ergue(tec,'g_armazem_3x1_2',78,6,3,'TECIDOS',['t',TELHA[2]],20);
+      for(let y=20;y<=21;y++)for(let x=68;x<=83;x++)M[y][x]='D';
+      for(let y=22;y<=25;y++)for(let x=70;x<=83;x++){marca.add(x+','+y);M[y][x]='p';}
+      ergue(arm,'g_armazem_3x1_1',70,6,3,'ARMAZÉM',['t',TELHA[1]],26);
+      ergue(ferr,'g_colonial_2x1_1',76,4,2,'FERRAGENS',['t',TELHA[3]],26);
+      ergue(tab1,'g_colonial_2x1_2',80,4,2,'TABACARIA',['z','#8492a0'],26);
+      for(const n of npcs)if(n.scene===S&&n.x>=70&&n.x<=83&&n.y>=22&&n.y<=25){const d=perto(n.x,21,2);if(d){n.x=d[0];n.y=d[1];n.px=d[0]*T;n.py=d[1]*T;}}
+      try{for(const q of C.P)if(q&&!q.v&&q.x>=68*16&&q.x<=84*16&&q.y>21.6*16&&q.y<26*16)q.y=21*16;}catch(_){}
+      rel.r16a=1;for(let y=12;y<=19;y++)for(let x=68;x<=83;x++)if((M[y][x]==='.'||M[y][x]===',')&&marca.has(x+','+y))M[y][x]='p';tapa(66,10,83,25);}
+     /* (b) Largo de São Bento */
+     {const hot=ini(20),barb=ini(147),rel2=ini(146);
+      if(hot&&hot.x===100){some(barb);ergue(hot,'g_hotel_4x4_2',100,8,4,'HOTEL D’OESTE',['z','#7e8a94'],19);rel.r16b=1;}
+      if(rel2&&rel2.x===88){for(let y=14;y<=18;y++)for(let x=86;x<=87;x++){marca.add(x+','+y);}ergue(rel2,'g_loja_2x2_1',86,4,2,'RELOJOARIA',['t',TELHA[0]],19);}
+      tapa(84,8,108,18);}
+     /* (c) Praça Antônio Prado */
+     {const lon=ini(14),tr=ini(137),ts=ini(138);
+      if(lon&&lon.x===110&&ts&&ts.x===119){some(tr);ergue(lon,'g_ecletico_4x3_1',106,8,4,'CIDADE DE LONDRES',['z','#7e8a94'],26);ergue(ts,'g_loja_2x2_2',119,4,2,'TABACARIA',['t',TELHA[1]],26);rel.r16c=1;tapa(104,16,123,25);}}
+     rel.movidos.push('São Bento, Antônio Prado e rua dos armazéns: 16ª rodada');}
     /* a Praça da Sé fica mais limpa na frente do Solar: uma banca vai para o Largo do Carmo e a árvore sai da frente */
     for(const [id,x,y] of [['rtp13',98,59],['rtp4',121,65]]){const o=objects.find(o=>o.scene===S&&o.id===id);if(o&&cabe(x,y,o.w||1)){rel.movidos.push(id+' '+o.x+','+o.y+' -> '+x+','+y);o.x=x;o.y=y;}}
     /* objetos pequenos (bancas, placas, postes, árvores) que ficaram debaixo de um prédio grande */
