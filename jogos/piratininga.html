@@ -17627,7 +17627,7 @@ window.__paulista82Ready=Promise.all(ready);
     if(!(typeof ride!=='undefined'&&ride)){const cw=MW*T,ch=MH*T;
       if(deitado()){if(cw<w)w=Math.max(224,cw);if(ch<h){const nh=Math.max(160,ch);if(w/nh<=base[0]/base[1])h=nh;}}else if(ch<h){h=Math.max(144,ch);w=Math.min(w,Math.max(208,cw<w?cw:h));}}
     mine=[w,h];if(w===VW&&h===VH)return;
-    VW=w;VH=h;cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;if(scr)scr.style.aspectRatio=VW+'/'+VH;
+    VW=w;VH=h;cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;if(scr)scr.style.aspectRatio=VW+'/'+VH;try{document.documentElement.style.setProperty('--ar',String(VW/VH));}catch(_){}
     try{nightCv.width=VW;nightCv.height=VH;}catch(_){}try{mmDirty=true;}catch(_){}}
   const r0=render;render=function(){try{ajusta();}catch(e){}return r0.apply(this,arguments);};
   window.__telaAjuste=()=>({VW,VH,base,MW,MH});
@@ -17651,6 +17651,29 @@ window.__paulista82Ready=Promise.all(ready);
   let n=0;const tenta=()=>{if(liga()||++n>30)return;setTimeout(tenta,500);};tenta();
 }catch(e){console.warn('v135 menu',e);}})();
 
+/* ===== v137 — COMPUTADOR: a tela do jogo se alarga para ocupar a janela (antes ficava estreita no meio, com vazio dos lados).
+   Mostra mais cidade para os lados, sem esticar o desenho. Nas salas pequenas, a v135 continua encolhendo a tela até o tamanho da sala. ===== */
+(function(){try{
+  const scr=document.querySelector('.screen'),app=document.querySelector('.app');
+  const st=document.createElement('style');
+  st.textContent='@media (min-width:900px) and (min-height:520px){.screen{width:min(100%,calc((100vh - 76px) * var(--ar,1.5714)))!important}}'+
+   '.app:fullscreen .screen{width:min(100%,calc((100vh - 58px) * var(--ar,1.5714)))!important}';
+  document.head.appendChild(st);
+  const pc=()=>matchMedia('(min-width:900px) and (min-height:520px)').matches&&!matchMedia('(hover:none) and (pointer:coarse)').matches;
+  function fitPC(){if(!pc())return;
+    const cs=getComputedStyle(app),pad=document.querySelector('.pad');
+    const fs=document.fullscreenElement||document.webkitFullscreenElement;
+    const avH=innerHeight-(fs?58:76);
+    const avW=app.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-(pad?pad.getBoundingClientRect().width:190)-22;
+    let nw=Math.round(224*avW/Math.max(200,avH));nw=Math.max(352,Math.min(576,nw));nw-=nw%2;
+    if(nw===VW&&VH===224)return;
+    VW=nw;VH=224;cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;if(scr)scr.style.aspectRatio=VW+'/'+VH;
+    try{nightCv.width=VW;nightCv.height=VH;}catch(_){}try{mmDirty=true;}catch(_){}
+    try{document.documentElement.style.setProperty('--ar',String(VW/VH));}catch(_){}}
+  try{document.documentElement.style.setProperty('--ar',String(VW/VH));}catch(_){}
+  let tm=0;const later=()=>{clearTimeout(tm);tm=setTimeout(fitPC,200);};
+  addEventListener('resize',later);document.addEventListener('fullscreenchange',later);setTimeout(fitPC,60);setTimeout(fitPC,900);
+}catch(e){console.warn('v137 computador',e);}})();
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 })();
 </script>
