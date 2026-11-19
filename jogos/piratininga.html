@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=132"></script>
+<script src="arte/arte_comum.js?v=133"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=132"></script>
+<script src="arte/arte_1554.js?v=133"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=132"></script>
+<script src="arte/arte_1830.js?v=133"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=132"></script>
+<script src="arte/arte_1888.js?v=133"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=132"></script>
+<script src="arte/arte_1922.js?v=133"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -8487,6 +8487,7 @@ setTimeout(function(){
   const NEWS={
    1:{nome:'Carta com notícias do Brasil',tipo:'Carta chegada de navio',nota:'Em 1554 não existe jornal no Brasil. As notícias chegam em cartas, levadas de navio, e demoram meses. Imprimir jornais aqui só será permitido em 1808. Esta carta foi escrita para o jogo, com fatos da época.',
       it:[["O Brasil é colônia de Portugal","Quem reina é D. João III, lá em Lisboa. Desde 1549 há um governo-geral, com sede em Salvador, na Bahia."],
+          ["Nasceu o príncipe!","Notícia do Reino: em 20 de janeiro de 1554 nasceu em Lisboa, no Paço da Ribeira, o príncipe D. Sebastião, neto de D. João III. O pai dele, o príncipe D. João, tinha morrido 18 dias antes, e o reino inteiro esperava esse herdeiro. Cinco dias depois, do outro lado do mar, os jesuítas rezavam a missa que fundou São Paulo de Piratininga. Mas aqui ninguém sabia: a notícia só chega meses depois, de navio."],
           ["Novo governador","O governador-geral é Duarte da Costa. Ele chegou em 1553, na mesma viagem que trouxe o jovem jesuíta José de Anchieta."],
           ["De quem é a terra?","A costa foi dividida em capitanias, entregues a donatários. Mas a maior parte da terra é de centenas de povos indígenas, que falam muitas línguas."],
           ["Açúcar e pau-brasil","Os engenhos de açúcar crescem em Pernambuco, na Bahia e em São Vicente. Neles trabalham indígenas escravizados e, cada vez mais, africanos trazidos à força."],
@@ -16004,6 +16005,468 @@ setTimeout(function(){try{
   const fix=()=>{for(const w of walkers){if(w.spr&&CHAR_ORDER.includes('z54_w_'+w.spr)&&eraOf(w.scene||'pira')===1)w.spr='z54_w_'+w.spr;}};
   fix();setInterval(fix,1500);
 })();
+
+/*/* ===== v133: blocos v106-v110 (personagens, retratos e abertura), aplicados sobre a v131; rodam depois que o mapa terminou de montar ===== */
+setTimeout(function(){
+
+/* =========================================================
+   v106 — PERSONAGENS NOVOS (pedido do professor, 19/11/2026)
+   1888: Cândida e Benedito Zago chegando de navio a Santos (homenagem à família do autor)
+   1922: Flávia Kairalla, libanesa, na Rua 25 de Março (homenagem à família do autor)
+         Senhor Posso, imigrante espanhol, no Brás (homenagem à família do autor)
+         Industriais italianos reais: Matarazzo, Crespi, Martinelli, Siciliano, Pinotti Gamba, Scarpa
+         Italianos comuns com sobrenomes típicos: Rossi, Bianchi, Esposito, Ferrari, Greco, Colombo, Romano
+   Fontes: Roberto Pompeu de Toledo, A capital da solidão (2003) e A capital da vertigem (2015).
+   (A notícia do nascimento de D. Sebastião foi posta direto na carta de 1554, em 03_recursos_recentes.js.)
+   ========================================================= */
+(function(){try{
+  const INV='[Personagem inventado para o jogo, a partir de documentos da época.]';
+  const HOM='[Personagem inventado: homenagem à família do autor do jogo.]';
+  const REAL='[Pessoa real, fala imaginada. Fonte: Roberto Pompeu de Toledo, A capital da vertigem.]';
+  const ocupado=(sc,x,y)=>npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===sc&&!i.got&&i.x===x&&i.y===y)||
+    objects.some(o=>o.scene===sc&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+  const C=window.__centro22||{};
+  /* quadradinho livre mais perto de (x,y), sem fechar passagem */
+  const lugar=(sc,x,y)=>{const M=SCN[sc]&&SCN[sc].map;if(!M)return null;const H=M.length,W=M[0].length;
+    for(let r=0;r<=12;r++)for(let b=y-r;b<=y+r;b++)for(let a=x-r;a<=x+r;a++){if(Math.max(Math.abs(a-x),Math.abs(b-y))!==r)continue;
+      if(a<1||b<1||a>=W-1||b>=H-2)continue;if(!freeAt(sc,a,b)||ocupado(sc,a,b))continue;
+      if(sc==='m_centro22'&&C.naRede&&!C.naRede(a,b))continue;
+      if(sc==='sp22'&&C.portal&&C.portal(a,b))continue; /* não fica no pedaço que leva ao centro novo */
+      const viz=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>freeAt(sc,a+dx,b+dy)&&!ocupado(sc,a+dx,b+dy)).length;if(viz<3)continue;
+      return [a,b];}return null;};
+  const perto=(id,sc)=>{const n=npcs.find(n=>n.id===id&&(!sc||n.scene===sc));if(n)return [n.scene,n.x,n.y];
+    const o=objects.find(o=>o.id===id&&(!sc||o.scene===sc));if(o)return [o.scene,o.x+Math.floor((o.w||1)/2),o.y+(o.h||1)];return null;};
+  const rel=window.__v106={postos:[],falhas:[]};
+  const poe=(id,spr,ref,dx,dy,nome,falas,diario,marca)=>{try{if(npcs.some(n=>n.id===id))return;
+    let r=null;for(const rf of ref){r=perto(...rf);if(r)break;}
+    if(!r){rel.falhas.push(id+': referência não achada');return;}
+    const p=lugar(r[0],r[1]+dx,r[2]+dy);if(!p){rel.falhas.push(id+': sem lugar livre');return;}
+    addNPCs([{id,spr,x:p[0],y:p[1],dir:'down',name:nome,lines:falas.concat([marca||INV]),diary:diario}],r[0]);rel.postos.push([id,r[0],p[0],p[1]]);}catch(e){rel.falhas.push(id+': '+e.message);}};
+
+  /* ---------------- 1888: OS ZAGO CHEGAM A SANTOS ---------------- */
+  poe('beneditoZago88','n88_imigrante~colono',[['vapor1','santos'],['vapor2','santos']],2,-2,'Benedito Zago, recém-chegado',[
+    'Buongiorno! Sou Benedito Zago. Acabamos de descer do navio, depois de semanas no mar.',
+    'Viemos do Vêneto, na Itália, perto de Treviso. Lá a terra era pouca e a fome era muita.',
+    'Agora é pegar o trem, subir a serra e ficar na Hospedaria dos Imigrantes, no Brás. Dizem que é nova: ficou pronta no ano passado.'],
+    'Em 1888 chegaram a São Paulo milhares de famílias italianas, como os Zago (personagens inventados). Do porto de Santos subiam de trem até a Hospedaria dos Imigrantes, no Brás, construída em 1886 e 1887.',HOM);
+  poe('candidaZago88','n88_italianaB~dona',[['beneditoZago88','santos']],1,0,'Cândida Zago, recém-chegada',[
+    'Sou Cândida Zago, mulher do Benedito. Tudo o que temos veio nesta mala e nesta trouxa.',
+    'Os fazendeiros de café precisam de muitos braços. É por isso que tanta família italiana está vindo.',
+    'Ouvi no navio que hoje, no Rio, vão acabar com a escravidão. Então nós vamos trabalhar no lugar de quem era escravizado?'],
+    'Com o fim da escravidão, os fazendeiros paulistas passaram a depender do trabalho de famílias imigrantes, sobretudo italianas.',HOM);
+
+  /* ---------------- 1922: HOMENAGENS ---------------- */
+  poe('kairalla22','n22_vendMappin~dona',[['mercado25','m_centro22']],0,1,'Flávia Kairalla, libanesa',[
+    '"Marhaba!" Quer dizer olá, em árabe. Sou Flávia Kairalla, libanesa.',
+    'Aqui na Rua 25 de Março quase toda loja é de sírio ou de libanês.',
+    'O caminho dos patrícios é quase sempre o mesmo: primeiro mascate, com a caixa nas costas; depois uma loja aqui na 25 de Março; e um dia, quem sabe, uma casa atacadista na Rua Florêncio de Abreu.'],
+    'Sírios e libaneses começavam como mascates, abriam lojas na Rua 25 de Março e, depois, casas atacadistas na Rua Florêncio de Abreu.',HOM);
+  poe('posso22','n22_espanholBF~colono',[['hospimig','sp22']],-3,2,'Senhor Posso, imigrante espanhol',[
+    '"¡Buenos días!" Sou o senhor Posso. Viemos da Espanha.',
+    'Os italianos são a metade dos imigrantes. Mas logo depois vêm os portugueses e nós, os espanhóis.',
+    'Conhece o frontão, a pelota basca? Fomos nós, espanhóis, que trouxemos esse jogo. Os moços ricos da cidade adoram!'],
+    'Os espanhóis foram, junto com os portugueses, o maior grupo de imigrantes em São Paulo depois dos italianos. Trouxeram o frontão, a pelota basca.',HOM);
+
+  /* ---------------- 1922: INDUSTRIAIS ITALIANOS (pessoas reais) ---------------- */
+  poe('matarazzo22','n22_industrial~tipografo#1',[['moinho','sp22']],0,1,'Francisco Matarazzo, industrial',[
+    'Sou Francisco Matarazzo. Nasci em Castellabate, no sul da Itália, numa casa de frente para o mar.',
+    'Comecei pequeno, fazendo banha em Sorocaba. Em 1890 vim para São Paulo e abri este moinho de farinha de trigo.',
+    'Depois vieram a tecelagem e muitas outras fábricas. Dizem que sou o industrial mais rico da cidade.'],
+    'Francisco Matarazzo, imigrante italiano, começou fazendo banha em Sorocaba e criou em São Paulo o Moinho Matarazzo e muitas outras fábricas.',REAL);
+  poe('crespi22','n22_corretorBolsa~tipografo#1',[['crespi','sp22']],0,1,'Rodolfo Crespi, industrial',[
+    'Rodolfo Crespi, às ordens. Cheguei em 1893 vendendo tecidos de uma firma de Milão.',
+    'Em 1901 abri a minha própria tecelagem, com trezentos operários. Em 1909 já eram 1.300.',
+    'Moro na Avenida Paulista, como outros industriais italianos.'],
+    'Rodolfo Crespi chegou em 1893 como vendedor de tecidos e criou o Cotonifício Crespi, na Mooca.',REAL);
+  poe('gamba22','n22_comissarioRP~tipografo#1',[['gamba22','sp22']],0,1,'Egidio Pinotti Gamba, industrial',[
+    'Egidio Pinotti Gamba. Estes são os Grandes Moinhos Gamba.',
+    'Moinho de trigo é negócio de concorrência dura. O meu rival é o Matarazzo, aqui do lado!'],
+    'Egidio Pinotti Gamba, imigrante italiano, dono de moinhos de trigo, era o grande rival de Matarazzo.',REAL);
+  poe('siciliano22','n22_agenteIt~tipografo#1',[['placaPaulista','sp22'],['ponto_paulista_22','sp22']],2,1,'Alexandre Siciliano, industrial',[
+    'Alexandre Siciliano. Fabrico máquinas de beneficiar café e artigos de ferro.',
+    'Moro aqui na Avenida Paulista, perto de outros italianos que enriqueceram: os Crespi, os Matarazzo, os Scarpa.',
+    'As famílias paulistas antigas estão começando a convidar imigrantes como nós para as suas festas.'],
+    'Alexandre Siciliano, das máquinas de beneficiar café, foi um dos imigrantes ricos aceitos nas altas rodas paulistas.',REAL);
+  poe('scarpa22','n22_conferente~tipografo#1',[['placaPaulista','sp22'],['ponto_paulista_22','sp22']],-3,2,'Nicolau Scarpa, industrial',[
+    'Nicolau Scarpa, do ramo de tecidos.',
+    'Na Avenida Paulista moram muitos de nós, italianos que fizeram fortuna com fábricas.'],
+    'Nicolau Scarpa, industrial têxtil, era um dos italianos que moravam na Avenida Paulista.',REAL);
+  poe('martinelli22','n22_empreiteiroRP~tipografo#1',[['jardimSB','m_centro22'],['mercado25','m_centro22']],0,3,'Giuseppe Martinelli',[
+    'Giuseppe Martinelli. Nasci em 1870, perto de Lucca, na Toscana. Meu pai era pedreiro e empreiteiro.',
+    'Fui pedreiro até os dezoito anos. Aqui em São Paulo faço negócios de muitos tipos.',
+    'Olho para estes prédios e penso: um dia ainda vou levantar o prédio mais alto da cidade.'],
+    'Giuseppe Martinelli, filho de pedreiro da Toscana, construiria anos depois o Edifício Martinelli, o primeiro arranha-céu famoso de São Paulo.',REAL);
+
+  /* ---------------- 1922: ITALIANOS COMUNS, SOBRENOMES TÍPICOS ---------------- */
+  poe('rossi22','n22_operarioJuta~colono',[['crespi','sp22']],-4,2,'Operário Rossi',[
+    'Rossi, operário. Rossi é o sobrenome mais comum da Itália, e aqui no Brás tem um em cada esquina!',
+    'Trabalho na tecelagem. São dez horas por dia no barulho dos teares.'],
+    'Milhares de italianos trabalhavam nas fábricas do Brás e da Mooca.');
+  poe('bianchi22','n22_feirante~cesteira',[['mercado25','m_centro22']],3,2,'Verdureira Bianchi',[
+    'Alface, almeirão, tomate! Tudo da minha horta, freguesa!',
+    'Nós, italianos, trouxemos para cá o gosto pela verdura, pelo tomate e pela massa.'],
+    'Muitos italianos plantavam hortas em volta da cidade e vendiam verduras nos mercados.');
+  poe('esposito22','n22_sapateiroAlp~taverneiro#5',[['hospimig','sp22']],3,3,'Sapateiro Esposito',[
+    'Esposito, sapateiro. É sobrenome de Nápoles. Conserto sapato desde menino.',
+    'Aqui no Brás quase todo mundo fala italiano. Até os brasileiros acabam aprendendo!'],
+    'No Brás, na Mooca e no Bexiga, o italiano se ouvia em toda parte.');
+  poe('ferrari22','n22_canteiroLaj~tipografo#1',[['operarioSe22']],-2,1,'Pedreiro Ferrari',[
+    'Ferrari, pedreiro. Muitos dos prédios novos desta cidade foram levantados por mãos italianas.',
+    'Mestre de obras italiano é o que não falta em São Paulo.'],
+    'Pedreiros e mestres de obras italianos construíram boa parte da São Paulo do começo do século XX.');
+  poe('greco22','n22_cantineiro~taverneiro#5',[['nonna'],['maeBexiga']],3,1,'Cantineiro Greco',[
+    'Venha comer uma macarronada! Aqui no Bexiga tem cantina, música e vizinho falando alto.',
+    'Domingo a família inteira come junto. É a mesa mais barulhenta da rua!'],
+    'O Bexiga ficou conhecido como bairro italiano, com cantinas e festas.');
+  poe('colombo22','n22_padeiroItaliano~taverneiro#5',[['nonna'],['maeBexiga']],-3,2,'Padeiro Colombo',[
+    'Pão italiano quentinho! Saiu agora do forno.',
+    'Padaria em São Paulo é quase tudo de português ou de italiano.'],
+    'Portugueses e italianos tinham muitas das padarias da cidade.');
+  poe('romano22','n22_engraxate22b~crianca',[['jornaleiroSe']],3,1,'Engraxate Romano',[
+    'Graxa, senhor? Brilho garantido!',
+    'Meu pai é italiano, minha mãe também. Mas eu nasci aqui: sou paulistano!'],
+    'Os filhos dos imigrantes, nascidos em São Paulo, já eram paulistanos.');
+}catch(e){console.warn('v106 personagens',e);}})();
+
+/* =========================================================
+   v107 — RETRATOS NOVOS (Oficina de Retratos v5)
+   74 personagens que falavam com a caixa vazia ou com o rostinho antigo de 38 px
+   ganham retrato de 85x78. As imagens ficam em arte_nova/RV_<id>.png (entram como NOVA_RV_<id>).
+   A lista usada para gerar fica em pesquisa/retratos_v107.json: dá para abrir na Oficina e refazer.
+   ========================================================= */
+(function(){try{
+  if(typeof A==='undefined')return;
+  const IM={};
+  const img=id=>{const k='NOVA_RV_'+id;if(!A[k])return null;if(!IM[id]){const i=new Image();i.src=A[k];IM[id]=i;}return IM[id];};
+  let atual=null;
+  {const tt=talkTo;talkTo=function(n){const ant=atual;atual=n;try{return tt.apply(this,arguments);}finally{atual=ant;}};}
+  {const s0=say;say=function(who,pages,onEnd,face){const r=s0.apply(this,arguments);
+     try{const n=atual;const i=n&&img(n.id);if(i){const poe=()=>{try{if(!dialog)return;dlgFace.width=85;dlgFace.height=78;fctx.imageSmoothingEnabled=false;fctx.clearRect(0,0,85,78);fctx.drawImage(i,0,0);dlgFace.hidden=false;}catch(_){}};
+       if(i.complete&&i.naturalWidth)poe();else i.onload=poe;}}catch(_){}
+     return r;};}
+  window.__rv107={img,conta:()=>npcs.filter(n=>A['NOVA_RV_'+n.id]).length};
+}catch(e){console.warn('retratos v107',e);}})();
+
+/* =========================================================
+   v109 — NOBRES E SENHORAS DA CAPITAL EM 1888
+   Fonte: notas ao Diário da Princesa Isabel (excursão a São Paulo, nov. 1884), em
+   "Vida cotidiana em São Paulo no século XIX", p. 261-262 (fotos enviadas pelo professor).
+   As notas são de 1884; títulos atualizados para 1888 quando o livro diz (Itu: marquês em 1887).
+   O mapa de 1888 é simplificado: cada pessoa fica no ponto que corresponde à rua dela, e diz o endereço.
+   ========================================================= */
+(function(){try{
+  const REAL='[Pessoa real, fala imaginada. Fonte: notas ao Diário da Princesa Isabel (1884), em "Vida cotidiana em São Paulo no século XIX".]';
+  const ocupado=(sc,x,y)=>npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===sc&&!i.got&&i.x===x&&i.y===y)||
+    objects.some(o=>o.scene===sc&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+  const lugar=(sc,x,y)=>{const M=SCN[sc]&&SCN[sc].map;if(!M)return null;const H=M.length,W=M[0].length;
+    for(let r=0;r<=10;r++)for(let b=y-r;b<=y+r;b++)for(let a=x-r;a<=x+r;a++){if(Math.max(Math.abs(a-x),Math.abs(b-y))!==r)continue;
+      if(a<1||b<1||a>=W-1||b>=H-2)continue;if(!freeAt(sc,a,b)||ocupado(sc,a,b))continue;
+      const viz=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>freeAt(sc,a+dx,b+dy)&&!ocupado(sc,a+dx,b+dy)).length;if(viz<3)continue;return [a,b];}return null;};
+  const rel=window.__v109={postos:[],falhas:[]};
+  const poe=(id,spr,x,y,nome,falas,diario)=>{try{if(npcs.some(n=>n.id===id))return;const p=lugar('sp88',x,y);if(!p){rel.falhas.push(id);return;}
+    addNPCs([{id,spr,x:p[0],y:p[1],dir:'down',name:nome,lines:falas.concat([REAL]),diary:diario}],'sp88');rel.postos.push([id,p[0],p[1]]);}catch(e){rel.falhas.push(id+': '+e.message);}};
+  poe('marquesItu88','n88_barao~fazendeiro',36,14,'Marquês de Itu',[
+    'Sou Antônio de Aguiar Barros, o Marquês de Itu. Nasci em Itu, em 1823.',
+    'Fui barão, depois visconde, depois conde. No ano passado o imperador me fez marquês.',
+    'Moro na Rua Florêncio de Abreu, número 1.'],
+    'O Marquês de Itu (Antônio de Aguiar Barros) morava na Rua Florêncio de Abreu. Recebeu os títulos de visconde (1880), conde (1885) e marquês (1887).');
+  poe('souzaQueiroz88','n88_baraoBan~fazendeiro',35,33,'Barão de Souza Queiroz',[
+    'Sou o senador Francisco Antônio de Souza Queiroz, Barão de Souza Queiroz.',
+    'Minha casa fica na Rua do Ouvidor, número 27.',
+    'No Brasil, título de nobreza não passa de pai para filho: é o imperador que dá, como um prêmio.'],
+    'O senador Souza Queiroz, Barão de Souza Queiroz, morava na Rua do Ouvidor (hoje José Bonifácio). No Império, os títulos de nobreza não eram hereditários.');
+  poe('tatui88','n88_conservador~tipografo',37,24,'Barão de Tatuí',[
+    'Dr. Francisco Xavier Paes de Barros, Barão de Tatuí, às suas ordens.',
+    'Moro aqui pertinho, na Rua de São José.'],
+    'O Barão de Tatuí morava na Rua de São José (hoje Líbero Badaró).');
+  poe('piracicaba88','n88_liberal~tipografo',31,13,'Barão de Piracicaba',[
+    'Rafael Tobias de Barros, Barão de Piracicaba.',
+    'Minha casa fica na Rua Alegre.'],
+    'O Barão de Piracicaba (Rafael Tobias de Barros) morava na Rua Alegre (hoje Brigadeiro Tobias).');
+  poe('limeira88','n88_dona88~dona',27,37,'Baronesa de Limeira',[
+    'Sou Dona Francisca de Paula Souza Queiroz, Baronesa de Limeira. Fiquei viúva.',
+    'Moro na Rua Riachuelo, número 22.'],
+    'A Baronesa de Limeira, viúva, morava na Rua Riachuelo.');
+  poe('saoJoaquim88','n88_banqueiro~caixeiro',46,28,'Visconde de São Joaquim',[
+    'Joaquim Lopes Lebre, Visconde de São Joaquim.',
+    'Meu título não é brasileiro: foi dado pelo rei de Portugal.',
+    'Moro aqui na Rua da Imperatriz.'],
+    'O Visconde de São Joaquim tinha título português e morava na Rua da Imperatriz (hoje 15 de Novembro).');
+  poe('eudoxia88','n88_dona88~dona',14,22,'Dona Maria Eudóxia',[
+    'Sou Dona Maria Eudóxia de Almeida Torres, viúva do Conde de Lages.',
+    'Meu pai, o Visconde de Macaé, foi presidente desta província em 1829 e em 1842.',
+    'Em 1865 acompanhamos a Princesa Isabel e o Conde d’Eu na primeira viagem deles à Europa, logo depois do casamento.',
+    'Moro no Largo do Arouche, número 19.'],
+    'Dona Maria Eudóxia de Almeida Torres, viúva do Conde de Lages, morava no Largo do Arouche. O pai dela governou a província em 1829 e 1842.');
+  poe('mariaDulce88','n88_professora~dona',38,45,'Dona Maria Dulce',[
+    'Dona Maria Dulce Duarte de Azevedo.',
+    'Meu marido, o Dr. João Pereira Monteiro, é professor de Direito na Faculdade, ali no Largo de São Francisco.',
+    'Moramos na Rua Episcopal.'],
+    'Dona Maria Dulce Duarte de Azevedo morava na Rua Episcopal (hoje Washington Luís). O marido era professor da Faculdade de Direito.');
+  poe('joanaMonteiro88','n88_normalista~dona',40,46,'Dona Joana Borges Monteiro',[
+    'Dona Joana Borges Monteiro. Sou filha do Visconde de Itaúna.',
+    'Meu marido, o Dr. João Batista de Morais, estudou na Faculdade de Direito e é deputado provincial, do partido conservador.',
+    'Também moramos na Rua Episcopal.'],
+    'Dona Joana Borges Monteiro morava na Rua Episcopal. O marido era deputado provincial conservador.');
+  poe('coutoMagalhaes88','n88_veterano~soldado',58,4,'General Couto de Magalhães',[
+    'General Couto de Magalhães. Nasci em Diamantina, em Minas, e me formei na Faculdade de Direito daqui em 1859.',
+    'Governei Goiás, o Pará e Mato Grosso. E escrevi um livro sobre os povos indígenas: O Selvagem.',
+    'Na minha chácara, na Ponte Grande, à beira do Tietê, plantei jabuticabeiras trazidas de Sabará.',
+    'E guardo peixes vivos numa canoa que virou viveiro!'],
+    'O General Couto de Magalhães, sertanista e autor de "O Selvagem", morava numa chácara na Ponte Grande, à beira do Tietê.');
+}catch(e){console.warn('v109 nobres',e);}})();
+
+
+/* =========================================================
+   IMIGRANTES DE 1922 (v110)
+   Pedido do professor: mostrar os outros povos que chegaram a São Paulo além de
+   italianos, portugueses e espanhóis (que já estão no jogo).
+   Entram: armênios (Rizkallah Jorge e um mascate, Rua Florêncio de Abreu), judeus da Rússia/Bessarábia,
+   da Polônia e da Lituânia (Bom Retiro), alemães (Cervejaria Bavária e canteiro da Sé).
+   Japoneses, sírio-libaneses, italianos, portugueses e espanhóis já existiam.
+   Fontes: São Paulo Antiga, "A história das duas igrejas apostólicas armênias de São Paulo";
+   Encyclopaedia Judaica, verbete "São Paulo"; anais ANPUR (judeus no Bom Retiro);
+   Instituto Martius-Staden, "Alemães no bairro do Brás".
+   ========================================================= */
+(function(){try{
+  const INV='[Personagem inventado para o jogo, a partir de documentos da época.]';
+  const REAL='[Pessoa real, fala imaginada. Fonte: site São Paulo Antiga.]';
+  const ocupado=(sc,x,y)=>npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===sc&&!i.got&&i.x===x&&i.y===y)||
+    objects.some(o=>o.scene===sc&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+  const C=window.__centro22||{};
+  /* procura o quadradinho livre mais perto de (x,y), com pelo menos dois vizinhos livres (não fecha passagem) */
+  const lugar=(sc,x,y)=>{const M=SCN[sc]&&SCN[sc].map;if(!M)return null;const H=M.length,W=M[0].length;
+    for(let r=0;r<=12;r++)for(let b=y-r;b<=y+r;b++)for(let a=x-r;a<=x+r;a++){if(Math.max(Math.abs(a-x),Math.abs(b-y))!==r)continue;
+      if(a<1||b<1||a>=W-1||b>=H-2)continue;if(!freeAt(sc,a,b)||ocupado(sc,a,b))continue;
+      if(sc==='m_centro22'&&C.naRede&&!C.naRede(a,b))continue;
+      const viz=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>freeAt(sc,a+dx,b+dy)&&!ocupado(sc,a+dx,b+dy)).length;if(viz<3)continue;
+      return [a,b];}return null;};
+  const perto=(id,sc)=>{const n=npcs.find(n=>n.id===id&&(!sc||n.scene===sc));if(n)return [n.scene,n.x,n.y];const o=objects.find(o=>o.id===id&&(!sc||o.scene===sc));if(o)return [o.scene,o.x+Math.floor((o.w||1)/2),o.y+(o.h||1)];return null;};
+  const rel=window.__v110={postos:[],falhas:[]};
+  const poe=(id,spr,ref,dx,dy,nome,falas,diario,marca)=>{try{if(npcs.some(n=>n.id===id))return;const r=perto(...ref);if(!r){rel.falhas.push(id+': referência '+ref[0]+' não achada');return;}
+    const p=lugar(r[0],r[1]+dx,r[2]+dy);if(!p){rel.falhas.push(id+': sem lugar livre');return;}
+    addNPCs([{id,spr,x:p[0],y:p[1],dir:'down',name:nome,lines:falas.concat([marca||INV]),diary:diario}],r[0]);rel.postos.push([id,r[0],p[0],p[1]]);}catch(e){rel.falhas.push(id+': '+e.message);}};
+
+  /* ---------- ARMÊNIOS: Rua Florêncio de Abreu, na frente da Casa da Boia (centro novo) ---------- */
+  poe('rizkallah22','n22_industrial~tipografo#1',['pt_44','m_centro22'],0,1,'Rizkallah Jorge, da Casa da Boia',[
+    'Bom dia! Sou Rizkallah Jorge. Sou sírio, de família armênia, e cheguei ao Brasil em 1890.',
+    'Comecei numa oficina de peças de metal. Em 1898 abri esta loja, a Casa da Boia, aqui na Rua Florêncio de Abreu.',
+    'Quando chega uma família armênia sem nada, eu cedo um prédio de três andares aqui no centro. Ela fica lá até achar trabalho.'],
+    'Rizkallah Jorge, dono da Casa da Boia, ajudava as famílias armênias que chegavam sem nada a São Paulo.',REAL);
+  poe('mascateArm22','n22_mascate1~caixeiro#4',['pt_44','m_centro22'],3,3,'Mascate armênio',[
+    'Linha, botão, agulha, renda! Ando de casa em casa com esta caixa nas costas.',
+    'Quase todo armênio que chega começa assim, de mascate. Por enquanto ainda somos poucos aqui.',
+    'Um dia quero ter a minha loja. Mas primeiro é vender, vender, vender.'],
+    'Os primeiros armênios de São Paulo trabalhavam muito como mascates, vendendo de porta em porta.');
+
+  /* ---------- JUDEUS DA EUROPA ORIENTAL: Bom Retiro, perto da Estação da Luz (mapa da cidade) ---------- */
+  poe('clientelchik22','n22_vendedor22~caixeiro#4',['prestamista22','sp22'],-3,2,'Clientelchik, vendedor a prestação',[
+    'Bom dia! Eu sou clientelchik. É assim que nós, judeus, chamamos quem vende de porta em porta, a prestação.',
+    'Cortina, toalha, corte de tecido... A freguesa paga um pouquinho por semana, e eu volto para cobrar.',
+    'Vim da Bessarábia. Aqui no Bom Retiro, perto da Estação da Luz, mora muita gente que chegou como eu.'],
+    'Muitos judeus do Leste Europeu começaram em São Paulo vendendo de porta em porta, a prestação. Eram chamados de clientelchiks.');
+  poe('sapateiroPol22','n22_sapateiroBix~taverneiro#5',['prestamista22','sp22'],3,3,'Sapateiro judeu polonês',[
+    '"Dzień dobry!" Quer dizer bom dia, em polonês. Sou sapateiro, vim da Polônia.',
+    'Nós, judeus poloneses, moramos quase todos na cidade. Muitos trabalham de sapateiro, de alfaiate ou de mecânico.',
+    'Sábado eu não abro a oficina: é o shabat, o dia de descanso.'],
+    'Os judeus poloneses que vieram para São Paulo viviam quase todos na cidade, como sapateiros, alfaiates, mecânicos e comerciantes.');
+  poe('mecanicoPol22','n22_mecanicoFord~tipografo#1',['prestamista22','sp22'],6,0,'Mecânico polonês',[
+    'Sou mecânico. Vim da Polônia, como o sapateiro ali da esquina.',
+    'Aqui no Bom Retiro tem alfaiate em todo canto. Máquina de costura quebrada? É comigo.'],
+    'Judeus poloneses também trabalhavam como mecânicos em São Paulo.');
+  poe('damaIsrael22','n22_senhoraP~cesteira',['rabino','sp22'],-3,0,'Senhora das Damas Israelitas',[
+    'Sou da Sociedade Beneficente das Damas Israelitas. Fundamos em 1915 para ajudar as famílias que chegam.',
+    'Desde 1912 temos a nossa primeira sinagoga em São Paulo.',
+    'Quem chega da Rússia, da Polônia, da Lituânia ou da Romênia às vezes não sabe uma palavra de português. A gente ajuda no começo.'],
+    'A comunidade judaica de São Paulo se organizou durante a Primeira Guerra: primeira sinagoga em 1912, Damas Israelitas em 1915.');
+  poe('costureiraLit22','n22_costureiraBix~cesteira',['costureiraRuss22','sp22'],2,2,'Costureira lituana',[
+    '"Labas!" É bom dia, em lituano. Vim da Lituânia com a minha irmã.',
+    'A vizinha ali é russa, o sapateiro é polonês, eu sou lituana. No Bom Retiro todo mundo veio de longe.',
+    'Costuro para fora, aqui em casa mesmo. Português eu estou aprendendo com as freguesas.'],
+    'Judeus da Rússia, da Polônia, da Lituânia, da Romênia e da Hungria formaram a comunidade do Bom Retiro.');
+
+  /* ---------- ALEMÃES ---------- */
+  poe('cervejeiro22','n22_alemaoSA~taverneiro#5',['bavaria','sp22'],0,1,'Cervejeiro alemão',[
+    '"Guten Tag!" Quer dizer bom dia, em alemão. Sou cervejeiro, vim da Alemanha.',
+    'Esta fábrica era a Cervejaria Bavária, aqui na Mooca, perto da ferrovia. Em 1904 a Companhia Antarctica Paulista comprou.',
+    'Já em 1901 trabalhavam aqui umas 200 pessoas. É muita cerveja para os botequins da cidade!'],
+    'Imigrantes alemães trabalharam nas cervejarias de São Paulo. A Bavária, na Mooca, foi comprada pela Antarctica em 1904.');
+  poe('alemaoSe22','n22_canteiroLaj~tipografo#1',['operarioSe22'],2,1,'Pedreiro alemão da catedral',[
+    'Sabia que o projeto desta catedral nova é de um arquiteto alemão? O nome dele era Maximilian Hehl.',
+    'Eu também vim da Alemanha. Aqui no canteiro tem italiano, português, espanhol... e alemão.',
+    'Catedral grande assim demora muito. Acho que os meus netos é que vão ver pronta.'],
+    'O projeto da nova Catedral da Sé é do arquiteto alemão Maximilian Hehl.');
+}catch(e){console.warn('imigrantes 1922',e);}})();
+
+
+/* =========================================================
+   TELA DE ABERTURA DA PARTE 1 (v110)
+   Ao entrar em 1554, mostra a imagem de abertura (arte_nova/ABERTURA1554.png, feita no Canva)
+   com o título "PARTE 1 – A ORIGEM (1554)" em letra grande. Toque, clique ou Espaço fecham.
+   Se a imagem não estiver no pacote, nada muda: fica só a faixa de título que já existia.
+   ========================================================= */
+(function(){try{
+  if(typeof A==='undefined')return;
+  const st=document.createElement('style');
+  st.textContent='#ovParte1{position:absolute;inset:0;z-index:45;background:#0c0a14;display:flex;align-items:flex-end;justify-content:center;cursor:pointer;overflow:hidden;opacity:0;transition:opacity .7s}'+
+   '#ovParte1.on{opacity:1}#ovParte1 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated}'+
+   '#ovParte1 .tit{position:relative;width:100%;box-sizing:border-box;padding:28px 12px 14px;text-align:center;background:linear-gradient(transparent,rgba(12,10,20,.88) 45%);color:#fff6e4;font:800 clamp(26px,7vw,52px)/1.05 Inter,system-ui,sans-serif;letter-spacing:.02em;text-shadow:0 3px 0 #2a1608,0 0 14px rgba(0,0,0,.7)}'+
+   '#ovParte1 .tit small{display:block;font-size:.42em;font-weight:700;letter-spacing:.18em;color:#f1c471;margin-bottom:4px}'+
+   '#ovParte1 .tit em{display:block;font-style:normal;font-size:.3em;font-weight:600;letter-spacing:.04em;color:#e8dcc4;margin-top:10px;text-shadow:none}';
+  document.head.appendChild(st);
+  let ov=null,ult=0,tm=0;
+  const fecha=()=>{if(!ov||ov.hidden)return;ov.classList.remove('on');clearTimeout(tm);setTimeout(()=>{ov.hidden=true;},700);};
+  const mostra=()=>{try{const src=A.NOVA_ABERTURA1554;if(!src)return false;
+    if(!ov){ov=document.createElement('div');ov.id='ovParte1';ov.hidden=true;
+      const im=document.createElement('img');im.alt='Colina de Piratininga em 1554';im.src=src;
+      const t=document.createElement('div');t.className='tit';
+      const s=document.createElement('small');s.textContent='PARTE 1';
+      const e=document.createElement('em');e.textContent='toque para começar';
+      t.append(s,document.createTextNode('A ORIGEM (1554)'),e);ov.append(im,t);
+      ov.addEventListener('click',ev=>{ev.stopPropagation();fecha();});
+      const pai=(document.getElementById('ovIntro')||{}).parentNode||(typeof ovQuiz!=='undefined'&&ovQuiz.parentElement)||document.body;pai.appendChild(ov);
+      window.addEventListener('keydown',ev=>{if(ov&&!ov.hidden&&/^( |Enter|Escape)$/.test(ev.key)){ev.preventDefault();ev.stopImmediatePropagation();fecha();}},true);}
+    ov.hidden=false;requestAnimationFrame(()=>ov.classList.add('on'));clearTimeout(tm);tm=setTimeout(fecha,9000);return true;}catch(e){console.warn('abertura 1554',e);return false;}};
+  setInterval(()=>{try{if(typeof started==='undefined'||!started||typeof era!=='number')return;
+    const o=document.getElementById('ovStart');if(o&&!o.hidden)return;const oi=document.getElementById('ovIntro');if(oi&&!oi.hidden)return;
+    if(era!==ult){ult=era;if(era===1)mostra();}}catch(_){}},400);
+  window.__abertura1554={mostra,fecha,temImagem:()=>!!A.NOVA_ABERTURA1554};
+}catch(e){console.warn('abertura 1554',e);}})();
+
+/* =========================================================
+   PERSONAGENS NOVOS DE 1922 (v111)
+   Zélia Gattai e o irmão Tito (Alameda Santos, perto da Paulista), meninos do futebol,
+   a dona da horta, a menina rica e a família, e os personagens das mini-aulas 01 a 07.
+   Usa bonecos que já existem no jogo; retratos feitos na Oficina de Retratos v6.
+   Falas dos inventados: RASCUNHO, para o professor trocar.
+   Fonte da Zélia: trecho de "Anarquistas, graças a Deus" (Companhia das Letras).
+   ========================================================= */
+(function(){try{
+  const RAS='[Personagem inventado para o jogo. Fala provisória (rascunho), para o professor revisar.]';
+  const ZEL='[Pessoa real, fala imaginada. Fonte: Zélia Gattai, Anarquistas, graças a Deus (memórias).]';
+  const ocupado=(sc,x,y)=>npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===sc&&!i.got&&i.x===x&&i.y===y)||
+    objects.some(o=>o.scene===sc&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+  const C=window.__centro22||{};
+  const lugar=(sc,x,y)=>{const M=SCN[sc]&&SCN[sc].map;if(!M)return null;const H=M.length,W=M[0].length;
+    for(let r=0;r<=12;r++)for(let b=y-r;b<=y+r;b++)for(let a=x-r;a<=x+r;a++){if(Math.max(Math.abs(a-x),Math.abs(b-y))!==r)continue;
+      if(a<1||b<1||a>=W-1||b>=H-2)continue;if(!freeAt(sc,a,b)||ocupado(sc,a,b))continue;
+      if(sc==='m_centro22'&&C.naRede&&!C.naRede(a,b))continue;
+      if(sc==='sp22'&&C.portal&&C.portal(a,b))continue;
+      const viz=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>freeAt(sc,a+dx,b+dy)&&!ocupado(sc,a+dx,b+dy)).length;if(viz<3)continue;
+      return [a,b];}return null;};
+  const perto=(id,sc)=>{const n=npcs.find(n=>n.id===id&&(!sc||n.scene===sc));if(n)return [n.scene,n.x,n.y];const o=objects.find(o=>o.id===id&&(!sc||o.scene===sc));if(o)return [o.scene,o.x+Math.floor((o.w||1)/2),o.y+(o.h||1)];return null;};
+  const rel=window.__v111={postos:[],falhas:[]};
+  const poe=(id,spr,ref,dx,dy,nome,falas,diario,marca)=>{try{if(npcs.some(n=>n.id===id))return;const r=perto(...ref);if(!r){rel.falhas.push(id+': referência '+ref[0]+' não achada');return;}
+    const p=lugar(r[0],r[1]+dx,r[2]+dy);if(!p){rel.falhas.push(id+': sem lugar livre');return;}
+    addNPCs([{id,spr,x:p[0],y:p[1],dir:'down',name:nome,lines:falas.concat([marca||RAS]),diary:diario}],r[0]);rel.postos.push([id,r[0],p[0],p[1]]);}catch(e){rel.falhas.push(id+': '+e.message);}};
+
+  /* ---------- DA MEMÓRIA DA ZÉLIA: Alameda Santos, atrás da Avenida Paulista ---------- */
+  poe('zelia22','n22_meninaRP~cesteira',['placaPaulista','sp22'],3,-3,'Zélia',[
+    'Oi! Eu sou a Zélia. Moro num casarão na Alameda Santos, número 8, pertinho da Avenida Paulista.',
+    'Meu pai, o Ernesto, é mecânico e motorista. A oficina dele fica no barracão do lado de casa, que antes era uma cocheira.',
+    'Em cima do barracão tem um cavalinho de alvenaria. Esse cavalo é o orgulho da minha infância!'],
+    'Zélia Gattai, filha de imigrantes italianos, cresceu na Alameda Santos, perto da Paulista. Depois de adulta escreveu as memórias "Anarquistas, graças a Deus".',ZEL);
+  poe('tito22','n22_menino22~colono',['placaPaulista','sp22'],5,-3,'Tito',[
+    'Eu sou o Tito, irmão da Zélia. O mais velho de nós é o Remo.',
+    'Eu e meus amigos subimos no telhado do barracão do meu pai. Não conta pra minha mãe, a dona Angelina!',
+    'Lá na Paulista moram os ricos, nos palacetes. A gente mora logo ali, na alameda.'],
+    'Tito Gattai, irmão de Zélia. A família era italiana e morava entre os palacetes dos ricos da Paulista.',ZEL);
+  poe('futebol1_22','n22_futebolAS~colono',['placaPaulista','sp22'],-4,-5,'Menino do futebol',[
+    'Passa a bola! Passa a bola!',
+    'Aqui no terreno vazio a gente marca o gol com duas pedras.',
+    'A bola é de couro, com costura. Quando fura, tem que remendar.'],
+    'Meninos jogavam futebol nos terrenos vazios da cidade, com bola de couro.');
+  poe('futebol2_22','n22_meninoVarzea~colono',['placaPaulista','sp22'],-6,-4,'Menino goleiro',[
+    'Eu sou o goleiro. Não passa nada!',
+    'Ih, a bola caiu na horta da vizinha de novo...'],
+    'Meninos jogavam futebol nos terrenos vazios da cidade.');
+  poe('futebol3_22','n22_criancaAS~colono',['placaPaulista','sp22'],-2,-6,'Menino que chuta forte',[
+    'Fui eu que chutei! Mas foi sem querer!',
+    'Quando eu crescer, vou jogar num time de verdade.'],
+    'Meninos jogavam futebol nos terrenos vazios da cidade.');
+  poe('donaHorta22','n22_nonna~dona',['placaPaulista','sp22'],-8,-2,'Dona da horta',[
+    'Madonna mia! Quem foi que pisou nas minhas couves?!',
+    'Toda semana é a mesma coisa: a bola cai aqui e lá vêm os meninos atrás!',
+    'Esta horta dá o tempero da minha casa. Se pisar de novo, a bola fica comigo!'],
+    'Muitas famílias de imigrantes tinham horta no quintal ou num pedaço de terreno.');
+
+  /* ---------- DA MENINA RICA: palacete da Avenida Paulista ---------- */
+  poe('meninaRica22','n22_meninaAS~cesteira',['palP0','sp22'],0,1,'Menina do palacete',[
+    'Bom dia. Eu moro neste palacete, aqui na Avenida Paulista.',
+    'De manhã tenho aula de piano e de francês com a professora, aqui em casa mesmo.',
+    'Da janela eu vejo os meninos jogando bola no terreno. Eu queria brincar também...'],
+    'Nos palacetes da Avenida Paulista moravam famílias ricas, muitas do café.');
+  poe('maeRica22','n22_madameMappin~dona',['palP0','sp22'],-2,1,'Senhora do palacete',[
+    'Nossa família tem fazenda de café no interior. Mas a gente mora aqui na capital.',
+    'Esta avenida é a mais moderna da cidade: larga, com árvores e casas de jardim.',
+    'Menina, venha para dentro! Está na hora do piano.'],
+    'As famílias do café construíram palacetes na Avenida Paulista e em Higienópolis.');
+  poe('empregadaRica22','n22_criadaPrado~cesteira',['palP0','sp22'],2,2,'Empregada do palacete',[
+    'Trabalho aqui no palacete desde cedo: limpo, passo, sirvo a mesa.',
+    'Durmo num quartinho nos fundos. Folga é só no domingo à tarde.'],
+    'Os palacetes tinham muitos empregados: cozinheira, copeira, arrumadeira, motorista.');
+  poe('motoristaRico22','n22_motorista~caixeiro',['palP0','sp22'],3,0,'Motorista da família',[
+    'Eu dirijo o automóvel da família. Levo a senhora ao centro, às compras, e a menina à missa.',
+    'Antes a família tinha cocheiro e carruagem. Agora quem tem dinheiro quer automóvel.'],
+    'Em 1922 as famílias ricas já trocavam a carruagem pelo automóvel, com motorista.');
+
+  /* ---------- DAS MINI-AULAS ---------- */
+  poe('carregadorLuz22','n22_carregador~colono',['luz22','sp22'],-2,1,'Carregador da Estação da Luz',[
+    'Leva a mala, patrão? Carrego até o bonde ou até o carro!',
+    'A Estação da Luz é da São Paulo Railway, a ferrovia dos ingleses. O trem vem de Santos e de Jundiaí.',
+    'Ganho por mala carregada. Dia de muito trem, dá para levar mais dinheiro para casa.'],
+    'Mini-aula 01: na Estação da Luz trabalhavam carregadores, que levavam as malas dos passageiros.');
+  poe('importados22','n22_tipo_caixeiro~caixeiro',['pc_111_g_loja_2x2_2','m_centro22'],0,1,'Comerciante de importados',[
+    'Na minha loja tem tecido inglês, perfume francês, louça e chapéu da Europa.',
+    'Quase tudo chega de navio, pelo porto de Santos, e sobe a serra de trem.',
+    'Quem mais compra são as famílias do café. Para elas, chique é o que vem de fora.'],
+    'Mini-aula 02: o dinheiro do café fazia crescer o comércio de produtos importados no centro.');
+  poe('bancario22','n22_corretorBolsa~caixeiro',['bancoXV','m_centro22'],0,1,'Funcionário de banco',[
+    'Trabalho no banco, aqui no centro. O dinheiro do café passa todo por aqui.',
+    'Fazendeiro deposita, exportador pede empréstimo, industrial abre conta para a fábrica nova.',
+    'Muita fábrica desta cidade começou com dinheiro que veio do café.'],
+    'Mini-aula 03: os bancos ligavam o dinheiro do café às fábricas e ao comércio da cidade.');
+  poe('ambulante22','n22_feirante~colono',['mercCaipiras22','m_centro22'],0,1,'Vendedor ambulante',[
+    'Olha a banana! Olha a laranja! Fresquinha, freguesa!',
+    'Não tenho loja, não. Vendo na rua, com o tabuleiro, de esquina em esquina.'],
+    'Mini-aula 04: muita gente trabalhava por conta própria, vendendo na rua.');
+  poe('artesao22','n22_tipo_ferreiro~colono',['placaBexiga','sp22'],2,1,'Dono de oficina pequena',[
+    'Minha oficina é pequena: eu, meu filho e dois aprendizes.',
+    'Em São Paulo tem muita oficina assim, em fundo de quintal. Faz sapato, móvel, ferragem, chapéu...'],
+    'Mini-aula 04: além das grandes fábricas, a cidade tinha muitas oficinas pequenas.');
+  poe('mestreObras22','n22_mestre22~colono',['pt_11','m_centro22'],0,1,'Mestre de obras italiano',[
+    'Sou mestre de obras. Vim da Itália, como quase todos aqui no canteiro.',
+    'Muitos prédios desta cidade foram levantados por pedreiros e mestres de obras italianos.',
+    'O engenheiro faz o desenho. Mas quem sabe pôr tijolo em cima de tijolo somos nós!'],
+    'Mini-aula 04: imigrantes italianos trabalharam muito na construção dos prédios de São Paulo.');
+  poe('advogado22','n22_secretarioWL~caixeiro',['pc_29_m_palacio_justica_obras','m_centro22'],-2,1,'Advogado',[
+    'Sou advogado. Estudei na Faculdade de Direito, no Largo de São Francisco.',
+    'Estão construindo aqui o Palácio da Justiça. Um dia vou trabalhar nele.'],
+    'Mini-aula 04: médicos, advogados e engenheiros formavam a camada média da cidade.');
+  poe('operaria22b','n22_operaria22~cesteira',['sedaItalo','sp22'],-2,1,'Operária da tecelagem',[
+    'Entro na fábrica de manhã cedinho e saio quando já está escurecendo.',
+    'Aqui na tecelagem tem muita mulher e muita menina trabalhando.',
+    'Em 1917 teve uma greve geral enorme. A gente pedia salário melhor e menos horas de trabalho.'],
+    'Mini-aula 05: as fábricas de tecido empregavam muitas mulheres e crianças. Em 1917 houve uma grande greve geral.');
+  poe('criancaOperaria22','n22_meninoTrem~colono',['sedaItalo','sp22'],1,2,'Menino da fábrica',[
+    'Eu trabalho na fábrica. Ajudo nas máquinas e carrego as bobinas.',
+    'Minha família precisa do dinheiro. Escola, só quando dá.'],
+    'Mini-aula 05: em 1922 muitas crianças trabalhavam nas fábricas de São Paulo.');
+  poe('domestica22','n22_empregada~cesteira',['higienopolis1','sp22'],0,1,'Empregada doméstica',[
+    'Vou ao mercado comprar verdura e carne para a patroa.',
+    'Trabalho numa casa aqui de Higienópolis. Começo antes de todo mundo acordar.'],
+    'Mini-aula 05: o trabalho doméstico era feito sobretudo por mulheres pobres, muitas delas negras e imigrantes.');
+  poe('fazInvest22','n22_fazendeiroRP~dona',['banco1','sp22'],0,1,'Fazendeiro investidor',[
+    'Tenho fazenda de café no interior. Mas agora eu ponho dinheiro aqui na cidade.',
+    'Ações de ferrovia, fábrica de tecido, terreno para lotear... O café paga tudo isso.'],
+    'Mini-aula 07: fazendeiros de café investiram em ferrovias, bancos, fábricas e terrenos na cidade.');
+  poe('maqCarga22','n22_ferroviario22~colono',['armIngl0','sp22'],0,1,'Guarda do trem de carga',[
+    'Este trem leva sacas de café até o porto de Santos.',
+    'Na volta, ele traz máquina, tecido, ferro e gente que chega de navio.'],
+    'Mini-aula 07: a ferrovia levava o café ao porto e trazia mercadorias e imigrantes.');
+}catch(e){console.warn('personagens 1922 v111',e);}})();
+
+},0);
 /*__V22_END__*/
 /*__HELP_START__*/
 /* =========================================================
