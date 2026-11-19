@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=113"></script>
+<script src="arte/arte_comum.js?v=115"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=113"></script>
+<script src="arte/arte_1554.js?v=115"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=113"></script>
+<script src="arte/arte_1830.js?v=115"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=113"></script>
+<script src="arte/arte_1888.js?v=115"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=113"></script>
+<script src="arte/arte_1922.js?v=115"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -10421,7 +10421,10 @@ setTimeout(function(){
 /* 1922: ninguém e nada fica preso num lugar onde o aluno não consegue chegar */
 (function(){let ok=false;const iv=setInterval(()=>{try{if(ok||cur!=='sp22'||!started)return;ok=true;clearInterval(iv);
   const seen=new Uint8Array(MW*MH),q=[player.x,player.y];seen[player.y*MW+player.x]=1;
-  for(let i=0;i<q.length;i+=2){const x=q[i],y=q[i+1];for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const xx=x+a,yy=y+b;if(xx<0||yy<0||xx>=MW||yy>=MH||seen[yy*MW+xx]||!walkable(xx,yy))continue;seen[yy*MW+xx]=1;q.push(xx,yy);}}
+  /* v115: sem bonecos e andantes durante a busca (antes travava o jogo ~1 s ao sair do centro) */
+  const W0=walkers.splice(0),N0=npcs.splice(0),PL=[player.x,player.y];player.x=-9;player.y=-9;
+  try{for(let i=0;i<q.length;i+=2){const x=q[i],y=q[i+1];for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const xx=x+a,yy=y+b;if(xx<0||yy<0||xx>=MW||yy>=MH||seen[yy*MW+xx]||!walkable(xx,yy))continue;seen[yy*MW+xx]=1;q.push(xx,yy);}}}
+  finally{walkers.push(...W0);npcs.push(...N0);player.x=PL[0];player.y=PL[1];}
   if(q.length<20000)return;
   const near=(x,y)=>[[1,0],[-1,0],[0,1],[0,-1],[0,0]].some(([a,b])=>seen[(y+b)*MW+x+a]);
   const spot=(x,y)=>{for(let r=1;r<9;r++)for(let yy=y-r;yy<=y+r;yy++)for(let xx=x-r;xx<=x+r;xx++){if(xx<1||yy<1||xx>=MW-1||yy>=MH-1||!seen[yy*MW+xx])continue;if(occ[yy][xx]||npcs.some(n=>n.scene==='sp22'&&n.x===xx&&n.y===yy)||ITEMS.some(i=>i.scene==='sp22'&&i.x===xx&&i.y===yy))continue;
@@ -14555,6 +14558,17 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   C.liga=rel;C.entradas=ENT;
 }catch(e){console.warn('centro novo ligado',e);}})();
 
+/* v115: o MAPA dentro do centro novo mostra São Paulo em 1922 (antes caía no mapa de 1554, de São Vicente) */
+(function(){try{const C=window.__centro22;if(!C||typeof drawMap!=='function')return;const S=C.S;
+  const raiz=()=>{let s=cur,k=0;while(SCN[s]&&SCN[s].room&&SCN[s].parent&&SCN[s].parent!==s&&k++<5){if(s===S)break;s=SCN[s].parent;}return s;};
+  const dm=drawMap;drawMap=function(){if(raiz()!==S)return dm.apply(this,arguments);
+    let px=player.x,py=player.y;if(cur!==S){let s=cur,r=null,k=0;while(s!==S&&SCN[s]&&k++<5){r=SCN[s].ret||r;s=SCN[s].parent;}if(r){px=r.x;py=r.y;}}
+    const gx=Math.round(C.X0+px/C.K),gy=Math.round(C.Y0+py/C.K);
+    try{const E=SCN.sp22.exp,W=SCN.sp22.map[0].length;for(let y=64;y<=112;y++)for(let x=58;x<=132;x++)E[y*W+x]=1;}catch(_){}
+    const c0=cur;SCN.__mapc22={room:1,parent:'sp22',ret:{x:gx,y:gy},map:SCN.sp22.map,exp:SCN.sp22.exp,label:'Centro'};
+    try{cur='__mapc22';dm.apply(this,arguments);}finally{cur=c0;delete SCN.__mapc22;try{buildStatic();}catch(_){}}};
+}catch(e){console.warn('mapa centro',e);}})();
+
 /* =========================================================
    GENTE DE 1922 (v105)
    - 42 personagens novos (folhas 32x64 da expansão HD, mostradas em 16x32, com retrato próprio);
@@ -14680,9 +14694,28 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
       lines:['Psiu! Eu também vim do seu tempo. Sou professora de História e me vesti como em 1922 para ninguém estranhar.','Um historiador do nosso tempo, Nicolau Sevcenko, escreveu um livro sobre esta cidade nos anos 1920. Escute o que ele diz:'].concat(CIT,['O que você acha: São Paulo, em 1922, já era moderna? Ande pela cidade e procure pistas.','[Personagem inventada para o jogo. A citação é de SEVCENKO, Nicolau. Orfeu extático na metrópole. 2009, p. 31.]']),
       diary:'Nicolau Sevcenko sobre São Paulo nos anos 1920: uma cidade que “não era ainda moderna, mas já não tinha mais passado”, um enigma para os próprios habitantes. (SEVCENKO, 2009, p. 31)'}],S);}catch(_){}};
   /* v106: ninguém sobe nos viadutos pelo meio do vale; entra só pelas cabeceiras */
-  const guarda=()=>{try{if(objects.some(o=>o.id==='guardaViad_0'))return;let k=0;
-    for(const y of [19,24,41,46]){objects.push({id:'guardaViad_'+(k++),scene:S,x:50,y,w:14,h:1,draw:()=>{},name:'Encosta do vale',text:['Daqui não dá para subir no viaduto: ele passa lá no alto. Para atravessar por cima, entre pela cabeceira, na rua.']});}
-    if(cur===S&&typeof buildOcc==='function')buildOcc();}catch(_){}};
+  /* v114: VIADUTOS DE DOIS ANDARES. Quem vem pela rua anda por cima; quem vem pelo vale do Anhangabaú passa por baixo
+     (o viaduto é desenhado por cima do boneco). Não dá para trocar de andar no meio do vão. */
+  const VIAS=[{x0:50,x1:63,y0:42,y1:45,nome:'Viaduto do Chá'},{x0:50,x1:63,y0:20,y1:23,nome:'Viaduto Santa Ifigênia'}];
+  const via=(x,y)=>VIAS.find(v=>x>=v.x0&&x<=v.x1&&y>=v.y0&&y<=v.y1);
+  const guarda=()=>{try{for(let i=objects.length-1;i>=0;i--)if(/^guardaViad_/.test(objects[i].id))objects.splice(i,1);if(cur===S&&typeof buildOcc==='function')buildOcc();}catch(_){}};
+  let avisouSob=false;
+  {const w0=walkable;walkable=function(x,y){try{if(cur===S&&player){const px=player.x,py=player.y;if(Math.abs(px-x)+Math.abs(py-y)===1){
+        const vd=via(x,y),vo=via(px,py),V=vd||vo;
+        if(V){const doVale=(yy)=>yy===V.y0-1||yy===V.y1+1;
+          if(vd&&!vo){ /* entrando no vão */
+            if(x===px&&doVale(py)&&x>=V.x0&&x<=V.x1){if(!w0(x,y))return false;player.sob=V;if(!avisouSob){avisouSob=true;try{toast('Você passa por baixo do '+V.nome+'.');}catch(_){}}return true;}
+            player.sob=null;return w0(x,y);}
+          if(vo&&!vd){ /* saindo do vão */
+            if(player.sob)return y!==py&&doVale(y)&&w0(x,y);
+            if(y!==py&&doVale(y))return false; /* de cima não se pula no vale */
+            return w0(x,y);}
+          if(vo&&vd&&player.sob&&y===py)return false; /* por baixo, só se anda reto */
+        }}}}catch(_){}return w0(x,y);};}
+  setInterval(()=>{try{if(player&&player.sob&&!player.moving&&(cur!==S||!via(player.x,player.y)))player.sob=null;}catch(_){}},200);
+  {const lo=lifeOverlay;lifeOverlay=function(camX,camY){const r=lo.apply(this,arguments);try{const V=player&&player.sob;if(V&&cur===S){
+      const sx=V.x0*16,sy=V.y0*16,w=(V.x1-V.x0+1)*16,h=(V.y1-V.y0+1)*16;const ga=ctx.globalAlpha;ctx.globalAlpha=.86;ctx.drawImage(stat,sx,sy,w,h,sx-camX,sy-camY,w,h);ctx.globalAlpha=ga;
+      ctx.fillStyle='rgba(20,27,27,.18)';ctx.fillRect(sx-camX,sy+h-camY,w,3);}}catch(_){}return r;};}
   /* v106: fontes (placas de foto) não ficam grudadas umas nas outras */
   const espalha=()=>{try{const F=objects.filter(o=>o.scene===S&&((typeof FONTES!=='undefined'&&FONTES[o.id])||o.fonteK||/^gl2_/.test(o.id)));const longe=(o,x,y)=>F.every(q=>q===o||Math.abs(q.x-x)+Math.abs(q.y-y)>=5);
     for(const o of F){if(longe(o,o.x,o.y))continue;let ok=null;for(let r=3;r<=14&&!ok;r++)for(let b=o.y-r;b<=o.y+r&&!ok;b++)for(let a=o.x-r;a<=o.x+r&&!ok;a++){if(Math.max(Math.abs(a-o.x),Math.abs(b-o.y))!==r)continue;if(!freeAt(S,a,b)||ocupado(S,a,b)||(C.naRede&&!C.naRede(a,b)))continue;if(longe(o,a,b))ok=[a,b];}
@@ -15000,6 +15033,183 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
       if(!V[cur])V[cur]=cria(cur);if(started&&!dialog)passo(cur,dt);desenha(cur,camX,camY);}}catch(e){if(!window.__trErr){window.__trErr=1;console.warn('transito',e);}}if(wo)wo.apply(this,arguments);};
   window.__transito={V,INFO,cria,CONF,info};
 }catch(e){console.warn('transito 1922',e);}})();
+
+/* =========================================================
+   CENTRO CHEIO (v115): interiores para os prédios do centro, telefone, prensa, café com conversa de política,
+   Câmara e Prefeitura no Palacete Prates, igrejas por dentro e gente andando pelas ruas.
+   Peças desenhadas em código (provisórias) até chegar a arte do Canva.
+   ========================================================= */
+(function(){try{const K=window.__kit;if(!K||!K.sala)return;const D=K.D,S='m_centro22',C=window.__centro22||{};
+  const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};const KK='#1c1418';
+  const box=(c,x,y,w,h,a,b)=>{R(c,x,y,w,h,KK);R(c,x+1,y+1,w-2,h-2,a);if(b)R(c,x+1,y+1,w-2,2,b);};
+  const sh=(c,X,Y,w)=>{c.fillStyle='rgba(20,27,27,.22)';c.fillRect(X+2,Y+13,w-4,3);};
+  const tt=()=>performance.now()/1000;
+  Object.assign(D,{
+    telefone:{w:1,h:1,wall:1,d(c,X,Y){box(c,X+3,Y-10,10,14,'#6a4424','#8a5a30');R(c,X+5,Y-8,6,3,'#c8a040');R(c,X+6,Y-4,4,4,KK);R(c,X+13,Y-7,2,6,'#2a2a2a');R(c,X+1,Y-9,2,7,'#2a2a2a');R(c,X+2,Y-3,1,5,'#2a2a2a');}},
+    telefoneMesa:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+2,Y+6,12,9,'#6a4424','#8a5a30');R(c,X+7,Y-3,2,10,'#1a1a1a');R(c,X+5,Y-5,6,3,'#1a1a1a');R(c,X+10,Y,4,2,'#1a1a1a');R(c,X+12,Y+2,1,4,'#1a1a1a');}},
+    mesaTelefonista:{w:3,h:1,d(c,X,Y){sh(c,X,Y,48);box(c,X+1,Y-12,46,26,'#5e3c20','#7a5030');for(let j=0;j<3;j++)for(let i=0;i<9;i++){R(c,X+4+i*5,Y-9+j*5,3,3,KK);R(c,X+5+i*5,Y-8+j*5,1,1,(i+j)%3?'#c8a040':'#e8e0d0');}R(c,X+3,Y+6,42,3,'#3a2a1a');const f=Math.floor(tt()*2)%3;R(c,X+8+f*12,Y-2,1,8,'#a03a2a');}},
+    maqEscrever:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+1,Y+3,14,11,'#6a4424','#8a5a30');box(c,X+3,Y-1,10,6,'#1a1a1a','#3a3a3a');R(c,X+5,Y-4,6,4,'#f4efe4');for(let i=0;i<4;i++)R(c,X+4+i*2,Y+3,1,1,'#c8c8c0');}},
+    prensa:{w:2,h:2,d(c,X,Y){sh(c,X,Y+16,32);box(c,X+2,Y+4,28,26,'#2a3232','#3e4a4a');const f=Math.sin(tt()*3)*3;box(c,X+5,Y+8+f,22,6,'#5a6a6a','#7a8a8a');R(c,X+6,Y+20,20,6,'#f4efe4');R(c,X+7,Y+22,12,1,'#3a3a3a');R(c,X+7,Y+24,8,1,'#3a3a3a');c.fillStyle=KK;c.beginPath();c.arc(X+28,Y+10,6,0,7);c.fill();c.fillStyle='#8a8a82';c.beginPath();c.arc(X+28,Y+10,4,0,7);c.fill();const a=tt()*3;R(c,X+28+Math.cos(a)*3,Y+10+Math.sin(a)*3,2,2,KK);}},
+    caixaTipos:{w:2,h:1,d(c,X,Y){sh(c,X,Y,32);box(c,X+1,Y-6,30,20,'#7a5030','#9a6a40');for(let j=0;j<3;j++)for(let i=0;i<7;i++){R(c,X+3+i*4,Y-4+j*5,3,4,'#3e2814');R(c,X+4+i*4,Y-2+j*5,1,1,'#c8c8c0');}}},
+    pilhaJornais:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);for(let j=0;j<5;j++){R(c,X+2,Y+11-j*3,12,3,KK);R(c,X+3,Y+11-j*3,10,2,j%2?'#e8e0d0':'#f4efe4');R(c,X+4,Y+11-j*3,6,1,'#6a6a6a');}}},
+    vitrineChapeus:{w:2,h:1,d(c,X,Y){sh(c,X,Y,32);box(c,X+1,Y-8,30,22,'#6a4424');R(c,X+3,Y-6,26,17,'#cfe4ee');const cs=['#3a3a3a','#b89060','#7a2a1c','#e8e0d0','#2a4a6a','#5a5a3a'];for(let j=0;j<2;j++)for(let i=0;i<3;i++){const x=X+5+i*8,y=Y-4+j*8;R(c,x,y+3,7,2,cs[(i+j*3)%6]);R(c,x+1,y,5,4,cs[(i+j*3)%6]);R(c,x+1,y+2,5,1,'#a03a2a');}}},
+    cabide:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);R(c,X+7,Y-10,2,24,'#5e3c20');R(c,X+4,Y+12,8,2,'#5e3c20');R(c,X+2,Y-10,5,3,'#3a3a3a');R(c,X+3,Y-12,3,2,'#3a3a3a');R(c,X+9,Y-7,5,3,'#b89060');R(c,X+10,Y-9,3,2,'#b89060');}},
+    balcaoCafe:{w:3,h:1,d(c,X,Y){sh(c,X,Y,48);box(c,X,Y+1,48,14,'#5e3820','#7a4a24');R(c,X+2,Y+1,44,2,'#d8d0c0');box(c,X+30,Y-10,10,12,'#b8b8b0','#d8d8d0');R(c,X+33,Y-14,4,4,'#8a8a82');const v=Math.floor(tt()*3)%3;R(c,X+34,Y-18-v,2,3,'rgba(240,240,240,.6)');for(let i=0;i<4;i++){R(c,X+4+i*6,Y-2,4,3,'#f4efe4');R(c,X+5+i*6,Y-2,2,1,'#5a3a1a');}}},
+    mesaCafe:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);c.fillStyle=KK;c.beginPath();c.ellipse(X+8,Y+5,7,4,0,0,7);c.fill();c.fillStyle='#e8e0d0';c.beginPath();c.ellipse(X+8,Y+5,6,3,0,0,7);c.fill();R(c,X+7,Y+8,2,6,KK);R(c,X+4,Y+3,3,2,'#f4efe4');R(c,X+10,Y+4,3,2,'#f4efe4');R(c,X+5,Y+3,1,1,'#5a3a1a');}},
+    altar:{w:3,h:1,d(c,X,Y){sh(c,X,Y,48);box(c,X+1,Y-4,46,18,'#e8e0d0','#f4efe4');R(c,X+3,Y,42,2,'#c8a040');R(c,X+22,Y-14,4,12,'#c8a040');R(c,X+19,Y-11,10,3,'#c8a040');for(const x of [8,38]){R(c,X+x,Y-9,2,6,'#f4efe4');R(c,X+x,Y-11+(Math.floor(tt()*6)%2),2,2,'#f1c471');}R(c,X+12,Y+4,24,8,'#7a2a1c');}},
+    bancoIgreja:{w:3,h:1,d(c,X,Y){const w=48;sh(c,X,Y,w);box(c,X+1,Y+1,w-2,5,'#6a4424','#8a5a30');box(c,X+1,Y+6,w-2,6,'#7a5030');R(c,X+2,Y+12,2,3,KK);R(c,X+w-4,Y+12,2,3,KK);}},
+    santo:{w:1,h:1,wall:1,d(c,X,Y){box(c,X+2,Y-12,12,20,'#c8a040');R(c,X+4,Y-10,8,16,'#3a4a6a');R(c,X+6,Y-9,4,4,'#e0b890');R(c,X+5,Y-5,6,10,'#7a2a1c');R(c,X+6,Y-11,4,1,'#f1c471');}},
+    cruz:{w:1,h:1,wall:1,d(c,X,Y){R(c,X+7,Y-12,2,18,'#5e3c20');R(c,X+3,Y-8,10,2,'#5e3c20');}},
+    icone:{w:1,h:1,wall:1,d(c,X,Y){box(c,X+2,Y-12,12,16,'#c8a040','#e8c060');R(c,X+5,Y-9,6,6,'#e0b890');R(c,X+4,Y-10,8,2,'#f1c471');R(c,X+5,Y-3,6,5,'#2a4a6a');}},
+    pulpito:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+2,Y-4,12,18,'#6a4424','#8a5a30');R(c,X+4,Y-6,8,3,'#f4efe4');}},
+    pia:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);R(c,X+6,Y+4,4,10,'#c8c8c0');c.fillStyle=KK;c.beginPath();c.ellipse(X+8,Y+3,7,4,0,0,7);c.fill();c.fillStyle='#e8e8e0';c.beginPath();c.ellipse(X+8,Y+3,6,3,0,0,7);c.fill();R(c,X+5,Y+2,6,2,'#8ac8e8');}},
+    guiche:{w:2,h:1,d(c,X,Y){sh(c,X,Y,32);box(c,X,Y-10,32,25,'#6a4424','#8a5a30');R(c,X+4,Y-8,24,10,'#cfe4ee');for(let i=0;i<6;i++)R(c,X+5+i*4,Y-8,1,10,'#8a7a50');R(c,X+2,Y+3,28,2,'#c8a040');}},
+    cofre:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+1,Y-2,14,16,'#3a4a4a','#5a6a6a');c.fillStyle='#c8a040';c.beginPath();c.arc(X+8,Y+5,3,0,7);c.fill();R(c,X+11,Y+3,2,4,'#c8c8c0');}},
+    arquivo:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+1,Y-6,14,20,'#5e4a2a','#7a6038');for(let j=0;j<3;j++){R(c,X+3,Y-4+j*6,10,1,'#3e2814');R(c,X+6,Y-2+j*6,4,1,'#c8a040');}}},
+    bandeira:{w:1,h:1,wall:1,d(c,X,Y){R(c,X+2,Y-12,1,18,'#5e3c20');R(c,X+3,Y-12,11,8,'#2a8a3a');c.fillStyle='#f1c471';c.beginPath();c.moveTo(X+8,Y-11);c.lineTo(X+13,Y-8);c.lineTo(X+8,Y-5);c.lineTo(X+4,Y-8);c.fill();c.fillStyle='#2a4a8a';c.beginPath();c.arc(X+8,Y-8,2,0,7);c.fill();}},
+    bilhar:{w:3,h:2,d(c,X,Y){sh(c,X,Y+16,48);box(c,X+1,Y+2,46,26,'#5e3820','#7a4a24');R(c,X+4,Y+5,40,20,'#2a7a4a');for(const [a,b] of [[4,5],[42,5],[4,23],[42,23],[23,5],[23,23]])R(c,X+a,Y+b,2,2,KK);R(c,X+14,Y+14,3,3,'#f4efe4');R(c,X+30,Y+12,3,3,'#a03a2a');R(c,X+33,Y+16,3,3,'#e8c060');R(c,X+6,Y+29,2,3,KK);R(c,X+40,Y+29,2,3,KK);}},
+    vitrine:{w:2,h:1,d(c,X,Y,o){sh(c,X,Y,32);box(c,X+1,Y-6,30,20,'#6a4424');R(c,X+3,Y-4,26,15,'#cfe4ee');const cs=o.cs||['#c8a040','#a03a2a','#2a4a6a','#e8e0d0'];for(let j=0;j<2;j++)for(let i=0;i<5;i++)R(c,X+5+i*5,Y-2+j*7,3,4,cs[(i+j)%cs.length]);}},
+    relogios:{w:2,h:1,wall:1,d(c,X,Y){box(c,X+1,Y-12,30,22,'#6a4424');for(let i=0;i<3;i++){c.fillStyle=KK;c.beginPath();c.arc(X+7+i*9,Y-4,4,0,7);c.fill();c.fillStyle='#f4efe4';c.beginPath();c.arc(X+7+i*9,Y-4,3,0,7);c.fill();R(c,X+7+i*9,Y-6,1,2,KK);}const p=Math.sin(tt()*3)*3;R(c,X+15+p,Y+3,2,5,'#c8a040');}},
+    bancaFrutas:{w:2,h:1,d(c,X,Y){sh(c,X,Y,32);box(c,X+1,Y+4,30,10,'#8a5a30','#a87440');const cs=['#e8a020','#c03a2a','#7aa648','#f1c471','#e86a3a'];for(let i=0;i<10;i++){c.fillStyle=cs[i%5];c.beginPath();c.arc(X+4+i*2.6,Y+3-(i%3),2,0,7);c.fill();}}},
+    camera:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);R(c,X+3,Y+4,1,10,KK);R(c,X+12,Y+4,1,10,KK);R(c,X+7,Y+4,1,10,KK);box(c,X+2,Y-4,12,9,'#3a2a1a','#5a4a2a');R(c,X+5,Y-1,6,5,'#1a1a1a');R(c,X+7,Y,2,2,'#8ab0d0');}},
+    quadro:{w:3,h:1,wall:1,d(c,X,Y,o){const w=(o&&o.w||3)*16;box(c,X+1,Y-12,w-2,20,'#6a4424');R(c,X+3,Y-10,w-6,16,'#7aa0b8');R(c,X+3,Y-2,w-6,8,'#6a9a5a');R(c,X+8,Y-8,6,4,'#e8e0d0');}}
+  });
+  const INV='[Personagem inventado para o jogo.]';
+  const REAL='[Personagem real. As falas foram criadas para o jogo a partir de fatos documentados.]';
+  /* liga um prédio do centro a uma sala */
+  const ligaC=(o,key,rot)=>{if(!o||!SCN[key])return false;if(o.room||o.enter)return false;let d=null;const c0=Math.floor(o.w/2);
+    for(const dx of [0,-1,1,-2,2,-3,3]){const x=c0+dx;if(x<0||x>=o.w)continue;const X=o.x+x,Y=o.y+o.h;if(freeAt(S,X,Y)&&(!C.naRede||C.naRede(X,Y))){d=x;break;}}
+    if(d==null)return false;o.door=d;o.enter='kit';o.room=key;o.__rotulo=rot||o.name;return true;};
+  const P=(t)=>t;
+  /* ---------- salas modelo ---------- */
+  const loja=(key,label,piso,parede,obj,gente)=>{if(SCN[key])return;K.sala(key,{W:14,H:10,sx:6,label,parede,piso:()=>piso,obj,gente});};
+  loja('m_t_relojoaria','Relojoaria','ladrilho','#c8b8a0',[['relogios',2,2,'Relógios de parede','Relógios de parede e de bolso. Em 1922, o relógio de bolso era objeto de valor, presente de casamento e de formatura.'],['relogios',8,2,'Mais relógios','Cada relógio marca uma hora um pouquinho diferente. O relojoeiro acerta todos pelo relógio da estação.'],['balcao',4,5,'Balcão',null,{w:5}],['vitrine',10,6,'Vitrine','Relógios de pulso: novidade que ficou popular depois da guerra.',{cs:['#c8a040','#c8c8c0','#e8e0d0']}],['lampada',6,2]],
+    [['relojoeiro22','colono',6,4,'Relojoeiro',['Conserto relógio de bolso, de parede e despertador. Precisa de lupa e muita paciência.','Os ingleses da estrada de ferro trouxeram a mania da hora certa: trem tem horário.'],'Os relógios ficaram mais importantes com os trens e as fábricas, que tinham horário certo.']]);
+  loja('m_t_papelaria','Papelaria','tabua','#d8ccb0',[['prateleira',1,4,'Prateleira','Cadernos, tinta, pena, mata-borrão e papel de carta.',{w:3}],['balcao',5,5,'Balcão',null,{w:4}],['vitrine',10,4,'Vitrine','Canetas-tinteiro e lápis importados.',{cs:['#2a4a6a','#a03a2a','#c8a040','#1a1a1a']}],['pilhaJornais',11,7,'Revistas','Revistas ilustradas da semana.'],['mapa',8,2,'Mapa da cidade','Planta da cidade de São Paulo à venda.']],
+    [['papeleiro22','colono',7,4,'Dono da papelaria',['Caderno, tinteiro, pena de aço. A escola começa e a papelaria enche.','Tenho também cartão-postal da cidade: o Viaduto do Chá e o Theatro Municipal são os que mais vendem.'],'As papelarias vendiam material escolar e cartões-postais da cidade.']]);
+  loja('m_t_tabacaria','Tabacaria','tabua','#b89870',[['prateleira',1,4,'Charutos','Caixas de charuto da Bahia e cigarros de maço.',{w:3,cs:['#7a4a24','#a87440','#c8a040']}],['balcao',5,5,'Balcão',null,{w:4}],['pilhaJornais',11,5,'Jornais','A tabacaria também vende jornal.'],['cartaz',9,2]],
+    [['tabaqueiro22','colono',7,4,'Tabaqueiro',['Charuto, cigarro, fumo de rolo e palha. E o jornal do dia, que o pessoal lê aqui mesmo.','Aqui se discute tudo: a eleição, o preço do café, o futebol do domingo.'],'As tabacarias eram ponto de encontro e de conversa no centro.']]);
+  loja('m_t_tecidos','Loja de tecidos','tabua','#d0c4a8',[['rolo',1,4,'Rolos de tecido','Chita, linho, casimira e seda. A seda boa vem de fora; a chita é feita aqui, nas fábricas do Brás e da Mooca.',{cs:['#c03a2a','#e8e0d0','#2a4a6a']}],['rolo',2,4,'Rolos de tecido',null,{cs:['#7aa648','#c8a040','#8a6a9a']}],['balcao',5,5,'Balcão de medir','O caixeiro mede o pano no metro de madeira e corta com a tesoura.',{w:5}],['prateleira',10,4,'Aviamentos','Botões, linhas, fitas e rendas.',{w:3}],['costura',3,7,'Máquina de costura','Máquina de costura à venda, a prestações.']],
+    [['caixeiroTec22','colono',7,4,'Caixeiro da loja de tecidos',['Quantos metros a senhora quer? A chita está barata: as fábricas daqui produzem muito.','Muitas lojas de tecidos do centro são de imigrantes, sírios, libaneses, portugueses e italianos.'],'Os tecidos produzidos nas fábricas paulistas eram vendidos nas lojas do centro.'],['freguesaTec22','colono',3,6,'Freguesa',['Vou fazer um vestido novo. Saia um pouco abaixo do joelho, como está na moda.'],'A moda feminina mudou depois de 1918: saias mais curtas e cortes mais retos.']]);
+  loja('m_t_calcados','Sapataria','tabua','#c8b49a',[['sapatos',1,4,'Sapatos','Botinas, sapatos de verniz e sandálias.',{w:3}],['balcao',5,5,'Balcão',null,{w:4}],['banco',9,6,'Banco para provar','Sente e experimente.',{w:2}],['sapatos',10,4,'Mais sapatos',null,{w:3}]],
+    [['sapateiro22','colono',7,4,'Vendedor de calçados',['Sapato feito em fábrica já é mais barato que o de sapateiro. Mas muita criança ainda anda descalça.'],'As fábricas de calçados barateavam os sapatos, mas muitos pobres andavam descalços.']]);
+  loja('m_t_fotografo','Ateliê de fotografia','tabua','#b8b0a8',[['camera',6,5,'Câmera de fole','A câmera fica no tripé. Para a foto sair boa, a pessoa precisa ficar parada alguns segundos.'],['quadro',2,2,'Fundo pintado','Um jardim pintado no pano de fundo.',{w:3}],['retrato',9,2,'Retratos','Retratos de família, de casamento, de formatura.'],['retrato',11,2],['banco',3,5,'Cadeira de pose',null,{w:2}]],
+    [['fotografo22','colono',8,5,'Fotógrafo',['Não se mexa! Um, dois, três... Pronto.','Muita família guarda uma foto só da vida inteira: a do casamento.'],'Em 1922, tirar retrato no ateliê do fotógrafo era um acontecimento para muitas famílias.']]);
+  loja('m_t_livraria','Livraria','tabua','#c8b898',[['prateleira',1,3,'Livros','Romances, livros de Direito, gramáticas e livros escolares.',{w:3,cs:['#7a2a1c','#2a4a6a','#3a5a3a','#c8a040']}],['prateleira',10,3,'Livros',null,{w:3,cs:['#5a3a6a','#7a2a1c','#e8e0d0']}],['mesa',5,6,'Novidades','Livros novos chegados de Lisboa e de Paris. E também de editoras daqui.',{w:3}]],
+    [['livreiro22','colono',7,4,'Livreiro',['Livro de São Paulo, impresso em São Paulo: Monteiro Lobato montou editora e está vendendo muito.','Os rapazes da Faculdade de Direito compram aqui, e às vezes pagam fiado.'],'Monteiro Lobato fundou uma editora em São Paulo e ajudou a vender livros pelo país nos anos 1920.']]);
+  loja('m_t_flores','Floricultura','ladrilho','#d8e0c8',[['vitrine',2,4,'Flores','Rosas, cravos e dálias.',{cs:['#c03a2a','#f4efe4','#e86a9a','#e8c060']}],['vitrine',9,4,'Coroas','Coroas de flores para enterros e buquês para casamentos.',{cs:['#7aa648','#f4efe4','#c03a2a']}],['balcao',5,6,'Balcão',null,{w:4}]],
+    [['florista22','colono',7,5,'Florista',['As flores vêm das chácaras em volta da cidade, de madrugada, de carroça.'],'Chácaras dos arredores abasteciam a cidade de flores, verduras e frutas.']]);
+  loja('m_t_presentes','Loja','ladrilho','#d0c0a0',[['vitrine',2,4,'Vitrine','Louças, perfumes, brinquedos e joias, conforme a loja.',{cs:['#c8a040','#cfe4ee','#a03a2a','#e8e0d0']}],['balcao',5,5,'Balcão',null,{w:4}],['vitrine',10,4,'Vitrine',null,{cs:['#2a4a6a','#c8a040','#f4efe4']}],['prateleira',1,7,'Prateleira',null,{w:3}],['lampada',7,2]],
+    [['lojista22','colono',7,4,'Lojista',['Mercadoria importada chega por Santos e sobe de trem até aqui.','A freguesia rica vai ao Triângulo para ver e ser vista, nas ruas XV, Direita e São Bento.'],'O Triângulo (ruas Direita, XV de Novembro e São Bento) era o centro do comércio elegante.']]);
+  loja('m_t_armazem','Armazém','tabua','#b8a080',[['saco',1,4,'Sacos','Arroz, feijão, farinha e açúcar, vendidos a granel.'],['saco',2,4],['barril',3,4,'Barril','Azeite, vinho e bacalhau em barricas.'],['balcao',5,5,'Balcão','No balcão, a balança e o caderno de fiado.',{w:4}],['prateleira',10,4,'Prateleira','Latas, velas, sabão e querosene.',{w:3}],['caixote',11,7],['caixote',12,7]],
+    [['armazem22','colono',7,4,'Dono do armazém',['Vendo fiado para a freguesia do bairro: anoto no caderno e cobro no fim do mês.','O preço do feijão subiu de novo. A carestia é a queixa de todo mundo.'],'A carestia, o aumento do preço dos alimentos, era uma queixa constante dos trabalhadores.']]);
+  loja('m_t_padaria','Padaria e doces','ladrilho','#e0d0b0',[['balcao',3,5,'Balcão','Pão francês, pão doce, broa e biscoito.',{w:6}],['forno',10,3,'Forno','O forno a lenha. O padeiro acorda de madrugada.'],['bancaFrutas',1,7,'Frutas e doces','Doces e frutas: goiabada, cocada, pé-de-moleque.']],
+    [['padeiro22b','colono',6,4,'Padeiro',['O primeiro pão sai às cinco da manhã. A carroça de entrega leva pão de casa em casa.'],'Padarias entregavam pão em casa, de carroça ou a pé, todas as manhãs.']]);
+  if(!SCN.m_t_cafe)K.sala('m_t_cafe',{W:16,H:11,sx:7,label:'Café',parede:'#c8a888',piso:()=> 'ladrilho',
+    obj:[['balcaoCafe',1,4,'Balcão do café','O café é coado na hora e servido em xícara pequena. Custa poucos tostões.'],['mesaCafe',6,5,'Mesa'],['mesaCafe',9,5,'Mesa'],['mesaCafe',12,5,'Mesa'],['mesaCafe',6,8,'Mesa'],['mesaCafe',11,8,'Mesa'],['pilhaJornais',14,4,'Jornais do dia','O Estado de S. Paulo, o Correio Paulistano, A Plebe. Cada freguês lê o seu.'],['quadro',8,2,'Tabuleta de preços','CAFÉ — 100 réis. PÃO COM MANTEIGA — 200 réis.',{w:3}],['lampada',4,2],['lampada',12,2],['telefone',14,2,'Telefone do café','O telefone fica na parede. Quem não tem telefone em casa vem ligar daqui.']],
+    gente:[['cafeEleitor','colono',7,6,'Freguês lendo o jornal',['A eleição para presidente é no dia 1º de março: Arthur Bernardes contra Nilo Peçanha.','O Nilo e a Reação Republicana dizem que São Paulo e Minas mandam demais no país.'],'Na eleição presidencial de 1º de março de 1922, Arthur Bernardes (apoiado por SP e MG) enfrentou Nilo Peçanha, da Reação Republicana.'],
+      ['cafeComerciante','colono',10,6,'Comerciante',['Eu voto. Mas quem não sabe ler não vota, e mulher também não. Pouca gente decide por todos.'],'Em 1922, analfabetos e mulheres não votavam no Brasil.'],
+      ['cafeVotoAberto','colono',13,6,'Senhor que fala de política',['O voto aqui é aberto: todo mundo vê em quem você votou. Tem patrão que manda no voto do empregado.'],'Na Primeira República, o voto era aberto, o que facilitava pressões e fraudes.'],
+      ['cafeEstudante','colono',7,9,'Estudante de Direito',['Nesta semana os modernistas fazem barulho no Theatro Municipal. Dizem que vai ter vaia!'],'A Semana de Arte Moderna aconteceu no Theatro Municipal nos dias 13, 15 e 17 de fevereiro de 1922.'],
+      ['cafeGarcom','colono',3,6,'Garçom',['Cafezinho? O café vem das fazendas do interior. O melhor grão vai de navio para a Europa e os Estados Unidos.'],'O café era o principal produto de exportação do Brasil e a base da riqueza de São Paulo.']]});
+  if(!SCN.m_t_tipografia)K.sala('m_t_tipografia',{W:16,H:11,sx:7,label:'Tipografia',parede:'#b8b0a0',piso:()=> 'cimento',
+    obj:[['prensa',2,4,'Prensa','A prensa imprime folha por folha. O barulho não para.'],['prensa',6,4,'Prensa',null],['caixaTipos',11,4,'Caixa de tipos','Cada letra é uma pecinha de metal. O tipógrafo monta as palavras letra por letra, de trás para a frente.'],['caixaTipos',11,7,'Caixa de tipos',null],['pilhaJornais',2,8,'Folhas impressas','Folhetos, cartazes, convites de casamento e jornais de bairro.'],['pilhaJornais',3,8],['telefone',14,2,'Telefone','O dono recebe as encomendas pelo telefone.'],['relogio',8,2]],
+    gente:[['tipografo22','colono',10,6,'Tipógrafo',['Monto as letras uma por uma no componedor. Um jornal inteiro leva a noite toda.','Muitos tipógrafos leem tudo o que imprimem. Por isso tanta gente do ofício entrou nos jornais operários.'],'Os tipógrafos estavam entre os trabalhadores mais organizados e ligados à imprensa operária.'],
+      ['impressor22','colono',4,7,'Impressor',['Cuidado com a mão na prensa! Aqui não tem pressa que valha um dedo.'],'O trabalho nas oficinas gráficas era longo e perigoso.']]});
+  if(!SCN.m_t_escritorio)K.sala('m_t_escritorio',{W:14,H:10,sx:6,label:'Escritório',parede:'#c8c0b0',piso:()=> 'tabua',
+    obj:[['escriv',1,4,'Escrivaninha','Contratos, cartas e recibos.'],['maqEscrever',4,4,'Máquina de escrever','A datilógrafa escreve as cartas da firma.'],['arquivo',12,3,'Arquivo','Pastas com contratos e correspondência.'],['arquivo',11,3],['telefoneMesa',9,5,'Telefone','Para ligar, pede-se a ligação à telefonista da central.'],['mesa',8,6,'Mesa',null,{w:2}],['mapa',6,2,'Mapa das ferrovias','As linhas de trem levam o café do interior até Santos.'],['relogio',10,2],['retrato',2,2]],
+    gente:[['datilografa22','colono',4,5,'Datilógrafa',['Escrevo à máquina sessenta palavras por minuto. É um emprego novo para as moças.'],'Nos anos 1920, cada vez mais mulheres trabalhavam em escritórios como datilógrafas.'],
+      ['corretorCafe22','colono',9,4,'Corretor de café',['Compro e vendo café, saca por saca. O preço muda todo dia, conforme o mercado lá fora.','Quando o café cai, o Brasil inteiro sente.'],'O preço do café dependia do mercado internacional e afetava toda a economia.']]});
+  if(!SCN.m_t_reparticao)K.sala('m_t_reparticao',{W:16,H:11,sx:7,label:'Repartição pública',parede:'#c8c4b0',piso:()=> 'ladrilho',
+    obj:[['guiche',2,4,'Guichê','Aqui se pagam impostos e taxas.'],['guiche',5,4,'Guichê'],['escriv',10,4,'Mesa do chefe de seção'],['arquivo',13,3,'Arquivo'],['arquivo',14,3],['telefone',12,2,'Telefone'],['bandeira',8,2,'Bandeira do Brasil','A bandeira republicana, com o lema Ordem e Progresso.'],['retrato',6,2,'Retrato do presidente do Estado'],['banco',3,8,'Banco de espera','A fila é longa.',{w:3}]],
+    gente:[['funcRep22','colono',3,5,'Funcionário público',['Carimbo, assinatura, mais um carimbo. Volte amanhã, que o chefe não está.'],'O governo do Estado tinha repartições espalhadas pelo centro.'],['contribuinte22','colono',4,9,'Contribuinte na fila',['Vim pagar o imposto e já estou aqui há duas horas!'],'']]});
+  if(!SCN.m_t_hotel)K.sala('m_t_hotel',{W:16,H:11,sx:7,label:'Hotel',parede:'#d8c8a8',piso:()=> 'tabua',
+    obj:[['balcao',2,4,'Recepção','O livro de hóspedes: nome, profissão e de onde vem.',{w:4}],['telefone',4,2,'Telefone do hotel'],['cama',10,3,'Quarto'],['cama',12,3,'Quarto'],['bau',11,6,'Malas','Malas de viajantes: fazendeiros do interior, caixeiros-viajantes, estrangeiros.'],['banco',6,7,'Sofá',null,{w:2}],['relogio',8,2],['lampada',6,2]],
+    gente:[['recepHotel22','colono',4,5,'Recepcionista',['Hóspede chegando do trem da Paulista? Temos quarto com vista para o largo.'],'Hotéis perto das estações e do centro recebiam fazendeiros e viajantes.'],
+      ['hospedeFaz22','colono',7,8,'Fazendeiro hospedado',['Vim do interior tratar de negócios no banco e ver a família. Volto no trem de sexta.'],'Os fazendeiros de café passavam temporadas em São Paulo para negócios.']]});
+  if(!SCN.m_t_bilhar)K.sala('m_t_bilhar',{W:16,H:11,sx:7,label:'Salão de bilhar',parede:'#8a7a60',piso:()=> 'tabua',
+    obj:[['bilhar',2,4,'Mesa de bilhar','Uma partida custa alguns tostões. Proibido apostar, diz a placa. Ninguém obedece.'],['bilhar',9,4,'Mesa de bilhar'],['cartaz',6,2,'Placa','É PROIBIDO APOSTAR.'],['lampada',4,2],['lampada',11,2],['banco',3,8,'Banco',null,{w:3}]],
+    gente:[['jogadorBilhar22','colono',6,5,'Jogador de bilhar',['Tacada certeira! O bilhar é o jogo dos rapazes do centro, depois do expediente.'],'Salões de bilhar eram lugares de lazer masculino no centro.']]});
+  if(!SCN.m_t_mercado)K.sala('m_t_mercado',{W:18,H:12,sx:8,label:'Mercado',parede:'#b8a888',piso:()=> 'cimento',
+    obj:[['bancaFrutas',1,4,'Banca de frutas'],['bancaFrutas',4,4,'Banca de frutas'],['saco',8,4,'Sacos de feijão'],['saco',9,4],['gancho',12,3,'Carne pendurada'],['gancho',13,3],['bancaFrutas',15,4,'Verduras'],['gelo',13,6,'Gelo','O gelo vem da fábrica, em barras.'],['caixote',2,8],['caixote',3,8],['barril',15,8]],
+    gente:[['feiranteMerc22','colono',3,6,'Feirante',['Verdura fresca das chácaras! Couve, alface, chuchu!'],'Os mercados abasteciam a cidade com produtos das chácaras dos arredores.'],['caipiraMerc22','colono',9,6,'Caipira vendendo frango',['Vim de madrugada do sítio, a pé, com as galinhas no balaio.'],'Pequenos produtores dos arredores vinham vender no centro.'],['compradoraMerc22','colono',14,7,'Cozinheira de casa rica',['A patroa quer peixe para o almoço de domingo. Está caro!'],'']]});
+  if(!SCN.m_t_casa)K.sala('m_t_casa',{W:14,H:10,sx:6,label:'Casa',parede:'#d8c8a8',piso:()=> 'tabua',
+    obj:[['mesa',2,5,'Mesa da sala',null,{w:3}],['banco',2,7,'Bancos',null,{w:3}],['cama',10,3,'Cama'],['bau',12,6,'Baú'],['fogao',6,3,'Fogão',null,{w:2}],['costura',9,7,'Máquina de costura','A dona da casa costura para fora e ganha um dinheirinho.'],['retrato',4,2,'Retrato da família'],['janela',11,2]],
+    gente:[['donaCasa22','colono',4,4,'Dona da casa',['A casa é alugada. Metade do salário do meu marido vai para o aluguel.'],'O aluguel caro era um dos maiores problemas das famílias trabalhadoras.'],['filhoCasa22','colono',8,6,'Menino da casa',['Amanhã tem escola. Hoje vou soltar pipa no largo!'],'']]});
+  if(!SCN.m_t_teatro)K.sala('m_t_teatro',{W:18,H:12,sx:8,label:'Theatro São José',parede:'#7a2a1c',piso:()=> 'tabua',
+    obj:[['quadro',6,2,'Palco','O palco, com cortina de veludo.',{w:6}],['bancoIgreja',2,6,'Poltronas'],['bancoIgreja',6,6],['bancoIgreja',10,6],['bancoIgreja',14,6],['bancoIgreja',2,8],['bancoIgreja',6,8],['bancoIgreja',10,8],['bancoIgreja',14,8],['lampada',3,2],['lampada',14,2]],
+    gente:[['atorSJ22','colono',9,4,'Ator em ensaio',['Hoje à noite tem comédia. O público gosta de rir da vida da cidade: o bonde, o aluguel, a sogra.'],'Os teatros do centro apresentavam comédias, operetas e revistas.']]});
+  /* Câmara e Prefeitura no Palacete Prates */
+  if(!SCN.m_t_camara)K.sala('m_t_camara',{W:18,H:12,sx:8,label:'Câmara Municipal e Prefeitura',parede:'#b8a888',piso:()=> 'tabua',
+    obj:[['mesaLonga',5,4,'Mesa da Câmara','Os vereadores discutem calçamento, bondes, limpeza, mercados e impostos da cidade.',{w:6}],['banco',3,7,'Bancada',null,{w:3}],['banco',8,7,'Bancada',null,{w:3}],['banco',13,7,'Bancada',null,{w:3}],['bandeira',8,2,'Bandeira'],['retrato',11,2,'Retrato'],['relogio',14,2],['telefone',16,2,'Telefone da Prefeitura','O telefone liga a Prefeitura às repartições e à polícia.'],['maqEscrever',15,4,'Máquina de escrever'],['arquivo',16,4,'Arquivo das leis municipais']],
+    gente:[['vereador1_22','colono',6,5,'Vereador',['A Câmara cuida das coisas da cidade: rua, praça, mercado, limpeza e imposto.','Hoje se discute o calçamento das ruas dos bairros. Todo mundo quer, mas o dinheiro não dá.'],'A Câmara Municipal de São Paulo funcionava no Palacete Prates em 1922.'],
+      ['vereador2_22','colono',12,5,'Vereador da oposição',['Os bairros operários não têm esgoto nem calçamento. O dinheiro vai todo para o centro e para os bairros ricos!'],'Os bairros pobres recebiam menos melhorias do que o centro e os bairros ricos.'],
+      ['contínuo22','colono',15,8,'Contínuo',['Levo os papéis de uma sala para outra. Sei de tudo o que acontece aqui!'],'']],
+    traz:[['prefeitoFirmiano',9,5]]});
+  /* igrejas por dentro */
+  const igreja=(key,label,santo,falas,dia,tipo)=>{if(SCN[key])return;const obj=[['altar',7,3,'Altar','O altar-mor.'],['bancoIgreja',3,6,'Bancos'],['bancoIgreja',10,6],['bancoIgreja',3,8],['bancoIgreja',10,8],['lampada',4,2],['lampada',13,2]];
+    if(tipo==='ortodoxa')obj.push(['icone',3,2,'Ícone','Ícones pintados: na Igreja Ortodoxa, as imagens são pinturas, não estátuas.'],['icone',13,2,'Ícone']);
+    else if(tipo==='presbiteriana')obj.splice(0,1,['pulpito',8,3,'Púlpito','Na igreja presbiteriana o centro é o púlpito, de onde se lê e explica a Bíblia. Não há imagens de santos.']);
+    else obj.push(['santo',3,2,santo,'Imagem de '+santo+'.'],['santo',13,2,'Imagem','Imagem de um santo de devoção.'],['pia',15,4,'Pia de água benta']);
+    K.sala(key,{W:18,H:12,sx:8,label,parede:tipo==='ortodoxa'?'#c8b070':'#e0d8c8',piso:()=> 'ladrilho',obj,gente:falas});};
+  igreja('m_ig_rosario','Igreja do Rosário dos Homens Pretos','Nossa Senhora do Rosário',[['irmaRosario22','colono',6,5,'Irmã da Irmandade do Rosário',['Nossa irmandade é de homens e mulheres negros, desde o tempo da escravidão.','A igreja antiga ficava no largo que hoje é a Praça Antônio Prado. Foi demolida, e a irmandade construiu esta, no Largo do Paissandu.'],'A Irmandade de Nossa Senhora do Rosário dos Homens Pretos teve sua igreja demolida no início do século XX e construiu a nova no Largo do Paissandu.']]);
+  igreja('m_ig_boamorte','Igreja da Boa Morte','Nossa Senhora da Boa Morte',[['sacristaoBM22','colono',6,5,'Sacristão',['A Boa Morte é igreja antiga, do tempo colonial. O sino dela avisava quando a procissão saía.'],'']]);
+  igreja('m_ig_saogoncalo','Igreja de São Gonçalo','São Gonçalo',[['devotaSG22','colono',6,5,'Devota',['Venho rezar aqui todo dia, antes de ir para o trabalho.'],'']]);
+  igreja('m_ig_santoantonio','Igreja de Santo Antônio','Santo Antônio',[['moçaSA22','colono',6,5,'Moça rezando',['Santo Antônio é o santo casamenteiro. Não conte para ninguém que eu vim pedir!'],'Santo Antônio é popularmente conhecido como santo casamenteiro.']]);
+  igreja('m_ig_carmo','Convento do Carmo','Nossa Senhora do Carmo',[['freiCarmo22','colono',6,5,'Frei carmelita',['Os carmelitas estão em São Paulo desde o tempo colonial. A cidade cresceu em volta das igrejas.'],'Ordens religiosas como carmelitas, franciscanos e beneditinos se instalaram em São Paulo no período colonial.']]);
+  igreja('m_ig_santaifigenia','Igreja de Santa Ifigênia','Santa Ifigênia',[['devotaSI22','colono',6,5,'Devota',['A igreja está sendo refeita, mais alta e mais bonita. Obra de igreja demora anos!'],'']]);
+  igreja('m_ig_saofrancisco','Igrejas de São Francisco e das Chagas','São Francisco de Assis',[['freiFrancisco22','colono',6,5,'Frei franciscano',['Ao lado fica a Faculdade de Direito, no antigo convento. Os estudantes passam aqui a caminho da aula.'],'A Faculdade de Direito do Largo de São Francisco funciona no local do antigo convento franciscano.']]);
+  igreja('m_ig_ortodoxa','Igreja Ortodoxa da Anunciação','',[['fielOrtodoxo22','colono',6,5,'Fiel da Igreja Ortodoxa',['Viemos da Síria e do Líbano. Trouxemos a nossa fé e a nossa língua.'],'Imigrantes sírios e libaneses fundaram igrejas ortodoxas em São Paulo.']],'ortodoxa');
+  igreja('m_ig_presbiteriana','Igreja Presbiteriana','',[['pastor22','colono',6,5,'Pastor presbiteriano',['Nossa igreja é protestante. Lemos a Bíblia em português e cantamos hinos.'],'Igrejas protestantes se instalaram em São Paulo no século XIX, com missionários e imigrantes.']],'presbiteriana');
+  /* telefone, prensa e delegado em salas que já existiam */
+  const poeEm=(key,tipo,x,y,name,text)=>{if(!SCN[key]||objects.some(o=>o.scene===key&&o.__tipo===tipo))return;const d=D[tipo];const M=SCN[key].map,H=M.length,W=M[0].length;
+    let p=null;const wall=d.wall;for(let r=0;r<8&&!p;r++)for(let yy=Math.max(wall?2:3,y-r);yy<=Math.min(H-2,y+r)&&!p;yy++)for(let xx=Math.max(1,x-r);xx<=Math.min(W-1-d.w,x+r)&&!p;xx++){
+      if(wall){if(yy!==2)continue;if(objects.some(o=>o.scene===key&&o.y===2&&xx<o.x+(o.w||1)&&xx+d.w>o.x))continue;p=[xx,2];break;}
+      let ok=true;for(let i=0;i<d.w&&ok;i++)for(let j=0;j<d.h&&ok;j++){if(M[yy+j]&&M[yy+j][xx+i]!=='.')ok=false;if(objects.some(o=>o.scene===key&&xx+i>=o.x&&xx+i<o.x+(o.w||1)&&yy+j>=o.y&&yy+j<o.y+(o.h||1)))ok=false;if(npcs.some(n=>n.scene===key&&n.x===xx+i&&n.y===yy+j))ok=false;}if(ok)p=[xx,yy];}
+    if(!p)return;const o={id:key+'_'+tipo+'_v115',scene:key,x:p[0],y:p[1],w:d.w,h:d.h,name,text:text?[].concat(text):null,__tipo:tipo};o.draw=function(c,X,Y){d.d(c,X,Y,o);};objects.push(o);};
+  const TEL='Telefone de parede. Gira-se a manivela e a telefonista da central faz a ligação.';
+  ['m_banco','m_redacao','i_redacao__22','m_quartel','m_botica','m_palacio','m_palCE','m_hotel','m_mappin','m_correios','m_academia','m_normal','m_alfaiataria','m_loja'].forEach(k=>poeEm(k,'telefone',8,2,'Telefone',TEL));
+  ['m_redacao','i_redacao__22'].forEach(k=>{poeEm(k,'prensa',3,5,'Prensa do jornal','A prensa roda de madrugada. De manhã cedo, os jornaleiros já estão na rua com o jornal.');poeEm(k,'caixaTipos',10,5,'Caixa de tipos','Os tipógrafos montam as páginas letra por letra.');poeEm(k,'pilhaJornais',6,8,'Jornal do dia','A tiragem de hoje, pronta para os jornaleiros.');});
+  ['m_chapelaria','m_loja'].forEach(k=>{poeEm(k,'vitrineChapeus',4,5,'Vitrine de chapéus','Chapéu-coco, palheta de verão, chapéu de feltro e chapéus de senhora. Ninguém sai sem chapéu.');poeEm(k,'cabide',11,5,'Cabide de chapéus',null);});
+  ['m_banco'].forEach(k=>{poeEm(k,'cofre',12,4,'Cofre','O cofre do banco. Só o gerente sabe o segredo.');poeEm(k,'guiche',3,5,'Guichê do caixa',null);});
+  if(SCN.m_quartel&&!npcs.some(n=>n.id==='delegado22')){const p=[6,5];addNPCs([{id:'delegado22',spr:'colono',x:p[0],y:p[1],dir:'down',name:'Delegado de polícia',lines:['Sou o delegado. Aqui chegam brigas, furtos, atropelamentos de bonde e queixas de vizinho.','Desde a greve de 1917, a polícia vigia também as reuniões de operários. Muito líder foi preso ou expulso do país.',INV],diary:'Depois da greve geral de 1917, a polícia reprimiu associações operárias e expulsou militantes estrangeiros.'}],'m_quartel');}
+  /* liga os prédios do centro às salas */
+  const TIPO=[[/relojoaria/i,'m_t_relojoaria'],[/papelaria/i,'m_t_papelaria'],[/tabacaria/i,'m_t_tabacaria'],[/tecido|modas|armarinho|cidade de londres|scardigno/i,'m_t_tecidos'],[/calçado|sapat/i,'m_t_calcados'],[/fotógraf/i,'m_t_fotografo'],[/livraria/i,'m_t_livraria'],[/flores/i,'m_t_flores'],
+    [/louça|brinquedo|perfum|joalh|lombarda|vencedora|fogo paulista|arlindo/i,'m_t_presentes'],[/atacad|armazém|secos e molhados|ferragens|depósito|casa da boia/i,'m_t_armazem'],[/padaria|doces e frutas/i,'m_t_padaria'],
+    [/café da praça|ponto chic|botequim|comidas de/i,'m_t_cafe'],[/tipografia/i,'m_t_tipografia'],[/escritório|corretores|martinico/i,'m_t_escritorio'],[/secretaria|pátio do colégio/i,'m_t_reparticao'],[/hotel|pensão|lutetia/i,'m_t_hotel'],[/bilhar/i,'m_t_bilhar'],[/mercado/i,'m_t_mercado'],
+    [/theatro são josé/i,'m_t_teatro'],[/palacete prates/i,'m_t_camara'],[/rosário/i,'m_ig_rosario'],[/boa morte/i,'m_ig_boamorte'],[/são gonçalo/i,'m_ig_saogoncalo'],[/santo antônio/i,'m_ig_santoantonio'],[/carmo/i,'m_ig_carmo'],[/santa ifigênia/i,'m_ig_santaifigenia'],[/são francisco/i,'m_ig_saofrancisco'],[/ortodoxa/i,'m_ig_ortodoxa'],[/presbiteriana/i,'m_ig_presbiteriana'],
+    [/cinema|pathé/i,'m_cine2'],[/barbeiro/i,'m_barbearia'],[/farmácia/i,'m_botica'],[/alfaiate/i,'m_alfaiataria'],[/chapelaria/i,'m_chapelaria'],[/oficina de (automóveis|máquinas)/i,'m_qmecanica'],[/^casa$|sobrado antigo|imóvel dividido|solar da marquesa|teresa de toledo|casa nº|sobrado da rua/i,'m_t_casa']];
+  const rel={ligados:0,sem:[]};
+  const ligaTudo=()=>{for(const o of objects){if(o.scene!==S||(o.w||1)<2||(o.h||1)<2||!o.name||o.room||o.enter)continue;if(/obra|canteiro|fundos de quadra|frente para a rua ao lado/i.test(o.name))continue;
+      const nm=o.name.replace(/^Lote\s*\d*\s*:\s*/,'');const t=TIPO.find(([re])=>re.test(nm));if(!t){rel.sem.push(nm);continue;}if(ligaC(o,t[1],nm))rel.ligados++;else rel.sem.push(nm+' (sem porta livre)');}
+    try{if(typeof buildOcc==='function'&&cur===S)buildOcc();}catch(_){}};
+  setTimeout(ligaTudo,2600);
+  /* gente andando pelas ruas do centro */
+  const PASS=[['Soldado da Força Pública em ronda',['Ronda pelo centro, de esquina em esquina. Muito bonde, muito carro: é preciso atenção.']],['Soldado da Força Pública em ronda',['Se precisar, o posto policial fica perto. O delegado atende lá.']],['Soldado da Força Pública em ronda',['Em dia de comício, a ordem é ficar de olho.']],['Soldado da Força Pública em ronda',['Ladrão de carteira gosta de bonde cheio. Cuidado com o bolso!']],
+    ['Varredor da limpeza pública',['Varro a rua desde as cinco da manhã. Esterco de cavalo, papel, casca de fruta: a cidade suja muito.']],['Varredor da limpeza pública',['A carroça da limpeza passa recolhendo o lixo. Nos bairros pobres ela quase não aparece.']],['Varredor da limpeza pública',['Com tanto automóvel, ainda tem muito cavalo na rua. Imagina a sujeira!']],
+    ['Menino engraxate',['Graxa, senhor? Deixo o sapato brilhando por um tostão!']],['Menino engraxate',['Não vou à escola: engraxo sapato para ajudar em casa.']],
+    ['Vendedor de doces',['Cocada, pé-de-moleque, quebra-queixo! Doce feito em casa!']],['Vendedora de doces',['Bolo de fubá e sonho! Fresquinho!']],['Vendedor de chapéus',['Chapéu de palha para o calor! Palheta, a moda do verão!']],['Vendedor de chapéus',['Chapéu-coco, chapéu de feltro... Homem de respeito não anda de cabeça descoberta.']],
+    ['Jornaleiro',['Olha o jornal! A campanha do Bernardes e do Nilo esquenta!']],['Jornaleiro',['Olha A Gazeta! Notícias da Semana de Arte Moderna!']],['Senhora de chapéu',['Vou ao Mappin ver as novidades. Dizem que chegaram vestidos de Paris.']],['Senhor de terno',['Vou ao banco. Na Rua XV ficam os maiores bancos da cidade.']],['Operário a caminho da fábrica',['Pego o bonde para o Brás. O apito da fábrica não espera ninguém.']],['Senhora fazendo compras na Rua XV',['Fita de seda para o laço de cabelo da minha filha, renda valenciana para a roupa branca... e depois, chá no salão do Mappin.','Desde menina faço compras aqui: a Garraux, livraria magnífica; a Drogaria Baruel, quase na Praça da Sé; as joalherias da Rua XV, com coisas finíssimas vindas da Europa.','Quase tudo o que é fino vem de fora. Produzimos tão pouco!']],['Mãe operária olhando as vitrines',['Olhar a vitrine não custa nada. Comprar aqui, não dá: eu compro no Brás, nas lojas do bairro, e costuro a roupa das crianças em casa.','As balas da confeitaria são lindas. Mas com o salário da fábrica, bala é luxo.']],['Normalista',['Estudo na Escola Normal da Praça da República. Vou ser professora.']],['Estudante de Direito',['Saio da aula no Largo de São Francisco direto para o café.']]];
+  const andantes=()=>{try{if(walkers.some(w=>w.id==='pass22_0'))return;const M=C.M;if(!M||!C.naRede)return;const W=M[0].length,H=M.length;
+      const livre=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&C.naRede(x,y)&&freeAt(S,x,y)&&'pDdeS,.'.includes(M[y][x]);
+      const pts=[];for(let y=2;y<H-2;y+=3)for(let x=2;x<W-2;x+=3)if(livre(x,y))pts.push([x,y]);
+      const bfs=(a,b)=>{const prev=new Int32Array(W*H).fill(-1),q=[a[0]+a[1]*W];prev[q[0]]=q[0];let h=0;while(h<q.length){const c=q[h++],x=c%W,y=(c/W)|0;if(x===b[0]&&y===b[1]){const P=[];for(let k=c;;k=prev[k]){P.push([k%W,(k/W)|0]);if(k===prev[k])break;}return P.reverse();}
+        for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(!livre(nx,ny))continue;const n=nx+ny*W;if(prev[n]<0){prev[n]=c;q.push(n);}}}return null;};
+      const quinas=P=>{const L=[P[0]];for(let i=1;i<P.length-1;i++){const a=P[i-1],b=P[i],c=P[i+1];if((b[0]-a[0])!==(c[0]-b[0])||(b[1]-a[1])!==(c[1]-b[1]))L.push(b);}L.push(P[P.length-1]);return L;};
+      const L=[];let i=0;for(const [name,lines] of PASS){for(let t=0;t<30;t++){const a=pts[Math.floor(Math.random()*pts.length)],b=pts[Math.floor(Math.random()*pts.length)];if(!a||!b)break;if(Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])<18)continue;const P=bfs(a,b);if(!P||P.length<18||P.length>90)continue;
+          const Q=quinas(P);L.push({id:'pass22_'+(i++),spr:'colono',name,path:Q.concat(Q.slice(1,-1).reverse()),speed:1.1+Math.random()*.4,lines:lines.concat([INV])});break;}}
+      addWalkers(S,L);rel.andantes=L.length;}catch(e){console.warn('andantes',e);}};
+  setTimeout(andantes,2400);
+  window.__interiores={rel,TIPO,ligaTudo};
+}catch(e){console.warn('interiores 1922',e);}})();
+
+/* v115: sair do centro sem travar — guarda o chão já desenhado da cidade de 1922 e reaproveita na volta */
+(function(){try{let snap=null,usa=false;
+  const ss=setScene;setScene=function(k){try{if(cur==='sp22'&&k!=='sp22'&&stat&&stat.width>0){if(!snap)snap=document.createElement('canvas');snap.width=stat.width;snap.height=stat.height;snap.getContext('2d').drawImage(stat,0,0);snap.__ok=true;}
+      usa=(k==='sp22'&&snap&&snap.__ok);}catch(_){usa=false;}const r=ss.apply(this,arguments);usa=false;return r;};
+  const bs=buildStatic;buildStatic=function(){if(usa&&cur==='sp22'&&snap&&snap.width===MW*T&&snap.height===MH*T){usa=false;if(stat.width!==MW*T||stat.height!==MH*T){stat.width=MW*T;stat.height=MH*T;}sc.imageSmoothingEnabled=false;sc.clearRect(0,0,stat.width,stat.height);sc.drawImage(snap,0,0);return;}usa=false;return bs.apply(this,arguments);};
+  window.__chaoGuardado=()=>!!(snap&&snap.__ok);
+}catch(e){console.warn('chao guardado',e);}})();
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
