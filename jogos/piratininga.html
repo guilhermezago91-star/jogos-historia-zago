@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=127"></script>
+<script src="arte/arte_comum.js?v=128"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=127"></script>
+<script src="arte/arte_1554.js?v=128"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=127"></script>
+<script src="arte/arte_1830.js?v=128"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=127"></script>
+<script src="arte/arte_1888.js?v=128"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=127"></script>
+<script src="arte/arte_1922.js?v=128"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -15778,6 +15778,76 @@ setTimeout(function(){try{const K=window.__kit;if(!K||!K.sala)return;const D=K.D
     poe(RK,'fardos',10,7,'Fardos de carga','Fardos de algodão e sacos de sal, prontos para a viagem.');poe(RK,'fogaoChao',5,7,'Fogo de chão','Os tropeiros cozinham feijão com toucinho e farinha no fogo de chão. Daí vem o feijão tropeiro.');}
   window.__igrejas30.rancho=SCN[RK]&&SCN[RK].__r127?'ok':'—';
 }catch(e){console.warn('igrejas 1830 interiores',e);}},3500);
+
+/* v128: 1830 mais vivo: oficinas e casas simples com mais coisas, garoa de manhã, canoas no Porto Geral,
+   nomes das pontes, Jardim da Luz e a Folia do Divino passando. */
+setTimeout(function(){try{const K=window.__kit;if(!K)return;const D=K.D;const S='sp';
+  const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};const KK='#1c1418';
+  const box=(c,x,y,w,h,a,b)=>{R(c,x,y,w,h,KK);R(c,x+1,y+1,w-2,h-2,a);if(b)R(c,x+1,y+1,w-2,2,b);};
+  const sh=(c,X,Y,w)=>{c.fillStyle='rgba(20,27,27,.22)';c.fillRect(X+2,Y+13,w-4,3);};
+  Object.assign(D,{
+    pilao30:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);box(c,X+4,Y+4,8,10,'#7a5030','#9a6a40');R(c,X+5,Y+5,6,2,'#3e2814');R(c,X+9,Y-6,2,12,'#8a6a40');}},
+    moringa30:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);c.fillStyle=KK;c.beginPath();c.ellipse(X+8,Y+8,5,6,0,0,7);c.fill();c.fillStyle='#c87a4a';c.beginPath();c.ellipse(X+8,Y+8,4,5,0,0,7);c.fill();R(c,X+7,Y+1,2,3,'#c87a4a');R(c,X+6,Y+6,2,2,'#e0a070');}},
+    esteira30:{w:2,h:1,d(c,X,Y){R(c,X+2,Y+4,28,9,'#a8884a');for(let i=0;i<7;i++)R(c,X+3+i*4,Y+4,1,9,'#8a6a34');R(c,X+2,Y+4,28,1,'#c8a868');}},
+    couros30:{w:1,h:1,wall:1,d(c,X,Y){R(c,X+2,Y-12,12,1,'#5a3a1a');R(c,X+3,Y-11,4,12,'#8a5a30');R(c,X+9,Y-11,4,10,'#7a4a24');R(c,X+4,Y-6,2,1,'#5a3a1a');}},
+    formas30:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);for(let i=0;i<3;i++){R(c,X+2,Y+3+i*4,12,3,'#b4552e');R(c,X+3,Y+3+i*4,10,1,'#d07040');}}},
+    tabuas30:{w:2,h:1,d(c,X,Y){sh(c,X,Y,32);for(let i=0;i<4;i++){R(c,X+1,Y+2+i*3,30,3,i%2?'#b88a50':'#a87a40');R(c,X+1,Y+4+i*3,30,1,'#7a5a30');}}},
+    rodaFiar30:{w:1,h:1,d(c,X,Y){sh(c,X,Y,16);c.strokeStyle='#5a3a1a';c.lineWidth=1;c.beginPath();c.arc(X+6,Y+4,5,0,7);c.stroke();R(c,X+5,Y+3,2,2,'#5a3a1a');R(c,X+4,Y+9,10,2,'#7a5030');R(c,X+12,Y+2,2,8,'#7a5030');R(c,X+12,Y+1,3,2,'#f4efe4');}},
+    placaPonte:{w:1,h:1,d(c,X,Y){R(c,X+7,Y+2,2,12,'#5a3a1a');box(c,X,Y-4,16,8,'#c8a060','#d8b070');R(c,X+3,Y-1,10,1,'#5a3a1a');}},
+    canoa30:{w:2,h:1,d(c,X,Y){c.fillStyle=KK;c.beginPath();c.ellipse(X+16,Y+8,15,4,0,0,7);c.fill();c.fillStyle='#7a4a24';c.beginPath();c.ellipse(X+16,Y+8,14,3,0,0,7);c.fill();R(c,X+6,Y+7,20,1,'#4a2a14');R(c,X+9,Y+3,6,4,'#c8a060');R(c,X+17,Y+4,5,3,'#e8e0d0');const b=Math.sin(performance.now()/500)*1;R(c,X+24,Y+3+b,1,6,'#5a3a1a');}}
+  });
+  const poe=(key,tipo,x,y,name,text)=>{const s=SCN[key];if(!s)return false;const d=D[tipo];const M=s.map,H=M.length,W=M[0].length;let p=null;
+    for(let r=0;r<6&&!p;r++)for(let yy=Math.max(d.wall?2:3,y-r);yy<=Math.min(d.wall?2:H-2,y+r)&&!p;yy++)for(let xx=Math.max(1,x-r);xx<=Math.min(W-1-d.w,x+r)&&!p;xx++){let ok=true;
+      for(let i=0;i<d.w&&ok;i++){const X=xx+i,Y=yy;if(!d.wall&&M[Y][X]!=='.')ok=false;if(objects.some(o=>o.scene===key&&X>=o.x&&X<o.x+(o.w||1)&&Y>=o.y&&Y<o.y+(o.h||1)))ok=false;if(npcs.some(n=>n.scene===key&&n.x===X&&n.y===Y))ok=false;}
+      const sx=Math.floor(W/2);if(!d.wall&&yy>=H-3&&xx<=sx+1&&xx+d.w>=sx-1)ok=false;if(ok)p=[xx,yy];}
+    if(!p)return false;const ob={id:key+'_'+tipo+'_'+x+'_128',scene:key,x:p[0],y:p[1],w:d.w,h:d.h,name:name||null,text:text?[].concat(text):null};ob.draw=function(c,X,Y){d.d(c,X,Y,ob);};objects.push(ob);return true;};
+  const MOB={i_sapataria:[['couros30',3,2,'Couros','Couro curtido de boi, para solas e botinas.'],['formas30',8,5,'Formas de sapato','Formas de madeira no tamanho do pé de cada freguês.'],['esteira30',3,7]],
+    i_acougue:[['couros30',8,2,'Couros pendurados','O couro do boi também é vendido: vira sola, cangalha e bruaca.'],['moringa30',3,6],['caixote',9,6]],
+    i_olaria:[['formas30',9,5,'Formas de telha','O barro é moldado na coxa do oleiro ou na forma de madeira e seca ao sol.'],['formas30',10,6],['esteira30',3,7],['moringa30',12,6,'Moringas prontas','Moringa de barro: a água fica fresquinha.']],
+    i_carpintaria:[['tabuas30',3,6,'Tábuas','Tábuas de peroba e canela, serradas à mão.'],['caixote',10,6],['banco',8,7,'Banco de carpinteiro',null,{w:2}]],
+    i_ferreiro:[['arreios',8,2,'Ferraduras e cravos','Ferradura para mula e cavalo: o ferreiro trabalha muito com as tropas.'],['caixote',10,6]],
+    i_alfaiataria:[['rodaFiar30',9,6,'Roda de fiar','Fio de algodão fiado em casa, para costurar.'],['couros30',4,2,'Peças penduradas','Casacas e calças esperando a última prova.']],
+    i_botica:[['moringa30',10,6],['cesto',3,7,'Ervas','Ervas para chás e remédios: erva-cidreira, arruda, boldo.'],['pilao30',8,6,'Almofariz','O boticário mói as ervas e os pós para fazer os remédios.']],
+    i_casapobre:[['rodaFiar30',8,4,'Roda de fiar','A dona da casa fia algodão e vende o fio para ajudar nas despesas.'],['moringa30',3,5],['esteira30',6,6,'Esteira','Esteira de taboa: de dia se senta, de noite se dorme.']],
+    i_casaliberta:[['pilao30',8,4,'Pilão','Pilão para socar milho e arroz. Na quitanda, a fubá vira cuscuz e bolo.'],['rodaFiar30',3,5],['esteira30',6,6]],
+    i_taverna:[['moringa30',12,6],['caixote',2,7],['barril',13,7]]};
+  for(const k in MOB){const s=SCN[k];if(!s||s.__m128)continue;s.__m128=1;for(const it of MOB[k])poe(k,...it);}
+  /* nomes das pontes e canoas no Porto Geral */
+  const M=SCN[S].map,H=M.length,W=M[0].length;
+  const ponte=(y0,nome,txt)=>{let xs=[];for(let x=0;x<W;x++)if(M[y0]&&M[y0][x]==='R')xs.push(x);if(!xs.length)return;const x=xs[xs.length-1]+1,y=y0-1;
+    for(const [dx,dy] of [[0,0],[1,0],[0,-1],[1,-1],[-xs.length-1,0]]){const X=x+dx,Y=y+dy;if(M[Y]&&'.,VTb'.includes(M[Y][X])&&!objects.some(o=>(o.scene||'pira')===S&&X>=o.x&&X<o.x+(o.w||1)&&Y>=o.y&&Y<o.y+(o.h||1))){
+      const o={id:'placaPonte_'+y0,scene:S,x:X,y:Y,w:1,h:1,name:nome,text:txt};o.draw=function(c,XX,YY){D.placaPonte.d(c,XX,YY);};objects.push(o);M[Y][X]=M[Y][X]==='T'||M[Y][X]==='b'?'.':M[Y][X];return;}}};
+  const leftB=[];for(let y=0;y<H;y++)if(M[y][19]==='R'||M[y][20]==='R')leftB.push(y);
+  ponte(22,'Ponte do Acu',['A Ponte do Acu, sobre o Anhangabaú. Por ela se vai para o lado de Santa Ifigênia e da Luz.']);
+  ponte(41,'Ponte do Lorena',['A Ponte do Lorena, no Piques, sobre o Anhangabaú. Por aqui passam as tropas que vão para Sorocaba e para o sul.']);
+  ponte(43,'Ponte do Carmo',['A Ponte do Carmo, sobre o Tamanduateí, no pé da Ladeira do Carmo. É o caminho da Penha e do Rio de Janeiro.']);
+  const porto=objects.find(o=>o.scene===S&&/Porto Geral/i.test(o.name||''));let nc=0;
+  if(porto){for(let r=1;r<10&&nc<2;r++)for(let y=porto.y-r;y<=porto.y+r&&nc<2;y++)for(let x=porto.x-r;x<=porto.x+r&&nc<2;x++){if(M[y]&&M[y][x]==='W'&&M[y][x+1]==='W'&&!objects.some(o=>o.scene===S&&o.y===y&&Math.abs(o.x-x)<3)){
+      const o={id:'canoa30_'+nc,scene:S,x,y,w:2,h:1,name:'Canoa do Porto Geral',text:['Canoas trazem lenha, farinha e capim pelo Tamanduateí até o Porto Geral, no pé da colina.','Daqui a carga sobe a ladeira nas costas dos carregadores.']};o.draw=function(c,X,Y){D.canoa30.d(c,X,Y);};objects.push(o);nc++;}}}
+  /* Jardim da Luz (Jardim Público, ao lado do Mosteiro da Luz) */
+  const luz=objects.find(o=>o.id==='luz'&&o.scene===S);let jl='não coube';
+  if(luz){outer:for(const [dx,dy] of [[7,0],[7,2],[-9,0],[8,6],[-9,4],[0,8]]){const x0=luz.x+dx,y0=luz.y+dy,w=6,h=4;let ok=x0>1&&y0>1&&x0+w<W-1&&y0+h<H-1;
+      for(let y=y0;y<y0+h&&ok;y++)for(let x=x0;x<x0+w&&ok;x++){if(!'.,Tb'.includes(M[y][x]))ok=false;if(objects.some(o=>(o.scene||'pira')===S&&x>=o.x-1&&x<o.x+(o.w||1)+1&&y>=o.y&&y<o.y+(o.h||1)))ok=false;if(npcs.some(n=>n.scene===S&&n.x===x&&n.y===y))ok=false;}
+      if(!ok)continue;const o={id:'jardimLuz30',scene:S,x:x0,y:y0,w,h,name:'Jardim Público da Luz',text:['O Jardim Botânico da Luz, ao lado do Mosteiro da Luz. Foi aberto ao público em 1825.','Tem árvores, canteiros e caminhos de terra. É o primeiro jardim público da cidade.']};
+      o.draw=function(c,X,Y){const ww=this.w*16,hh=this.h*16;R(c,X,Y,ww,hh,'#3e7a3a');R(c,X+2,Y+2,ww-4,hh-4,'#4f8a3a');R(c,X+ww/2-3,Y,6,hh,'#d8c090');R(c,X,Y+hh/2-3,ww,6,'#d8c090');
+        for(const [a,b] of [[12,12],[ww-14,12],[12,hh-12],[ww-14,hh-12]]){c.fillStyle=KK;c.beginPath();c.arc(X+a,Y+b-4,8,0,7);c.fill();c.fillStyle='#2e6a2a';c.beginPath();c.arc(X+a,Y+b-4,7,0,7);c.fill();c.fillStyle='#4a9a3a';c.beginPath();c.arc(X+a-2,Y+b-6,3,0,7);c.fill();R(c,X+a-1,Y+b+2,2,4,'#6a4424');}
+        for(let i=0;i<6;i++){R(c,X+22+i*6,Y+hh/2-10,3,3,['#e86a9a','#f1c471','#f4efe4'][i%3]);}
+        R(c,X,Y,ww,2,'#5a3a1a');for(let i=0;i<ww;i+=6)R(c,X+i,Y-4,2,6,'#5a3a1a');};
+      objects.push(o);for(let y=y0;y<y0+h;y++)for(let x=x0;x<x0+w;x++)if('Tb'.includes(M[y][x]))M[y][x]='.';jl='ok @'+x0+','+y0;break outer;}}
+  /* garoa de manhã cedo */
+  const lo=lifeOverlay;lifeOverlay=function(camX,camY){const r=lo.apply(this,arguments);try{let e2=false;try{e2=eraOf(cur)===2&&!SCN[cur].room;}catch(_){}
+      if(e2&&typeof hourNow==='function'){const h=hourNow();const f=h<6.5?.28:h<9?.28*(9-h)/2.5:0;if(f>0){ctx.fillStyle='rgba(220,226,230,'+f.toFixed(3)+')';ctx.fillRect(0,0,VW,VH);
+        const tt=performance.now()/1000;ctx.fillStyle='rgba(235,240,245,'+(f*1.4).toFixed(3)+')';for(let i=0;i<60;i++){const x=(i*53+tt*40)%(VW+20)-10,y=(i*97+tt*90)%(VH+20)-10;ctx.fillRect(Math.round(x),Math.round(y),1,3);}}}}catch(_){}return r;};
+  /* Folia do Divino: bandeira vermelha com a pomba e músicos, pedindo esmolas pelas ruas */
+  let fol='não';try{const proc=walkers.find(w=>w.scene===S&&w.mules&&w.mules.length&&w.mules[0].spr);const caixeiro=walkers.find(w=>w.scene===S&&w.path&&w.path.length>4&&!w.mules?.length);
+    if(proc&&caixeiro){addWalkers(S,[{id:'foliaDivino30',spr:'h22_n|libertoGama|2',name:'Folia do Divino',path:caixeiro.path.slice(),speed:.7,
+        lines:['É a Folia do Divino! Levamos a bandeira vermelha com a pomba branca de casa em casa, cantando e pedindo esmolas para a festa.','Quem beija a bandeira recebe a bênção. A festa do Divino Espírito Santo é uma das mais animadas do ano.','[Personagens inventados para o jogo.]']}]);
+      const w=walkers.find(w=>w.id==='foliaDivino30');if(w){w.mules=['bandaLuz','pop_21','seg_musico','molequeRes'].map((k,i)=>Object.assign({},proc.mules[0],{spr:'h22_n|'+k+'|'+(i%3),hidden:true,x:w.x,y:w.y,fx:w.x,fy:w.y,px:w.x*T,py:w.y*T}));w.__divino=1;fol='ok';}}}catch(e){console.warn('folia',e);}
+  /* a bandeira do Divino em cima do folião */
+  const lo2=lifeOverlay;lifeOverlay=function(camX,camY){const r=lo2.apply(this,arguments);try{const w=walkers.find(w=>w.id==='foliaDivino30');if(w&&w.scene===cur){const X=Math.round(w.px-camX),Y=Math.round(w.py-camY);
+      R(ctx,X+13,Y-22,1,22,'#5a3a1a');const b=Math.sin(performance.now()/300)*1.5;R(ctx,X+14,Y-22,9,7+b,'#c0302a');R(ctx,X+17,Y-20,3,2,'#f4efe4');R(ctx,X+16,Y-19,1,1,'#f4efe4');R(ctx,X+20,Y-19,1,1,'#f4efe4');R(ctx,X+14,Y-15+b,9,1,'#f1c471');}}catch(_){}return r;};
+  window.__v128={jardim:jl,canoas:nc,folia:fol};try{if(cur===S){buildStatic();buildOcc();}}catch(_){}
+}catch(e){console.warn('1830 v128',e);}},4200);
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
