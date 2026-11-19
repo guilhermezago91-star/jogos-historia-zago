@@ -348,15 +348,15 @@ requestAnimationFrame(draw);})();
   </div>
 </div>
 
-<script src="arte/arte_comum.js?v=118"></script>
+<script src="arte/arte_comum.js?v=119"></script>
 <script>window.__carrega&&window.__carrega(0.26,"Carregando a arte do jogo... (1 de 5)");</script>
-<script src="arte/arte_1554.js?v=118"></script>
+<script src="arte/arte_1554.js?v=119"></script>
 <script>window.__carrega&&window.__carrega(0.42,"Carregando a arte do jogo... (2 de 5)");</script>
-<script src="arte/arte_1830.js?v=118"></script>
+<script src="arte/arte_1830.js?v=119"></script>
 <script>window.__carrega&&window.__carrega(0.58,"Carregando a arte do jogo... (3 de 5)");</script>
-<script src="arte/arte_1888.js?v=118"></script>
+<script src="arte/arte_1888.js?v=119"></script>
 <script>window.__carrega&&window.__carrega(0.74,"Carregando a arte do jogo... (4 de 5)");</script>
-<script src="arte/arte_1922.js?v=118"></script>
+<script src="arte/arte_1922.js?v=119"></script>
 <script>window.__carrega&&window.__carrega(0.90,"Carregando a arte do jogo... (5 de 5)");</script>
 <script>(function(){var f=[];if(!window.__ARTE_comum)f.push('arte_comum.js');if(!window.__ARTE_1554)f.push('arte_1554.js');if(!window.__ARTE_1830)f.push('arte_1830.js');if(!window.__ARTE_1888)f.push('arte_1888.js');if(!window.__ARTE_1922)f.push('arte_1922.js');if(f.length){document.body.insertAdjacentHTML('afterbegin','<p style="margin:16px;padding:12px;background:#fff3cd;color:#141b1b;font:600 16px system-ui,sans-serif;border:2px solid #141b1b;border-radius:6px">Faltou carregar: '+f.join(', ')+'. A pasta <b>arte</b> precisa estar junto do index.html.</p>');}})();</script>
 <script>
@@ -3749,7 +3749,7 @@ function life88Update(dt){
 }
 
 /* ---------- QUIZ E PASSAGEM PARA 1888 ---------- */
-let quizDone3=false;
+let quizDone3=false;let quizDone4=false;
 const quiz3=[
   {q:"O que aconteceu em 13 de maio de 1888?",o:["A princesa Isabel assinou a Lei Áurea, que acabou com a escravidão","D. Pedro I proclamou a independência","Foi proclamada a República"],a:0,e:"A Lei Áurea acabou com a escravidão, mas não deu terra, escola nem indenização aos libertos."},
   {q:"Por que o governo paulista trazia imigrantes italianos?",o:["Para trabalhar nas fazendas de café","Para construir o metrô","Para lutar numa guerra"],a:0,e:"Com o fim da escravidão, os fazendeiros de café queriam trabalhadores livres e pagavam a viagem dos imigrantes."},
@@ -15412,6 +15412,103 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
       o.text=o.text.concat(['A porta está aberta: dá para entrar e ver o salão do pregão.']);}}};
   setTimeout(()=>{try{faz();}catch(e){console.warn('bolsa',e);}},3000);
 }catch(e){console.warn('bolsa',e);}})();
+
+/* =========================================================
+   RECURSOS ESSENCIAIS (v119): menu de pausa (☰, Esc, P), configurações (letra, modo leve, som),
+   salvamento automático com aviso "✓ Progresso salvo", confirmação do Novo jogo.
+   O código de salvamento já existia (diário > Meu código; tela inicial > Tenho um código): agora também fica no menu.
+   ========================================================= */
+setTimeout(function(){try{
+  const $$=id=>document.getElementById(id);
+  const el=(t,c,txt)=>{const e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;};
+  /* ---------- configurações guardadas ---------- */
+  const CK='pira_cfg';let cfg={fs:0,leve:false,vol:1};
+  try{const v=JSON.parse(localStorage.getItem(CK)||'null');if(v)cfg=Object.assign(cfg,v);}catch(_){}
+  const salvaCfg=()=>{try{localStorage.setItem(CK,JSON.stringify(cfg));}catch(_){}};
+  const FS=[1,1.2,1.4],FSN=['Normal','Grande','Muito grande'];
+  const stFs=el('style');document.head.appendChild(stFs);
+  const aplicaFs=()=>{const z=FS[cfg.fs]||1;stFs.textContent=z===1?'':`#dlg,#quest,.ov .card{zoom:${z}}`;};
+  /* modo leve: sem trânsito, metade das pessoas andando, sem partículas */
+  let guardados=[];
+  const aplicaLeve=()=>{window.__leve=!!cfg.leve;window.__transitoOff=!!cfg.leve;
+    try{if(cfg.leve&&!guardados.length){for(let i=walkers.length-1;i>=0;i--)if(i%2===1)guardados.push(walkers.splice(i,1)[0]);}
+        else if(!cfg.leve&&guardados.length){walkers.push(...guardados);guardados=[];}}catch(_){}};
+  setInterval(()=>{if(cfg.leve){try{parts.length=0;}catch(_){}}},250);
+  /* volume dos efeitos */
+  try{const s0=sfx;sfx=function(k){s0.apply(this,arguments);try{if(AU[k])AU[k].volume=Math.max(0,Math.min(1,AU[k].volume*cfg.vol));}catch(_){}};}catch(_){}
+  aplicaFs();setTimeout(aplicaLeve,4000);
+  /* ---------- aviso "✓ Progresso salvo" e salvamento automático ---------- */
+  const css=el('style');css.textContent=
+   '#salvoAviso{position:fixed;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));z-index:60;background:#20301e;color:#e8f6d8;font:700 14px/1.2 var(--f,system-ui);padding:6px 10px;border-radius:6px;border:2px solid #7fbf6a;pointer-events:none;opacity:0;transition:opacity .25s}'+
+   '#salvoAviso.on{opacity:.95}'+
+   '#btnPausa{font-size:18px;line-height:1;min-width:44px;min-height:36px;padding:4px 10px}'+
+   '#ovPausa .card,#ovConf .card{max-width:380px}#ovPausa .lista{display:flex;flex-direction:column;gap:8px;margin-top:8px}#ovPausa .lista .btn{width:100%;min-height:44px;font-size:16px;text-align:left}'+
+   '#ovPausa .linha{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}#ovPausa .linha .btn{flex:1 1 30%;min-height:40px}#ovPausa .linha .btn.on{outline:3px solid var(--orange,#e8a020)}#ovPausa label{font-weight:700}'+
+   '#ovPausa input[type=range]{flex:1 1 60%}';
+  document.head.appendChild(css);
+  const av=el('div',null,'✓ Progresso salvo');av.id='salvoAviso';document.body.appendChild(av);let avT=0,ultimo=0;
+  const aviso=()=>{av.classList.add('on');clearTimeout(avT);avT=setTimeout(()=>av.classList.remove('on'),2000);};
+  const s1=save;save=function(){const r=s1.apply(this,arguments);if(started&&performance.now()-ultimo>12000){ultimo=performance.now();aviso();}return r;};
+  setInterval(()=>{try{if(started&&!dialog)save();}catch(_){}},60000);
+  try{const ss=setScene;setScene=function(k){const r=ss.apply(this,arguments);try{if(started&&!(SCN[k]&&SCN[k].room))setTimeout(()=>{try{save();}catch(_){}},400);}catch(_){}return r;};}catch(_){}
+  /* ---------- cartões ---------- */
+  const host=ovQuiz.parentElement;
+  const mk=(id)=>{const o=el('div','ov');o.id=id;o.hidden=true;const c=el('div','card');o.appendChild(c);host.appendChild(o);return [o,c];};
+  const [ovP,cP]=mk('ovPausa');const [ovC,cC]=mk('ovConf');
+  const _ip=isPaused;isPaused=function(){return _ip()||!ovP.hidden||!ovC.hidden;};
+  const confirma=(tit,txt,sim,nao,fn)=>{cC.innerHTML='';cC.append(el('div','kicker','Atenção'),el('h2',null,tit),el('p',null,txt));const r=el('div','row');
+    const bS=el('button','btn',sim);bS.type='button';const bN=el('button','btn alt',nao);bN.type='button';r.append(bS,bN);cC.appendChild(r);
+    bS.onclick=()=>{ovC.hidden=true;fn();};bN.onclick=()=>{ovC.hidden=true;};ovC.hidden=false;bN.focus();};
+  /* missão atual (a mesma do lembrete) */
+  const atual=()=>{try{const act=Object.keys(Q).filter(k=>!Q[k].done&&Q[k].step!==null&&(Q[k].era||1)===era&&(!Q[k].ep89||EP89));if(!act.length)return null;const pref=era===4?QE4:era===3?QE3:era===2?QE2:QE1;return pref.find(k=>act.includes(k))||act[0];}catch(_){return null;}};
+  let tela='menu';
+  const desenha=()=>{cP.innerHTML='';
+    if(tela==='menu'){cP.append(el('div','kicker','Jogo pausado'),el('h2',null,'O que você quer fazer?'));const L=el('div','lista');
+      const b=(t,fn,cl)=>{const x=el('button','btn'+(cl?' '+cl:''),t);x.type='button';x.onclick=fn;L.appendChild(x);return x;};
+      const bc=b('▶ Continuar',fecha);
+      b('🔑 Meu código',()=>{fecha();const m=$$('btnMeuCod');if(m)m.click();},'alt');
+      b('⚙ Configurações',()=>{tela='cfg';desenha();},'alt');
+      const k=atual();const br=b('↺ Reiniciar missão'+(k&&Q[k].title?': '+Q[k].title:''),()=>{if(!k)return;confirma('Reiniciar a missão?','A missão "'+(Q[k].title||k)+'" volta para o começo. O resto do jogo continua igual.','Sim, reiniciar','Não',()=>{Q[k].step=0;Q[k].count=0;try{updQuest();save();}catch(_){}fecha();try{toast('Missão reiniciada');}catch(_){}});},'alt');if(!k){br.disabled=true;br.textContent='↺ Reiniciar missão (nenhuma em andamento)';}
+      b('⌂ Sair para a tela inicial',()=>{try{save();}catch(_){}location.reload();},'alt');
+      cP.appendChild(L);cP.appendChild(el('p','small','O jogo salva sozinho neste aparelho. Para continuar em outro, use o seu código.'));setTimeout(()=>bc.focus(),30);}
+    else{cP.append(el('div','kicker','Configurações'),el('h2',null,'Do seu jeito'));
+      const lin=(rot,botoes)=>{const d=el('div','linha');d.appendChild(el('label',null,rot));const w=el('div','linha');w.style.width='100%';botoes.forEach(x=>w.appendChild(x));cP.append(d,w);};
+      const op=(t,on,fn)=>{const x=el('button','btn alt'+(on?' on':''),t);x.type='button';x.setAttribute('aria-pressed',on?'true':'false');x.onclick=()=>{fn();salvaCfg();desenha();};return x;};
+      lin('Tamanho da letra',FSN.map((n,i)=>op(n,cfg.fs===i,()=>{cfg.fs=i;aplicaFs();})));
+      const somOn=typeof soundOn!=='undefined'&&soundOn;
+      lin('Som dos efeitos',[op('Ligado',somOn,()=>{if(!soundOn){const bt=$$('btnSom');if(bt)bt.click();}}),op('Mudo',!somOn,()=>{if(soundOn){const bt=$$('btnSom');if(bt)bt.click();}})]);
+      {const d=el('div','linha');d.appendChild(el('label',null,'Volume dos efeitos'));const r=el('input');r.type='range';r.min='0';r.max='100';r.value=String(Math.round(cfg.vol*100));r.setAttribute('aria-label','Volume dos efeitos');
+        r.oninput=()=>{cfg.vol=Number(r.value)/100;salvaCfg();};r.addEventListener('keydown',e=>e.stopPropagation());d.appendChild(r);cP.appendChild(d);}
+      lin('Modo leve (computador fraco)',[op('Desligado',!cfg.leve,()=>{cfg.leve=false;aplicaLeve();}),op('Ligado',cfg.leve,()=>{cfg.leve=true;aplicaLeve();})]);
+      cP.appendChild(el('p','small','O modo leve tira os carros e bondes, metade das pessoas andando e as poeirinhas. O jogo fica mais rápido.'));
+      if(typeof window.__tutorial==='function'){const t=el('button','btn alt','Rever o tutorial');t.type='button';t.onclick=()=>{fecha();window.__tutorial();};cP.appendChild(t);}
+      const v=el('button','btn','Voltar');v.type='button';v.style.marginTop='8px';v.onclick=()=>{tela='menu';desenha();};cP.appendChild(v);}};
+  const abre=()=>{if(!started||!ovStart.hidden)return;if(!ovP.hidden)return;try{keyStack=[];padDir=null;}catch(_){}tela='menu';desenha();ovP.hidden=false;try{save();}catch(_){}};
+  const fecha=()=>{ovP.hidden=true;};
+  window.__pausa={abre,fecha,cfg};
+  /* botão ☰ no topo */
+  try{const hud=document.querySelector('.hud');const bt=el('button','btn','☰');bt.type='button';bt.id='btnPausa';bt.setAttribute('aria-label','Menu de pausa');bt.title='Menu (Esc ou P)';
+    bt.onclick=()=>{if(!ovP.hidden)fecha();else abre();};hud.insertBefore(bt,hud.firstChild);}catch(_){}
+  /* teclas: Esc e P abrem e fecham */
+  addEventListener('keydown',e=>{const k=e.key;if(!(k==='Escape'||k==='p'||k==='P'))return;const ae=document.activeElement;if(ae&&ae.tagName==='INPUT')return;
+    if(!ovC.hidden){if(k==='Escape'){ovC.hidden=true;e.stopImmediatePropagation();}return;}
+    if(!ovP.hidden){if(tela==='cfg'&&k==='Escape'){tela='menu';desenha();}else fecha();e.preventDefault();e.stopImmediatePropagation();return;}
+    if(dialog||!started||!ovStart.hidden)return;
+    try{if(_ip())return;}catch(_){}
+    e.preventDefault();e.stopImmediatePropagation();abre();},true);
+  /* ---------- Novo jogo com progresso salvo: pede confirmação ---------- */
+  let okNovo=false;const NOVOS=['btnStart','btn1830','btn1888','btn1922'];
+  window.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('button');if(!b||!NOVOS.includes(b.id)||okNovo)return;
+    if(!ovStart||ovStart.hidden)return;let tem=false;try{const v=loadSave();tem=!!(v&&v.scene);}catch(_){}
+    if(!tem)return;e.preventDefault();e.stopImmediatePropagation();e.stopPropagation();
+    confirma('Começar do zero?','O progresso salvo neste computador será apagado.','Sim, começar do zero','Não, voltar',()=>{okNovo=true;try{b.click();}finally{okNovo=false;}});},true);
+  /* Continuar em destaque (aparece sempre que houver jogo salvo) */
+  try{const bc=$$('btnCont');let sv=null;try{sv=loadSave();}catch(_){}
+    if(bc&&bc.hidden&&sv&&sv.scene){bc.hidden=false;const bs=$$('btnStart');if(bs){bs.textContent='Começar de novo';bs.classList.add('alt');}}
+    if(bc&&!bc.hidden){bc.textContent='▶ Continuar';bc.style.fontSize='18px';const r=bc.parentElement;if(r&&r.firstChild!==bc)r.insertBefore(bc,r.firstChild);}}catch(_){}
+  /* mensagem do código, como no combinado */
+  try{const ok=$$('codOk'),inp=$$('codIn'),msg=$$('codMsg');if(ok&&inp&&msg){inp.maxLength=20;const tr=()=>{if(/existe/.test(msg.textContent))msg.textContent='Esse código não funcionou. Confira se copiou certinho.';};ok.addEventListener('click',()=>setTimeout(tr,0));inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')setTimeout(tr,0);});}}catch(_){}
+}catch(e){console.warn('recursos',e);}},0);
 
 
 /* ---- 1554: personagens no estilo Zelda clássico e retratos da Oficina do Zago ---- */
