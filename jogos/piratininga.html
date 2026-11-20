@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=f1c2bbcf","kb":781,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=77e23c77","kb":786,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -9228,6 +9228,25 @@ setTimeout(function(){
 
 /* ===== v167 — SÃO VICENTE: NAU NOVA FEITA NO CANVA (pedido do professor, 20/11/2026) =====
    Desenho da nau (SV54_NAU em arte_1554.js) trocado pela versão do Canva e posta mais para dentro do mar (ajuste no bloco v164 logo abaixo). */
+/* ===== v169 — SÃO VICENTE: BARCO E CANAVIAL NOVOS FEITOS NO CANVA (pedido do professor, 20/11/2026) =====
+   Barco a remo (SV54_BARCO) e touceiras de cana no canavial (dentro de SV54_MAPA) trocados por desenhos do Canva; ajuste do barco no bloco v164 logo abaixo. */
+(function(){try{
+  if(typeof A==='undefined'||!A.SV54_CANA0||!SCN.sv)return;
+  const CANA=[0,1,2,3].map(k=>{const i=new Image();i.onload=()=>{try{if(cur==='sv')buildStatic();}catch(_){}};i.src=A['SV54_CANA'+k];return i;});
+  /* cana em pé: uma touceira do Canva em cada quadradinho de canavial */
+  const ct=cropTall;cropTall=function(c,ch,X,Y,x,y){
+    if(cur==='sv'&&ch==='K'){const I=CANA[(hash(x,y,5)*4)|0];if(I.complete&&I.naturalWidth){const j=((hash(x,y,9)*5)|0)-2;
+      c.drawImage(I,Math.round(X+8-I.naturalWidth/2+j),Math.round(Y+T+2-I.naturalHeight));}return;}
+    return ct(c,ch,X,Y,x,y);};
+  /* cana cortada: tocos e palha no chão */
+  const bs=buildStatic;buildStatic=function(){bs();try{if(cur!=='sv')return;const M=SCN.sv.map;
+    for(let y=0;y<M.length;y++)for(let x=0;x<M[y].length;x++)if(M[y][x]==='k'){const X=x*T,Y=y*T;
+      sc.fillStyle='#8a5a33';sc.fillRect(X,Y,T,T);sc.fillStyle='#7e5434';sc.fillRect(X,Y+5,T,2);sc.fillRect(X,Y+11,T,2);
+      for(const [dx,dy] of [[2,3],[7,8],[12,2],[4,12],[11,11]]){sc.fillStyle='#4a3324';sc.fillRect(X+dx,Y+dy,3,4);sc.fillStyle='#c9c45a';sc.fillRect(X+dx,Y+dy,3,1);sc.fillStyle='#8db44a';sc.fillRect(X+dx+1,Y+dy+1,1,3);}
+      sc.fillStyle='#c9a85a';sc.fillRect(X+5,Y+6,5,1);sc.fillRect(X+1,Y+14,4,1);sc.fillRect(X+10,Y+7,4,1);}}catch(_){}};
+  setTimeout(()=>{try{if(cur==='sv')buildStatic();}catch(_){}},0);
+}catch(e){console.warn('sv54cana',e);}})();
+
 /* ===== v164 — SÃO VICENTE: OBJETOS DA PRAIA E ENGENHO POR DENTRO NO ESTILO NOVO (pedido do professor, 20/11/2026) =====
    Canoa, toras de pau-brasil, caixas de açúcar, barris, cordas, sacas, barco e nau (velas com a cruz de Cristo)
    redesenhados; sala do engenho com moenda, caldeiras (fogo aceso), formas de açúcar, sacos e barril.
@@ -9241,7 +9260,7 @@ setTimeout(function(){
   pinta('torasSV','SV54_TORAS',-2,3); pinta('ob54_canoa_sv_nauSV','SV54_CANOA',-6,3);
   pinta('ob54_caixote_sv_nauSV','SV54_CAIXOTE',-1,2); pinta('ob54_barril_sv_nauSV','SV54_BARRIL',0,2);
   pinta('ob54_ancoraCorda_sv_nauSV','SV54_CORDA',-1,1); pinta('ob54_sacas_sv_mestre','SV54_SACAS',-2,2);
-  pinta('barco','SV54_BARCO',-2,2,true); pinta('nauSV','SV54_NAU',-4,34,true);
+  pinta('barco','SV54_BARCO',4,8,true); pinta('nauSV','SV54_NAU',-4,34,true);
   /* engenho por dentro */
   const R='j_x1engenho',S=SCN[R];if(!S)return;
   for(const x of [6,7,8,11,12,13])if(S.map[3]&&S.map[3][x]==='.')S.map[3][x]='#';   /* atrás das caldeiras e das formas não se passa */
