@@ -18561,7 +18561,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v168) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v173) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -19170,7 +19170,11 @@ window.__paulista82Ready=Promise.all(ready);
         if(alto){for(let x=x0+5;x+6<=x0+w-4;x+=10){g.fillStyle='#f4ecd8';g.fillRect(x-1,rh+3,7,7);g.fillStyle='#2f3f58';g.fillRect(x,rh+4,5,5);g.fillStyle='#5f86a4';g.fillRect(x,rh+4,1,2);g.fillStyle='#f4ecd8';g.fillRect(x+2,rh+4,1,5);}}
         else{for(let x=x0+4;x+4<=x0+w-3;x+=8){g.fillStyle='#2f3f58';g.fillRect(x,rh+2,3,2);g.fillStyle='#f4ecd8';g.fillRect(x-1,rh+4,5,1);}}};
       let nT=0;for(const o of objects){if(o.scene!==S||o.enter||o.room||!/^pt_|^jm_tapa_|^jm_sul_/.test(o.id))continue;const W=o.w*16,H=(o.h||1)*16;let cv=null;nT++;
-        const faz=()=>{cv=document.createElement('canvas');cv.width=W;cv.height=H+4;const g=cv.getContext('2d');let x=0;while(x<o.w){let sw=(o.h||1)===1?(3+Math.floor(hh(o.x+x,o.y,9)*3)):(o.w>7?(3+Math.floor(hh(o.x+x,o.y,9)*3)):o.w);if(o.w-x-sw<2)sw=o.w-x;casa(g,x*16,sw*16,H,o.x+x,o.y);x+=sw;}};
+        const faz=()=>{cv=document.createElement('canvas');cv.width=W;cv.height=H+4;const g=cv.getContext('2d'),oh=o.h||1;
+          /* ===== v173 — CENTRO DE 1922: TELHADÕES REPARTIDOS — bloco de cenário alto ou largo vira fileiras de casas de 2 quadradinhos de fundo e 3 a 5 de frente (pedido do professor, 20/11/2026) ===== */
+          let y=0;while(y<oh){let sh=oh-y;if(sh>=4)sh=2;else if(sh===3)sh=2;let x=0;g.save();g.translate(0,y*16);
+            while(x<o.w){let sw=3+Math.floor(hh(o.x+x,o.y+y,9)*3);if(o.w<=5&&oh<=2)sw=o.w;if(o.w-x-sw<2)sw=o.w-x;casa(g,x*16,sw*16,sh*16,o.x+x,o.y+y);x+=sw;}
+            g.restore();y+=sh;}};
         o.draw=function(c,X,Y){if(!cv)faz();c.drawImage(cv,X,Y-4);};}
       rel.telhados=nT;}catch(e){console.warn('telhados JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
@@ -19232,6 +19236,22 @@ window.__paulista82Ready=Promise.all(ready);
           g.fillStyle='#6a6258';g.fillRect(29*16+1,85*16+6,30,1);[['#f2efe6',3],['#d8b0a0',10],['#a8c0d8',17],['#f2efe6',24]].forEach(v=>{g.fillStyle=v[0];g.fillRect(29*16+v[1],85*16+7,5,6);});
           g.fillStyle='#8f897c';g.fillRect(29*16+2,87*16+4,11,9);g.fillStyle='#5f8fae';g.fillRect(29*16+4,87*16+6,7,5);}
         for(let j=0;j<32;j+=4){g.fillStyle='#c9c2b2';g.fillRect(51*16,72*16+j,32,3);g.fillStyle='#8f8878';g.fillRect(51*16,72*16+j+3,32,1);}}
+      /* ===== v173 — CENTRO DE 1922: BARRANCOS DESENHADOS — o desnível do terreno deixa de ser uma faixa marrom riscada e vira barranco de terra com capim em cima e sombra embaixo (pedido do professor, 20/11/2026) ===== */
+      try{const MM=window.__centro22.M,eC=(x,y)=>MM[y]&&MM[y][x]==='C';
+        for(let y=0;y<MM.length;y++)for(let x=0;x<MM[y].length;x++){if(MM[y][x]!=='C')continue;const X=x*16,Y=y*16,up=eC(x,y-1),dn=eC(x,y+1),lf=eC(x-1,y),rt=eC(x+1,y);
+          let n=0;for(let k=y;eC(x,k-1);k--)n++;let tot=n+1;for(let k=y;eC(x,k+1);k++)tot++;const f=tot>1?n/(tot-1):.5;
+          const cs=['#a58558','#987a50','#8c6f48','#806440','#745a39'];
+          for(let j=0;j<16;j+=4){const t=Math.min(4,Math.floor((f*(tot)+j/16)/tot*5));g.fillStyle=cs[t];g.fillRect(X,Y+j,16,4);g.fillStyle='rgba(50,30,15,.22)';g.fillRect(X,Y+j+3,16,1);}
+          for(let i=0;i<5;i++){const px=hsh(x*5+i,y)%15,py=hsh(x,y*7+i)%14;g.fillStyle=i%2?'rgba(60,40,20,.35)':'rgba(220,190,140,.30)';g.fillRect(X+px,Y+py,2,1);}
+          if(hsh(x*3,y*11)%4===0){const px=2+hsh(x,y*13)%10,py=3+hsh(x*17,y)%9;g.fillStyle='#4f7a34';g.fillRect(X+px,Y+py,3,2);g.fillStyle='#78a850';g.fillRect(X+px+1,Y+py-1,1,2);}
+          if(!up){g.fillStyle='#5f9440';g.fillRect(X,Y,16,3);g.fillStyle='#86bb5c';g.fillRect(X,Y,16,1);g.fillStyle='#4a7632';for(let i=1;i<16;i+=3)g.fillRect(X+i,Y+3,1,1+(hsh(x*9+i,y)%2));}
+          if(!dn){g.fillStyle='rgba(30,18,10,.45)';g.fillRect(X,Y+13,16,3);g.fillStyle='#3a2a1c';g.fillRect(X,Y+15,16,1);}
+          if(!lf){g.fillStyle='rgba(30,18,10,.30)';g.fillRect(X,Y,1,16);}if(!rt){g.fillStyle='rgba(30,18,10,.30)';g.fillRect(X+15,Y,1,16);}}
+        /* onde a rua desce o barranco: ladeira calçada com degraus de pedra, no lugar do riscado amarelo */
+        for(let y=0;y<MM.length;y++)for(let x=0;x<MM[y].length;x++){if(MM[y][x]!=='S')continue;const X=x*16,Y=y*16;g.fillStyle='#8f8a80';g.fillRect(X,Y,16,16);
+          for(let j=0;j<16;j+=4){g.fillStyle='#b4aea2';g.fillRect(X,Y+j,16,2);g.fillStyle='#9a958a';g.fillRect(X,Y+j+2,16,1);g.fillStyle='#5e5a52';g.fillRect(X,Y+j+3,16,1);for(let i=(j%8?3:7);i<16;i+=8){g.fillStyle='#7d786e';g.fillRect(X+i,Y+j,1,3);}}
+          if(MM[y][x-1]!=='S'){g.fillStyle='#55524a';g.fillRect(X,Y,2,16);g.fillStyle='#c9c3b6';g.fillRect(X+2,Y,1,16);}if(MM[y][x+1]!=='S'){g.fillStyle='#55524a';g.fillRect(X+14,Y,2,16);g.fillStyle='#c9c3b6';g.fillRect(X+13,Y,1,16);}}
+      }catch(e){console.warn('barranco JM',e);}
     }catch(e){console.warn('calcada JM',e);}};}
   let n=0;const tenta=()=>{try{if(roda()||++n>20)return;}catch(e){console.warn('quadra de teste JM',e);return;}setTimeout(tenta,700);};
   setTimeout(tenta,3600);
