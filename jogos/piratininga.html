@@ -2495,6 +2495,7 @@ for(const o of objects){if(!o.kind||!/^[ik]_/.test(o.scene))continue;
 /*__S22_START__*/
 /*__FERROVIAS22_A_START__*/
 /* ===== v159 — FERROVIAS DE 1922 LARGAS (MAPA DE 1917), TRENS EM ESCALA, PORTEIRA DO BRÁS E MENOS TELHADO NOS BAIRROS (pedido do professor, 20/11/2026) ===== */
+/* ===== v162 — PÁTIOS FERROVIÁRIOS DO PARI E DO BRÁS, ARMAZÉM DA INGLESA, SACAS DE CAFÉ E LOCOMOTIVA DE MANOBRA (pedido do professor, 20/11/2026) ===== */
 /* ---------- FERROVIAS DE 1922 (mapa dos bairros): traçado largo, guiado pelo mapa da greve de 1917 ----------
    Cada linha: pontos em quadradinhos (centro da via) e número de vias. Os quadradinhos cobertos viram leito
    de ferrovia ('Y', sólido); ruas que atravessam viram passagem de nível; pontes sobre os rios ficam.
@@ -2506,7 +2507,11 @@ const RAIL22=[
   {id:'norte',nome:'Central do Brasil',vias:2,pts:[[138,91],[243,91]]},
   {id:'cant',nome:'Tramway da Cantareira',vias:1,pts:[[144.5,56],[144.5,30],[141,22],[132,14.5],[100,14.5]]},
   {id:'pari',nome:'Ramal dos armazéns do Pari',vias:1,pts:[[150,57],[152.5,47.5],[170,47.5]]},
-  {id:'hosp',nome:'Ramal da Hospedaria dos Imigrantes',vias:1,pts:[[167,104],[162,107.5],[138,107.5]]}
+  {id:'hosp',nome:'Ramal da Hospedaria dos Imigrantes',vias:1,pts:[[167,104],[162,107.5],[138,107.5]]},
+  // pátios: o do Pari (armazéns da Inglesa, entre a Luz e o Brás) e o do Brás (linha de manobra ao lado da principal)
+  {id:'patioPari1',nome:'Pátio do Pari',vias:1,patio:true,pts:[[139,53.5],[158,53.5],[162,57.5]]},
+  {id:'patioPari2',nome:'Pátio do Pari',vias:1,patio:true,pts:[[141,51.5],[156,51.5],[160.5,56.5]]},
+  {id:'patioBras',nome:'Pátio do Brás',vias:1,patio:true,pts:[[165,81],[162.5,85],[162.5,106],[165,110]]}
 ];
 const RAILT22=new Map();
 (function(){
@@ -2555,8 +2560,10 @@ const RAILT22=new Map();
     for(const q of fora){for(let j=q.y;j<q.y+q.h;j++)for(let i=q.x;i<q.x+q.w;i++)OC.delete(i+','+j);objs.splice(objs.indexOf(q),1);}};
   const achar=(o,x0,y0,R)=>{for(let r=0;r<=R;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;
       if(cabe(x0+dx,y0+dy,o.w,o.h,true))return [x0+dx,y0+dy];}return null;};
-  const ALVO={estSoroc:[71,44],penteado:[160,92],estBras:[160,99],sacaN2:[154,45],sacaN3:[162,45]};
+  const ALVO={estSoroc:[71,44],penteado:[160,92],armInglPatio:[146,48],sacasPatio0:[150,50],sacasPatio1:[159,82],estBras:[160,99],sacaN2:[154,45],sacaN3:[162,45]};
   const MUDA={estBras:{sp:'estnorte',w:7,h:3}};
+  // o armazém da Inglesa no pátio do Pari e pilhas de sacas de café
+  mover.push({id:'armInglPatio',sp:'galpao',x:146,y:48,w:8,h:3},{id:'sacasPatio0',sp:'sacaria',x:150,y:50,w:2,h:1},{id:'sacasPatio1',sp:'sacaria',x:159,y:82,w:2,h:1});
   for(const o of mover){Object.assign(o,MUDA[o.id]||{});const a=ALVO[o.id]||[o.x,o.y];const p=achar(o,a[0],a[1],26);
     if(!p){console.warn('[ferrovias22] sem lugar para',o.id);continue;}tira(p[0],p[1],o.w,o.h);o.x=p[0];o.y=p[1];objs.push(o);marca(o);}
   // estação do Brás da Inglesa: se não estava no leito, traz para perto da linha
@@ -2774,6 +2781,8 @@ const BINFO22X=[[/^labor$/,'Fábrica de Tecidos Labor',["Fábrica de Tecidos Lab
   BINFO22[id]=o.sp==='fabrica5'?['Fábrica na beira da linha',["Uma fábrica colada na ferrovia: o carvão e o algodão chegam de trem, os tecidos e os sacos saem de trem.","No Brás, na Mooca e no Belenzinho as fábricas se enfileiram ao longo dos trilhos. O apito do trem e o apito da fábrica marcam o dia."]]
    :o.sp==='galpao'?['Galpão da ferrovia',["Galpão de depósito ao lado da linha: sacas, fardos e caixotes esperam o trem.","Carregadores, muitos deles negros e imigrantes, passam o dia levando peso nas costas."]]
    :['Armazém da ferrovia',["Armazém junto aos trilhos: café, farinha, tecidos e ferragens entram e saem de trem."]];});
+BINFO22.armInglPatio=['Armazém da São Paulo Railway',["O armazém da Inglesa, no pátio do Pari. Aqui as sacas de café descansam antes de descer a serra até o porto de Santos.","Os ingleses mandam na ferrovia: cobram o frete de cada saca. Quem controla o trem controla o café."]];
+BINFO22.sacasPatio0=BINFO22.sacasPatio1=['Sacas de café',["Sacas de 60 quilos, empilhadas à espera do trem. Cada uma passa nas costas de um carregador.","O café ainda é a maior riqueza do Brasil: de cada 10 sacas vendidas no mundo, mais da metade sai do Brasil."]];
 /*__FERROVIAS22_A2_END__*/
 SPMAP22.objs.forEach((o,i)=>{
   let inf=BINFO22[o.id];for(const [re,n,t] of BINFO22X)if(!inf&&re.test(o.id))inf=[n,t];let name,text;
@@ -5283,6 +5292,7 @@ function drawVagaoP(X,Y){ctx.fillStyle='#141b1b';ctx.fillRect(X,Y,16,34);ctx.fil
   const pele=['#f0c8a0','#c8966b','#8a5a3a','#e0b088','#f4d8b8'];for(let i=0;i<4;i++){const yy=Y+4+i*7;ctx.fillStyle='#141b1b';ctx.fillRect(X+3,yy,10,6);ctx.fillStyle='#a8d0f0';ctx.fillRect(X+4,yy+1,8,4);ctx.fillStyle=pele[(i+((Y/36)|0))%5];ctx.fillRect(X+5+(i%2)*3,yy+2,3,3);ctx.fillStyle='#3a2a1a';ctx.fillRect(X+5+(i%2)*3,yy+1,3,1);}}
 /*__FERROVIAS22_B_START__*/
 /* ===== v159 — FERROVIAS DE 1922 LARGAS (MAPA DE 1917), TRENS EM ESCALA, PORTEIRA DO BRÁS E MENOS TELHADO NOS BAIRROS (pedido do professor, 20/11/2026) ===== */
+/* ===== v162 — PÁTIOS FERROVIÁRIOS DO PARI E DO BRÁS, ARMAZÉM DA INGLESA, SACAS DE CAFÉ E LOCOMOTIVA DE MANOBRA (pedido do professor, 20/11/2026) ===== */
 /* ---------- ferrovias de 1922: desenho do leito largo e trens em escala ---------- */
 TREM22.wait=1e12;TREM22.parou=false;   // o trem antigo, fino, sai de cena
 const FER22=(()=>{
@@ -5357,6 +5367,10 @@ const TRENS22=[
   {lin:'soroc',via:0,ida:1,comp:['loco','tender','pass','pass','pass'],vel:50,paradas:[],volta:true,msg:'Trem da Sorocabana: vem do oeste do estado, das terras novas do café e do algodão.'},
   {lin:'norte',via:0,ida:1,comp:['loco','tender','passV','passV','passV','passV'],vel:55,paradas:[],volta:true,msg:'Trem da Central do Brasil: sai da Estação do Norte rumo ao Rio de Janeiro, a capital federal.'},
   {lin:'pari',via:0,ida:1,comp:['carga','carga','carga'],vel:0,paradas:[],parado:.55},
+  {lin:'patioPari1',via:0,ida:1,comp:['cafe','cafe','cafe','cafe','cafe'],vel:0,paradas:[],parado:.62},
+  {lin:'patioPari2',via:0,ida:1,comp:['carga','carga','carga','cafe','cafe'],vel:0,paradas:[],parado:.66},
+  {lin:'patioBras',via:0,ida:1,comp:['cafe','cafe','cafe','carga','carga','cafe'],vel:0,paradas:[],parado:.78},
+  {lin:'patioBras',via:0,ida:1,comp:['loco'],vel:16,paradas:[],volta:true,msg:'Uma locomotiva de manobra arruma os vagões no pátio do Brás.'},
   {lin:'hosp',via:0,ida:1,comp:['pass','pass'],vel:0,paradas:[],parado:.75},
   {lin:'cant',via:0,ida:1,comp:['locoP','passP','passP'],vel:38,paradas:[],volta:true,msg:'O trenzinho da Cantareira: vai do Pari até Santana e sobe para a serra da Cantareira, de onde vem a água da cidade.'}
 ];
