@@ -12506,6 +12506,205 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
   window.__quiosque88=[p,pc];
 }catch(e){console.warn('quiosque 1888',e);}})();
 
+/* ===== v149 — FERROVIAS DE 1888 NO TRAÇADO CERTO (pedido do professor, 19/11/2026) ===== */
+/* Conferido com a Planta de São Paulo de Jules Martin (1890), que está no jogo, e com o documento
+   "Piratininga — Correções ferroviárias do mapa de São Paulo (1888)":
+   - São Paulo Railway (a Inglesa): vem de Jundiaí pelo oeste, passa atrás da Estação da Luz, atravessa o
+     Tamanduateí por uma ponte, passa pelo Brás (estação e ramal da Hospedaria), pela Mooca (sem estação)
+     e pela Estação do Ipiranga (1886), e sai para Santos. Sai o trilho reto que corria ao lado da várzea.
+   - Sorocabana: termina na estação dela, a oeste da Luz, correndo ao lado da Inglesa até a borda.
+   - Estrada de Ferro do Norte: estação no Brás, ao lado da do Brás, e linha para leste (Penha e Rio).
+   - Tramway de Santo Amaro (a vapor): São Joaquim, Vila Mariana (com ramal do Matadouro) e Santo Amaro.
+   - Placas nas bordas dizem para onde vai cada linha. */
+(function(){try{
+  if(!SCN.sp88)return;
+  const M=SCN.sp88.map,H=M.length,W=M[0].length;
+  const LINHAS={
+    spr:[[0,29],[114,29],[114,86],[126,86],[126,H-1]],
+    soro:[[0,27],[43,27]],
+    norte:[[118,65],[W-1,65]],
+    tram:[[66,101],[66,H-1]],
+    hosp:[[110,80],[113,80]],
+    matad:[[57,120],[65,120]]
+  };
+  const celulas=p=>{const out=[];for(let i=0;i<p.length-1;i++){let [x,y]=p[i];const [x1,y1]=p[i+1];
+    while(true){out.push([x,y]);if(x===x1&&y===y1)break;if(x!==x1)x+=Math.sign(x1-x);else y+=Math.sign(y1-y);}}return out;};
+  const RAIL=new Map();/* "x,y" -> {n,s,e,w} ligações */
+  const liga=(a,b)=>{const k=a[0]+','+a[1];const r=RAIL.get(k)||{n:0,s:0,e:0,w:0};
+    if(b){if(b[0]>a[0])r.e=1;if(b[0]<a[0])r.w=1;if(b[1]>a[1])r.s=1;if(b[1]<a[1])r.n=1;}RAIL.set(k,r);};
+  for(const p of Object.values(LINHAS)){const cs=celulas(p);cs.forEach((c,i)=>{liga(c,cs[i+1]);if(i>0)liga(c,cs[i-1]);});}
+  /* as pontas que saem do mapa continuam para fora */
+  for(const p of Object.values(LINHAS))for(const e of [p[0],p[p.length-1]]){const r=RAIL.get(e[0]+','+e[1]);if(!r)continue;
+    if(e[0]===0)r.w=1;if(e[0]===W-1)r.e=1;if(e[1]===H-1)r.s=1;}
+  /* ramais encostam na linha principal */
+  {const r=RAIL.get('113,80');if(r)r.e=1;const q=RAIL.get('114,80');if(q)q.w=1;
+   const a=RAIL.get('65,120');if(a)a.e=1;const b=RAIL.get('66,120');if(b)b.w=1;}
+  const temTrilho=(x,y)=>RAIL.has(x+','+y);
+  window.__RAIL88=RAIL;
+  try{train.wait=1e9;}catch(_){}
+
+  /* 1) tira os trilhos velhos: a coluna reta ao lado da várzea, o pedaço da Sorocabana até a Luz e o trilho da Vila Mariana antiga */
+  for(let y=0;y<H;y++){const ch=M[y][88];if(ch!=='L')continue;
+    const l=M[y][87],r=M[y][89];
+    if(r==='W'||l==='W')M[y][88]='W';
+    else if(r==='B'&&l==='B')M[y][88]='B';
+    else if(r==='V'||l==='V')M[y][88]='V';
+    else M[y][88]='.';}
+  for(let x=44;x<W;x++)if(M[27][x]==='L')M[27][x]='.';
+  for(let x=20;x<=45;x++)if(M[117][x]==='L')M[117][x]='.';
+  /* 2) põe os trilhos novos: em rua fica a rua (passagem de nível); em rio fica o rio (ponte desenhada por cima) */
+  for(const k of RAIL.keys()){const [x,y]=k.split(',').map(Number);const ch=M[y][x];
+    if('dDRSWBe'.includes(ch))continue;M[y][x]='L';}
+  for(const k of RAIL.keys()){const [x,y]=k.split(',').map(Number);if(SPTAG88[y])SPTAG88[y][x]=(y===27&&x<=43)?'Estrada de Ferro Sorocabana':(x===66&&y>=101)||(y===120&&x>=57&&x<=65)?'Tramway de Santo Amaro':(y===65&&x>=118)?'Estrada de Ferro do Norte':'São Paulo Railway';}
+
+  /* 3) estações nos lugares certos */
+  const ob=id=>objects.find(o=>o.id===id&&(o.scene||'pira')==='sp88');
+  const move=(id,x,y)=>{const o=ob(id);if(!o)return null;const dx=x-o.x,dy=y-o.y;
+    /* quem estava parado na porta vai junto */
+    for(const n of npcs)if(n.scene==='sp88'&&n.x>=o.x-1&&n.x<=o.x+o.w&&n.y>=o.y&&n.y<=o.y+o.h+1){n.x+=dx;n.y+=dy;}
+    o.x=x;o.y=y;return o;};
+  const GEN0=/^(n\d+|h\d+|chiqueiro.*|banca.*|varal.*|saca.*|q\d+)$/;
+  const livre=(o,x,y,w,h)=>!objects.some(p=>p!==o&&(p.scene||'pira')==='sp88'&&x<p.x+(p.w||1)&&x+w>p.x&&y<p.y+(p.h||1)&&y+h>p.y);
+  const abre=(x,y,w,h,extra)=>{for(const p of objects.slice()){if((p.scene||'pira')!=='sp88')continue;if(!(x<p.x+(p.w||1)&&x+w>p.x&&y<p.y+(p.h||1)&&y+h>p.y))continue;
+      if(!(GEN0.test(p.id)||(extra||[]).includes(p.id)))continue;
+      let q=null;for(const R of [6,12,20]){const c=findFreeRect('sp88',p.x,p.y,p.w||1,p.h||1,R);if(c&&!(c[0]<x+w&&c[0]+(p.w||1)>x&&c[1]<y+h&&c[1]+(p.h||1)>y)&&livre(p,c[0],c[1],p.w||1,p.h||1)){let t=false;for(let yy=c[1];yy<c[1]+(p.h||1);yy++)for(let xx=c[0];xx<c[0]+(p.w||1);xx++)if(temTrilho(xx,yy))t=true;if(!t){q=c;break;}}}
+      if(q){p.x=q[0];p.y=q[1];}else objects.splice(objects.indexOf(p),1);}};
+  move('estBras',110,66);abre(118,61,7,4,['cortBras2']);move('estnorte',118,62);
+  const limpa=(x,y,w,h)=>{for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)if(M[yy]&&'TbP,'.includes(M[yy][xx]))M[yy][xx]='.';};
+  move('estVM88',58,114);move('matadouro',57,121);
+  abre(58,114,7,3);abre(57,121,6,3);abre(57,126,6,3);abre(62,101,3,2);abre(127,107,3,2);
+  limpa(58,113,7,4);limpa(57,120,6,4);limpa(57,126,6,3);limpa(62,100,3,3);limpa(127,106,4,4);limpa(118,61,7,4);limpa(110,65,4,4);
+  {const t=ob('tremVM88');if(t)objects.splice(objects.indexOf(t),1);}
+  {const p=ob('ponto_vm88');if(p){p.x=60;p.y=117;if(p.ponto){p.ponto.x=60;p.ponto.y=117;p.ponto.to=[60,118];}}}
+  for(const n of npcs)if(n.scene==='sp88'&&(n.id==='maqVM88')){n.x=65;n.y=115;}
+  for(const n of npcs)if(n.scene==='sp88'&&(n.id==='magarefe')){n.x=63;n.y=122;}
+  /* estações novas: Ipiranga (1886, da Inglesa) e São Joaquim (ponta do tramway) */
+  /* estação pequena de madeira e tijolo, com plataforma coberta (desenho próprio, sem arte nova) */
+  const estPeq=(cor)=>function(c,X,Y){c.fillStyle='rgba(20,27,27,.25)';c.fillRect(X+1,Y+29,46,3);
+      c.fillStyle='#141b1b';c.fillRect(X+2,Y+4,44,28);c.fillStyle='#e8dcc0';c.fillRect(X+3,Y+12,42,19);
+      c.fillStyle=cor;c.fillRect(X+1,Y+2,46,10);c.fillStyle='rgba(255,255,255,.18)';for(let i=0;i<46;i+=4)c.fillRect(X+1+i,Y+3,2,8);
+      c.fillStyle='#141b1b';c.fillRect(X,Y+11,48,2);
+      c.fillStyle='#4e6a8a';for(const wx of [7,33])c.fillRect(X+wx,Y+16,7,8);c.fillStyle='#5a3a24';c.fillRect(X+20,Y+17,8,14);
+      c.fillStyle='#f1c471';c.fillRect(X+14,Y+13,20,3);c.fillStyle='#8a5c34';c.fillRect(X+40,Y+24,2,7);c.fillRect(X+6,Y+24,2,7);};
+  {const q=livre(null,127,107,3,2)?[127,107]:(findFreeRect('sp88',128,107,3,2,6)||[128,107]);
+   objects.push({id:'estIpir88',scene:'sp88',x:q[0],y:q[1],w:3,h:2,name:'Estação do Ipiranga',draw:estPeq('#7a3a2a'),
+    text:["A Estação do Ipiranga, da São Paulo Railway, aberta em 1886. O trem que desce para Santos passa por aqui.","Perto daqui estão as obras do Monumento do Ipiranga."]});}
+  objects.push({id:'estSJ88',scene:'sp88',x:62,y:101,w:3,h:2,name:'Estação São Joaquim',draw:estPeq('#4e6a3a'),
+    text:["A estação São Joaquim, na Liberdade: daqui sai o tramway a vapor para a Vila Mariana e Santo Amaro, desde 1886.","É um trenzinho pequeno, bem diferente do trem grande da Inglesa e do bonde puxado por burros."]});
+
+  /* 4) casas genéricas que ficaram em cima do trilho vão para o lado */
+  const GEN=/^(n\d+|h\d+|chiqueiro.*|banca.*|varal.*|saca.*|q\d+|curralMat)$/;
+  const cobre=(o,x,y)=>x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1);
+  const sobreTrilho=o=>{for(let y=o.y;y<o.y+(o.h||1);y++)for(let x=o.x;x<o.x+(o.w||1);x++)if(temTrilho(x,y))return true;return false;};
+  const lugar=(o,cx,cy)=>{for(const R of [6,12,20]){const q=findFreeRect('sp88',cx,cy,o.w||1,o.h||1,R);
+      if(q){const t={x:q[0],y:q[1],w:o.w,h:o.h};if(!sobreTrilho(t)&&!objects.some(p=>p!==o&&(p.scene||'pira')==='sp88'&&q[0]<p.x+(p.w||1)&&q[0]+(o.w||1)>p.x&&q[1]<p.y+(p.h||1)&&q[1]+(o.h||1)>p.y))return q;}}return null;};
+  const arruma=()=>{const fora=[];
+    for(const o of objects.slice()){if((o.scene||'pira')!=='sp88'||!sobreTrilho(o))continue;
+      if(o.id==='estSJ88'||o.id==='estIpir88')continue;
+      if(GEN.test(o.id)||o.id==='curralMat'){const q=lugar(o,o.x,o.y);if(q){o.x=q[0];o.y=q[1];}else{objects.splice(objects.indexOf(o),1);}}
+      else fora.push(o.id);}
+    const cm=ob('curralMat');if(cm&&!(cm.x===57&&cm.y===126)&&livre(cm,57,126,6,3)){cm.x=57;cm.y=126;}
+    /* gente e placas em cima do trilho */
+    const lado=(a,b)=>{for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0],[0,2],[0,-2],[2,0],[-2,0],[1,1],[-1,-1]]){const x=a+dx,y=b+dy;if(!temTrilho(x,y)&&freeAt('sp88',x,y)&&!npcs.some(n=>n.scene==='sp88'&&n.x===x&&n.y===y))return [x,y];}return null;};
+    for(const n of npcs){if(n.scene!=='sp88'||!temTrilho(n.x,n.y))continue;const q=lado(n.x,n.y);if(q){n.x=q[0];n.y=q[1];}}
+    for(const o of objects){if((o.scene||'pira')!=='sp88'||(o.w||1)>1||(o.h||1)>1||!temTrilho(o.x,o.y))continue;const q=lado(o.x,o.y);if(q){o.x=q[0];o.y=q[1];}}
+    try{if(cur==='sp88'){buildOcc();buildStatic();}}catch(_){}
+    window.__trilhoBloqueado=fora;};
+  arruma();setTimeout(arruma,1500);
+
+  /* a família de imigrantes agora desce na nova Estação do Brás */
+  setTimeout(()=>{try{const w=walkers.find(q=>q.id==='chegada'&&q.scene==='sp88'),e=ob('estBras'),h=ob('hospimig');if(!w||!e||!h)return;
+    const hx=h.x+(h.door||Math.floor(h.w/2)),P=[[e.x+1,e.y+e.h],[e.x+1,74],[hx,74],[hx,h.y+h.h]];
+    w.path=P;w.x=w.fx=P[0][0];w.y=w.fy=P[0][1];w.px=w.x*T;w.py=w.y*T;w.wi=1;w.step=1;w.prog=1;}catch(_){}},400);
+
+  /* 5) placas nas bordas e nomes no mapa */
+  const placa=(id,x,y,name,txt)=>{const q=findFree('sp88',x,y,4);if(!q||temTrilho(q[0],q[1]))return;objects.push({id,scene:'sp88',x:q[0],y:q[1],w:1,h:1,draw:drawSign,name,text:txt});};
+  placa('placaJundiai',2,30,'Para Jundiaí',["São Paulo Railway, a Inglesa: por aqui o trem segue para Jundiaí, onde começam as ferrovias do interior do café.","Na outra ponta, ela desce a serra até o porto de Santos."]);
+  placa('placaSorocaba',2,26,'Para Sorocaba',["Estrada de Ferro Sorocabana: por aqui o trem vai para Sorocaba, a oeste.","A estação dela fica perto da Luz, mas é de outra companhia."]);
+  placa('placaSantos',127,H-2,'Para Santos',["São Paulo Railway: por aqui o trem passa por São Caetano e desce a Serra do Mar até o porto de Santos.","É por este caminho que o café sai para o mundo."]);
+  placa('placaRio',W-2,66,'Para a Penha e o Rio',["Estrada de Ferro do Norte: por aqui o trem vai para a Penha, Mogi das Cruzes e o vale do Paraíba.","Em Cachoeira, a linha encontra a ferrovia que vai até o Rio de Janeiro, a capital do Império."]);
+  placa('placaSantoAmaro',65,H-2,'Para Santo Amaro',["Tramway de Santo Amaro: o trenzinho a vapor sai de São Joaquim, para na Vila Mariana e segue até Santo Amaro, longe, no meio das chácaras.","Faz fumaça, apita e anda devagar. Para os moradores de Santo Amaro, é o jeito de chegar à cidade sem passar o dia na estrada."]);
+  for(let i=LABELS_88.length-1;i>=0;i--){const n=LABELS_88[i][0];if(n==='para Vila Mariana'||n==='Estação da Vila Mariana'||n==='Matadouro (Vila Mariana)'||n==='Estrada de Ferro Sorocabana')LABELS_88.splice(i,1);}
+  LABELS_88.push(['Estrada de Ferro Sorocabana',18,26.1,'#e3f1f5'],['São Paulo Railway (a Inglesa)',18,30.4,'#e3f1f5'],['São Paulo Railway',92,28.1,'#e3f1f5'],
+    ['Estação do Brás',111.5,69.6,'#f1c471'],['Estação do Norte',121.5,66.4,'#f1c471'],['Estrada de Ferro do Norte',138,64.1,'#e3f1f5'],
+    ['Estação do Ipiranga',128.5,109.6,'#f1c471'],['Tramway de Santo Amaro',70,111,'#e3f1f5'],['Estação São Joaquim',63.5,100.2,'#f1c471'],
+    ['Estação da Vila Mariana',61.5,113.2,'#f1c471'],['Matadouro (Vila Mariana)',60,124.6]);
+
+  /* 6) desenho dos trilhos: passagem de nível, ponte e curvas */
+  const curva=(c,X,Y,a,b)=>{/* a,b em 'nsew' */
+    const cxp={ne:[X+T,Y],nw:[X,Y],se:[X+T,Y+T],sw:[X,Y+T]}[a+b];
+    c.save();c.beginPath();c.rect(X,Y,T,T);c.clip();
+    for(const [r,col,lw] of [[4.5,'#141b1b',4],[10.5,'#141b1b',4],[4.5,'#8d977f',2],[10.5,'#8d977f',2]]){c.strokeStyle=col;c.lineWidth=lw;c.beginPath();c.arc(cxp[0],cxp[1],r,0,Math.PI*2);c.stroke();}
+    c.restore();};
+  const desenhaTrilhos=c=>{
+    for(const [k,r] of RAIL){const [x,y]=k.split(',').map(Number),X=x*T,Y=y*T,ch=M[y][x];
+      const h=r.e||r.w,v=r.n||r.s;
+      if(ch==='W'||ch==='B'){/* ponte de ferro */
+        c.fillStyle='#141b1b';c.fillRect(X,Y+1,T,14);c.fillStyle='#5a4a3a';c.fillRect(X,Y+2,T,12);
+        c.fillStyle='#3a3a44';c.fillRect(X,Y+1,T,2);c.fillRect(X,Y+13,T,2);
+        c.fillStyle='#6a6a76';for(let i=0;i<T;i+=4){c.fillRect(X+i,Y,1,3);c.fillRect(X+i,Y+13,1,3);}
+        if(v&&!h)railsT(c,X,Y);else railsH(c,X,Y);continue;}
+      const canto=(h&&v)&&!((r.e&&r.w)||(r.n&&r.s));
+      if(canto){if(ch==='L')S(c,'Z',4,0,X,Y);const a=r.n?'n':'s',b=r.e?'e':'w';curva(c,X,Y,a,b);continue;}
+      if('dDRSe'.includes(ch)||ch==='L'){if(h&&v){railsT(c,X,Y);railsH(c,X,Y);}else if(h)railsH(c,X,Y);else railsT(c,X,Y);}}};
+  {const BR=BONDE_RAIL;railsOverlay88=function(c){
+    c.fillStyle='rgba(60,50,40,.55)';
+    for(const [k,d] of BR){const [x,y]=k.split(',').map(Number),X=x*T,Y=y*T;
+      if(d==='v'){c.fillRect(X+4,Y,1,T);c.fillRect(X+11,Y,1,T);}else{c.fillRect(X,Y+5,T,1);c.fillRect(X,Y+11,T,1);}}
+    desenhaTrilhos(c);};}
+
+  /* 7) os trens andando pelo traçado novo */
+  const comp=p=>{const segs=[];let L=0;for(let i=0;i<p.length-1;i++){const a=p[i],b=p[i+1],l=(Math.abs(b[0]-a[0])+Math.abs(b[1]-a[1]))*T;segs.push({a,b,l,L0:L});L+=l;}return {segs,L};};
+  const pos=(P,s)=>{s=Math.max(0,Math.min(P.L,s));for(const g of P.segs){if(s<=g.L0+g.l||g===P.segs[P.segs.length-1]){const f=g.l?(s-g.L0)/g.l:0;
+      return {x:(g.a[0]+(g.b[0]-g.a[0])*f)*T,y:(g.a[1]+(g.b[1]-g.a[1])*f)*T,h:g.a[1]===g.b[1],sg:g.a[1]===g.b[1]?Math.sign(g.b[0]-g.a[0]):Math.sign(g.b[1]-g.a[1])};}}};
+  const COR={spr:{cor:'#7a4a2a',cor2:'#f1c471',carga:true},norte:{cor:'#2e4a3a',cor2:'#e3d6b0'},tram:{cor:'#4e6a3a',cor2:'#f1e4c0'}};
+  const TRENS=[
+    {k:'spr',P:comp(LINHAS.spr),n:5,gap:33,v:58,s:0,ida:1,wait:3,paradas:[[82,29],[114,66],[126,107]],parado:0,feito:new Set()},
+    {k:'norte',P:comp(LINHAS.norte),n:2,gap:33,v:45,s:0,ida:1,wait:6,paradas:[],parado:0,feito:new Set()},
+    {k:'tram',P:comp(LINHAS.tram),n:2,gap:22,v:30,s:0,ida:1,wait:4,paradas:[[66,115]],parado:0,feito:new Set(),pequeno:true}];
+  for(const tr of TRENS)tr.sp=tr.paradas.map(([px,py])=>{let best=0,bd=1e9;for(let s=0;s<=tr.P.L;s+=8){const q=pos(tr.P,s),d=Math.abs(q.x-px*T)+Math.abs(q.y-py*T);if(d<bd){bd=d;best=s;}}return best;});
+  window.__trens88=TRENS;
+  const locoH=(c,X,Y,dir,cfg,peq)=>{c.save();if(dir>0){c.translate(X*2+30,0);c.scale(-1,1);}
+    if(peq){c.fillStyle='rgba(20,27,27,.3)';c.fillRect(X+2,Y+13,20,3);c.fillStyle='#141b1b';c.fillRect(X+2,Y+3,20,11);c.fillStyle='#262230';c.fillRect(X+3,Y+4,12,8);c.fillStyle=cfg.cor;c.fillRect(X+15,Y+2,6,10);
+      c.fillStyle='#141b1b';c.fillRect(X+4,Y-2,4,6);for(const wx of [6,16]){c.beginPath();c.arc(X+wx,Y+13,2.5,0,7);c.fill();}}
+    else drawTremLado(c,X,Y,0,{larga:false,cor:cfg.cor,cor2:'#a83a30'});
+    c.restore();};
+  const vagH=(c,X,Y,cfg,peq)=>{const w=peq?20:30,hh=peq?10:12,top=Y+16-hh-3;
+    c.fillStyle='rgba(20,27,27,.3)';c.fillRect(X,Y+13,w,3);c.fillStyle='#141b1b';c.fillRect(X,top,w,hh);c.fillStyle=cfg.cor;c.fillRect(X+1,top+1,w-2,hh-2);
+    if(cfg.carga){c.fillStyle='#e3d6b0';for(let s=0;s<4;s++)c.fillRect(X+3+s*6,top+3,5,hh-6);}else{c.fillStyle='#e3f1f5';for(let w2=0;w2<(peq?2:4);w2++)c.fillRect(X+3+w2*7,top+3,5,3);c.fillStyle=cfg.cor2;c.fillRect(X+1,top+hh-4,w-2,1);}
+    for(const wx of (peq?[4,16]:[6,24])){c.fillStyle='#141b1b';c.beginPath();c.arc(X+wx,Y+12,2.5,0,7);c.fill();}};
+  const locoV=(c,X,Y,dir,cfg,peq)=>{const w=peq?10:14,l=peq?20:30,x=X+(16-w)/2;c.fillStyle='rgba(20,27,27,.3)';c.fillRect(x+2,Y+3,w,l);
+    c.fillStyle='#141b1b';c.fillRect(x,Y,w,l);c.fillStyle='#262230';c.fillRect(x+1,Y+1,w-2,l-2);
+    const cab=dir>0?Y+1:Y+l-9;c.fillStyle=peq?cfg.cor:'#a83a30';c.fillRect(x+1,cab,w-2,8);
+    const ch=dir>0?Y+l-7:Y+3;c.fillStyle='#141b1b';c.fillRect(x+w/2-2,ch,4,4);c.fillStyle='#4e484a';c.fillRect(x+w/2-1,ch+1,2,2);};
+  const vagV=(c,X,Y,cfg,peq)=>{const w=peq?10:14,l=peq?18:30,x=X+(16-w)/2;c.fillStyle='rgba(20,27,27,.3)';c.fillRect(x+2,Y+3,w,l);
+    c.fillStyle='#141b1b';c.fillRect(x,Y,w,l);c.fillStyle=cfg.cor;c.fillRect(x+1,Y+1,w-2,l-2);
+    if(cfg.carga){c.fillStyle='#e3d6b0';for(let s=0;s<4;s++)c.fillRect(x+3,Y+3+s*7,w-6,5);}else{c.fillStyle=cfg.cor2;c.fillRect(x+2,Y+2,w-4,l-4);c.fillStyle=cfg.cor;c.fillRect(x+3,Y+3,w-6,l-6);}};
+  const t0=trainUpdate;trainUpdate=function(dt){
+    if(typeof trainXUpdate==='function')trainXUpdate(dt);
+    if(trainS.wait<=0&&trainS.x>30*T)trainS.x=30*T;
+    for(const tr of TRENS){
+      if(tr.wait>0){tr.wait-=dt;continue;}
+      if(tr.parado>0){tr.parado-=dt;continue;}
+      const tot=tr.P.L+tr.n*tr.gap+40;tr.s+=dt*tr.v;
+      const sv=tr.ida?tr.s:tot-tr.s;
+      for(let i=0;i<tr.sp.length;i++){const k=i+(tr.ida?0:100);if(!tr.feito.has(k)&&(tr.ida?sv>=tr.sp[i]:sv<=tr.sp[i])&&Math.abs(sv-tr.sp[i])<40){tr.feito.add(k);tr.parado=3;}}
+      if(tr.s>=tot){tr.s=0;tr.ida=!tr.ida;tr.wait=tr.k==='spr'?6:5;tr.feito.clear();}
+      if(cur==='sp88'&&Math.random()<.45){const head=tr.ida?tr.s:tot-tr.s;const q=pos(tr.P,Math.min(head,tr.P.L));if(head>=0&&head<=tr.P.L)parts.push({x:q.x+8,y:q.y+2,vx:(Math.random()-.5)*8,vy:-12-Math.random()*6,life:1.4,max:1.4,c:'#c8c8cc',s:tr.pequeno?2:3});}}
+  };
+  const r0=trainRender;trainRender=function(list,camX,camY){
+    if(typeof trainXRender==='function')trainXRender(list,camX,camY);
+    if(cur!=='sp88')return;
+    for(const tr of TRENS){if(tr.wait>0&&tr.s===0)continue;const cfg=COR[tr.k],peq=!!tr.pequeno;
+      const tot=tr.P.L+tr.n*tr.gap+40,head=tr.ida?tr.s:tot-tr.s,dirS=tr.ida?1:-1;
+      for(let i=0;i<=tr.n;i++){const s=tr.ida?head-i*tr.gap:head+i*tr.gap;if(s<0||s>tr.P.L)continue;
+        const q=pos(tr.P,s),sg=q.sg*dirS,X=Math.round(q.x-camX),Y=Math.round(q.y-camY);
+        if(X<-60||X>VW+60||Y<-60||Y>VH+60)continue;
+        if(q.h){const XX=X-(i===0?(sg>0?14:16):(peq?10:15));list.push({z:q.y+T,f:()=>{i===0?locoH(ctx,XX,Y,sg,cfg,peq):vagH(ctx,XX,Y,cfg,peq);}});}
+        else{const L=i===0?(peq?20:30):(peq?18:30),YY=Y+8-L/2;list.push({z:q.y+L/2+8,f:()=>{i===0?locoV(ctx,X,YY,sg,cfg,peq):vagV(ctx,X,YY,cfg,peq);}});}}}
+  };
+}catch(e){console.warn('ferrovias 1888',e);}})();
+
 /* =========================================================
    IPIRANGA 1922 — setor monumental (Museu, jardim, Monumento, riacho),
    fábrica Jafet a leste, moradias e Casa do Grito.
