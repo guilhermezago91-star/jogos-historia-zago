@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=a8d67fb3","kb":768,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=82d06875","kb":777,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -9225,6 +9225,32 @@ setTimeout(function(){
   const bs=buildStatic;buildStatic=function(){bs();try{if(cur==='sv'&&ok){sc.imageSmoothingEnabled=false;sc.drawImage(IM,0,0);}}catch(_){}};
   setTimeout(()=>{try{if(cur==='sv'){buildStatic();buildOcc();mmDirty=true;}}catch(_){}},0);
 }catch(e){console.warn('sv54',e);}})();
+
+/* ===== v164 — SÃO VICENTE: OBJETOS DA PRAIA E ENGENHO POR DENTRO NO ESTILO NOVO (pedido do professor, 20/11/2026) =====
+   Canoa, toras de pau-brasil, caixas de açúcar, barris, cordas, sacas, barco e nau (velas com a cruz de Cristo)
+   redesenhados; sala do engenho com moenda, caldeiras (fogo aceso), formas de açúcar, sacos e barril.
+   Arte em arte_1554.js: SV54_* e ENG54_*. */
+(function(){try{
+  if(typeof A==='undefined'||!A.ENG54_SALA)return;
+  const img=k=>{const i=new Image();i.src=A[k];return i;};
+  const bob=()=>Math.round(Math.sin((typeof t==='number'?t:performance.now()/1000)*1.6)*1.5);
+  const pinta=(id,k,dx,dy,mar)=>{const o=objects.find(o=>o.id===id);if(!o)return;const I=img(k);
+    o.draw=(c,X,Y)=>{if(!I.complete||!I.naturalWidth)return;c.drawImage(I,Math.round(X+dx),Math.round(Y+o.h*T-I.naturalHeight+dy+(mar?bob():0)));};};
+  pinta('torasSV','SV54_TORAS',-2,3); pinta('ob54_canoa_sv_nauSV','SV54_CANOA',-6,3);
+  pinta('ob54_caixote_sv_nauSV','SV54_CAIXOTE',-1,2); pinta('ob54_barril_sv_nauSV','SV54_BARRIL',0,2);
+  pinta('ob54_ancoraCorda_sv_nauSV','SV54_CORDA',-1,1); pinta('ob54_sacas_sv_mestre','SV54_SACAS',-2,2);
+  pinta('barco','SV54_BARCO',-2,2,true); pinta('nauSV','SV54_NAU',-4,14,true);
+  /* engenho por dentro */
+  const R='j_x1engenho',S=SCN[R];if(!S)return;
+  for(const x of [6,7,8,11,12,13])if(S.map[3]&&S.map[3][x]==='.')S.map[3][x]='#';   /* atrás das caldeiras e das formas não se passa */
+  for(const o of objects)if(o.scene===R&&['moenda','formasac','saco_e','saco_e2','barril_e','feixeCana'].includes(o.id))o.draw=()=>{};
+  const FG=img('ENG54_FOGO'),cal=objects.find(o=>o.id==='caldeiras');
+  if(cal)cal.draw=(c,X,Y)=>{if(!FG.complete||!FG.naturalWidth)return;const f=(typeof OPT!=='undefined'&&OPT.calm)?0:Math.floor(performance.now()/180)%3;
+    c.drawImage(FG,f*50,0,50,10,Math.round(X-1),Math.round(Y+2),50,10);};
+  const IM=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur===R){buildStatic();buildOcc&&buildOcc();}}catch(_){}};IM.src=A.ENG54_SALA;
+  const bs=buildStatic;buildStatic=function(){bs();try{if(cur===R&&ok){sc.imageSmoothingEnabled=false;sc.drawImage(IM,0,0);}}catch(_){}};
+}catch(e){console.warn('sv54b',e);}})();
+
 
 /* ---- fontes: o Pátio do Colégio hoje, o desenho da colina e o mapa do Triângulo ---- */
 (function(){
