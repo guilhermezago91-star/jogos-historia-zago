@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=d9db775b","kb":788,"m":1},{"f":"pac_e1234.js?v=56ee25a1","kb":2140,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=d9db775b","kb":788,"m":1},{"f":"pac_e1234.js?v=56ee25a1","kb":2140,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=9e50ae28","kb":1400,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -13523,13 +13523,97 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
   window.__viagemSA88=viagem;
   {const h0=questHookX;questHookX=function(n){
     if(n.id==='bilheteSJ88'){const q=Q.tramway88;if(!q)return h0(n);
-      if(q.step===null&&!q.done)return{pages:["Quer conhecer o tramway de Santo Amaro? É um trenzinho a vapor, pequeno, de bitola estreita. Bem diferente do trem grande da Inglesa!","Tome o bilhete, eu pago desta vez. Suba!"],after:()=>{qStart('tramway88');viagem(()=>{
+      if(q.step===null&&!q.done)return{pages:["Quer conhecer o tramway de Santo Amaro? É um trenzinho a vapor, pequeno, de bitola estreita. Bem diferente do trem grande da Inglesa!","Tome o bilhete, eu pago desta vez. Suba!"],after:()=>{qStart('tramway88');(window.__viagemSA88||viagem)(()=>{
         say('Tramway de Santo Amaro',["Santo Amaro fica longe da cidade: antes do trem, a viagem era de carroça ou a cavalo, e levava o dia todo.","De lá vêm para a capital cereais, madeira, carvão e pedra de cantaria. E na volta, o trenzinho traz a carne do Matadouro da Vila Mariana.","Você volta para a Estação São Joaquim."],
           ()=>finishMission('tramway88','O trem de Santo Amaro',"Para onde ia o tramway a vapor que saía da Estação São Joaquim, em 1888?",["Para Santos, descendo a serra","Para Santo Amaro, passando pela Vila Mariana","Para o Rio de Janeiro, pelo vale do Paraíba"],1,"O tramway de Santo Amaro, de 1886, ligava São Joaquim, na Liberdade, à Vila Mariana e a Santo Amaro. Em 1913 virou bonde elétrico, e foi a última linha de bonde da cidade, até 1968.","Tramway de Santo Amaro: trem a vapor de 1886, de São Joaquim a Santo Amaro, pela Vila Mariana. Em 1913 virou bonde elétrico; foi a última linha de bonde de São Paulo (1968)."),'player');});}};
       if(q.done)return{pages:["Gostou da viagem? Daqui a uns anos dizem que vão trocar o vapor pela eletricidade, como nos bondes da Europa."]};}
     return h0(n);};}
   window.__tram88=feito;
 }catch(e){console.warn('tramway 1888',e);}})();
+
+/* ===== v176 — FILMINHO DO TRAMWAY DE SANTO AMARO COM ILUSTRAÇÕES DO CANVA (pedido do professor, 20/11/2026) ===== */
+/* O filminho da viagem de tramway (missão do bilheteiro da Estação São Joaquim, 1888) agora é feito
+   como o flashback da Independência: cinco ilustrações em pixel art feitas no Canva e aprovadas pelo professor
+   (TRSA88_1..5 no arte_1888.js), que se movem devagar, com o texto embaixo e os botões Voltar / Continuar / Pular.
+   No fim, um cartão "E depois?" conta o que aconteceu com a linha. Substitui a viagem desenhada da v163. */
+setTimeout(function(){try{
+  if(typeof SKEY==='undefined'||SKEY!=='piratininga1554_v2'||!SCN.sp88)return;
+  const FONT="system-ui,-apple-system,Roboto,Arial,sans-serif";
+  const css=document.createElement('style');
+  css.textContent=
+   '#ovTram{position:absolute;inset:0;z-index:40;background:#0c0a14;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:8px;padding:8px 10px;overflow:auto}'+
+   '#ovTram .fl-head{width:100%;max-width:720px;display:flex;align-items:center;gap:8px;flex:none}'+
+   '#ovTram .fl-date{flex:none;background:#f3e6c4;color:#3a2a1a;border:2px solid #7a5a32;border-radius:6px;padding:2px 8px;font:700 13px/1.3 '+FONT+'}'+
+   '#ovTram .fl-tit{color:#f1c471;font:700 clamp(15px,4.2vw,20px)/1.2 '+FONT+';margin:0}'+
+   '#ovTram canvas{flex:none;display:block;width:auto;height:auto;max-width:min(100%,720px);max-height:46vh;object-fit:contain;border:2px solid #c9a24a;border-radius:6px;background:#000}'+
+   '#ovTram .fl-cap{width:100%;max-width:720px;margin:0;font:italic 13px/1.35 '+FONT+';color:#cfc6dc;flex:none}'+
+   '#ovTram .fl-box{width:100%;max-width:720px;display:flex;gap:10px;align-items:flex-start;background:#141a2c;border:2px solid #c9a24a;border-radius:8px;padding:8px 10px;flex:none}'+
+   '#ovTram .fl-box img{width:64px;height:64px;image-rendering:pixelated;border:2px solid #c9a24a;border-radius:5px;flex:none;background:#26344e}'+
+   '#ovTram .fl-box p{margin:0;font:400 clamp(16px,4.3vw,19px)/1.45 '+FONT+';color:#f6f0f4}'+
+   '#ovTram .fl-box ul{margin:0;padding-left:18px;font:400 clamp(15px,4vw,18px)/1.45 '+FONT+';color:#f6f0f4}'+
+   '#ovTram .row{flex:none;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}'+
+   '#ovTram .btn{font:600 17px/1.2 '+FONT+';padding:8px 14px}'+
+   '@media (orientation:landscape) and (max-height:520px){#ovTram{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-auto-rows:min-content;align-content:center;column-gap:12px;row-gap:6px}#ovTram>*{grid-column:2}#ovTram canvas{grid-column:1;grid-row:1 / span 5;align-self:center;justify-self:center;width:100%;max-height:86vh}#ovTram .fl-box img{width:44px;height:44px}#ovTram .fl-box.lista img{display:none}#ovTram .fl-box ul{font-size:14px;line-height:1.3}#ovTram .fl-box p,#ovTram .fl-box ul{font-size:15px}#ovTram .fl-cap{font-size:12px}#ovTram .btn{font-size:15px;padding:6px 10px}}';
+  document.head.appendChild(css);
+  const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+  const ov=el('div');ov.id='ovTram';ov.hidden=true;
+  const head=el('div','fl-head'),dt=el('span','fl-date'),tit=el('h2','fl-tit');head.append(dt,tit);
+  const cv=el('canvas');cv.width=640;cv.height=360;cv.setAttribute('role','img');
+  const cap=el('p','fl-cap');
+  const box=el('div','fl-box'),por=el('img'),tx=el('div');por.alt='';box.append(por,tx);
+  const row=el('div','row');
+  const bV=el('button','btn alt','← Voltar'),bN=el('button','btn','Continuar ▸'),bS=el('button','btn alt','Pular »');[bV,bN,bS].forEach(b=>b.type='button');row.append(bV,bN,bS);
+  ov.append(head,cv,cap,box,row);
+  (typeof ovQuiz!=='undefined'&&ovQuiz.parentElement?ovQuiz.parentElement:document.body).appendChild(ov);
+  const _ip=isPaused;isPaused=function(){return _ip()||!ov.hidden;};
+  const c=cv.getContext('2d');
+  const PIC={};const carrega=()=>{for(let i=1;i<=5;i++){const k='TRSA88_'+i;if(!PIC[k]&&A[k]){const im=new Image();im.src=A[k];PIC[k]=im;}}};
+  const CENAS=[
+   {img:'TRSA88_1',d:'1886',h:'Estação São Joaquim, na Liberdade',pan:[0,0,1.12,-1],
+    t:'Em 1886 começa a funcionar o tramway de Santo Amaro: um trenzinho a vapor, pequeno, de trilhos estreitos, que sai da Estação São Joaquim, na Liberdade. O imperador D. Pedro II veio ver a inauguração.',
+    cap:'Reconstrução artística: não sabemos como a estação estava enfeitada naquele dia.',
+    alt:'Uma pequena locomotiva a vapor verde, com dois vagões abertos cheios de gente, para diante de uma estação de tijolo enfeitada com bandeirinhas verdes e amarelas. Na plataforma, senhores de cartola, senhoras de vestido longo e sombrinha, e trabalhadores de chapéu de palha.'},
+   {img:'TRSA88_2',d:'1888',h:'Estrada do Vergueiro',pan:[1,0,1.1,1],
+    t:'A linha segue pelo caminho do Vergueiro, entre chácaras, pomares de laranja e cercas. Na estrada de terra ainda passam tropeiros com mulas e carros de boi.',
+    alt:'O trenzinho a vapor passa com dois vagões de madeira cheios de passageiros. Atrás, uma estrada de terra vermelha com um tropeiro e sua mula e um carro de boi carregado de sacos, entre casas caiadas, pomares e cercas.'},
+   {img:'TRSA88_3',d:'1888',h:'Vila Mariana',pan:[0,1,1.12,-1],
+    t:'Parada na Vila Mariana, ainda um povoado pequeno. Ali perto fica o Matadouro Municipal, aberto em 1887: dali sai a carne para a cidade.',
+    cap:'Hoje, os prédios do antigo Matadouro abrigam a Cinemateca Brasileira.',
+    alt:'O trenzinho parado junto a um abrigo de madeira onde dois homens esperam sentados. Ao fundo, os galpões de tijolo do Matadouro e currais com bois e um vaqueiro a cavalo.'},
+   {img:'TRSA88_4',d:'1888',h:'Encontro e Volta Redonda',pan:[1,1,1.1,1],
+    t:'Depois vêm campos, capoeiras, riachos e sítios. Santo Amaro fica longe: antes do trem, a viagem era de carroça ou a cavalo e levava muitas horas.',
+    alt:'Os trilhos fazem uma curva larga no meio de campos dourados de fim de tarde. O trenzinho solta uma fita de fumaça branca; ao lado, um rio com uma ponte e uma pequena parada de madeira.'},
+   {img:'TRSA88_5',d:'1888',h:'Santo Amaro',pan:[.5,0,1.12,-1],
+    t:'Chegamos a Santo Amaro, uma vila com igreja matriz e câmara própria, onde vivem descendentes dos colonos alemães que chegaram em 1829. De lá vêm para a capital cereais, lenha, carvão e pedra de cantaria.',
+    cap:'Santo Amaro foi um município separado de São Paulo até 1935.',
+    alt:'Um largo de terra diante de uma igreja branca com uma torre. O trenzinho chega pela esquerda. Pessoas descarregam carroças com sacos de cereais, lenha, carvão e blocos de pedra.'},
+   {img:'TRSA88_4',d:'Depois de 1888',h:'E depois?',escuro:true,pan:[.5,.5,1.05,1],
+    lista:['Em 1900, a Light comprou a linha.','Em 1913, o trem a vapor virou bonde elétrico.','O bonde de Santo Amaro foi a última linha de bonde de São Paulo: rodou até 1968.','Hoje o metrô (Linha 5-Lilás) passa perto do antigo caminho.'],
+    alt:'A mesma paisagem dos campos, escurecida, como fundo para o resumo do que aconteceu depois com a linha.'}];
+  let i=0,t0=0,run=false,raf=0,onEnd=null;
+  function frame(now){if(!run)return;const t=(now-t0)/1000,S=CENAS[i],im=PIC[S.img];
+    try{c.fillStyle='#0c0a14';c.fillRect(0,0,cv.width,cv.height);
+      if(im&&im.complete&&im.naturalWidth){
+        /* movimento lento: aproxima (ou afasta) e desliza para um lado em 12 s */
+        const k=Math.min(1,t/12),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2,[px,py,z,dir]=S.pan;
+        const zz=dir>0?1+(z-1)*e:z-(z-1)*e,W=cv.width,H=cv.height,iw=im.naturalWidth,ih=im.naturalHeight;
+        const sw=iw/zz,sh=ih/zz,sx=(iw-sw)*(dir>0?px*e+(1-e)*.5:px*(1-e)+e*.5),sy=(ih-sh)*(dir>0?py*e+(1-e)*.5:py*(1-e)+e*.5);
+        c.imageSmoothingEnabled=true;c.drawImage(im,sx,sy,sw,sh,0,0,W,H);
+        if(S.escuro){c.fillStyle='rgba(12,10,20,.55)';c.fillRect(0,0,W,H);}}
+      const fa=Math.max(0,1-t/.5);if(fa>0){c.fillStyle='rgba(12,10,20,'+fa.toFixed(2)+')';c.fillRect(0,0,cv.width,cv.height);}}catch(_){}
+    raf=requestAnimationFrame(frame);}
+  function go(n){i=Math.max(0,Math.min(CENAS.length-1,n));t0=performance.now();const S=CENAS[i];
+    dt.textContent=S.d;tit.textContent=S.h;tx.textContent='';
+    if(S.lista){const ul=el('ul');S.lista.forEach(l=>ul.append(el('li','',l)));tx.append(ul);}else tx.append(el('p','',S.t));
+    cv.setAttribute('aria-label',S.alt);cv.title=S.alt;cap.textContent=S.cap||'';cap.hidden=!S.cap;
+    box.classList.toggle('lista',!!S.lista);const pk=A['POR_'+(window.HERO||'player')]||A.POR_player||'';por.src=pk;por.hidden=!pk;
+    bV.disabled=i===0;bN.textContent=i===CENAS.length-1?'Fechar ✓':'Continuar ▸';bS.hidden=i===CENAS.length-1;
+    try{sfx('pista');}catch(_){}}
+  function fim(){if(!run)return;run=false;cancelAnimationFrame(raf);ov.hidden=true;const f=onEnd;onEnd=null;if(f)f();}
+  bN.onclick=()=>{if(i===CENAS.length-1)fim();else go(i+1);};bV.onclick=()=>go(i-1);bS.onclick=fim;
+  function play(cb){carrega();onEnd=cb;run=true;ov.hidden=false;go(0);raf=requestAnimationFrame(frame);setTimeout(()=>{try{bN.focus();}catch(_){}},30);}
+  window.__viagemSA88=play;window.__tramFilme=CENAS.length;
+}catch(e){console.warn('filminho tramway',e);}},0);
 
 /* =========================================================
    IPIRANGA 1922 — setor monumental (Museu, jardim, Monumento, riacho),
