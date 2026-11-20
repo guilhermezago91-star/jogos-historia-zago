@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=2e7cb19e","kb":711,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=a8d67fb3","kb":768,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -9186,6 +9186,31 @@ setTimeout(function(){
   setTimeout(()=>{try{if(cur==='serra'){buildStatic();buildOcc();mmDirty=true;}}catch(_){}},0);
 }catch(e){console.warn('serra54',e);}})();
 
+
+/* ===== v161 — SÃO VICENTE NOVA EM 1554 (pedido do professor, 20/11/2026) =====
+   Vila redesenhada no estilo da serra (Stardew, 32 px): largo de terra com igreja, Câmara e pelourinho,
+   seis casas de taipa, quintal com bananeiras e horta, engenho com roda d'água, fornalha e canavial,
+   morro de mata, mangue, praia curva, riacho chegando ao mar e cais. Prédios nos mesmos lugares de antes.
+   Arte em arte_1554.js: SV54_MAPA. */
+(function(){try{
+  if(typeof A==='undefined'||!A.SV54_MAPA||!SCN.sv)return;
+  const G=["TTTTGTTTTTTTTTTTTTDDTTTTTTTTTTTTW.TTTTTT", "GGGGGGGTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTT", "GGGGGGGGTTTTTTTTT.D.TTTTTTTTTTTTW.TTTTTT", "GGGGGGGGTTTTTTTTT.D.TTTTTTTTTTT.W.TTTTTT", "GGGGGGGGTTTTTTTTT.DDTTTTTTTTTTTTW.TTTTTT", "GGGGGGGG.TTTTTTTT.D.TTTTTTTT.T..WW.TTTTT", "GGGGGGGG..CCCTCTTCD.TTTTTTTCCCCCW..TTTTT", "TGGGGGGC..CCCCCCCCD.CCTCC.CCCC.WW..TTTTT", "TTT.CCCC......CCCCDD...........WW.TTTTTT", "TTT.CCCC......CCCCD.............W..TTTTT", "TTTTCCCC......CCCCDD.D.......CDDW..TTTTT", "TTTC...DDDDDDDDDDDDDDDDDDDDDDDDWW..TTTTT", "TTTC...DDDDDDDDDDDDDDDCDDDDDDDD.W..TTTTT", "TTT......CCCCCCCCDDDDDCD.......CWW.TTTTT", "TTT.CCCCCCCC.CCCC.D....D........WWCTTTTT", "TTT.CC.C.........DD....DKKKKKK..WW.TTTTT", "TTT.CC...........DD....DKKKKKK..W..TTTTT", "TTT.C.CC........DDD....DKKKKKK..W..TTTTT", "....CCCCDDDDD.DDD.DD...DKKKKKK..W.......", ".........DDDDDDDA.DD..AAAAA.............", "AA.AAAAAAA.A.AAAAAAAAAAAAAAAAAAAAAAAA...", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "AAAAAAAAAAAAAAAAAAQQQAAAAAAAAAAAAAAAAAAA", "AAAAAAAAAAAOOOOOOOQQQOOOOOOOOAAAAAAOOOAO", "OOOOOOOOOOOOOOOOOOQQQOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOQQQOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOQQQOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"],S=SCN.sv,MATA=new Set(),MANG=new Set(),CERCA=new Set();
+  const novo=G.map((r,y)=>r.split('').map((c,x)=>{const k=x+','+y;if(c==='T'){MATA.add(k);return 'C';}if(c==='G'){MANG.add(k);return 'C';}if(c==='C'){CERCA.add(k);return 'C';}return c;}));
+  for(let y=0;y<S.map.length;y++)for(let x=0;x<S.map[y].length;x++)S.map[y][x]=novo[y][x];   /* mesmo tamanho: troca no lugar */
+  /* os prédios antigos param de se desenhar: o desenho novo já os mostra */
+  const ESC=['igreja','camara','engenho','casa1','casa2','forno','roda','pelourinho'];
+  for(const o of objects)if(o.scene==='sv'&&ESC.includes(o.id))o.draw=()=>{};
+  /* textos ao tocar na mata, no mangue e nas cercas */
+  {const c0=TILE_INFO.C;TILE_INFO.C=(x,y)=>{if(cur==='sv'){const k=x+','+y;
+     if(MANG.has(k))return {name:'Mangue',text:['Lama, água salgada e árvores com raízes no ar. Pelos canais do mangue, as canoas levavam gente e carga de São Vicente até o pé da serra.']};
+     if(MATA.has(k))return {name:'Mata Atlântica',text:['O morro em volta da vila ainda é coberto de mata fechada.']};
+     if(CERCA.has(k))return {name:'Casas e quintais',text:['Casas de taipa com telhado de palha e quintais cercados, com bananeiras, horta e galinhas.']};}
+     return c0(x,y);};}
+  /* desenho: a imagem pronta por cima do chão */
+  const IM=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur==='sv'){buildStatic();buildOcc&&buildOcc();}}catch(_){}};IM.src=A.SV54_MAPA;
+  const bs=buildStatic;buildStatic=function(){bs();try{if(cur==='sv'&&ok){sc.imageSmoothingEnabled=false;sc.drawImage(IM,0,0);}}catch(_){}};
+  setTimeout(()=>{try{if(cur==='sv'){buildStatic();buildOcc();mmDirty=true;}}catch(_){}},0);
+}catch(e){console.warn('sv54',e);}})();
 
 /* ---- fontes: o Pátio do Colégio hoje, o desenho da colina e o mapa do Triângulo ---- */
 (function(){
