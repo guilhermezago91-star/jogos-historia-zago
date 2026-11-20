@@ -18928,6 +18928,321 @@ window.__paulista82Ready=Promise.all(ready);
   try{const s0=setScene;setScene=function(to){const r=s0.apply(this,arguments);try{if(to===SALA&&!diary.some(d=>d.kind==='Fonte'&&d.text===DIARIO))setTimeout(()=>{if(cur===SALA&&!mcqOpen)mostra();},700);}catch(_){}return r;};}catch(_){}
 })();
 
+/* ===== v158 — 1830: OUTUBRO DE 1830 — personagens reais, Hospital dos Lázaros, Santa Casa de 1825, Ordem Terceira do Carmo, mulheres de 1830, ponchos, Debret e as aquarelas, mapa (Anhangabaú estreito, colina e ladeiras, casario, várzea alagada, chácaras) (pedido do professor, 20/11/2026) =====
+   Só mexe em 1830 (cena 'sp' e salas 'i_' de 1830). As imagens ficam em arte/fontes1830/. */
+(function(){
+  const S='sp',R30=window.__out30={};const IMG='arte/fontes1830/';
+  const KK='#1c1418';const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
+  const INV='[Personagem inventado para o jogo.]',REAL='[Pessoa real; a fala foi imaginada para o jogo.]';
+  const M=()=>SCN[S]&&SCN[S].map;
+  const dentro=(o,x,y)=>x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1);
+  const objsS=()=>objects.filter(o=>(o.scene||'pira')===S);
+  const objAt=(x,y,me)=>objsS().find(o=>o!==me&&dentro(o,x,y));
+  const portas=()=>objsS().filter(o=>o.enter).map(o=>[o.x+(o.door||0),o.y+o.h]);
+  const caminhos=()=>{const s=new Set();for(const w of walkers){if(w.scene!==S||!w.path)continue;const P=w.path;for(let i=0;i+1<P.length;i++){const [x0,y0]=P[i],[x1,y1]=P[i+1];
+    for(let x=Math.min(x0,x1);x<=Math.max(x0,x1);x++)for(let y=Math.min(y0,y1);y<=Math.max(y0,y1);y++)s.add(x+','+y);}}return s;};
+  let CAM=null;const RES=[];
+  const reservado=(x,y)=>RES.some(([a,b,w,h])=>x>=a&&x<a+w&&y>=b&&y<b+h);
+  const livre=(x,y,chao)=>{const m=M();if(!m||!m[y]||m[y][x]===undefined)return false;if(!(chao||',.').includes(m[y][x]))return false;if(reservado(x,y))return false;
+    if(objAt(x,y))return false;if(npcs.some(n=>n.scene===S&&n.x===x&&n.y===y))return false;if(ITEMS.some(i=>i.scene===S&&!i.got&&i.x===x&&i.y===y))return false;
+    if(CAM&&CAM.has(x+','+y))return false;if(portas().some(([a,b])=>a===x&&b===y))return false;return true;};
+  const perto=(x,y,cond,chao)=>{for(let r=0;r<12;r++)for(let yy=y-r;yy<=y+r;yy++)for(let xx=x-r;xx<=x+r;xx++){if(Math.max(Math.abs(xx-x),Math.abs(yy-y))!==r)continue;if(livre(xx,yy,chao)&&(!cond||cond(xx,yy)))return [xx,yy];}return null;};
+  /* quem anda: chão que não é sólido e não tem objeto */
+  function alcance(){const m=M(),H=m.length,W=m[0].length,occ=new Uint8Array(W*H);
+    for(const o of objsS())for(let j=0;j<(o.h||1);j++)for(let i=0;i<(o.w||1);i++){const x=o.x+i,y=o.y+j;if(x>=0&&y>=0&&x<W&&y<H)occ[y*W+x]=1;}
+    const ok=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&!SOLID.includes(m[y][x])&&!occ[y*W+x];
+    let s=null;for(const [x,y] of [[41,43],[40,44],[45,43],[41,49]])if(ok(x,y)){s=[x,y];break;}
+    const seen=new Uint8Array(W*H);if(!s)return {seen,ok,W};const q=[s];seen[s[1]*W+s[0]]=1;
+    while(q.length){const [x,y]=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(ok(nx,ny)&&!seen[ny*W+nx]){seen[ny*W+nx]=1;q.push([nx,ny]);}}}
+    return {seen,ok,W};}
+  const VIZ=[[1,0],[-1,0],[0,1],[0,-1]];
+  function tudoAlcancavel(){const {seen,W}=alcance();const tem=(x,y)=>x>=0&&y>=0&&seen[y*W+x];
+    for(const [x,y] of portas())if(!tem(x,y))return false;
+    for(const n of npcs){if(n.scene!==S)continue;if(!VIZ.some(([a,b])=>tem(n.x+a,n.y+b)))return false;}
+    for(const i of ITEMS){if(i.scene!==S||i.got)continue;if(!tem(i.x,i.y)&&!VIZ.some(([a,b])=>tem(i.x+a,i.y+b)))return false;}
+    for(const o of objsS()){if(!/^f30_|^fMuller|^f[A-Z]/.test(o.id||''))continue;if(!VIZ.some(([a,b])=>tem(o.x+a,o.y+b)))return false;}
+    return true;}
+
+  /* ---------- quadro de fonte (uma ou várias imagens) ---------- */
+  function quadro(o){try{
+    mcqOpen=true;ovQuiz.hidden=false;const box=$('quizBox');box.innerHTML='';let i=0;
+    const k=document.createElement('div');k.className='kicker';k.textContent=o.kick||'Fonte histórica';
+    const h=document.createElement('h2');
+    const intro=document.createElement('p');if(o.intro)intro.textContent=o.intro;
+    const im=document.createElement('img');im.style.cssText='display:block;max-width:100%;max-height:52vh;width:auto;height:auto;margin:6px auto;border:2px solid #141b1b;border-radius:3px';
+    const cap=document.createElement('p');const cr=document.createElement('p');cr.className='small';
+    const row=document.createElement('div');row.className='row';
+    const ant=document.createElement('button');ant.type='button';ant.className='btn alt';ant.textContent='◀ Anterior';
+    const prox=document.createElement('button');prox.type='button';prox.className='btn alt';prox.textContent='Próxima ▶';
+    const fe=document.createElement('button');fe.type='button';fe.className='btn';fe.textContent='Fechar';
+    const mostra=()=>{const p=o.imgs[i];h.textContent=p.title;im.src=IMG+p.src;im.alt=p.title;cap.textContent=p.cap||'';cr.textContent=p.cred?('Fonte: '+p.cred):'';
+      ant.hidden=o.imgs.length<2||i===0;prox.hidden=o.imgs.length<2||i===o.imgs.length-1;};
+    ant.onclick=()=>{if(i>0){i--;mostra();}};prox.onclick=()=>{if(i<o.imgs.length-1){i++;mostra();}};
+    fe.onclick=()=>{ovQuiz.hidden=true;mcqOpen=false;if(o.diary&&!diary.some(d=>d.kind==='Fonte'&&d.text===o.diary)){addDiary('Fonte',o.diary);try{save();}catch(_){}}if(o.after)setTimeout(o.after,60);};
+    row.append(ant,prox,fe);box.append(k,h);if(o.intro)box.append(intro);box.append(im,cap,cr,row);mostra();setTimeout(()=>fe.focus(),30);
+  }catch(e){console.warn('quadro 1830',e);}}
+  function aula(o){try{
+    mcqOpen=true;ovQuiz.hidden=false;const box=$('quizBox');box.innerHTML='';
+    const k=document.createElement('div');k.className='kicker';k.textContent=o.kick||'Mini-aula';
+    const h=document.createElement('h2');h.textContent=o.title;box.append(k,h);
+    for(const b of o.blocos){if(b.img){const im=document.createElement('img');im.src=IMG+b.img;im.alt=b.alt||'';im.style.cssText='display:block;max-width:100%;max-height:38vh;width:auto;height:auto;margin:6px auto;border:2px solid #141b1b;border-radius:3px';box.append(im);}
+      if(b.sub){const s=document.createElement('h3');s.textContent=b.sub;s.style.margin='8px 0 2px';box.append(s);}
+      if(b.p){const p=document.createElement('p');p.textContent=b.p;if(b.small)p.className='small';box.append(p);}}
+    const fe=document.createElement('button');fe.type='button';fe.className='btn';fe.textContent='Fechar';
+    fe.onclick=()=>{ovQuiz.hidden=true;mcqOpen=false;if(o.diary&&!diary.some(d=>d.text===o.diary)){addDiary(o.dkind||'Fonte',o.diary);try{save();}catch(_){}}if(o.after)setTimeout(o.after,60);};
+    const row=document.createElement('div');row.className='row';row.appendChild(fe);box.append(row);setTimeout(()=>fe.focus(),30);
+  }catch(e){console.warn('aula 1830',e);}}
+  function quiz(qs,fim){try{let i=0,acertos=0;mcqOpen=true;ovQuiz.hidden=false;const box=$('quizBox');
+    const passo=()=>{box.innerHTML='';if(i>=qs.length){const h=document.createElement('h2');h.textContent='Você acertou '+acertos+' de '+qs.length+'!';
+        const fe=document.createElement('button');fe.type='button';fe.className='btn';fe.textContent='Fechar';fe.onclick=()=>{ovQuiz.hidden=true;mcqOpen=false;if(fim)fim(acertos);};
+        const row=document.createElement('div');row.className='row';row.appendChild(fe);box.append(h,row);setTimeout(()=>fe.focus(),30);return;}
+      const q=qs[i];const k=document.createElement('div');k.className='kicker';k.textContent='Pergunta '+(i+1)+' de '+qs.length;const h=document.createElement('h2');h.textContent=q.q;box.append(k,h);
+      const fb=document.createElement('p');fb.className='small';
+      q.op.forEach((t,j)=>{const b=document.createElement('button');b.type='button';b.className='btn alt';b.style.cssText='display:block;width:100%;text-align:left;margin:4px 0';b.textContent=String.fromCharCode(65+j)+') '+t;
+        b.onclick=()=>{if(box.__resp)return;box.__resp=1;const certo=j===q.c;if(certo)acertos++;fb.textContent=(certo?'Isso mesmo! ':'Não foi bem isso. ')+q.ex;
+          const nx=document.createElement('button');nx.type='button';nx.className='btn';nx.textContent=i===qs.length-1?'Ver resultado':'Próxima';nx.onclick=()=>{box.__resp=0;i++;passo();};box.append(nx);setTimeout(()=>nx.focus(),30);};box.append(b);});
+      box.append(fb);};passo();}catch(e){console.warn('quiz 1830',e);}}
+
+  /* ---------- as fontes espalhadas pelo jogo (aparecem sozinhas uma vez, com espera entre elas) ---------- */
+  const FON={
+    f30_se:{alvo:[42,47],kick:'Fonte histórica: aquarela',diary:'Aquarela de Debret, 1827: o Largo da Sé e a Igreja de São Pedro, com mulheres cobertas por mantos escuros e homens de poncho.',
+      imgs:[{src:'debret_se_sao_pedro_1827.jpg',title:'O Largo da Sé e a Igreja de São Pedro (1827)',cap:'À direita, a Igreja de São Pedro dos Clérigos; ao fundo, a Sé. Repare nas mulheres cobertas por mantos escuros e nos homens de poncho e chapéu de aba larga.',cred:'Jean-Baptiste Debret, 1827. Aquarela. Acervo do Museu Paulista da USP.'}]},
+    f30_esplanada:{alvo:[55,43],kick:'Fonte histórica: aquarela',diary:'Aquarela de Debret, 1827: a chegada a São Paulo pelo caminho do Rio, com o Convento do Carmo no alto e tropas de mulas subindo a ladeira.',
+      imgs:[{src:'debret_entrada_carmo_1827.jpg',title:'A entrada de São Paulo pelo Carmo (1827)',cap:'Quem vinha do Rio de Janeiro subia esta ladeira de terra vermelha. No alto, o Convento e a Igreja do Carmo. Repare nas tropas de mulas e nos cavaleiros.',cred:'Jean-Baptiste Debret, 1827. Aquarela. Acervo a confirmar.'}]},
+    f30_ender:{alvo:[50,42],kick:'Fonte histórica: desenho',diary:'Desenho de Thomas Ender, 1817: o Convento do Carmo na beira da colina, com a várzea e o rio lá embaixo.',
+      imgs:[{src:'ender_convento_carmo_1817.jpg',title:'O Convento do Carmo (1817)',cap:'O convento fica na beira da colina. Lá embaixo, a várzea do Tamanduateí, com o rio fazendo curvas.',cred:'Thomas Ender, 1817. Desenho aquarelado. Acervo a confirmar.'}]},
+    f30_tropeiros:{alvo:[46,66],kick:'Fonte histórica: aquarela',diary:'Aquarela de Debret: tropeiros pobres de São Paulo num rancho, com cestos, sacos de couro e mulas.',
+      imgs:[{src:'debret_tropeiros_pobres.jpg',title:'Tropeiros pobres de São Paulo',cap:'Num rancho de beira de estrada, tropeiros arrumam a carga: cestos de taquara, sacos de couro (as bruacas) e as mulas esperando.',cred:'Jean-Baptiste Debret, 1823. Aquarela sobre papel. Museus Castro Maya.'}]},
+    f30_varzea:{alvo:[73,45],kick:'Fonte histórica: pintura',diary:'Pintura de cerca de 1821: São Paulo vista da Várzea do Carmo, com a colina, a ladeira, a ponte e uma tropa de mulas.',
+      imgs:[{src:'vista_varzea_carmo_c1821.jpg',title:'São Paulo vista da Várzea do Carmo (c. 1821)',cap:'A cidade fica no alto da colina. Embaixo, a várzea alagada e o rio. Três anjinhos seguram uma faixa com o nome da cidade: S. Paulo.',cred:'Pintura de cerca de 1821, atribuída a Arnaud Julien Pallière (autoria a confirmar).'},
+        {src:'vista_varzea_carmo_c1821_detalhe.jpg',title:'De perto: a ladeira e a ponte',cap:'A estrada atravessa o rio por uma ponte e sobe a ladeira até o alto da colina. Repare na mulher com a trouxa de roupa na cabeça.',cred:'Detalhe da mesma pintura.'}]},
+    f30_vista:{alvo:[81,46],kick:'Fonte histórica: aquarela',diary:'Vista geral de São Paulo: a cidade pequena no alto da colina, cercada de campos, várzea e rio.',
+      imgs:[{src:'vista_geral.jpg',title:'Vista geral de São Paulo',cap:'Visto de longe, São Paulo é uma cidade pequena no alto de uma colina, com as torres das igrejas aparecendo. Em volta, campos, chácaras e o rio fazendo curvas.',cred:'Aquarela do começo do século 19. Autoria a confirmar (possivelmente Debret, 1827).'}]},
+  };
+  const FONTE_SALA={id:'f30_planta',sala:'i_camara',kick:'Fonte histórica: planta da cidade',diary:'Planta da Imperial Cidade de São Paulo (levantada em 1810, copiada em 1841): a cidade, as igrejas, o Hospital dos Lázaros, a Casa da Pólvora e o Jardim Público.',
+    imgs:[{src:'planta_imperial_cidade_1810_1841.jpg',title:'Planta da Imperial Cidade de São Paulo',cap:'No meio, o mapa da cidade entre os rios. Em volta, desenhos dos prédios: a Sé, São Pedro, o Palácio, o Carmo, São Bento, a Luz, a Cadeia. Na lista de "Explicações" aparecem também o Hospital dos Lázaros, a Casa da Pólvora e o Jardim Público.',cred:'Levantada em 1810 pelo capitão engenheiro Rufino José Felizardo e Costa e copiada em 1841, com as mudanças. Cópia de 1918, impressa em 1954.'}]};
+  const fdesenho=function(c,X,Y){R(c,X+2,Y+14,12,2,'rgba(20,27,27,.2)');R(c,X+3,Y+5,1,10,'#6a4424');R(c,X+12,Y+5,1,10,'#6a4424');R(c,X+7,Y+9,1,6,'#6a4424');
+    R(c,X+2,Y+1,12,9,KK);R(c,X+3,Y+2,10,7,'#f4ecd6');R(c,X+4,Y+5,8,3,'#8ab06a');R(c,X+4,Y+3,8,2,'#a8c8e0');R(c,X+9,Y+3,2,3,'#c8603e');R(c,X+5,Y+6,1,2,'#2a5a2a');};
+  let ultimaAuto=0;const vistas=new Set();
+  function abreFonte(id){const f=FON[id]||(id===FONTE_SALA.id?FONTE_SALA:null);if(!f)return;vistas.add(id);quadro(f);}
+
+  /* ---------- mulheres, ponchos e baetas: desenho por cima dos bonecos ---------- */
+  const BAETA=new Set(),PONCHO=new Set();
+  function desenhaBaeta(c,X,Y){/* manto escuro da cabeça aos pés, deixa ver só o rosto */
+    R(c,X+3,Y-15,10,2,'#14141f');R(c,X+2,Y-13,12,9,'#1a1a28');R(c,X+5,Y-10,6,5,'#d8a888');R(c,X+5,Y-10,6,1,'#14141f');R(c,X+6,Y-8,1,1,'#3a2418');R(c,X+9,Y-8,1,1,'#3a2418');
+    R(c,X+1,Y-5,14,19,'#1c1d2e');R(c,X+2,Y-5,2,19,'#2c2d45');R(c,X+12,Y-5,2,19,'#121219');R(c,X+7,Y-2,1,15,'#121219');R(c,X+1,Y+13,14,1,'#0e0e16');}
+  function desenhaPoncho(c,X,Y,cor){/* poncho listrado sobre os ombros */
+    c.fillStyle=cor||'#8a3a28';c.beginPath();c.moveTo(X+1,Y-3);c.lineTo(X+15,Y-3);c.lineTo(X+13,Y+6);c.lineTo(X+8,Y+8);c.lineTo(X+3,Y+6);c.closePath();c.fill();
+    R(c,X+2,Y,12,1,'#e8c070');R(c,X+3,Y+3,10,1,'#2a2a3a');R(c,X+6,Y-3,4,2,'#3a2418');}
+  const CORES=['#8a3a28','#3a5a8a','#6a4a2a','#7a2a4a','#2a6a4a'];
+  try{const lo0=lifeOverlay;lifeOverlay=function(camX,camY){const r=lo0.apply(this,arguments);try{if(cur!==S)return r;
+      for(const n of npcs){if(n.scene!==S)continue;const X=Math.round((n.px!=null?n.px:n.x*16)-camX),Y=Math.round((n.py!=null?n.py:n.y*16)-camY);if(X<-20||Y<-20||X>VW+20||Y>VH+30)continue;
+        if(BAETA.has(n.id))desenhaBaeta(ctx,X,Y+R30.oy);else if(PONCHO.has(n.id))desenhaPoncho(ctx,X,Y+R30.oy,CORES[n.id.length%5]);}
+      for(const w of walkers){if(w.scene!==S)continue;const ix=w.px!=null?w.px:(w.fx!=null?w.fx*16:w.x*16),iy=w.py!=null?w.py:(w.fy!=null?w.fy*16:w.y*16);const X=Math.round(ix-camX),Y=Math.round(iy-camY);if(X<-20||Y<-20||X>VW+20||Y>VH+30)continue;
+        if(BAETA.has('w:'+w.id))desenhaBaeta(ctx,X,Y+R30.oy);else if(PONCHO.has('w:'+w.id))desenhaPoncho(ctx,X,Y+R30.oy,CORES[(w.id||'').length%5]);}
+    }catch(_){}return r;};}catch(e){console.warn('roupas 1830',e);}
+  R30.oy=0;
+
+  /* ---------- personagens novos ---------- */
+  const ELAS=['mulherBaeta30','marquesa30','viuva30','moca30','quitandeiraLiberta30'];const falou=new Set();
+  const novos=[
+    {id:'debret30',spr:'h22_n|fotografo|0',alvo:[44,47],name:'Jean-Baptiste Debret, pintor',lines:['Bonjour! Sou Jean-Baptiste Debret, pintor francês. Moro no Rio de Janeiro e desenho tudo o que vejo no Brasil.','Passei por São Paulo em 1827, a caminho do Sul. Pintei as ruas, as igrejas, as pessoas e as tropas.','Quer ver as minhas aquarelas? Repare nas roupas: os mantos das mulheres e os ponchos dos homens.',
+      '[Debret existiu e passou por São Paulo em 1827. Este encontro em 1830 é inventado para o jogo.]'],diary:'Debret, pintor francês, passou por São Paulo em 1827 e pintou ruas, igrejas, roupas e tropas. As aquarelas dele ajudam a imaginar a cidade.'},
+    {id:'muller30',spr:'h22_n|permanente|0',alvo:[52,31],name:'Daniel Pedro Müller, engenheiro',lines:['Bom dia! Sou Daniel Pedro Müller, engenheiro militar. Desenho mapas e cuido de estradas e pontes da província.','Para fazer uma estrada, primeiro é preciso medir o terreno: as subidas, os rios, as várzeas que alagam.','Ainda vou contar todos os moradores da província, vila por vila. Contar gente também é trabalho de engenheiro!',REAL],
+      diary:'Daniel Pedro Müller, engenheiro militar, fazia mapas e estradas. Em 1836 organizou a contagem dos moradores da província de São Paulo.'},
+    {id:'mulherBaeta30',spr:'h22_n|n88_casa|0',alvo:[39,47],name:'Senhora coberta pela baeta',lines:['Bom dia. Estou indo à missa na Sé.','Este pano escuro é a baeta. Com ela eu cubro a cabeça e o corpo quando saio de casa. Minha mãe e minha avó também usavam.','Uma ordem do rei, de 1810, mandou as mulheres andarem com o rosto descoberto. Mas muita gente continua usando a baeta.',INV],
+      diary:'Muitas mulheres de São Paulo saíam à rua cobertas por baetas, mantos de tecido grosso e escuro. Uma ordem de 1810 proibiu andar “embuçada em baeta”, mas o costume continuou.'},
+    {id:'marquesa30',spr:'h22_n|beneditaRes|1',alvo:[36,47],name:'Domitila de Castro, a Marquesa de Santos',lines:['Boa tarde! Sou Domitila de Castro. Nasci aqui em São Paulo.','Morei muitos anos na Corte, no Rio de Janeiro, perto do imperador D. Pedro I. Ganhei o título de Marquesa de Santos.','No ano passado voltei para São Paulo. Aqui as senhoras ricas saem pouco de casa: vão à missa, às festas e às visitas, sempre acompanhadas.',REAL],
+      diary:'Domitila de Castro, a Marquesa de Santos, nasceu em São Paulo, viveu na Corte perto de D. Pedro I e voltou para São Paulo em 1829.'},
+    {id:'viuva30',spr:'h22_n|n88_casa|1',alvo:[33,47],name:'Dona Ana, que sustenta a casa',lines:['Meu marido foi com uma tropa para o Sul e nunca mais voltou. Quem sustenta a casa agora sou eu.','Fio algodão, faço doces e vendo na rua. Minha filha mais velha lava roupa no rio.','Na minha rua, muitas casas são chefiadas por mulheres. Os homens vão com as tropas, as monções e as guerras, e nós ficamos.',INV],
+      diary:'Em São Paulo, muitas casas pobres eram chefiadas por mulheres, que fiavam, costuravam, faziam doces, vendiam na rua e lavavam roupa.'},
+    {id:'moca30',spr:'h22_n|colona|1',alvo:[30,41],name:'Moça que queria estudar',lines:['Está vendo o Convento de São Francisco? Ali funciona a Academia de Direito.','Lá só entram rapazes. Moça não pode estudar leis, nem ser deputada, nem votar.','Eu aprendi a ler escondida, com os livros do meu irmão. Um dia as mulheres ainda vão estudar ali.',INV],
+      diary:'Em 1830, as mulheres não podiam estudar na Academia de Direito, ser deputadas nem votar.'},
+    {id:'quitandeiraLiberta30',spr:'h22_n|beneditaRes|3',alvo:[46,50],name:'Quitandeira liberta',lines:['Compra pinhão? Compra cuscuz de milho?','Eu era escravizada. Vendi quitandas na rua por muitos anos e juntei dinheiro para comprar a minha liberdade.','Hoje vendo para mim mesma. As ruas de São Paulo estão cheias de mulheres trabalhando: quitandeiras, lavadeiras, doceiras, carregadoras de água.',INV],
+      diary:'Muitas mulheres escravizadas e libertas trabalhavam nas ruas de São Paulo vendendo comida. Algumas conseguiam juntar dinheiro e comprar a liberdade.'},
+    {id:'poncho30',spr:'h22_n|tropeiroBan|1',alvo:[50,66],name:'Tropeiro de poncho',lines:['Gostou do meu poncho? É um pano grosso com um buraco no meio para passar a cabeça.','Protege da garoa, do vento e do frio da serra. De noite, vira cobertor.','Em São Paulo, tropeiros, estudantes e fazendeiros usam poncho e chapéu de aba larga. O pintor Debret desenhou paulistas assim.',INV],
+      diary:'O poncho, um pano com um buraco para a cabeça, era usado por tropeiros, estudantes e fazendeiros paulistas contra a garoa e o frio.'},
+    {id:'lazaro30',spr:'h22_n|padreBan88|0',alvo:[100,42],name:'Irmão que cuida dos lázaros',lines:['Aqui é o Hospital dos Lázaros. O terreno foi comprado em 1802 pelo governador Franca e Horta e dado à Santa Casa.','Aqui ficam os doentes de lepra, que hoje chamamos de hanseníase. Eles têm manchas na pele e perdem a sensibilidade nas mãos e nos pés.','Em 1830 ninguém sabe curar essa doença. Por medo, a cidade manda os doentes para longe, fora da cidade.','Lázaro é o nome de um homem doente que aparece na Bíblia. Por isso os doentes eram chamados de lázaros.',INV],
+      diary:'O Hospital dos Lázaros recebia doentes de lepra (hanseníase), afastados da cidade por medo. Hoje a hanseníase tem cura, com tratamento de graça no SUS.'},
+  ];
+  /* duas senhoras de baeta indo à missa, só de enfeite */
+  novos.push({id:'baetaMissa30a',spr:'h22_n|n88_casa|2',alvo:[41,47],name:'Senhoras a caminho da missa',lines:['Psiu, estamos atrasadas para a missa!',INV],diary:''},
+             {id:'baetaMissa30b',spr:'h22_n|beneditaRes|2',alvo:[42,47],name:'Senhoras a caminho da missa',lines:['A baeta esconde o rosto, mas a gente vê tudo!',INV],diary:''});
+
+  /* ---------- prédios novos ou corrigidos ---------- */
+  const lazarosDraw=function(c,X,Y){const W=this.w*16,H=this.h*16;c.fillStyle='rgba(20,14,8,.22)';c.fillRect(X+3,Y+H-2,W-4,4);
+    R(c,X,Y+15,W,H-15,KK);R(c,X+1,Y+16,W-2,H-17,'#efe6d2');R(c,X+1,Y+H-4,W-2,3,'#c8b890');
+    R(c,X-2,Y+3,W+4,15,KK);R(c,X-1,Y+4,W+2,13,'#b8603e');for(let j=Y+7;j<Y+17;j+=3)R(c,X-1,j,W+2,1,'#9a4a30');R(c,X-1,Y+4,W+2,1,'#d87a54');
+    const dx=X+Math.floor(W/2)-4;R(c,dx,Y+H-16,8,15,KK);R(c,dx+1,Y+H-15,6,14,'#6a4424');R(c,dx+5,Y+H-9,1,1,'#d8a838');
+    for(const wx of [X+7,X+20,X+W-27,X+W-14]){R(c,wx,Y+H-26,8,9,KK);R(c,wx+1,Y+H-25,6,7,'#2a6a4a');R(c,wx+3,Y+H-25,1,7,'#1a4a34');}
+    R(c,X+Math.floor(W/2)-1,Y-6,2,10,'#6a4424');R(c,X+Math.floor(W/2)-4,Y-3,8,2,'#6a4424');};
+  const santaCasaDraw=function(c,X,Y){const W=this.w*16,H=this.h*16;c.fillStyle='rgba(20,14,8,.22)';c.fillRect(X+3,Y+H-2,W-4,4);
+    R(c,X,Y+14,W,H-14,KK);R(c,X+1,Y+15,W-2,H-16,'#f2ece0');R(c,X+1,Y+H-5,W-2,4,'#c8b890');
+    R(c,X-2,Y+2,W+4,15,KK);R(c,X-1,Y+3,W+2,13,'#c06a44');for(let j=Y+6;j<Y+16;j+=3)R(c,X-1,j,W+2,1,'#9a4a30');
+    /* varanda com esteios de madeira */
+    R(c,X+4,Y+17,W-8,2,'#6a4424');for(let px=X+6;px<X+W-6;px+=14)R(c,px,Y+19,2,H-24,'#6a4424');
+    const dx=X+(this.door!=null?this.door:3)*16+4;R(c,dx,Y+H-17,8,16,KK);R(c,dx+1,Y+H-16,6,15,'#6a4424');
+    R(c,dx+3,Y+8,2,8,'#5a3418');R(c,dx+1,Y+10,6,2,'#5a3418');
+    for(let wx=X+10;wx<X+W-8;wx+=16){if(Math.abs(wx-dx)<12)continue;R(c,wx,Y+H-27,8,10,KK);R(c,wx+1,Y+H-26,6,8,'#2a6a4a');R(c,wx+1,Y+H-22,6,1,'#1a4a34');}
+    /* a roda dos expostos: um cilindro de madeira na parede */
+    const rx=X+W-20;R(c,rx,Y+H-18,12,12,KK);R(c,rx+1,Y+H-17,10,10,'#8a5a30');R(c,rx+5,Y+H-17,2,10,'#5a3418');R(c,rx+1,Y+H-13,10,2,'#5a3418');};
+  const muroDraw=function(c,X,Y){R(c,X,Y+5,16,11,KK);R(c,X,Y+6,16,9,'#b8865a');R(c,X,Y+12,16,3,'#9a6a44');R(c,X+3,Y+8,2,2,'#c89a6a');R(c,X+10,Y+10,3,1,'#8a5a38');R(c,X-1,Y+3,18,3,'#a8503a');R(c,X-1,Y+3,18,1,'#c8704a');};
+  const roda30=function(c,X,Y){R(c,X+2,Y+1,12,14,KK);R(c,X+3,Y+2,10,12,'#8a5a30');R(c,X+7,Y+2,2,12,'#5a3418');R(c,X+3,Y+7,10,2,'#5a3418');R(c,X+4,Y+3,3,3,'#a87a48');};
+  const esteiraDraw=function(c,X,Y){const w=(this.w||1)*16;R(c,X+1,Y+3,w-2,11,'#8a6a34');R(c,X+2,Y+4,w-4,9,'#c8a860');for(let i=X+3;i<X+w-3;i+=3)R(c,i,Y+4,1,9,'#a8884a');R(c,X+5,Y+5,6,5,'#a83a2a');};
+  const igImg={};try{for(const k of ['cap48']){if(!A['IG_'+k])continue;const im=new Image();im.src=A['IG_'+k];igImg[k]=im;}}catch(_){}
+
+  /* ---------- MAPA ---------- */
+  function rios(){const m=M();let n=0;for(let y=0;y<m.length;y++){const row=m[y].join('');let i=row.indexOf('BWWWB',14);if(i>=0&&i<=26){m[y][i]='.';m[y][i+1]='B';m[y][i+3]='B';m[y][i+4]='.';n++;}
+      let j=row.indexOf('RRRRR',14);if(j>=0&&j<=26){m[y][j]='D';m[y][j+4]='D';n++;}}
+    /* lavadeiras do Anhangabaú chegam um passo mais perto da água */
+    for(const p of npcs){if(p.scene!==S||!/Lavadeira/.test(p.name||'')||p.x<15||p.x>27)continue;for(const d of [1,-1]){const x=p.x+d;if(m[p.y][x]==='.'&&m[p.y][x+d]==='B'&&!objAt(x,p.y)){p.x=x;if('px' in p)p.px=x*16;if(p.home)p.home=[p.x,p.y];break;}}}
+    R30.rios=n;}
+  function varzea(){const m=M();let n=0;const sementes=[[60,4],[63,9],[60,15],[62,19],[60,26],[63,29],[61,36],[64,39],[60,51],[63,55],[61,63],[60,70],[63,77],[61,80],[64,22],[59,33]];
+    for(const [sx,sy] of sementes){const forma=[[0,0],[1,0],[0,1],[1,1]].slice(0,(sx+sy)%2?4:2);const ts=forma.map(([a,b])=>[sx+a,sy+b]);
+      if(!ts.every(([x,y])=>m[y]&&m[y][x]==='V'&&livre(x,y,'V')))continue;
+      if(ts.some(([x,y])=>VIZ.concat([[1,1],[-1,-1],[1,-1],[-1,1]]).some(([a,b])=>m[y+b]&&'DRd'.includes(m[y+b][x+a]))))continue;
+      ts.forEach(([x,y])=>m[y][x]='W');if(!tudoAlcancavel()){ts.forEach(([x,y])=>m[y][x]='V');continue;}n++;}
+    /* cavalos e mulas soltos pastando */
+    const cav=objects.find(o=>o.scene===S&&o.name==='Cavalo selado'),bur=objects.find(o=>o.scene===S&&o.name==='Burro de aluguel');let a=0;
+    for(const [x,y,q] of [[61,12,cav],[63,33,bur],[60,57,cav],[62,66,bur],[61,47,bur]]){if(!q)continue;const p=perto(x,y,(xx,yy)=>m[yy][xx]==='V','V');if(!p)continue;
+      const o={id:'pasto30_'+a,scene:S,x:p[0],y:p[1],w:1,h:1,draw:q.draw,name:q===cav?'Cavalo pastando na várzea':'Mula solta na várzea',text:['Os tropeiros soltam os animais para comer capim na várzea.','Quando o rio enche, tudo isto vira um alagado e os bichos vão para o alto.']};
+      objects.push(o);if(!tudoAlcancavel()){objects.pop();continue;}a++;}
+    R30.varzea=n+' poças, '+a+' animais';}
+  function chacaras(){const m=M();let ok=0;const lista=objsS().filter(o=>/^(Chácara|Sítio)/.test(o.name||'')&&!o.enter);
+    const TIPOS=[['l','h'],['m','j'],['h','l'],['j','m'],['l','m'],['h','j']];
+    lista.forEach((o,k)=>{const mud=[],obs=[];const troca=(x,y,t)=>{if(m[y]&&(m[y][x]==='.'||m[y][x]===',')&&livre(x,y)){mud.push([x,y,m[y][x]]);m[y][x]=t;}};
+      const [ta,tb]=TIPOS[k%TIPOS.length];
+      /* pomar ou roça de um lado, horta ou roça do outro */
+      for(let y=o.y;y<o.y+o.h;y++){for(let x=o.x-4;x<o.x-1;x++){if(ta==='l'&&(x+y)%2)continue;troca(x,y,ta);}for(let x=o.x+o.w+1;x<o.x+o.w+4;x++){if(tb==='l'&&(x+y)%2)continue;troca(x,y,tb);}}
+      /* muro de taipa atrás da casa */
+      for(let x=o.x-1;x<=o.x+o.w;x++){const y=o.y-1;if(m[y]&&livre(x,y)){const mo={id:'muro30_'+k+'_'+x,scene:S,x,y,w:1,h:1,draw:muroDraw,name:'Muro de taipa',text:['Muro de taipa: terra socada entre tábuas, com um telhadinho para a chuva não desmanchar.']};objects.push(mo);obs.push(mo);}}
+      if(!tudoAlcancavel()){mud.forEach(([x,y,t])=>m[y][x]=t);for(const mo of obs){const i=objects.indexOf(mo);if(i>=0)objects.splice(i,1);}return;}
+      ok++;o.text=(o.text||[]).concat(['Em volta da casa: '+({l:'pomar de laranjeiras',h:'horta',m:'milharal',j:'feijoal'}[ta])+' e '+({l:'pomar de laranjeiras',h:'horta',m:'milharal',j:'feijoal'}[tb])+'. As chácaras abastecem a cidade de frutas, verduras, milho e feijão.']);});
+    R30.chacaras=ok+' de '+lista.length;}
+  function casario(){const m=M(),H=m.length;const proto=objsS().filter(o=>o.name==='Casa de taipa'&&o.draw&&o.h===3);if(!proto.length)return;let n=0;
+    const casas=[];
+    for(let y=18;y<=53&&n<60;y++){const row=m[y];for(let x=26;x<=56&&n<60;){if(row[x]!=='d'){x++;continue;}
+        const w=(x+y)%3?3:4;const tiles=[];for(let j=y-3;j<y;j++)for(let i=x;i<x+w;i++)tiles.push([i,j]);
+        if(x+w-1>56||!tiles.every(([i,j])=>j>=15&&m[j][i]===','&&livre(i,j))||![...Array(w).keys()].every(i=>m[y][x+i]==='d')){x++;continue;}
+        const p=proto[(x*7+y)%proto.length];const o={id:'g30_'+n,scene:S,x,y:y-3,w,h:3,draw:p.draw,name:'Casa de taipa',text:['Casas de taipa coladas umas nas outras, com a frente na rua. Muitas têm loja ou oficina embaixo e moradia em cima.']};
+        objects.push(o);if(!tudoAlcancavel()){objects.pop();x++;continue;}casas.push(o);n++;x+=w;}}
+    R30.casario=n;}
+  /* colina, encostas e ladeiras de terra vermelha: desenhado por cima do chão */
+  function pintaColina(){try{if(cur!==S)return;const m=M(),H=m.length,W=m[0].length;const c=stat.getContext('2d');
+      const dentro=(x,y)=>x>=26&&x<=56&&y>=15&&y<=53;const anel=(x,y)=>m[y]&&(m[y][x]==='C'||m[y][x]==='S');
+      for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(dentro(x,y)||anel(x,y))continue;if(!'.,bfV'.includes(m[y][x]))continue;let d=9;
+        for(let b=-2;b<=2;b++)for(let a=-2;a<=2;a++)if(anel(x+a,y+b))d=Math.min(d,Math.max(Math.abs(a),Math.abs(b)));if(d>2)continue;
+        const X=x*16,Y=y*16;c.fillStyle=d===1?'rgba(70,45,20,.26)':'rgba(70,45,20,.12)';c.fillRect(X,Y,16,16);
+        c.fillStyle=d===1?'rgba(60,38,18,.45)':'rgba(60,38,18,.25)';for(let k=0;k<3;k++){const hx=((x*13+y*7+k*5)%12)+2,hy=((x*5+y*11+k*7)%12)+2;c.fillRect(X+hx,Y+hy,3,1);c.fillRect(X+hx+1,Y+hy+1,2,1);}
+        if(d===1&&(x+y)%3===0){c.fillStyle='#b8603a';c.fillRect(X+((x*3)%10)+3,Y+((y*5)%9)+4,3,2);}}
+      /* ladeiras: estradas que descem das saídas da colina */
+      const seen=new Set();const q=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(m[y][x]==='S')for(const [a,b] of VIZ){const nx=x+a,ny=y+b;if(m[ny]&&m[ny][nx]==='D'&&!dentro(nx,ny)){q.push([nx,ny,1]);seen.add(nx+','+ny);}}
+      while(q.length){const [x,y,d]=q.shift();const X=x*16,Y=y*16;const hz=(m[y][x-1]==='D'||m[y][x+1]==='D')&&!(m[y-1]&&m[y-1][x]==='D'&&m[y+1]&&m[y+1][x]==='D');
+        c.fillStyle='rgba(176,84,48,'+(0.46-d*0.05)+')';c.fillRect(X,Y,16,16);c.fillStyle='rgba(110,50,28,.30)';
+        if(hz){c.fillRect(X,Y+5,16,1);c.fillRect(X,Y+11,16,1);}else{c.fillRect(X+5,Y,1,16);c.fillRect(X+11,Y,1,16);}
+        c.fillStyle='rgba(90,40,20,.45)';for(let k=0;k<3;k++)c.fillRect(X+((x*5+y*3+k*7)%14)+1,Y+((x*3+y*7+k*5)%14)+1,2,1);
+        if(d>=6)continue;for(const [a,b] of VIZ){const nx=x+a,ny=y+b,kk=nx+','+ny;if(!seen.has(kk)&&m[ny]&&m[ny][nx]==='D'&&!dentro(nx,ny)){seen.add(kk);q.push([nx,ny,d+1]);}}}
+      /* casas coladas: onde a frente de um prédio encosta na rua e o desenho dele não ocupa tudo, aparecem fachadas de casas geminadas */
+      const PRED=/Casa|Igreja|Convento|Mosteiro|Palácio|Câmara|Quartel|Loja|Tipografia|Botica|Ferraria|Padaria|Taverna|Sapataria|Alfaiataria|Barbearia|Carpintaria|Açougue|Olaria|Ourivesaria|Solar|Escola|Repartição|Selaria|casinhas/;
+      const pred=objsS().filter(o=>PRED.test(o.name||'')&&(o.h||1)>=2&&!o.__semFachada);
+      for(const o of pred){const yb=o.y+o.h;if(!m[yb])continue;for(let x=o.x;x<o.x+o.w;x++){if(!dentro(x,yb)||m[yb][x]!=='d')continue;const X=x*16,Yr=(yb-2)*16,Yw=(yb-1)*16,hsh=(x*7+yb*3)%5;
+          R(c,X,Yr+5,16,11,'#9a4a30');R(c,X,Yr+6,16,9,'#c06a44');for(let j=Yr+8;j<Yr+16;j+=3)R(c,X,j,16,1,'#a8553a');R(c,X,Yr+5,16,1,'#d8805a');
+          const parede=['#f2ece0','#efe2c8','#f4e8d4','#e8dcc0','#f2ece0'][hsh];R(c,X,Yw,16,16,parede);R(c,X,Yw,16,2,'rgba(40,20,10,.25)');R(c,X,Yw+14,16,2,'#c8b890');
+          if(x===o.x)R(c,X,Yw,1,16,'#b8a888');
+          if(hsh===0||hsh===3){R(c,X+5,Yw+5,6,11,KK);R(c,X+6,Yw+6,4,10,'#6a4424');}else{R(c,X+4,Yw+4,8,8,KK);R(c,X+5,Yw+5,6,6,hsh===1?'#2a6a4a':'#3a5a8a');R(c,X+7,Yw+5,1,6,'rgba(0,0,0,.35)');R(c,X+4,Yw+12,8,1,'#6a4424');}}}
+    }catch(e){console.warn('colina 1830',e);}}
+  try{const bs0=buildStatic;buildStatic=function(){const r=bs0.apply(this,arguments);try{if(cur===S&&R30.feito)pintaColina();}catch(_){}return r;};}catch(e){console.warn('buildStatic 1830',e);}
+
+  /* ---------- tudo junto, depois que o resto de 1830 já se arrumou ---------- */
+  function roda(){try{if(R30.feito)return;const m=M();if(!m)return;R30.feito=1;CAM=caminhos();
+    const ob=id=>objects.find(o=>o.scene===S&&o.id===id);
+    /* 1. data: outubro de 1830 */
+    try{const e=npcs.find(n=>n.id==='estEntrudo');if(e){e.lines=['Chegou a notícia da França! Em julho, o povo de Paris derrubou o rei Carlos X.','A notícia chegou ao Rio em setembro e agora corre por São Paulo. Nós, estudantes, vamos pôr luminárias nas janelas para comemorar.','O jornalista Líbero Badaró escreve que o Brasil devia seguir o exemplo. O governo não gosta nada disso.'];
+        e.diary='Em outubro de 1830, os estudantes de São Paulo comemoravam a Revolução de Julho na França, que derrubou o rei Carlos X. Líbero Badaró apoiava os estudantes.';}}catch(_){}
+    try{const N=NEWS[2];if(N&&N.it){N.it[1]=['Imperador em crise','Cresce a oposição a D. Pedro I. Muitos o acusam de governar sem ouvir os deputados. (O viajante do tempo sabe: em abril de 1831 ele vai deixar o trono para o filho, de 5 anos.)'];
+        N.it[2]=['Revolução na França','Em julho, o povo de Paris derrubou o rei Carlos X. A notícia chegou ao Rio em 14 de setembro. Em São Paulo, os estudantes do Curso Jurídico comemoram com luminárias, e o jornalista Líbero Badaró escreve que o Brasil devia seguir o exemplo.'];
+        if(!N.it.some(t=>t[0]==='Quem governa a província'))N.it.push(['Quem governa a província','Desde abril de 1830, quem governa São Paulo é o bispo D. Manuel Joaquim Gonçalves de Andrade, como vice-presidente da província.']);}}catch(_){}
+    /* 2. personagens reais nas salas */
+    try{const p=npcs.find(n=>n.id==='presidente'&&n.scene==='i_palacio');if(p){p.name='D. Manuel Joaquim Gonçalves de Andrade, bispo';p.spr='h22_n|padreSe88|0';delete p.__spr30;
+        p.lines=['Seja bem-vindo. Sou D. Manuel Joaquim Gonçalves de Andrade, bispo de São Paulo desde 1827.','Desde abril deste ano também governo a província, como vice-presidente, até chegar um novo presidente.','De manhã cuido da Igreja; de tarde, dos papéis do governo. E os estudantes andam agitados com as notícias da França!',REAL];
+        p.diary='Em outubro de 1830, quem governava a província de São Paulo era o bispo D. Manuel Joaquim Gonçalves de Andrade, como vice-presidente.';}}catch(_){}
+    try{const l=npcs.find(n=>n.id==='lente'&&n.scene==='i_academia');if(l){l.name='José Arouche de Toledo Rendon, diretor da Academia';
+        l.lines=['Sou José Arouche de Toledo Rendon, diretor do Curso Jurídico desde que ele foi criado, em 1827.','As aulas são aqui, no Convento de São Francisco, que os frades cederam. Os rapazes vêm de todo o Brasil estudar leis.','Tenho mais de setenta anos e conheço esta cidade desde menino. Nunca vi tantos estudantes agitados como agora!',REAL];
+        l.diary='José Arouche de Toledo Rendon foi o primeiro diretor do Curso Jurídico de São Paulo, de 1827 a 1833.';}}catch(_){}
+    /* 3. Santa Casa de 1825 */
+    try{const sc=ob('santacasa');if(sc){sc.name='Hospital da Santa Casa (Chácara dos Ingleses)';sc.draw=santaCasaDraw;sc.__grande=1;
+        sc.text=['O hospital da Santa Casa de Misericórdia abriu numa chácara fora do centro, a Chácara dos Ingleses, em 2 de julho de 1825.','No mesmo dia começou a funcionar a roda dos expostos: um cilindro de madeira na parede onde se deixavam bebês que a família não podia criar.','[O lugar da chácara no jogo é aproximado.]'];}
+      const sala=SCN.i_santacasa;if(sala&&!objects.some(o=>o.id==='roda30')){const sm=sala.map,sh=sm.length,sw=sm[0].length;let alvo=null;
+        for(let y=1;y<sh-1&&!alvo;y++)for(let x=sw-2;x>=1&&!alvo;x--){if(SOLID.includes(sm[y][x]))continue;if(objects.some(o=>o.scene==='i_santacasa'&&dentro(o,x,y))||npcs.some(n=>n.scene==='i_santacasa'&&n.x===x&&n.y===y))continue;
+          if(VIZ.filter(([a,b])=>sm[y+b]&&!SOLID.includes(sm[y+b][x+a])).length>=3)alvo=[x,y];}
+        if(alvo)objects.push({id:'roda30',scene:'i_santacasa',x:alvo[0],y:alvo[1],w:1,h:1,draw:roda30,name:'Roda dos expostos',text:['A roda dos expostos: um cilindro de madeira que gira na parede.','Quem não podia criar um bebê o colocava na roda, girava e ia embora sem ser visto. A Santa Casa pagava amas para criar essas crianças.','Em São Paulo, a roda começou a funcionar em 2 de julho de 1825 e só fechou em 1950.']});}}catch(e){console.warn('santa casa 1830',e);}
+    /* 4. Ordem Terceira do Carmo, ao lado do convento */
+    try{const ca=ob('carmo');if(ca&&!ca.__ot30){const d0=ca.draw;ca.__ot30=1;ca.draw=function(c,X,Y){if(d0)d0.call(this,c,X,Y);const im=igImg.cap48;if(im&&im.complete&&im.naturalWidth){const W=this.w*16,H=this.h*16;c.imageSmoothingEnabled=false;
+          R(c,X+W-im.width-2,Y+H-im.height+6,im.width+2,im.height-6,'rgba(20,14,8,.18)');c.drawImage(im,X+W-im.width,Y+H-im.height);}};
+        const p=perto(55,41,null,',.dD');if(p)objects.push({id:'placaOT30',scene:S,x:p[0],y:p[1],w:1,h:1,draw:drawSign,name:'Igreja da Ordem Terceira do Carmo',text:['Ao lado do convento fica a Igreja da Ordem Terceira do Carmo, dos irmãos leigos carmelitas.','O convento foi demolido em 1928, mas a Igreja da Ordem Terceira ficou: ela existe até hoje, na Avenida Rangel Pestana, perto da Praça da Sé.']});}}catch(e){console.warn('ordem terceira 1830',e);}
+    /* 5. Hospital dos Lázaros, fora da cidade */
+    try{if(!ob('lazaros30')){for(let y=37;y<=42;y++)for(let x=97;x<=103;x++)if(m[y]&&'Tb'.includes(m[y][x]))m[y][x]='.';
+        let pos=null;for(const [x,y] of [[98,38],[97,37],[99,37],[98,36]]){let ok=true;for(let j=y;j<y+3;j++)for(let i=x;i<x+5;i++)if(!livre(i,j))ok=false;if(ok&&livre(x+2,y+3)){pos=[x,y];break;}}
+        if(pos){const o={id:'lazaros30',scene:S,x:pos[0],y:pos[1],w:5,h:3,draw:lazarosDraw,name:'Hospital dos Lázaros',__grande:1,text:['O Hospital dos Lázaros, longe do centro. Aqui ficam os doentes de lepra, a doença que hoje chamamos de hanseníase.','[O lugar do hospital no jogo é aproximado.]']};objects.push(o);
+          if(!tudoAlcancavel()){objects.pop();R30.lazaros='sem caminho';}else{R30.lazaros=pos.join(',');novos.find(n=>n.id==='lazaro30').alvo=[pos[0]+5,pos[1]+3];}}}}catch(e){console.warn('lázaros 1830',e);}
+    /* 6. personagens novos na rua */
+    for(const n of novos){try{if(npcs.some(q=>q.id===n.id))continue;const p=perto(n.alvo[0],n.alvo[1],null,',.dD');if(!p)continue;
+      const q={id:n.id,spr:n.spr,x:p[0],y:p[1],dir:'down',name:n.name,lines:n.lines,diary:n.diary||n.name,scene:S};npcs.push(q);if(!tudoAlcancavel()){npcs.pop();continue;}}catch(_){}}
+    for(const id of ['mulherBaeta30','baetaMissa30a','baetaMissa30b'])BAETA.add(id);
+    for(const n of npcs){if(n.scene!==S)continue;if(/^(Tropeiro|Viajante|Estudante|Carregador do Caminho do Mar)/.test(n.name||'')||n.id==='poncho30')PONCHO.add(n.id);}
+    for(const w of walkers){if(w.scene!==S||w.mules||w.horse||w.mounted)continue;const nm=w.name||'';if(/^Moradora$|^Vendedora$/.test(nm))BAETA.add('w:'+w.id);else if(/^Tropeiro$|^Estudante|^Viajante$/.test(nm)&&!/cavalo|montad|mula/i.test(nm))PONCHO.add('w:'+w.id);}
+    /* 7. fontes espalhadas: longe umas das outras */
+    const fontes=()=>objects.filter(o=>/^f30_|^f[A-Z][A-Za-z0-9]*30$/.test(o.id||'')&&o.scene===S);
+    for(const [id,f] of Object.entries(FON)){try{if(ob(id))continue;const p=perto(f.alvo[0],f.alvo[1],(x,y)=>fontes().every(o=>Math.max(Math.abs(o.x-x),Math.abs(o.y-y))>=3)&&!npcs.some(n=>n.scene===S&&Math.abs(n.x-x)+Math.abs(n.y-y)<2),',.dD');if(!p)continue;
+      const o={id,scene:S,x:p[0],y:p[1],w:1,h:1,draw:fdesenho,name:'Fonte histórica: '+f.imgs[0].title,text:['Uma imagem antiga desta parte da cidade.']};objects.push(o);if(!tudoAlcancavel())objects.pop();}catch(_){}}
+    try{const sala=SCN[FONTE_SALA.sala];if(sala&&!objects.some(o=>o.id===FONTE_SALA.id)){const sm=sala.map,sh=sm.length,sw=sm[0].length;let alvo=null;
+        for(let y=1;y<sh-1&&!alvo;y++)for(let x=1;x<sw-1&&!alvo;x++){if(SOLID.includes(sm[y][x]))continue;if(objects.some(o=>o.scene===FONTE_SALA.sala&&dentro(o,x,y))||npcs.some(n=>n.scene===FONTE_SALA.sala&&n.x===x&&n.y===y))continue;
+          if(VIZ.filter(([a,b])=>sm[y+b]&&!SOLID.includes(sm[y+b][x+a])).length>=3&&y>=2)alvo=[x,y];}
+        if(alvo)objects.push({id:FONTE_SALA.id,scene:FONTE_SALA.sala,x:alvo[0],y:alvo[1],w:1,h:1,draw:fdesenho,name:'Planta da Imperial Cidade de São Paulo',text:['Uma planta antiga da cidade.']});}}catch(_){}
+    /* 8. igrejas que ainda tinham bancos */
+    try{for(const k of Object.keys(SCN)){if(k.indexOf('i_')!==0)continue;const t=SCN[k].title||'';if(!/Rosário|São Bento/.test(t))continue;
+        for(const o of objects)if(o.scene===k&&o.name==='Bancos'){o.name='Esteiras';o.text=['Esteiras de palha e almofadas no chão.','Nas igrejas de 1830 quase não havia bancos: as mulheres sentavam no chão, sobre esteiras, e os homens ficavam de pé.'];const oo=o;o.draw=function(c,X,Y){esteiraDraw.call(oo,c,X,Y);};}}}catch(_){}
+    /* 9. mapa */
+    try{rios();}catch(e){console.warn('rios 1830',e);}
+    try{varzea();}catch(e){console.warn('várzea 1830',e);}
+    try{chacaras();}catch(e){console.warn('chácaras 1830',e);}
+    try{casario();}catch(e){console.warn('casario 1830',e);}
+    R30.ok=tudoAlcancavel();
+    try{if(cur===S){buildStatic();buildOcc();}}catch(_){}
+  }catch(e){console.warn('outubro 1830',e);R30.erro=String(e);}}
+  setTimeout(roda,6800);
+
+  /* ---------- conversas que abrem quadros ---------- */
+  {const h0=questHookX;questHookX=function(n){const r=h0(n);if(r!==undefined)return r;try{
+    if(n.id==='debret30')return{pages:[],after:()=>quadro({kick:'As aquarelas de Debret',diary:'Debret mostrou as aquarelas que pintou em São Paulo: o Largo da Sé, a entrada pelo Carmo, os tropeiros e as mulheres de manto.',
+      imgs:[FON.f30_se.imgs[0],FON.f30_esplanada.imgs[0],FON.f30_tropeiros.imgs[0],{src:'debret_mulheres_largo_se_1827_detalhe.jpg',title:'De perto: as mulheres no Largo da Sé',cap:'Algumas vão cobertas da cabeça aos pés por mantos escuros, as baetas. Outras usam xale e saia colorida. Há também uma criança e uma mulher negra de vestido claro.',cred:'Detalhe da aquarela de Debret, 1827.'}]})};
+    if(n.id==='lazaro30')return{pages:[],after:()=>{if(R30.aulaLaz)return;R30.aulaLaz=1;aula({kick:'Mini-aula',title:'Hanseníase: ontem e hoje',dkind:'Fonte',diary:'Hanseníase: em 1830 não havia cura e os doentes eram afastados. Hoje a doença tem cura, o tratamento é de graça no SUS e quem está em tratamento não transmite a doença.',
+      blocos:[{sub:'Em 1830',p:'Ninguém sabia curar a lepra. Os doentes eram separados da família e levados para longe da cidade, para lugares como o Hospital dos Lázaros. Muitos viviam de esmola.'},
+        {sub:'Hoje',p:'A doença se chama hanseníase e tem cura. O tratamento é feito com remédios, de graça, no SUS. Depois que a pessoa começa a se tratar, ela deixa de transmitir a doença.'},
+        {sub:'Respeito',p:'Não se separa ninguém por causa da hanseníase, e a palavra "leproso" ofende. Manchas na pele com dormência? O certo é procurar o posto de saúde.'}]});}};
+    if(ELAS.includes(n.id))return{pages:[],after:()=>{falou.add(n.id);
+      if(n.id==='mulherBaeta30'&&!R30.aulaMul){R30.aulaMul=1;aula({kick:'Mini-aula',title:'As mulheres de São Paulo em 1830',dkind:'Fonte',diary:'Mulheres de São Paulo em 1830: muitas saíam cobertas pela baeta, muitas chefiavam a casa e trabalhavam na rua, e nenhuma podia estudar na Academia nem votar.',
+        blocos:[{img:'debret_mulheres_largo_se_1827_detalhe.jpg',alt:'Mulheres no Largo da Sé, aquarela de Debret'},
+          {sub:'A baeta',p:'Muitas mulheres saíam à rua cobertas por baetas, mantos de tecido grosso e escuro que escondiam a cabeça e o corpo. Era um costume antigo. Uma ordem do rei, de 1810, proibiu andar "embuçada em baeta", mas muitas continuaram usando.'},
+          {sub:'O trabalho',p:'Nas ruas trabalhavam quitandeiras, lavadeiras, doceiras e carregadoras de água, muitas delas escravizadas ou libertas. Em casa, as mulheres fiavam algodão, costuravam e cozinhavam. Muitas casas pobres eram chefiadas por mulheres.'},
+          {sub:'O que era proibido',p:'Mulheres não podiam estudar na Academia de Direito, ser deputadas nem votar.'},
+          {p:'Converse com outras mulheres pela cidade: a Marquesa de Santos, Dona Ana, a moça que queria estudar e a quitandeira liberta.',small:true}]});}
+      if(falou.size>=4&&!R30.quizMul){R30.quizMul=1;setTimeout(()=>quiz([
+        {q:'Por que muitas mulheres andavam cobertas pela baeta?',op:['Era o uniforme das escolas','Era um costume antigo de se cobrir para sair à rua','Era moda trazida pelos ingleses','Era obrigatório por lei'],c:1,ex:'Era um costume antigo. Uma ordem de 1810 até tentou proibir, mas muitas continuaram usando.'},
+        {q:'Em 1830, mulheres podiam estudar na Academia de Direito?',op:['Sim, se fossem ricas','Sim, nas aulas da noite','Só as filhas dos professores','Não, a Academia era só para rapazes'],c:3,ex:'A Academia era só para rapazes. Mulheres também não podiam votar.'},
+        {q:'Quem sustentava muitas casas pobres de São Paulo?',op:['Mulheres que fiavam, vendiam e lavavam roupa','Os estudantes da Academia','O imperador','Os padres do convento'],c:0,ex:'Muitas casas eram chefiadas por mulheres, que trabalhavam em casa e na rua.'}],
+        a=>{if(!diary.some(d=>d.text.startsWith('Mulheres de 1830: quiz')))addDiary('Fonte','Mulheres de 1830: quiz respondido, '+a+' de 3 acertos.');try{save();}catch(_){}}),400);}}};
+  }catch(_){}return r;};}
+  {const a0=questActionX;questActionX=function(tg){const o=tg&&tg.type==='obj'&&tg.o;if(o&&(FON[o.id]||o.id===FONTE_SALA.id)){abreFonte(o.id);return true;}return a0(tg);};}
+  /* uma fonte se abre sozinha quando a pessoa chega perto pela primeira vez, no máximo uma a cada 90 segundos */
+  setInterval(()=>{try{if(cur!==S&&cur!==FONTE_SALA.sala)return;if(mcqOpen)return;try{if(typeof dialog!=='undefined'&&dialog)return;}catch(_){}
+    if(Date.now()-ultimaAuto<90000)return;for(const o of objects){if(o.scene!==cur||!(FON[o.id]||o.id===FONTE_SALA.id)||vistas.has(o.id))continue;
+      if(Math.abs(o.x-player.x)+Math.abs(o.y-player.y)<=1){ultimaAuto=Date.now();abreFonte(o.id);break;}}}catch(_){}},600);
+  /* chegada: outubro de 1830 */
+  try{const s0=setScene;setScene=function(to){const r=s0.apply(this,arguments);try{if(to===S&&!R30.avisoData){R30.avisoData=1;setTimeout(()=>{try{toast('São Paulo, outubro de 1830');}catch(_){}},900);
+      if(!diary.some(d=>d.text&&d.text.startsWith('Você chegou a São Paulo em outubro de 1830')))addDiary('Lugar','Você chegou a São Paulo em outubro de 1830. É primavera e começam as chuvas.');}}catch(_){}return r;};}catch(_){}
+})();
+
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
