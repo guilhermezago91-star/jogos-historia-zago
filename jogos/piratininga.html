@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=d9db775b","kb":788,"m":1},{"f":"pac_e1234.js?v=56ee25a1","kb":2140,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=9e50ae28","kb":1400,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=d9db775b","kb":788,"m":1},{"f":"pac_e1234.js?v=56ee25a1","kb":2140,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=9e50ae28","kb":1400,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=2d6a3124","kb":4154,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -19432,7 +19432,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v187) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v190) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -20144,6 +20144,11 @@ window.__paulista82Ready=Promise.all(ready);
       const Q=[];let nQ=0;for(let y=0;y<HH;y++){let x=0;while(x<WW){if(!R.has(K2(x,y))){x++;continue;}let x1=x;while(x1+1<WW&&R.has(K2(x1+1,y)))x1++;
           objects.push({id:'jm_q_'+x+'_'+y,scene:S,x,y,w:x1-x+1,h:1,name:'Quintal',text:['O quintal dos fundos de uma casa: horta, varal, tanque, galinheiro.'],__jm:1,__q:1,draw(){}});nQ++;for(let i=x;i<=x1;i++)Q.push([i,y]);x=x1+1;}}
       rel.quintais=Q;rel.semTelhado=[nF,nTr,nQ,Q.length];}catch(e){console.warn('sem telhado JM',e);}
+    /* ===== v190 — CENTRO DE 1922: FACHADAS NOVAS DO CANVA — Igreja de Santa Ifigênia no estilo novo (desenho aprovado pelo professor), no tamanho de 8 quadradinhos de frente (pedido do professor, 20/11/2026) ===== */
+    try{const troca=(re,key,larg,fundo,porta)=>{const o=objects.find(q=>q.scene===S&&q.enter&&re.test(q.name||''));if(!o||!A[key])return 0;const base=o.y+(o.h||1),cx=o.x+(o.w||1)/2,im=new Image();im.src=A[key];
+        o.x=Math.round(cx-larg/2);o.w=larg;o.h=fundo;o.y=base-fundo;o.door=porta;o.__canva=1;
+        o.draw=function(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth/2,h=im.naturalHeight/2;c.drawImage(im,Math.round(X+larg*8-w/2),Math.round(Y+fundo*16-h),w,h);};return 1;};
+      rel.canva=[troca(/Santa Ifig/,'JM22_ig_santa_ifigenia',8,5,4)];}catch(e){console.warn('fachadas canva JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
