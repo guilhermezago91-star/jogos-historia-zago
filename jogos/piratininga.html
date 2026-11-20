@@ -14231,6 +14231,105 @@ setTimeout(function(){try{
   window.__mooca22log={quadras:Q.map(q=>[q.x0,q.y0,q.x1,q.y1].join(',')),novos:NOVOS.length,fabricas:IND.length,travessas:trav,patio:np,gente:ng};
 }catch(e){console.warn('[bairros22 mooca]',e);}},0);
 /*__BAIRROS22_H_END__*/
+/*__BAIRROS22_I_START__*/
+/* ===== v186 — MOOCA AINDA MAIOR E VILA PRUDENTE PEQUENA (ESQUEMA DO PROFESSOR + ATLAS SP 1922): A MOOCA DESCE ATÉ A RUA DO IPIRANGA COM MAIS FÁBRICAS, VILAS E GENTE; OLARIAS DO MEIO DO BAIRRO VIRAM OFICINAS; A VILA PRUDENTE VIRA SÓ UM NÚCLEO NO CANTO, EM VOLTA DA FÁBRICA DE CHOCOLATES (pedido do professor, 20/11/2026) ===== */
+/* Roda por último e só usa lugar livre (árvore e mato do miolo das quadras). Longe do centro (colunas 186 em diante). Nomes genéricos: nenhuma fábrica inventada leva nome histórico. */
+setTimeout(function(){try{
+  if(!SCN.sp22||typeof spDraw!=='function')return;const S='sp22',M=SCN.sp22.map;
+  const ZX0=186,ZX1=236,ZY0=148,ZY1=176;
+  const h=(x,y,s)=>{let n=(x*374761393+y*668265263+s*1442695041)|0;n=(n^(n>>>13))*1274126177;return ((n^(n>>>16))>>>0)/4294967296;};
+  const RUA='dDeRSY',MATO='.,TVbqf';
+  const occ=new Set();for(const q of objects)if(q.scene===S&&!q.walker&&q.x!=null)for(let y=q.y;y<q.y+(q.h||1);y++)for(let x=q.x;x<q.x+(q.w||1);x++)occ.add(x+','+y);
+  for(const n of npcs)if(n.scene===S)occ.add(n.x+','+n.y);for(const n of ITEMS)if(n.scene===S&&!n.got)occ.add(n.x+','+n.y);
+  const ob=id=>objects.find(o=>o.scene===S&&o.id===id);
+  /* chácaras que ficaram no meio do bairro novo viram vilas operárias, no mesmo lugar */
+  const VILA=["Vila operária: casinhas iguais, enfileiradas ao longo de uma travessa. Muitas foram construídas pelas próprias fábricas e alugadas aos operários.","O aluguel é descontado do salário. Quem perde o emprego na fábrica, perde também a casa."];
+  for(const id of ['n1411','n1414','chacRio22_2','chacRio22_4']){const o=ob(id);if(!o||o.w!==6||o.h!==3)continue;o.draw=spDraw('vila6',6,3);o.name='Vila operária';Object.defineProperty(o,'text',{configurable:true,writable:true,value:VILA});}
+  /* a rua da coluna 218 volta a ser contínua onde o antigo rio a interrompia */
+  for(let y=ZY0;y<=ZY1;y++)if(M[y]&&MATO.includes(M[y][218])&&!occ.has('218,'+y))M[y][218]='d';
+  /* quadras do Alto da Mooca */
+  const visto=new Set(),Q=[];
+  for(let y=ZY0;y<=ZY1;y++)for(let x=ZX0;x<=ZX1;x++){const k=x+','+y;if(visto.has(k)||!M[y]||RUA.includes(M[y][x]))continue;
+    const f=[[x,y]],c=[];visto.add(k);let ok=true;
+    while(f.length){const [a,b]=f.pop();c.push([a,b]);if(a<ZX0||a>ZX1+14||b<ZY0||b>ZY1+2){ok=false;}
+      for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=a+dx,Y=b+dy,kk=X+','+Y;if(visto.has(kk)||!M[Y]||M[Y][X]==null||RUA.includes(M[Y][X]))continue;visto.add(kk);f.push([X,Y]);}
+      if(c.length>400){ok=false;break;}}
+    if(!ok)continue;const xs=c.map(p=>p[0]),ys=c.map(p=>p[1]);const q={x0:Math.min(...xs),x1:Math.max(...xs),y0:Math.min(...ys),y1:Math.max(...ys),n:c.length};
+    if(q.x1>ZX1||q.n!==(q.x1-q.x0+1)*(q.y1-q.y0+1)||q.x1-q.x0<9)continue;Q.push(q);}
+  Q.sort((a,b)=>a.y0-b.y0||a.x0-b.x0);
+  const livre=(x,y,w,hh,q)=>{for(let j=y;j<y+hh;j++)for(let i=x;i<x+w;i++){if(i<q.x0||i>q.x1||j<q.y0||j>q.y1)return false;const c=M[j][i];if(!(MATO+'pk').includes(c)||occ.has(i+','+j))return false;}return true;};
+  const NOVOS=[],IND=[];let ni=0;
+  const poe=(sp,w,hh,x,y,name,text,ind)=>{const o={id:'moocaS22_'+(ni++),scene:S,x,y,w,h:hh,draw:spDraw(sp,w,hh),name,text};
+    objects.push(o);NOVOS.push(o);if(ind)IND.push(o);for(let j=y;j<y+hh;j++)for(let i=x;i<x+w;i++){occ.add(i+','+j);M[j][i]='p';}return o;};
+  const tenta=(q,lista,yy)=>{for(const [sp,w,hh,name,text,ind] of lista){const y=yy(hh);for(let x=q.x0+1;x+w-1<=q.x1-1;x++)if(livre(x,y,w,hh,q))return poe(sp,w,hh,x,y,name,text,ind);}return null;};
+  const FAB=[
+    ['fabricaG8',8,3,'Tecelagem',["Uma tecelagem da Mooca: centenas de teares batendo o dia inteiro, num barulho que não deixa ninguém conversar.","Muitas operárias são mulheres e meninas, filhas de imigrantes italianos e espanhóis. A jornada passa de dez horas."],1],
+    ['fabrica',7,4,'Fundição',["Fundição de ferro: aqui se fazem grades, portões, peças de máquina e tampas de bueiro para a cidade que cresce.","O calor do forno é tanto que os operários trabalham de camiseta até no inverno."],1],
+    ['fabrica5',5,4,'Fábrica de massas',["Fábrica de macarrão: farinha de trigo, água e ovos. A massa seca pendurada em varas, como na Itália.","Os donos são italianos, os operários também. Na hora do almoço, a conversa é em dialeto napolitano e calabrês."],1]];
+  const DEP=[
+    ['galpao',8,3,'Depósito de algodão',["Fardos de algodão do interior paulista chegam de trem e esperam aqui até entrar nas fiações do bairro."],1],
+    ['armazem',6,3,'Armazém de cereais',["Sacos de arroz, feijão e milho. Daqui saem as carroças que abastecem os armazéns de secos e molhados da Mooca."],1],
+    ['fabrica5',5,4,'Fábrica de móveis',["Marceneiros italianos fazem cadeiras, mesas e guarda-roupas em série. As famílias operárias compram a prestação."],1]];
+  const MOR=[['vila6',6,3,'Vila operária',VILA,0],['cortico',6,3,'Cortiço',["Cortiço: uma casa comprida dividida em quartinhos, um para cada família, com um tanque e uma latrina para todos no fundo.","É a moradia mais barata do bairro. Quando chove, a água entra por baixo da porta."],0]];
+  const IMG={};const img=k=>IMG[k]||(IMG[k]=(()=>{const i=new Image();i.src=(typeof A!=='undefined'&&A['IND_mod_'+k])||'';return i;})());
+  const casaLinha=(q,y)=>{for(let x=q.x0;x<=q.x1;x++)for(const [k,w] of [['casa_operaria_dupla',5],['casa_operaria',3]]){if(typeof A==='undefined'||!A['IND_mod_'+k])continue;if(!livre(x,y,w,2,q))continue;
+      let rua=true;for(let i=x;i<x+w;i++)if(!RUA.includes((M[y+2]&&M[y+2][i])||'#'))rua=false;if(!rua)continue;
+      const o={id:'moocaS22_'+(ni++),scene:S,x,y,w,h:2,name:w===5?'Casas de operários':'Casa de operário',
+        text:["Casinhas geminadas do Alto da Mooca: porta, janela e quintal nos fundos, com horta, galinheiro e varal.","Quase todo mundo da rua trabalha nas fábricas do bairro. O apito da fábrica é o relógio de todas as casas."],
+        draw:function(c,PX,PY){const b=PY+32;c.fillStyle='rgba(20,14,8,.22)';c.fillRect(PX+3,b,w*16-6,3);const i=img(k);if(i.complete&&i.naturalWidth)c.drawImage(i,Math.round(PX+(w*16-i.width)/2),Math.round(b-i.height));}};
+      objects.push(o);NOVOS.push(o);for(let j=y;j<y+2;j++)for(let i=x;i<x+w;i++){occ.add(i+','+j);M[j][i]='p';}x+=w-1;break;}};
+  const TIPO=['mor','ind','mor','mor','ind','mor','ind','mor'];let ti=0,trav=0;
+  for(const q of Q){const alto=q.y1-q.y0+1;
+    if(alto<8){casaLinha(q,q.y1-1);}
+    else{const t=TIPO[ti++%TIPO.length];
+      if(t==='ind'){tenta(q,FAB.slice(ti%3).concat(FAB.slice(0,ti%3)),()=>q.y0+1);tenta(q,DEP.slice(ti%3).concat(DEP.slice(0,ti%3)),hh=>q.y1-hh+1);tenta(q,FAB.slice(2),()=>q.y0+1);
+        for(let y=q.y0;y<=q.y1;y++)for(let x=q.x0;x<=q.x1;x++)if(!occ.has(x+','+y)&&MATO.includes(M[y][x]))M[y][x]='p';}   // o resto vira pátio calçado
+      else{const ty=q.y0+3;let ok=true;for(let x=q.x0;x<=q.x1;x++)if(occ.has(x+','+ty))ok=false;
+        if(ok){for(let x=q.x0;x<=q.x1;x++)M[ty][x]='d';trav++;                                                           // travessa da vila
+          for(let n=0;n<2;n++)tenta(q,MOR.slice(n%2).concat(MOR.slice(0,n%2)),()=>q.y0);}
+        casaLinha(q,q.y1-1);}}
+    for(let y=q.y0;y<=q.y1;y++)for(let x=q.x0;x<=q.x1;x++){const c=M[y][x];if(occ.has(x+','+y)||!MATO.includes(c))continue;const v=h(x,y,21);M[y][x]=v<.06?'T':(v<.2?',':(v<.3?'d':'k'));}}   // quintais
+  /* pátio das fábricas novas: carvão, fardos, caixotes */
+  const KS=['carvao','fardos','caixas','barris','carvao'];let np=0;
+  const TP={carvao:['Monte de carvão',["Carvão para a caldeira. Sem vapor, as máquinas da fábrica param."]],fardos:['Fardos de algodão',["Fardos de algodão esperando a vez de entrar na fiação."]],caixas:['Caixotes',["Caixotes com mercadoria pronta para a carroça ou para o trem."]],barris:['Barris',["Barris de madeira empilhados no pátio."]]};
+  for(const f of IND)for(let y=f.y-1;y<=f.y+f.h;y++)for(let x=f.x-1;x<=f.x+f.w;x++){if(M[y][x]!=='p'||occ.has(x+','+y)||occ.has((x+1)+','+y)||M[y][x+1]!=='p'||h(x,y,51)>.3||typeof A==='undefined')continue;
+    const k=KS[(h(x,y,53)*KS.length)|0];if(!A['IND_mod_'+k])continue;const t=TP[k];
+    const o={id:'moocaSP22_'+(np++),scene:S,x,y,w:2,h:1,name:t[0],text:t[1],draw:function(c,PX,PY){const i=img(k);if(i.complete&&i.naturalWidth)c.drawImage(i,Math.round(PX+(32-i.width)/2),Math.round(PY+16-i.height));}};
+    objects.push(o);occ.add(x+','+y);occ.add((x+1)+','+y);}
+  /* olarias que ficaram no meio da Mooca viram oficinas e pequenas fábricas, no mesmo lugar */
+  const OFI=[['n1404','loja4',72,'Ferraria',["O ferreiro faz ferradura, roda de carroça e grade de janela. O martelo na bigorna se ouve da rua inteira."]],
+    ['n1405','loja4',71,'Fábrica de gasosa',["Gasosa e água com gás, engarrafadas uma a uma. As garrafas voltam vazias para lavar e encher de novo."]],
+    ['n1408','loja4',30,'Fábrica de biscoitos',["Biscoito e bolacha em lata, para os armazéns do bairro. O cheiro doce se espalha pela rua de manhã."]],
+    ['n1409','loja4',72,'Marcenaria',["Marceneiros fazem portas, janelas e móveis para as casinhas novas que não param de subir no bairro."]],
+    ['n1410','loja4',63,'Fábrica de sacaria',["Sacos de pano grosso para café, açúcar e farinha. Muitas costureiras trabalham por peça, em casa."]],
+    ['chacRio22_1','loja4',72,'Oficina de carroças',["Aqui se conserta carroça, roda e arreio. Na Mooca de 1922, quase tudo ainda anda puxado a cavalo ou a burro."]]];
+  for(const [id,sp,ic,name,text] of OFI){const o=ob(id);if(!o||o.w!==4||o.h!==3)continue;const base=spDraw(sp,4,3);o.name=name;
+    Object.defineProperty(o,'text',{configurable:true,writable:true,value:text});o.draw=(c,X,Y)=>{base(c,X,Y);if(typeof signBoard==='function')signBoard(c,X+T+8,Y+3*T-36,ic);};}
+  /* Vila Prudente: só um núcleo pequeno no canto, em volta da fábrica de chocolates */
+  {const q={x0:219,x1:232,y0:177,y1:187};for(let y=q.y0;y<=q.y1;y++)if(M[y]&&MATO.includes(M[y][218])&&!occ.has('218,'+y))M[y][218]='d';
+   const f=tenta(q,[['fabrica5',5,4,'Fábrica de chocolates',["Foi em volta de uma fábrica de chocolates e confeitos, a dos irmãos Falchi, que a Vila Prudente nasceu, em 1890. O nome homenageia o presidente Prudente de Moraes.","Os operários são italianos que vieram da Mooca, do Brás e do Ipiranga. A fábrica ajudou a construir as casas deles, em mutirão."],1]],()=>q.y0+1);
+   tenta(q,[['vila6',6,3,'Vila dos operários do chocolate',["Casinhas construídas em mutirão para quem trabalha na fábrica de chocolates. Em volta, ainda é pasto e pomar."],0]],()=>q.y0+1);
+   casaLinha(q,q.y1-1);
+   for(let y=q.y0;y<=q.y1;y++)for(let x=q.x0;x<=q.x1;x++){if(occ.has(x+','+y))continue;const c=M[y][x];if(!MATO.includes(c))continue;const v=h(x,y,61);M[y][x]=v<.1?'T':(v<.4?',':'k');}
+   const o=ob('n1415');if(o){o.name='Cerâmica';Object.defineProperty(o,'text',{configurable:true,writable:true,value:["Fábrica de tijolos, telhas e louça de barro: uma das primeiras indústrias que vieram para a Vila Prudente depois da fábrica de chocolates."]});}
+   const o2=ob('n1418');if(o2){o2.name='Fábrica de louças';Object.defineProperty(o2,'text',{configurable:true,writable:true,value:["Pratos, xícaras e potes de louça. A Vila Prudente começa a ter várias fabriquinhas, mas em volta ainda é quase tudo campo."]});}}
+  /* nomes: MOOCA no meio do bairro grande; VILA PRUDENTE no núcleo */
+  try{const L=LABELS_22.find(l=>l[0]==='MOOCA');if(L){L[1]=186;L[2]=140;}const V=LABELS_22.find(l=>l[0]==='VILA PRUDENTE');if(V){V[1]=226;V[2]=180;}}catch(_){}
+  /* gente */
+  const G=[[192,150,'operario','Ferreiro da Mooca',["Malho o ferro desde os doze anos. Aprendi com meu pai, lá na Calábria."]],
+    [210,150,'tecela','Costureira de sacaria',["Costuro saco de café em casa, por peça. Cem sacos por dia, se as crianças deixarem!"]],
+    [225,150,'operario','Operário da tecelagem nova',["A fábrica cresce, o bairro cresce. Onde meu avô via chácara, agora tem rua, vila e chaminé."]],
+    [196,158,'crianca','Menino da gasosa',["Eu entrego gasosa de carrocinha. Ganho um tostão por engradado... e às vezes uma garrafa de presente!"]],
+    [212,165,'dona','Dona do armazém',["Vendo fiado para meio bairro. Quando a fábrica atrasa o pagamento, o armazém também fica sem dinheiro."]],
+    [227,167,'carregador','Carroceiro de tijolos',["Levo tijolo da olaria para as obras. A Mooca não para de crescer: cada semana sobe uma vila nova."]],
+    [200,170,'colono','Imigrante português',["Vim do Minho com a família. Primeiro moramos num cortiço do Brás; agora alugamos uma casinha aqui na Mooca."]],
+    [226,183,'tecela','Bombonzeira da Vila Prudente',["Embrulho bombom em papel colorido, um por um. O cheiro de chocolate fica na roupa até em casa!"]],
+    [230,190,'crianca','Menina da Vila Prudente',["Minha vila é pequenininha: a fábrica, umas casas e o resto é pasto. Para ir à escola, ando até o Ipiranga."]]];
+  let ng=0;G.forEach(([x,y,spr,name,lines],i)=>{const p=findFree(S,x,y,6);if(!p)return;const sp=CHAR_ORDER.includes(spr)?spr:(CHAR_ORDER.includes('rt_'+spr)?'rt_'+spr:'colono');
+    addNPCs([{id:'moocaS22n_'+i,spr:sp,x:p[0],y:p[1],dir:'down',name,lines,diary:name+', 1922: '+lines[0]}],S);ng++;});
+  window.__moocaS22log={quadras:Q.map(q=>[q.x0,q.y0,q.x1,q.y1].join(',')),novos:NOVOS.length,fabricas:IND.length,travessas:trav,patio:np,gente:ng};
+}catch(e){console.warn('[bairros22 mooca]',e);}},0);
+/*__BAIRROS22_I_END__*/
 
 /* =========================================================
    NOMES DAS RUAS NO CHÃO E NO MAPA (1922)
