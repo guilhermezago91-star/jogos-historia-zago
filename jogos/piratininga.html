@@ -19434,9 +19434,7 @@ window.__paulista82Ready=Promise.all(ready);
     /* 6. personagens novos na rua */
     for(const n of novos){try{if(npcs.some(q=>q.id===n.id))continue;const p=perto(n.alvo[0],n.alvo[1],null,',.dD');if(!p)continue;
       const q={id:n.id,spr:n.spr,x:p[0],y:p[1],dir:'down',name:n.name,lines:n.lines,diary:n.diary||n.name,scene:S};npcs.push(q);if(!tudoAlcancavel()){npcs.pop();continue;}}catch(_){}}
-    for(const id of ['mulherBaeta30','baetaMissa30a','baetaMissa30b'])BAETA.add(id);
-    for(const n of npcs){if(n.scene!==S)continue;if(/^(Tropeiro|Viajante|Estudante|Carregador do Caminho do Mar)/.test(n.name||'')||n.id==='poncho30')PONCHO.add(n.id);}
-    for(const w of walkers){if(w.scene!==S||w.mules||w.horse||w.mounted)continue;const nm=w.name||'';if(/^Moradora$|^Vendedora$/.test(nm))BAETA.add('w:'+w.id);else if(/^Tropeiro$|^Estudante|^Viajante$/.test(nm)&&!/cavalo|montad|mula/i.test(nm))PONCHO.add('w:'+w.id);}
+    /* ===== v160 — 1830: SEM PONCHOS E BAETAS PINTADOS POR CIMA DOS BONECOS (voltam como bonecos desenhados) (pedido do professor, 20/11/2026) ===== */
     /* 7. fontes espalhadas: longe umas das outras */
     const fontes=()=>objects.filter(o=>/^f30_|^f[A-Z][A-Za-z0-9]*30$/.test(o.id||'')&&o.scene===S);
     for(const [id,f] of Object.entries(FON)){try{if(ob(id))continue;const p=perto(f.alvo[0],f.alvo[1],(x,y)=>fontes().every(o=>Math.max(Math.abs(o.x-x),Math.abs(o.y-y))>=3)&&!npcs.some(n=>n.scene===S&&Math.abs(n.x-x)+Math.abs(n.y-y)<2),',.dD');if(!p)continue;
