@@ -14087,6 +14087,67 @@ setTimeout(function(){try{
   window.__linha22log={muros:nm,postes:np,porteiras:grupos.length,gente:nn};
 }catch(e){console.warn('[bairros22 linha]',e);}},0);
 /*__BAIRROS22_F_END__*/
+/*__BAIRROS22_G_START__*/
+/* ===== v183 — RIO ARICANDUVA SÓ NA FOZ (perto do Tietê, entre Tatuapé e Penha); NO LUGAR DO RESTO, RUAS, CASINHAS E QUINTAIS NO BELENZINHO E CHÁCARAS NA VILA PRUDENTE (pedido do professor, 20/11/2026) ===== */
+/* O Aricanduva de verdade vem do sudeste (Vila Formosa, Carrão) e não corta o Belenzinho. Roda por último: nada muda de lugar. Longe do centro. */
+setTimeout(function(){try{
+  if(!SCN.sp22)return;const S='sp22',M=SCN.sp22.map,H=M.length,X0=200,X1=226,FOZ=37;
+  const h=(x,y,s)=>{let n=(x*374761393+y*668265263+s*1442695041)|0;n=(n^(n>>>13))*1274126177;return ((n^(n>>>16))>>>0)/4294967296;};
+  const rio=c=>c==='W'||c==='B'||c==='R';
+  const tirados=[];
+  for(let y=FOZ+1;y<H;y++){const row=M[y];if(!row)continue;let a=-1,b=-1;
+    for(let x=X0;x<=X1;x++)if(rio(row[x])){if(a<0)a=x;b=x;}
+    if(a<0)continue;
+    while(a-1>=X0&&row[a-1]==='V')a--;while(b+1<=X1&&row[b+1]==='V')b++;     // mato da margem sai junto
+    const rua=row.slice(a,b+1).includes('R')||(y>112&&row[a-1]==='d'&&row[a-2]==='d'&&row[b+1]==='d'&&row[b+2]==='d');   // rua que atravessava o rio
+    const cidade=y>=61&&y<=112;                                                // Belenzinho
+    for(let x=a;x<=b;x++){row[x]=rua?'d':(cidade?(h(x,y,7)<.3?',':'k'):(y>112&&h(x,y,11)<.14?'T':'.'));tirados.push([x,y]);}
+  }
+  /* a linha da Central atravessava o rio por uma ponte: agora segue no chão */
+  if(typeof RAILT22!=='undefined')for(const [k,t] of RAILT22){if(!t.bridge)continue;const [x,y]=k.split(',').map(Number);if(x<X0||x>X1||y<=FOZ)continue;t.bridge=false;M[y][x]='Y';}
+  /* o nome do rio vai para a foz */
+  try{const L=LABELS_22.find(l=>l[0]==='Rio Aricanduva');if(L){L[1]=213;L[2]=31;}}catch(_){}
+  /* ocupação atual */
+  const occ=new Set();for(const q of objects)if(q.scene===S&&!q.walker&&q.x!=null)for(let y=q.y;y<q.y+(q.h||1);y++)for(let x=q.x;x<q.x+(q.w||1);x++)occ.add(x+','+y);
+  for(const n of npcs)if(n.scene===S)occ.add(n.x+','+n.y);
+  const livre=(x,y,w,hh,ok)=>{for(let j=y;j<y+hh;j++)for(let i=x;i<x+w;i++){const c=M[j]&&M[j][i];if(!c||!ok.includes(c)||occ.has(i+','+j))return false;}return true;};
+  const marca=(x,y,w,hh)=>{for(let j=y;j<y+hh;j++)for(let i=x;i<x+w;i++)occ.add(i+','+j);};
+  const ruaEmbaixo=(x,y,w)=>{for(let i=x;i<x+w;i++)if(!'dDe'.includes((M[y]&&M[y][i])||'#'))return false;return true;};
+  const NOVOS=[];
+  /* Belenzinho: casinhas de operários de frente para a rua, na faixa onde era o rio */
+  const IM={};const img=k=>IM[k]||(IM[k]=(()=>{const i=new Image();i.src=(typeof A!=='undefined'&&A['IND_mod_'+k])||'';return i;})());
+  const dm=(c,k,x,base)=>{const i=img(k);if(i.complete&&i.naturalWidth)c.drawImage(i,Math.round(x),Math.round(base-i.height));return i.width||0;};
+  let nc=0;
+  for(let y=61;y<=112;y++)for(let x=X0;x<=X1;x++){
+    for(const [k,w] of [['casa_operaria_dupla',5],['casa_operaria',3]]){if(typeof A==='undefined'||!A['IND_mod_'+k])continue;
+      if(!livre(x,y,w,2,'k,.p')||!ruaEmbaixo(x,y+2,w))continue;
+      if(!tirados.some(([tx,ty])=>tx>=x&&tx<x+w&&ty>=y&&ty<y+2))continue;              // só na faixa do antigo rio
+      const o={id:'casaRio22_'+nc++,scene:S,x,y,w,h:2,name:w===5?'Casas de operários':'Casa de operário',
+        text:["Casas novas de operários no Belenzinho, de frente para a rua de terra. Atrás, o quintal com horta.","O bairro cresce depressa: as fábricas da linha da Central precisam de gente morando perto."],
+        draw:function(c,PX,PY){const b=PY+32;c.fillStyle='rgba(20,14,8,.22)';c.fillRect(PX+3,b,w*16-6,3);const iw=img(k).width||0;dm(c,k,PX+Math.round((w*16-iw)/2),b);}};
+      objects.push(o);NOVOS.push(o);marca(x,y,w,2);break;}}
+  /* Vila Prudente: chácaras e uma olaria no terreno que era beira de rio */
+  if(typeof spDraw==='function'){let nq=0;
+    const POS=[['chacara',6,3,'Chácara de portugueses',["Chácara de uma família portuguesa: horta, pomar, galinhas e uma vaca leiteira.","De madrugada, a carroça leva verdura e leite para as quitandas do Belenzinho e do Brás."]],
+               ['olaria',4,3,'Olaria',["Olaria: o barro é amassado, moldado em tijolo e telha e queimado no forno.","Cada casinha nova da cidade precisa de milhares de tijolos. As olarias não param."]],
+               ['chacara',6,3,'Chácara de italianos',["Chácara de uma família italiana: parreira de uva, tomate e verdura para vender na cidade."]],
+               ['olaria',4,3,'Olaria da várzea',["Mais uma olaria: os tijolos secam ao sol em fileiras antes de ir para o forno.","O carroceiro leva a carga para as obras do Belenzinho e da Mooca."]],
+               ['chacara',6,3,'Chácara de espanhóis',["Família vinda da Andaluzia: cuidam da horta e vendem ovos e galinha na feira."]]];
+    for(let y=114;y<=196&&nq<POS.length;y++)for(let x=X0;x<=X1&&nq<POS.length;x++){const [sp,w,hh,name,text]=POS[nq];
+      if(!livre(x,y,w,hh,'.,T')||!tirados.some(([tx,ty])=>tx>=x&&tx<x+w&&ty>=y&&ty<y+hh))continue;
+      for(let j=y;j<y+hh;j++)for(let i=x;i<x+w;i++)if(M[j][i]==='T')M[j][i]='.';
+      const o={id:'chacRio22_'+nq,scene:S,x,y,w,h:hh,draw:spDraw(sp,w,hh),name,text};objects.push(o);NOVOS.push(o);marca(x-1,y-1,w+2,hh+2);nq++;y+=hh;}}
+  /* gente: quem trabalha nas chácaras e nas olarias, e quem mora nas casinhas novas */
+  const GT=[['chacRio22_0','colono','Chacareiro português',["Acordo antes do sol para colher couve e alface. Às quatro da manhã a carroça já está na estrada para o Brás.","Meu avô plantava assim em Trás-os-Montes. Aqui a terra é boa e a cidade compra tudo."]],
+    ['chacRio22_1','carregador','Oleiro',["Amasso o barro com os pés, ponho na fôrma e deixo secar. Depois, dois dias no forno.","Cada casinha de operário leva uns oito mil tijolos. Serviço não falta!"]],
+    ['chacRio22_2','dona','Nonna da chácara',["Na minha chácara tem parreira. Em março a família toda pisa a uva e faz o vinho do ano."]],
+    ['casaRio22_0','crianca','Menina da rua nova',["Minha rua é nova: antes era só mato. Agora tem casa, tem vizinho e tem campinho para jogar bola!"]]];
+  GT.forEach(([oid,spr,name,lines],i)=>{const o=objects.find(q=>q.scene===S&&q.id===oid);if(!o)return;const p=findFree(S,o.x+(o.w>>1),o.y+o.h+1,6);if(!p)return;
+    const sp=CHAR_ORDER.includes(spr)?spr:(CHAR_ORDER.includes('rt_'+spr)?'rt_'+spr:'colono');
+    addNPCs([{id:'rio22_'+i,spr:sp,x:p[0],y:p[1],dir:'down',name,lines,diary:name+', 1922: '+lines[0]}],S);});
+  window.__rio22log={tirados:tirados.length,casas:nc,chacaras:NOVOS.length-nc};
+}catch(e){console.warn('[bairros22 rio]',e);}},0);
+/*__BAIRROS22_G_END__*/
 
 /* =========================================================
    NOMES DAS RUAS NO CHÃO E NO MAPA (1922)
