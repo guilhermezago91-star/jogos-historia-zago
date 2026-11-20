@@ -1796,7 +1796,8 @@ for(const [x,z] of [[2.7,-57],[-2.7,-53],[2.8,-35]]){const g=groupAt(x,z,0);cyl(
 for(const [x,z,r,skin] of [[-14,-49,1.1,0x8f6546],[-12,-52,.4,0x6e4630],[-9,-50,2.3,0xb98a64]]){
   const f=placeFig(makeFigure({skin,body:0xe8e0cc,legs:0x6a5038,barefoot:true}),x,z,r,.7);f.gesture=2+rnd()*2;
 }
-// Guardas e soldados em pontos importantes do largo e do porto.for(const [x,z,r] of [[23,9,Math.PI],[29,11,Math.PI],[29,-103,-2.2],[34,-115,-2.5]]){
+// Guardas e soldados em pontos importantes do largo e do porto.
+for(const [x,z,r] of [[23,9,Math.PI],[29,11,Math.PI],[29,-103,-2.2],[34,-115,-2.5]]){
   const f=placeFig(makeFigure({skin:0xd8ae88,body:0x2f4a8a,coat:0x2f4a8a,legs:0xe8e0cc,hat:'tri',sleeve:0x2f4a8a,belts:true}),x,z,r,.98);f.gesture=1.1;
 }
 // Frades e pessoas ligadas aos conventos.

@@ -151,7 +151,8 @@ function birds30(n,color,span,make){const wing=new THREE.BufferGeometry();wing.s
 // [13] urubus planando sobre os morros (eram vistos limpando o lixo da cidade)
 { const B=birds30(7,0x1b1816,.95,()=>({cx:[15,-60,-20,40][Math.floor(R30()*4)],cz:[72,40,-95,-80][Math.floor(R30()*4)],r:14+R30()*16,y:30+R30()*16,a:R30()*6.28,v:(.12+R30()*.1)*(R30()<.5?1:-1)}));
   V30.upd.push(dt=>{const vis=!inPalace&&!eco30();if(vis){B.st.forEach((b,i)=>{b.a+=b.v*dt;B.draw(i,b.cx+Math.cos(b.a)*b.r,b.y,b.cz+Math.sin(b.a)*b.r,-b.a+(b.v>0?0:Math.PI),.12);});}B.done(vis);});}
-// [14] morcegos ao anoitecer perto do Castelo{ const B=birds30(8,0x15121a,.32,()=>({cx:15+R30()*10,cz:62+R30()*14,r:4+R30()*6,y:10+R30()*8,a:R30()*6.28,v:(1+R30())*(R30()<.5?1:-1),f:R30()*6}));
+// [14] morcegos ao anoitecer perto do Castelo
+{ const B=birds30(8,0x15121a,.32,()=>({cx:15+R30()*10,cz:62+R30()*14,r:4+R30()*6,y:10+R30()*8,a:R30()*6.28,v:(1+R30())*(R30()<.5?1:-1),f:R30()*6}));
   V30.upd.push(dt=>{const n=sm30(.35,.7,dusk);const vis=n>.05&&!inPalace&&!eco30();if(vis){const t=performance.now()/1000;B.st.forEach((b,i)=>{b.a+=b.v*dt;B.draw(i,b.cx+Math.cos(b.a)*b.r+Math.sin(t*3+b.f),b.y+Math.sin(t*2+b.f),b.cz+Math.sin(b.a)*b.r,-b.a,Math.sin(t*16+b.f)*.7);});}B.done(vis);});}
 // [15] pombos no Largo do Paço que levantam voo quando Tonico chega perto
 { const N=12,body=new THREE.SphereGeometry(.13,8,6);body.scale(1,.8,1.5);const m=new THREE.MeshLambertMaterial({color:0x8a8f9a});const im=new THREE.InstancedMesh(body,m,N);im.frustumCulled=false;scene.add(im);
