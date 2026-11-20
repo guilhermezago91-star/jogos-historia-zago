@@ -12954,17 +12954,39 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
       c.fillStyle='#141b1b';c.fillRect(X+4,Y-2,4,6);for(const wx of [6,16]){c.beginPath();c.arc(X+wx,Y+13,2.5,0,7);c.fill();}}
     else drawTremLado(c,X,Y,0,{larga:false,cor:cfg.cor,cor2:'#a83a30'});
     c.restore();};
-  const vagH=(c,X,Y,cfg,peq)=>{const w=peq?20:30,hh=peq?10:12,top=Y+16-hh-3;
-    c.fillStyle='rgba(20,27,27,.3)';c.fillRect(X,Y+13,w,3);c.fillStyle='#141b1b';c.fillRect(X,top,w,hh);c.fillStyle=cfg.cor;c.fillRect(X+1,top+1,w-2,hh-2);
-    if(cfg.carga){c.fillStyle='#e3d6b0';for(let s=0;s<4;s++)c.fillRect(X+3+s*6,top+3,5,hh-6);}else{c.fillStyle='#e3f1f5';for(let w2=0;w2<(peq?2:4);w2++)c.fillRect(X+3+w2*7,top+3,5,3);c.fillStyle=cfg.cor2;c.fillRect(X+1,top+hh-4,w-2,1);}
+  /* v163: cada vagão leva uma carga diferente (veja CARGA88, mais abaixo) */
+  const CORES_CARGA={cafe:['#7a4a2a','#e3d6b0','#b89a6a'],algodao:['#6a5a4a','#f4f0e6','#c8c0b0'],gado:['#7a5a3a','#5a3a24','#e8dcc0'],carvao:['#4a4a52','#1e1e24','#3a3a44'],
+    madeira:['#6a4a2a','#a8743e','#7a5230'],caixas:['#6a5a4a','#c8a06a','#8a6a3a'],ferro:['#4a4a52','#8d977f','#5a5a66'],carne:['#e8e4dc','#c84a3a','#b0aca4']};
+  const vagH=(c,X,Y,cfg,peq,tipo)=>{const w=peq?20:30,hh=peq?10:12,top=Y+16-hh-3;
+    c.fillStyle='rgba(20,27,27,.3)';c.fillRect(X,Y+13,w,3);c.fillStyle='#141b1b';c.fillRect(X,top,w,hh);
+    const C=CORES_CARGA[tipo];
+    if(!C||tipo==='pass'){c.fillStyle=cfg.cor;c.fillRect(X+1,top+1,w-2,hh-2);c.fillStyle='#e3f1f5';for(let w2=0;w2<(peq?2:4);w2++)c.fillRect(X+3+w2*7,top+3,5,3);c.fillStyle=cfg.cor2;c.fillRect(X+1,top+hh-4,w-2,1);}
+    else{c.fillStyle=C[0];c.fillRect(X+1,top+1,w-2,hh-2);
+      if(tipo==='cafe'||tipo==='algodao'){c.fillStyle=C[1];for(let s=0;s<(peq?3:4);s++)c.fillRect(X+3+s*6,top+2,5,hh-5);c.fillStyle=C[2];for(let s=0;s<(peq?3:4);s++)c.fillRect(X+3+s*6,top+hh-4,5,1);}
+      else if(tipo==='carvao'){c.fillStyle=C[1];c.fillRect(X+2,top-2,w-4,4);for(let s=0;s<w-4;s+=3)c.fillRect(X+2+s,top-3-((s*7)%3),2,2);c.fillStyle=C[2];c.fillRect(X+2,top+3,w-4,hh-5);}
+      else if(tipo==='madeira'){for(let s=0;s<3;s++){c.fillStyle=C[1];c.fillRect(X+2,top-1+s*3,w-4,2);c.fillStyle=C[2];c.fillRect(X+2,top+s*3,2,1);c.fillRect(X+w-4,top+s*3,2,1);}}
+      else if(tipo==='caixas'){for(let s=0;s<(peq?2:3);s++){c.fillStyle='#141b1b';c.fillRect(X+2+s*9,top,8,hh-3);c.fillStyle=C[1];c.fillRect(X+3+s*9,top+1,6,hh-5);c.fillStyle=C[2];c.fillRect(X+3+s*9,top+(hh-3)/2,6,1);}}
+      else if(tipo==='ferro'){c.fillStyle=C[1];for(let s=0;s<3;s++)c.fillRect(X+2,top+1+s*3,w-4,1);}
+      else if(tipo==='gado'){c.fillStyle=C[2];for(let s=0;s<w-4;s+=4)c.fillRect(X+2+s,top+1,1,hh-3);c.fillStyle=C[1];for(let s=0;s<(peq?2:3);s++){c.fillRect(X+4+s*9,top+2,5,3);c.fillStyle='#e8dcc0';c.fillRect(X+4+s*9,top+2,1,1);c.fillStyle=C[1];}}
+      else if(tipo==='carne'){c.fillStyle=C[0];c.fillRect(X+1,top+1,w-2,hh-2);c.fillStyle=C[1];c.fillRect(X+3,top+hh/2-1,w-6,2);c.fillStyle=C[2];c.fillRect(X+1,top+1,w-2,1);}}
     for(const wx of (peq?[4,16]:[6,24])){c.fillStyle='#141b1b';c.beginPath();c.arc(X+wx,Y+12,2.5,0,7);c.fill();}};
   const locoV=(c,X,Y,dir,cfg,peq)=>{const w=peq?10:14,l=peq?20:30,x=X+(16-w)/2;c.fillStyle='rgba(20,27,27,.3)';c.fillRect(x+2,Y+3,w,l);
     c.fillStyle='#141b1b';c.fillRect(x,Y,w,l);c.fillStyle='#262230';c.fillRect(x+1,Y+1,w-2,l-2);
     const cab=dir>0?Y+1:Y+l-9;c.fillStyle=peq?cfg.cor:'#a83a30';c.fillRect(x+1,cab,w-2,8);
     const ch=dir>0?Y+l-7:Y+3;c.fillStyle='#141b1b';c.fillRect(x+w/2-2,ch,4,4);c.fillStyle='#4e484a';c.fillRect(x+w/2-1,ch+1,2,2);};
-  const vagV=(c,X,Y,cfg,peq)=>{const w=peq?10:14,l=peq?18:30,x=X+(16-w)/2;c.fillStyle='rgba(20,27,27,.3)';c.fillRect(x+2,Y+3,w,l);
-    c.fillStyle='#141b1b';c.fillRect(x,Y,w,l);c.fillStyle=cfg.cor;c.fillRect(x+1,Y+1,w-2,l-2);
-    if(cfg.carga){c.fillStyle='#e3d6b0';for(let s=0;s<4;s++)c.fillRect(x+3,Y+3+s*7,w-6,5);}else{c.fillStyle=cfg.cor2;c.fillRect(x+2,Y+2,w-4,l-4);c.fillStyle=cfg.cor;c.fillRect(x+3,Y+3,w-6,l-6);}};
+  const vagV=(c,X,Y,cfg,peq,tipo)=>{const w=peq?10:14,l=peq?18:30,x=X+(16-w)/2;c.fillStyle='rgba(20,27,27,.3)';c.fillRect(x+2,Y+3,w,l);
+    c.fillStyle='#141b1b';c.fillRect(x,Y,w,l);const C=CORES_CARGA[tipo];
+    if(!C||tipo==='pass'){c.fillStyle=cfg.cor;c.fillRect(x+1,Y+1,w-2,l-2);c.fillStyle=cfg.cor2;c.fillRect(x+2,Y+2,w-4,l-4);c.fillStyle=cfg.cor;c.fillRect(x+3,Y+3,w-6,l-6);return;}
+    c.fillStyle=C[0];c.fillRect(x+1,Y+1,w-2,l-2);
+    if(tipo==='carne'){c.fillStyle=C[1];c.fillRect(x+w/2-1,Y+3,2,l-6);return;}
+    if(tipo==='gado'){c.fillStyle=C[1];for(let s=0;s<(peq?2:3);s++)c.fillRect(x+3,Y+3+s*9,w-6,6);return;}
+    c.fillStyle=C[1];for(let s=0;s<(peq?2:4);s++)c.fillRect(x+3,Y+3+s*7,w-6,5);c.fillStyle=C[2];for(let s=0;s<(peq?2:4);s++)c.fillRect(x+3,Y+7+s*7,w-6,1);};
+  /* que carga vai em cada vagão: na Inglesa, café e algodão descem para Santos; carvão, ferro e caixotes sobem do porto.
+     No Norte, passageiros e café do vale do Paraíba. No tramway de Santo Amaro, passageiros; na volta para a cidade, lenha e a carne do Matadouro. */
+  const CARGA88={spr:{ida:['cafe','cafe','algodao','cafe','gado'],volta:['carvao','ferro','caixas','carvao','pass']},
+    norte:{ida:['pass','cafe'],volta:['pass','caixas']},tram:{ida:['pass','caixas'],volta:['pass','carne']}};
+  const tipoVag=(tr,i)=>{const C=CARGA88[tr.k];if(!C)return 'pass';const L=tr.ida?C.ida:C.volta;return L[(i-1)%L.length];};
+  window.__CARGA88=CARGA88;
   const t0=trainUpdate;trainUpdate=function(dt){
     if(typeof trainXUpdate==='function')trainXUpdate(dt);
     if(trainS.wait<=0&&trainS.x>30*T)trainS.x=30*T;
@@ -12985,8 +13007,8 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
       for(let i=0;i<=tr.n;i++){const s=tr.ida?head-i*tr.gap:head+i*tr.gap;if(s<0||s>tr.P.L)continue;
         const q=pos(tr.P,s),sg=q.sg*dirS,X=Math.round(q.x-camX),Y=Math.round(q.y-camY);
         if(X<-60||X>VW+60||Y<-60||Y>VH+60)continue;
-        if(q.h){const XX=X-(i===0?(sg>0?14:16):(peq?10:15));list.push({z:q.y+T,f:()=>{i===0?locoH(ctx,XX,Y,sg,cfg,peq):vagH(ctx,XX,Y,cfg,peq);}});}
-        else{const L=i===0?(peq?20:30):(peq?18:30),YY=Y+8-L/2;list.push({z:q.y+L/2+8,f:()=>{i===0?locoV(ctx,X,YY,sg,cfg,peq):vagV(ctx,X,YY,cfg,peq);}});}}}
+        if(q.h){const XX=X-(i===0?(sg>0?14:16):(peq?10:15));list.push({z:q.y+T,f:()=>{i===0?locoH(ctx,XX,Y,sg,cfg,peq):vagH(ctx,XX,Y,cfg,peq,tipoVag(tr,i));}});}
+        else{const L=i===0?(peq?20:30):(peq?18:30),YY=Y+8-L/2;list.push({z:q.y+L/2+8,f:()=>{i===0?locoV(ctx,X,YY,sg,cfg,peq):vagV(ctx,X,YY,cfg,peq,tipoVag(tr,i));}});}}}
   };
 }catch(e){console.warn('ferrovias 1888',e);}})();
 
@@ -13286,6 +13308,167 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
   window.__predios88=feito;
   try{if(cur==='sp88'){buildOcc();buildStatic();}}catch(_){}
 }catch(e){console.warn('predios 1888',e);}})();
+
+/* ===== v163 — 1888: TRAMWAY DE SANTO AMARO (MISSÃO E VIAGEM), BANDEIRAS DO IMPÉRIO, CANTAREIRA, TROPAS E CARROÇAS (pedido do professor, 20/11/2026) ===== */
+/* O Tramway de Santo Amaro: trem a vapor de bitola estreita inaugurado em 1886, com a presença de D. Pedro II.
+   Paradas: São Joaquim, Vila Mariana, Encontro, Volta Redonda e Santo Amaro (pela estrada do Vergueiro e do Jabaquara).
+   Em 1900 a Light comprou a companhia; em 7/7/1913 o trem virou bonde elétrico; a linha Sé–Santo Amaro foi a última
+   linha de bonde da cidade, desativada em 27/3/1968. Fontes: Wikipédia (Tramway de Santo Amaro); Subprefeitura de
+   Santo Amaro (histórico: colônia alemã de 1829; cereais, madeira, carvão e pedra de cantaria para a capital). */
+(function(){try{
+  if(!SCN.sp88)return;
+  const M=SCN.sp88.map;
+  const ob=id=>objects.find(o=>o.id===id&&(o.scene||'pira')==='sp88');
+  const trilho=(x,y)=>window.__RAIL88&&window.__RAIL88.has(x+','+y);
+  const feito=[];
+
+  /* ---------- 1) bandeiras do Império nos prédios do governo ---------- */
+  const bandeira=function(c,X,Y){const t=performance.now()/1000;
+    c.fillStyle='rgba(20,27,27,.25)';c.fillRect(X+6,Y+14,5,2);
+    c.fillStyle='#3a2a1e';c.fillRect(X+7,Y-22,2,37);c.fillStyle='#c8a040';c.fillRect(X+6,Y-24,4,2);
+    for(let i=0;i<13;i++){const dy=Math.round(Math.sin(t*4-i*.5)*1.2);/* pano verde com o losango amarelo e o brasão */
+      for(let j=0;j<9;j++){const cx=i-6,cy=j-4;const los=Math.abs(cx)/6+Math.abs(cy)/4<=1;const br=cx*cx+cy*cy<=4;
+        c.fillStyle=br?(cy<-1?'#e8c040':'#2a4a8a'):los?'#f1c42a':'#1e7a3a';c.fillRect(X+9+i,Y-21+j+dy,1,1);}}
+    c.fillStyle='#e8f0f0';c.fillRect(X+15,Y-17+Math.round(Math.sin(t*4-3)*1.2),1,1);};
+  const TXTB=["A bandeira do Império do Brasil: verde, com um losango amarelo e o brasão do imperador no meio.","Em 1888 o Brasil ainda é um império, governado por D. Pedro II. Daqui a um ano e meio, em novembro de 1889, vem a República e a bandeira muda."];
+  for(const [id,dx,dy] of [['palacio',-1,2],['camara',-1,2],['quartel',3,1],['quartel88',-1,2],['estacao',-1,2]]){const o=ob(id);if(!o)continue;
+    const q=findFree('sp88',o.x+(dx<0?-1:o.w),o.y+dy,2);if(!q||trilho(q[0],q[1]))continue;
+    objects.push({id:'bandeira88_'+id,scene:'sp88',x:q[0],y:q[1],w:1,h:1,name:'Bandeira do Império',draw:bandeira,text:TXTB});feito.push('bandeira:'+id);}
+
+  /* ---------- 2) Companhia Cantareira: água encanada chegando ---------- */
+  {const r=ob('reservatorio');if(r){r.name='Reservatório da Companhia Cantareira';
+     r.text=["O reservatório da Companhia Cantareira e Esgotos, fundada em 1877. A água vem das nascentes da Serra da Cantareira, ao norte, por canos de ferro.","Pela primeira vez a água chega dentro de algumas casas. Mas quase todo mundo ainda busca água nos chafarizes, com potes e barris."];feito.push('reservatorio');}
+   const desenhaObra=function(c,X,Y){const w=3*T;c.fillStyle='#5e3a1e';c.fillRect(X+1,Y+4,w-2,9);c.fillStyle='#3a2416';c.fillRect(X+2,Y+6,w-4,5);
+     c.fillStyle='#4a4a52';c.fillRect(X+3,Y+8,w-6,3);c.fillStyle='#8d977f';c.fillRect(X+3,Y+8,w-6,1);
+     c.fillStyle='#9c8156';for(let i=0;i<w;i+=5)c.fillRect(X+i,Y+2,4,3);c.fillStyle='#7d6640';c.fillRect(X,Y+12,w,3);
+     c.fillStyle='#141b1b';c.fillRect(X+w-10,Y-6,8,8);c.fillStyle='#4a4a52';c.fillRect(X+w-9,Y-5,6,6);c.fillStyle='#6a6a76';c.fillRect(X+w-9,Y-5,6,1);};
+   const base=ob('reservatorio');let q=null;
+   if(base){const grama=(x,y)=>M[y]&&',.'.includes(M[y][x])&&!trilho(x,y)&&!objects.some(o=>(o.scene||'pira')==='sp88'&&x>=o.x-1&&x<o.x+(o.w||1)+1&&y>=o.y-1&&y<o.y+(o.h||1)+1);
+     for(let r=1;r<10&&!q;r++)for(let y=base.y-r;y<=base.y+r&&!q;y++)for(let x=base.x-r;x<=base.x+r&&!q;x++)if(grama(x,y)&&grama(x+1,y)&&grama(x+2,y)&&grama(x+1,y+1))q=[x,y];}
+   if(q){objects.push({id:'obraCantareira88',scene:'sp88',x:q[0],y:q[1],w:3,h:1,name:'Vala dos canos da Cantareira',draw:desenhaObra,
+       text:["Uma vala aberta na rua, com canos de ferro dentro. É a Companhia Cantareira levando água encanada para as casas.","Os canos vêm da Inglaterra, pelo porto de Santos e pela ferrovia."]});
+     const n=findFree('sp88',q[0]+1,q[1]+1,3);
+     if(n&&!trilho(n[0],n[1]))addNPCs([{id:'encanador88',spr:'ferreiro',x:n[0],y:n[1],dir:'up',name:'Operário da Cantareira',
+       lines:["Trabalho para a Companhia Cantareira e Esgotos. A gente cava a vala, deita o cano de ferro e fecha de novo.","A água vem lá da Serra da Cantareira. Quem pode pagar já tem torneira em casa; o resto vai ao chafariz.","E o esgoto? Por enquanto, na maior parte da cidade, ainda vai para a rua e para os rios."],
+       diary:"Companhia Cantareira e Esgotos (1877): água das nascentes da Serra da Cantareira em canos de ferro; em 1888, poucas casas têm água encanada."}],'sp88');
+     feito.push('cantareira');}}
+
+  /* ---------- casas, chiqueiros e prédios que ficaram em cima da rua vão para um terreno ao lado ---------- */
+  {const ALVO=/^(n\d+|h\d+|chiqueiro.*|chacaraL\d+|tendal88|estSJ88|quiosque88|obraCantareira88|cortBras2)$/;
+   const RUA='dDRS';const OCCW=new Set();
+   for(const w of walkers){if(w.scene!=='sp88'||!w.path)continue;const P=w.path;for(let i=0;i<P.length-1;i++){let [x,y]=P[i];const [x1,y1]=P[i+1];while(true){OCCW.add(x+','+y);if(x===x1&&y===y1)break;if(x!==x1)x+=Math.sign(x1-x);else y+=Math.sign(y1-y);}}}
+   const naRua=o=>{let n=0;for(let y=o.y;y<o.y+(o.h||1);y++)for(let x=o.x;x<o.x+(o.w||1);x++)if(M[y]&&RUA.includes(M[y][x]))n++;return n;};
+   const terreno=(o,x,y)=>{const w=o.w||1,h=o.h||1;for(let yy=y-1;yy<=y+h;yy++)for(let xx=x-1;xx<=x+w;xx++){const dentro=yy>=y&&yy<y+h&&xx>=x&&xx<x+w;
+       if(!M[yy]||M[yy][xx]===undefined)return false;
+       if(dentro){if(!',.TbV'.includes(M[yy][xx])||trilho(xx,yy)||OCCW.has(xx+','+yy))return false;}
+       if(objects.some(p=>p!==o&&(p.scene||'pira')==='sp88'&&xx>=p.x&&xx<p.x+(p.w||1)&&yy>=p.y&&yy<p.y+(p.h||1)))return false;
+       if(npcs.some(n=>n.scene==='sp88'&&n.x===xx&&n.y===yy))return false;}return true;};
+   let nr=0,nf=0;
+   for(const o of objects.slice()){if((o.scene||'pira')!=='sp88'||!ALVO.test(o.id)||naRua(o)<2)continue;let q=null;
+     for(let r=1;r<=16&&!q;r++)for(let y=o.y-r;y<=o.y+r&&!q;y++)for(let x=o.x-r;x<=o.x+r&&!q;x++){if(Math.max(Math.abs(x-o.x),Math.abs(y-o.y))!==r)continue;if(terreno(o,x,y))q=[x,y];}
+     if(q){for(let y=q[1];y<q[1]+(o.h||1);y++)for(let x=q[0];x<q[0]+(o.w||1);x++)if('Tb'.includes(M[y][x]))M[y][x]='.';o.x=q[0];o.y=q[1];nr++;}
+     else if(/^(n\d+|h\d+|chiqueiro.*|chacaraL\d+)$/.test(o.id)){objects.splice(objects.indexOf(o),1);nf++;}}
+   feito.push('foraDaRua:'+nr+'/'+nf);}
+
+  /* ---------- 3) mais tropas e carroças nas estradas ---------- */
+  {const pode=(x,y)=>M[y]&&M[y][x]!==undefined&&('dDRSe'.includes(M[y][x])||(',.'.includes(M[y][x])&&!trilho(x,y)));
+   const caminhoOk=P=>{for(let i=0;i<P.length-1;i++){let [x,y]=P[i];const [x1,y1]=P[i+1];while(true){if(!pode(x,y)||objects.some(o=>(o.scene||'pira')==='sp88'&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1)))return false;if(x===x1&&y===y1)break;if(x!==x1)x+=Math.sign(x1-x);else y+=Math.sign(y1-y);}}return true;};
+   const L=[
+     {id:'tropaSA88',spr:'tropeiro',name:'Tropa de Santo Amaro',path:[[40,128],[40,108],[60,108]],speed:.7,mules:4,lines:["Tropa vinda de Santo Amaro! Trago farinha, feijão e carvão para vender na cidade.","Os burros andam devagar, mas sobem qualquer ladeira."]},
+     {id:'tropaPenha88',spr:'tropeiro',name:'Tropa da Penha',path:[[148,90],[100,90]],speed:.7,mules:3,lines:["Venho da Penha com milho e toucinho. Hoje tem trem para tudo, mas para os sítios ainda é a tropa que leva e traz."]},
+     {id:'carrocaLeite88',spr:'carrocacafe',name:'Carroça do leiteiro',path:[[1,72],[40,72]],speed:.9,lines:["Leite fresco! Tiro o leite da vaca de manhã cedinho na chácara e venho vender de porta em porta."]},
+     {id:'carrocaLenha88',spr:'carrocacafe',name:'Carroça de lenha',path:[[56,96],[86,96]],speed:.8,lines:["Lenha para o fogão! Quase toda casa cozinha com lenha ou carvão."]},
+     {id:'carrocaCapim88',spr:'carrocacafe',name:'Carroça de capim',path:[[10,10],[10,50]],speed:.8,lines:["Capim para os burros dos bondes e das carroças. A cidade tem centenas de animais para alimentar!"]},
+     {id:'carrocaPipa88',spr:'carrocacafe',name:'Carroça-pipa de água',path:[[0,53],[30,53]],speed:.8,lines:["Água! Encho o barril no chafariz e vendo nas casas que não têm cano da Cantareira."]}];
+   const ok=L.filter(w=>caminhoOk(w.path));addWalkers('sp88',ok);feito.push('tropas:'+ok.map(w=>w.id).join(','));}
+
+  /* ---------- placas e bandeiras que caíram no meio da rua vão para a calçada ---------- */
+  {const meu=/^(placaN_|bandeira88_|placaJundiai|placaSorocaba|placaSantos|placaRio$|placaSantoAmaro)/;let nm=0;
+   for(const o of objects){if((o.scene||'pira')!=='sp88'||!meu.test(o.id)||!M[o.y]||!'dDRS'.includes(M[o.y][o.x]))continue;
+     for(const [dx,dy] of [[0,-1],[0,1],[-1,0],[1,0],[0,-2],[0,2],[-2,0],[2,0],[1,1],[-1,-1],[1,-1],[-1,1]]){const x=o.x+dx,y=o.y+dy;
+       if(M[y]&&',.'.includes(M[y][x])&&!trilho(x,y)&&!objects.some(p=>p!==o&&(p.scene||'pira')==='sp88'&&x>=p.x&&x<p.x+(p.w||1)&&y>=p.y&&y<p.y+(p.h||1))&&!npcs.some(n=>n.scene==='sp88'&&n.x===x&&n.y===y)){o.x=x;o.y=y;nm++;break;}}}
+   feito.push('placasNaCalcada:'+nm);}
+
+  /* ---------- 4) o tramway de Santo Amaro: bilheteiro, missão e a viagem ---------- */
+  const sj=ob('estSJ88');
+  if(sj){const b=findFree('sp88',sj.x+1,sj.y+sj.h+1,3);
+    if(b&&!trilho(b[0],b[1]))addNPCs([{id:'bilheteSJ88',spr:'caixeiro',x:b[0],y:b[1],dir:'down',name:'Bilheteiro do tramway',
+      lines:["Estação São Joaquim, do tramway de Santo Amaro! O trenzinho a vapor vai até Santo Amaro, passando pela Vila Mariana."],
+      diary:"Tramway de Santo Amaro (1886): trem a vapor de São Joaquim até Santo Amaro, pela Vila Mariana."}],'sp88');
+    Object.assign(Q,{tramway88:{era:3,title:'O trem de Santo Amaro',where:'Fale com o bilheteiro do tramway, na Estação São Joaquim (Liberdade).',steps:['Faça a viagem de tramway até Santo Amaro'],step:null,count:0,done:false}});
+    QE3.push('tramway88');Object.assign(GIVER,{bilheteSJ88:['tramway88']});
+    feito.push('tramway');}
+
+  /* o filminho da viagem: uma tela por cima do jogo */
+  const CENAS=[
+    {nome:'Estação São Joaquim',t:["O trenzinho a vapor sai da Liberdade desde 1886.","D. Pedro II veio à inauguração!"],tipo:'cidade'},
+    {nome:'Estrada do Vergueiro',t:["A linha segue pelo caminho velho para o mar,","entre chácaras, pomares e cercas de pau."],tipo:'chacara'},
+    {nome:'Vila Mariana',t:["Parada na Vila Mariana. Ali perto fica o Matadouro:","a carne vai para a cidade no próprio trem."],tipo:'matadouro'},
+    {nome:'Encontro e Volta Redonda',t:["Campos, capoeiras e sítios. É longe!","Por isso o trem é tão importante para quem mora aqui."],tipo:'campo'},
+    {nome:'Santo Amaro',t:["Chegamos! Santo Amaro é uma vila com igreja matriz.","Aqui vivem descendentes dos colonos alemães de 1829."],tipo:'vila'}];
+  const DUR=4.6;
+  function viagem(fim){
+    const cv=document.createElement('canvas');cv.width=320;cv.height=180;
+    cv.style.cssText='position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#141b1b;image-rendering:pixelated;z-index:9999';
+    const bt=document.createElement('button');bt.textContent='Pular';bt.className='btn alt';bt.style.cssText='position:fixed;right:12px;bottom:12px;z-index:10000';
+    document.body.appendChild(cv);document.body.appendChild(bt);
+    const c=cv.getContext('2d');c.imageSmoothingEnabled=false;let t0=performance.now(),acabou=false;
+    const sai=()=>{if(acabou)return;acabou=true;cv.remove();bt.remove();fim&&fim();};bt.onclick=sai;
+    const hsh=(a,b)=>{const v=Math.sin(a*127.1+b*311.7)*43758.5453;return v-Math.floor(v);};
+    const W=320,H=180,base=128;
+    const casa=(x,y,cor)=>{c.fillStyle='#30222a';c.fillRect(x-1,y-17,26,19);c.fillStyle=cor;c.fillRect(x,y-11,24,12);c.fillStyle='#a84a2a';c.fillRect(x-2,y-18,28,8);c.fillStyle='#4e6a8a';c.fillRect(x+4,y-8,4,4);c.fillStyle='#5a3a24';c.fillRect(x+14,y-8,5,9);};
+    const arvore=(x,y,r)=>{c.fillStyle='#5a3a24';c.fillRect(x-1,y-6,3,7);c.fillStyle='#1e5a2a';c.beginPath();c.arc(x,y-10,r,0,7);c.fill();c.fillStyle='#2e7a3a';c.beginPath();c.arc(x-2,y-12,r*.55,0,7);c.fill();};
+    const cerca=(x,y)=>{c.fillStyle='#7a5230';c.fillRect(x,y-8,2,9);c.fillRect(x-6,y-6,14,1);c.fillRect(x-6,y-3,14,1);};
+    const boi=(x,y)=>{c.fillStyle='#30222a';c.fillRect(x,y-7,14,7);c.fillStyle='#c8b898';c.fillRect(x+1,y-6,12,5);c.fillStyle='#30222a';c.fillRect(x+12,y-9,4,4);c.fillRect(x+2,y,1,3);c.fillRect(x+10,y,1,3);};
+    const igreja=(x,y)=>{c.fillStyle='#30222a';c.fillRect(x-1,y-29,32,31);c.fillStyle='#f0ead8';c.fillRect(x,y-22,30,23);c.fillStyle='#30222a';c.fillRect(x+11,y-46,10,20);c.fillStyle='#f0ead8';c.fillRect(x+12,y-45,8,19);
+      c.fillStyle='#a84a2a';c.fillRect(x+10,y-50,12,5);c.fillStyle='#30222a';c.fillRect(x+15,y-56,2,6);c.fillRect(x+13,y-54,6,2);c.fillStyle='#5a3a24';c.fillRect(x+12,y-10,7,11);c.fillStyle='#4e6a8a';c.fillRect(x+14,y-38,4,5);};
+    const trem=(x,y,tt)=>{const bob=Math.floor(tt*10)%2;
+      /* locomotiva de bonde a vapor: caixa fechada, chaminé por cima */
+      c.fillStyle='#141b1b';c.fillRect(x,y-20+bob,30,18);c.fillStyle='#4e6a3a';c.fillRect(x+1,y-19+bob,28,16);c.fillStyle='#f1e4c0';c.fillRect(x+3,y-16+bob,6,5);c.fillRect(x+21,y-16+bob,6,5);
+      c.fillStyle='#141b1b';c.fillRect(x+12,y-27+bob,5,8);c.fillStyle='#30222a';c.fillRect(x-1,y-21+bob,32,2);
+      for(let s=0;s<5;s++){const ph=((tt*.9)+s/5)%1;c.fillStyle='rgba(236,236,236,'+(.8*(1-ph))+')';c.beginPath();c.arc(x+14-ph*40,y-30-ph*20,3+ph*7,0,7);c.fill();}
+      for(let v=0;v<2;v++){const vx=x-28-v*28;c.fillStyle='#141b1b';c.fillRect(vx,y-17,26,15);c.fillStyle=v===1?'#e8e4dc':'#7a4a2a';c.fillRect(vx+1,y-16,24,13);
+        if(v===0){c.fillStyle='#e3f1f5';for(let w=0;w<3;w++)c.fillRect(vx+3+w*7,y-14,5,4);c.fillStyle='#f1c471';c.fillRect(vx+1,y-6,24,1);}else{c.fillStyle='#c84a3a';c.fillRect(vx+3,y-10,20,2);}
+        c.fillStyle='#141b1b';c.fillRect(vx+26,y-8,2,2);for(const wx of [5,20]){c.beginPath();c.arc(vx+wx,y-1,2.5,0,7);c.fill();}}
+      for(const wx of [6,24]){c.fillStyle='#141b1b';c.beginPath();c.arc(x+wx,y-1,3,0,7);c.fill();}};
+    function quadro(){if(acabou)return;const tt=(performance.now()-t0)/1000,k=Math.floor(tt/DUR);
+      if(k>=CENAS.length){
+        const f=tt-CENAS.length*DUR;c.fillStyle='#141b1b';c.fillRect(0,0,W,H);c.textAlign='center';c.fillStyle='#f1c471';c.font='600 13px "Pixelify Sans", sans-serif';c.fillText('E depois?',W/2,40);
+        c.fillStyle='#f2eaf1';c.font='11px "Pixelify Sans", sans-serif';
+        ["Em 1900 a Light comprou a linha.","Em 1913 o trem a vapor virou bonde elétrico.","O bonde de Santo Amaro foi a última linha de bonde","de São Paulo: rodou até 1968.","Hoje o metrô (Linha 5-Lilás) passa perto do antigo caminho."].forEach((l,i)=>c.fillText(l,W/2,66+i*16));
+        if(f>6.5)return sai();requestAnimationFrame(quadro);return;}
+      const C=CENAS[k],lt=tt-k*DUR;
+      const g=c.createLinearGradient(0,0,0,base);g.addColorStop(0,'#7cbce8');g.addColorStop(1,'#dcecf2');c.fillStyle=g;c.fillRect(0,0,W,H);
+      c.fillStyle='#8fa88a';c.beginPath();c.moveTo(0,base-30);for(let x=0;x<=W;x+=6)c.lineTo(x,base-36-Math.sin((x+tt*8)*.02)*8);c.lineTo(W,base);c.lineTo(0,base);c.fill();
+      c.fillStyle=C.tipo==='campo'?'#9ab060':'#86a858';c.fillRect(0,base-24,W,H);
+      const sp=60,off=(tt*sp)%400;
+      for(let i=0;i<6;i++){const x=((i*70-tt*sp*.6)%(W+80)+W+80)%(W+80)-40,y=base-6;
+        if(C.tipo==='cidade'){casa(x,y,i%2?'#e8dcc0':'#f0e0b8');}
+        else if(C.tipo==='chacara'){if(i%2)arvore(x,y,8);else{casa(x,y,'#e8dcc0');cerca(x+30,y);}}
+        else if(C.tipo==='matadouro'){if(i===2){c.fillStyle='#30222a';c.fillRect(x-1,y-21,60,23);c.fillStyle='#d8c8a8';c.fillRect(x,y-15,58,16);c.fillStyle='#8a3a24';c.fillRect(x-2,y-22,62,8);c.fillStyle='#5a3a24';c.fillRect(x+8,y-10,8,11);c.fillRect(x+40,y-10,8,11);}else boi(x,y);}
+        else if(C.tipo==='campo'){arvore(x,y,6+(i%3)*2);}
+        else if(C.tipo==='vila'){if(i===3)igreja(x,y);else casa(x,y,i%2?'#e8dcc0':'#d8e0c8');}}
+      /* trilho */
+      c.fillStyle='#9a8a6a';c.fillRect(0,base,W,5);c.fillStyle='#141b1b';c.fillRect(0,base-1,W,2);c.fillStyle='#5a3a24';for(let x=-(tt*sp*1.6)%8;x<W;x+=8)c.fillRect(x,base+1,5,3);
+      c.fillStyle='#6a8a48';c.fillRect(0,base+5,W,H-base-5);
+      trem(Math.round(W*.6),base,tt);
+      /* textos */
+      c.textAlign='left';c.fillStyle='rgba(20,27,27,.8)';c.fillRect(6,6,W-12,44);c.fillStyle='#f1c471';c.font='600 13px "Pixelify Sans", sans-serif';c.fillText(C.nome,12,21);
+      c.fillStyle='#f2eaf1';c.font='11px "Pixelify Sans", sans-serif';C.t.forEach((l,i)=>c.fillText(l,12,34+i*11));
+      c.fillStyle='rgba(20,27,27,.8)';c.fillRect(6,H-24,W-12,18);c.fillStyle='#e3f1f5';c.font='10px "Pixelify Sans", sans-serif';c.fillText('Tramway de Santo Amaro, 1888',12,H-11);
+      const fa=Math.max(0,1-lt/.4,1-(DUR-lt)/.4);if(fa>0){c.fillStyle='rgba(20,27,27,'+fa+')';c.fillRect(0,0,W,H);}
+      requestAnimationFrame(quadro);}
+    requestAnimationFrame(quadro);}
+  window.__viagemSA88=viagem;
+  {const h0=questHookX;questHookX=function(n){
+    if(n.id==='bilheteSJ88'){const q=Q.tramway88;if(!q)return h0(n);
+      if(q.step===null&&!q.done)return{pages:["Quer conhecer o tramway de Santo Amaro? É um trenzinho a vapor, pequeno, de bitola estreita. Bem diferente do trem grande da Inglesa!","Tome o bilhete, eu pago desta vez. Suba!"],after:()=>{qStart('tramway88');viagem(()=>{
+        say('Tramway de Santo Amaro',["Santo Amaro fica longe da cidade: antes do trem, a viagem era de carroça ou a cavalo, e levava o dia todo.","De lá vêm para a capital cereais, madeira, carvão e pedra de cantaria. E na volta, o trenzinho traz a carne do Matadouro da Vila Mariana.","Você volta para a Estação São Joaquim."],
+          ()=>finishMission('tramway88','O trem de Santo Amaro',"Para onde ia o tramway a vapor que saía da Estação São Joaquim, em 1888?",["Para Santos, descendo a serra","Para Santo Amaro, passando pela Vila Mariana","Para o Rio de Janeiro, pelo vale do Paraíba"],1,"O tramway de Santo Amaro, de 1886, ligava São Joaquim, na Liberdade, à Vila Mariana e a Santo Amaro. Em 1913 virou bonde elétrico, e foi a última linha de bonde da cidade, até 1968.","Tramway de Santo Amaro: trem a vapor de 1886, de São Joaquim a Santo Amaro, pela Vila Mariana. Em 1913 virou bonde elétrico; foi a última linha de bonde de São Paulo (1968)."),'player');});}};
+      if(q.done)return{pages:["Gostou da viagem? Daqui a uns anos dizem que vão trocar o vapor pela eletricidade, como nos bondes da Europa."]};}
+    return h0(n);};}
+  window.__tram88=feito;
+}catch(e){console.warn('tramway 1888',e);}})();
 
 /* =========================================================
    IPIRANGA 1922 — setor monumental (Museu, jardim, Monumento, riacho),
