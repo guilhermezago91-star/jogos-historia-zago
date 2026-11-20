@@ -16960,7 +16960,8 @@ setTimeout(function(){try{
     c.drawImage(IM,(fr%3)*FW,r*FH,FW,FH,Math.round(X+8-w/2),Math.round(Y+16-h),w,h);};
   window.__mula30=mula;
   /* tropa */
-  const dm0=drawMulaTropa;drawMulaTropa=function(m,MX,MY,w){if(!e2()||!ok())return dm0.apply(this,arguments);const anda=w&&w.prog<1;mula(ctx,MX,MY,m.dir||'down',anda?Math.floor(t*6)%3:1);return true;};
+  /* ===== v165 — 1830: MULAS DAS TROPAS ANDANDO (o desenho de 1888 nem sempre está carregado em 1830; sem ele, isto dava erro e as mulas ficavam paradas) (pedido do professor, 20/11/2026) ===== */
+  const dm0=(typeof drawMulaTropa==='function')?drawMulaTropa:function(){return false;};drawMulaTropa=function(m,MX,MY,w){if(!e2()||!ok())return dm0.apply(this,arguments);const anda=w&&w.prog<1;mula(ctx,MX,MY,m.dir||'down',anda?Math.floor(t*6)%3:1);return true;};
   /* mulas soltas e burros (desenho antigo da linha 4 do AN) */
   const di=ctx.drawImage;ctx.drawImage=function(img,a,b,c2,d,X,Y,w,h){
     if(arguments.length===9&&img===IMG.AN&&b===64&&c2===16&&e2()&&ok()){mula(this,X,Y,'right',a?2:0);return;}
