@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=0c065f63","kb":327,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=2e7cb19e","kb":711,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -8889,6 +8889,57 @@ setTimeout(function(){
     return r;};
   setTimeout(()=>{try{if(cur==='pira'||cur==='serra'){buildStatic();buildOcc();mmDirty=true;}}catch(_){}},0);
 })();
+
+/* ===== v148 — SERRA DO MAR NOVA EM 1554 (pedido do professor, 19/11/2026) =====
+   Mapa desenhado de novo no estilo Stardew (32 px): mata fechada, trilha de terra,
+   três barrancos, cachoeira com poço e pouso, tronco-ponte e mirante. Três telas de altura.
+   A mata é parede: só se anda pela trilha e pelas clareiras.
+   Fontes: foto aérea da serra hoje (meio) e infográfico da Mata Atlântica (final).
+   Arte em arte_1554.js: SERRA54_MAPA, SERRA54_CACH, SERRA54_FOTO, SERRA54_MATA. */
+(function(){try{
+  if(typeof A==='undefined'||!A.SERRA54_MAPA||!SCN.serra)return;
+  const G=["TTTTTTTTTTWTTTTTTTDDTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTWWWTTTTTTDDTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTWTTTTTTTDDTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTWWTTTTTTDTTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTWWTTTTTTDDTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTWTTTTTTTDTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTWWTTTTTTDDTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTWWTTTTTTTDDTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTWWTTTTTTTTDDTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTWWTTTTTTTTDDDTTTTTTTTTTTTTTT", "TTTTTTTTTTTTWWTTTTTTTTTTDDDTTTTTTTTTTTTT", "TTTTTTTTTTTTTWTTTTTTTTTTTTDDDTTTTTTTTTTT", "TTTTTTTTTTTTTWWTTTTTTTTTTTTTDDDDDTTTTTTT", "TTTTTTTTTTTTTWWTTTTTTTTTTTTTTDDDDDDDDTTT", "TTTTTTTTTTTTTTWTTTTTTTTTTTTTTTTDDDDDDDDD", "TTTTTTTTTTTTTTWWTTTTTTTTTTTTTTTTDDTTDDDD", "TTTTTTTTTTTTTTWWTTTTTTTTTTTTTTTTTDTTTTTT", "TTTTTTTTTTTTTTTWWTTTTTTTTTTTTTTTTDTTTTTT", "TTTTTTTTTTTTTTTWWTTTTTTTTTTTTTTTTDDTTTTT", "TTTTTTTTTTTTTTTTWWTTTTTTTTTTTTTTTDDTTTTT", "TTTTTTTTTTTTTTTTWWTTTTTTTTTTTTTTTDDTTTTT", "TTTTTTTTTTTTTTTTTWTTTTTTTTTTTTTTTDDTTTTT", "TTTTTTTTTTTTTTTTTWWTTTTTTTTTTTTTTDDTTTTT", "TTTTTTTTTTTTTTTTTWWTTTTTTTTTTTTTTTDTTTTT", "TTTTTTTTTTTTTTTTTTWTTTTTTTTTTTTTTTDTTTTT", "TTTTTTTTTTTTTTTTTTWWTTTTTTTTTTTTTTDTTTTT", "TTTTTTTTTTTTTTTTTTTWTTTTTTTTTTTTTTDTTTTT", "TTTTTTTTTTTTTTTTTTTWWTTTTTTTTTTTTDDTTTTT", "TTTTTTCCTTTTTTTTTTTTWTTTTTTTTTTTTDDCTTTT", "CCCCCCCCCCCTTTTTTTTTWTTTCCCCCCCCCDDTCCCT", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCTDDTTCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCTTDTTTCCC", "CCCTTTTTTCCCCCCCCCCCCCCCCCCCCCCTDDTTTTCC", "TCTTTTTTTTTCCCCCCCCCCCCCTTCCTTTDDTTTTTTT", "TTTTTTTTTTTCCTTTCTTTTTTTTTTTTTDDTTTTTTTT", "TTTTTTTTTTTTTTTTTTDDDDDTTTTTTDDTTTTTTTTT", "TTTTTTTTTTTTTTTDDDWWWWWDDTTTTDDTTTTTTTTT", "TTTTTTTTTTTTTTDDWWWWWWWWWDDTDDTTTTTTTTTT", "TTTTTTTTTTTTTTDDWWWWWWWWWDDTDTTTTTTTTTTT", "TTTTTTTTTTTTTTTDDWWWWWWWDDDDDTTTTTTTTTTT", "TTTTTTTTTTTTTTTTDDWWWDDDDTTTDTTTTTTTTTTT", "TTTTTTTTTTTTTTTTTTWWTTTTTTTTDDTTTTTTTTTT", "TTTTTTTTTTTTTTTTTWWWTTTTTTTTTDTTTTTTTTTT", "TTTTTTTTTTTTTTTTTWWWTTTTTTTTTDTTTTTTTTTT", "TTTTTTTTTTTTTTTTWWWTTTTTTTTTDDTTTTTTTTTT", "TTTTTTTTTTTTTTTWWWTTTTTTTTTDDTTTTTTTTTTT", "TTTTTTTTTTTTTTWWWWTTTTTTTTDDTTTTTTTTTTTT", "TTTTTTTTTTTTTWWWWTTTTTTTTDDTTTTTTTTTTTTT", "TTTTTTTTTTTTTWWWTTTTTTTDDDTTTTTTTTTTTTTT", "TTTTTTTTTTTTWWWTTTTTTDDDTTTTTTTTTTTTTTTT", "TTTTTTTTTTTWWTTTTTTDDDTTTTTTTTTTTTTTTTTT", "TTTTTTTTTWWWWTTTTDDDTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTWWWTTTTDDDTTTTTTTTTTTTTTTTTTTTTT", "CCCCCTTTWWWTTTDDDTTTCCCCCCCCCCCCCTTTTTTT", "CCCCCCCWWWCCCCDDCCCCCCCCCCCCCCCCCCCCCTCC", "CCCCCCCWWCCCTTDTTCCCCCTTTTTTTTCCCCCCCCCC", "TTTTTCWWWCCTTTDTTTTCCTTTTTTTTTTTTTCCCCTT", "TTTTTTWWTTTTTTDTTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTWWWTTTTTTDTTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTWWWTTTTTTDDTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTWWTTTTTTTTDTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTWWWTTTTTTTDTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTWWWTTTTTTTDTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTWWWTTTTTTTDTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTWWWTTTTTTDDTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTWWTTTTTTTDDTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTTWWTTTTTTDDTTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTTWWTTCCCCDDCCCCCCCTTTTTTTTTTTTTTTCC", "CCCCCCWWWCCCCTTDTTTTTTCCCCCCCCCCCCCCCCCC", "CCCTTCCWWTTTTTTDDTTTTTTTTTCCCTCCCCCTTTTT", "TTTTTTTTWWTTTTTDDTTTTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTWWWTTTTTDDTTTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTWWWWTTTTDTTTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTWWWTTTTDDTTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTWWWTTTTDDTTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTWWWWTTTDDTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTWWWTTDDTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTWWWWTDDTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTTTWWDDDTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTTTTDDDWTTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTTTDDDWWWTTTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTTDDDTWWWWWTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTTDDTTTTWWWTTTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTTDTTTTTTWWWWTTTTTTTTTTTTTT", "TTTTTTTTTTTTTTDDTTTTTTTWWWWTTTTTTTTTTTTT", "TTTTTTTTTTTTTTDTTTTTTTTTWWWWTTTTTTTTTTTT", "TTTTTTTTTTTTTTDTTTTTTTTTTWWWTTTTTTTTTTTT", "TTTTTTTTTTTTTTDTTTTTTTTTTTWWWTTTTTTTTTTT", "TTTTTTTTTTTTTTDTTTTTTTTTTTTWWTTTTTTTTTTT", "TTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTTTTTT", "TTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTTTTTT", "TTTTTTTTTTTTTTTDTTTTTTTTTTTTTWWTTTTTTTTT", "TTTTTTTTTTTTTTTDTTTTTTTTTTTTTWWTTTTTTTTT", "TTTTTTTTTTTTTTTDDTTTTTTTTTTTTTWWTTTTTTTT", "TTTTTTTTTTTTTTTDDTTTTTTTTTTTTTWWTTTTTTTT", "TTTTTTTTTTTTTTTTDTTTTTTTTTTTTTWWTTTTTTTT", "TTTTTTTTTTTTTTTTDDTTTTTTTTTTTTTWWTTTTTTT", "TTTTTTTTTTTTTTTTTDTTTTTTTTTTTTTWWTTTTTTT", "TTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTTT", "TTTTTTTTTTTTTTTTTTDTTTTTTTTTTTTWWWTTTTTT", "TTTTTTTTTTTTTTTTTTDTTTTTTTTTTTTWWWTTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTWWWTTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWTTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWWTTTTT", "TTTTTTTTTTTTTTTTTTDDTTTTTTTTTTTTWWWTTTTT"],S=SCN.serra;
+  const MATA=new Set(),RIO=new Set();S.map=G.map((r,y)=>r.split('').map((c,x)=>{if(c==='T'){MATA.add(x+','+y);return 'C';}if(c==='W'){RIO.add(x+','+y);return 'C';}return c;}));S.exp=new Uint8Array(G[0].length*G.length);
+  const W=G[0].length,H=G.length,free=(x,y)=>{for(let r=0;r<10;r++)for(let yy=y-r;yy<=y+r;yy++)for(let xx=x-r;xx<=x+r;xx++)if(S.map[yy]&&S.map[yy][xx]==='D'&&!objects.some(o=>(o.scene)==='serra'&&o.x===xx&&o.y===yy))return [xx,yy];return [x,y];};
+  const mv=(o,x,y)=>{if(!o)return;const p=free(x,y);o.x=p[0];o.y=p[1];if('px' in o){o.px=p[0]*T;o.py=p[1]*T;}if('fx' in o){o.fx=p[0];o.fy=p[1];}if(o.box)o.box=[p[0]-1,p[1]-1,p[0]+1,p[1]+1];};
+  /* gente, placas e bichos no traçado novo */
+  mv(npcs.find(n=>n.id==='guia'&&n.scene==='serra'),25,38);
+  const PL={placaSerra0:[19,2],placaSerra1:[36,15],placaSerra2:[14,67],placaRio_serra:[16,82],serraHoje:[15,54],mataAtl:[19,104]};
+  const fixa=()=>{for(const o of objects)if(o.scene==='serra'&&PL[o.id])pon(o,...PL[o.id]);try{if(cur==='serra')buildOcc();}catch(_){}};
+  const pon=(o,x,y)=>{if(!o)return;o.x=x;o.y=y;if('px' in o){o.px=x*T;o.py=y*T;}if('fx' in o){o.fx=x;o.fy=y;}if(o.box)o.box=[x,y,x,y];};
+  const BICHO={bugio2:[32,19],arara2:[22,7]};for(const a of animals)if(a.scene==='serra'&&BICHO[a.id])pon(a,...BICHO[a.id]);
+  for(const o of objects)if(o.scene==='serra'&&!PL[o.id]&&S.map[o.y]&&S.map[o.y][o.x]!=='D')mv(o,o.x,Math.round(o.y*H/36));
+  for(const it of (typeof ITEMS!=='undefined'?ITEMS:[]))if(it.scene==='serra'&&(!S.map[it.y]||S.map[it.y][it.x]!=='D'))mv(it,it.x,Math.round(it.y*H/36));
+  /* carregador: desce do topo até o pouso pela trilha */
+  {const rua=(x,y)=>S.map[y]&&S.map[y][x]==='D',a=[18,0],b=free(24,40);const prev=new Int32Array(W*H).fill(-1),q=[a[0]];prev[q[0]]=q[0];let fim=-1;
+   for(let h=0;h<q.length;h++){const c=q[h],x=c%W,y=(c/W)|0;if(x===b[0]&&y===b[1]){fim=c;break;}for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(!rua(nx,ny))continue;const n=nx+ny*W;if(prev[n]<0){prev[n]=c;q.push(n);}}}
+   if(fim>=0){const P=[];for(let k=fim;;k=prev[k]){P.push([k%W,(k/W)|0]);if(k===prev[k])break;}P.reverse();const L=[P[0]];for(let i=1;i<P.length-1;i++){const u=P[i-1],v=P[i],w=P[i+1];if(v[0]-u[0]!==w[0]-v[0]||v[1]-u[1]!==w[1]-v[1])L.push(v);}L.push(P[P.length-1]);
+     const wk=walkers.find(w=>w.id==='carregaSerra');if(wk){wk.path=L;wk.wi=1;wk.x=wk.fx=L[0][0];wk.y=wk.fy=L[0][1];wk.px=wk.x*T;wk.py=wk.y*T;wk.prog=1;}}}
+  /* nomes no mapa */
+  LABELS_SERRA.length=0;LABELS_SERRA.push(['Mirante',36.5,13.4],['Cachoeira',20.5,28.6],['Pouso da trilha',24.5,42.6],['Rio da serra',8.5,64],['Tronco-ponte',18.5,77.4]);
+  /* fontes: a serra hoje (meio) e a Mata Atlântica (final) */
+  const fonte=(id,x,y,f,txt)=>{const p=[x,y];FONTES[id]=Object.assign({sc:'serra',xy:p},f);objects.push({id,scene:'serra',x:p[0],y:p[1],w:1,h:1,draw:drawSign,name:'Fonte histórica',text:[txt]});};
+  fonte('serraHoje',15,54,{kick:'Fonte: fotografia de hoje',title:'A Serra do Mar hoje',img:'SERRA54_FOTO',
+    cap:'Esta é a serra que você está descendo, vista do alto nos dias de hoje. Lá em cima, no planalto, fica a cidade de São Paulo. No meio, o paredão da Serra do Mar, ainda coberto de mata. Embaixo, no litoral, a cidade de Cubatão, perto de Santos e São Vicente. Hoje há estradas que sobem a serra em zigue-zague. Em 1554, só havia a trilha a pé. Quanto tempo você acha que levava a viagem naquela época?',
+    cred:'Fotografia aérea enviada pelo professor; autor não identificado.',
+    diary:'A Serra do Mar hoje: São Paulo no planalto, a serra coberta de mata no meio e Cubatão no litoral. Em 1554 só havia a trilha a pé.'},'Uma fotografia da serra nos dias de hoje. Aperte A para ver.');
+  fonte('mataAtl',19,104,{kick:'Fonte: infográfico',title:'A Mata Atlântica',img:'SERRA54_MATA',
+    cap:'A mata que você atravessou é a Mata Atlântica. Ela tem uma variedade enorme de árvores e de bichos, muitos que só existem aqui: onças e jaguatiricas, tucanos, antas, araras, capivaras, saguis e jacarés. Em 1554 ela cobria quase todo o litoral do Brasil. Hoje resta só uma pequena parte, e a Serra do Mar guarda um dos maiores pedaços que sobraram.',
+    cred:'Infográfico enviado pelo professor; autor não identificado.',
+    diary:'A Mata Atlântica tem muitas espécies que só existem nela. Em 1554 cobria quase todo o litoral; hoje resta pouco, e a Serra do Mar guarda um dos maiores pedaços.'},'Um cartaz sobre a Mata Atlântica. Aperte A para ver.');
+  fixa();setTimeout(fixa,6000);setTimeout(fixa,12000);
+  /* desenho: a imagem pronta por cima do chão */
+  const IM=new Image(),CA=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur==='serra'){buildStatic();buildOcc&&buildOcc();}}catch(_){}};IM.src=A.SERRA54_MAPA;CA.src=A.SERRA54_CACH;
+  const bs=buildStatic;buildStatic=function(){bs();try{if(cur==='serra'&&ok){sc.imageSmoothingEnabled=false;sc.drawImage(IM,0,0);}}catch(_){}};
+  const CB=[298, 478, 362, 574];
+  const lo=lifeOverlay;lifeOverlay=function(camX,camY){const r=lo(camX,camY);
+    try{if(cur==='serra'&&CA.complete&&CA.naturalWidth){const w=CB[2]-CB[0],f=(typeof OPT!=='undefined'&&OPT.calm)?0:Math.floor(performance.now()/160)%3;
+      ctx.drawImage(CA,f*w,0,w,CB[3]-CB[1],CB[0]-camX,CB[1]-camY,w,CB[3]-CB[1]);}}catch(_){}
+    return r;};
+  {const c0=TILE_INFO.C;TILE_INFO.C=(x,y)=>(cur==='serra'&&RIO.has(x+','+y))?{name:'Rio da serra',text:['Um rio de água gelada que desce a serra entre pedras e cachoeiras, até o mar.']}:(cur==='serra'&&MATA.has(x+','+y))?{name:'Mata Atlântica',text:['Mata fechada: árvores altas, cipós e samambaias. Sem a trilha, ninguém passa por aqui.']}:c0(x,y);}
+  setTimeout(()=>{try{if(cur==='serra'){buildStatic();buildOcc();mmDirty=true;}}catch(_){}},0);
+}catch(e){console.warn('serra54',e);}})();
+
 
 /* ---- fontes: o Pátio do Colégio hoje, o desenho da colina e o mapa do Triângulo ---- */
 (function(){
