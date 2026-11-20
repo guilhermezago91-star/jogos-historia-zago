@@ -19135,7 +19135,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v184) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v187) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -19537,7 +19537,7 @@ window.__paulista82Ready=Promise.all(ready);
       const fig=(id,k,x,y,w,h,nm,tx)=>{if(!A[k])return null;const im=new Image();im.src=A[k];const o={id,scene:S,x,y,w,h,name:nm,text:tx,__jm:1,draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;c.drawImage(im,Math.round(X+w*8-im.naturalWidth/2),Y+h*16-im.naturalHeight);}};objects.push(o);return o;};
       /* (1) parque no lugar do rio: gramado com caminhos de saibro */
       set(51,82,60,97,'.');set(53,70,58,79,'.');
-      set(55,70,56,79,'d');set(52,82,52,97,'d');set(55,84,56,88,'W');set(54,89,55,92,'W');set(55,93,56,97,'W');set(53,90,56,91,'d');
+      set(55,70,56,79,'d');set(52,82,52,97,'d');set(55,84,55,88,'W');set(54,89,55,89,'W');set(54,90,54,92,'W');set(54,93,55,93,'W');set(55,94,55,97,'W');set(53,90,56,91,'d');
       objects.push({id:'jm_bocaGaleria',scene:S,x:55,y:83,w:2,h:1,name:'Boca da galeria',__jm:1,text:['Aqui o córrego some: entra num túnel de tijolos e segue por baixo do parque e das ruas até o rio Tamanduateí.','Do Largo do Riachuelo para cima, o Anhangabaú foi canalizado. Daqui para baixo, o Saracura ainda corre a céu aberto, no meio do capim.'],
         draw(c,X,Y){c.fillStyle='#7a3f2c';c.fillRect(X-2,Y-6,36,22);c.fillStyle='#96523a';for(let j=0;j<22;j+=4)for(let i=(j%8?0:4);i<36;i+=8)c.fillRect(X-2+i,Y-6+j,6,3);c.fillStyle='#b9b3a4';c.fillRect(X-3,Y-8,38,3);c.fillStyle='#14161c';c.fillRect(X+6,Y+2,20,14);c.fillRect(X+8,Y,16,2);c.fillRect(X+11,Y-2,10,2);c.fillStyle='#3f6f8f';c.fillRect(X+8,Y+13,16,3);}});
       objects.push({id:'jm_gradeAnh',scene:S,x:57,y:74,w:1,h:1,name:'Grade da galeria',__jm:1,text:['Uma grade de ferro no chão do parque. Encostando o ouvido, dá para ouvir água correndo lá embaixo, no escuro.','É o ribeirão Anhangabaú. No começo do século ele foi canalizado: fechado num túnel de tijolos. Por cima ficaram o parque e as ruas.'],
@@ -19764,7 +19764,7 @@ window.__paulista82Ready=Promise.all(ready);
       [[54,74],[57,76]].forEach((a,i)=>prop('jm_pqBanco'+i,i%2?'ANH_banco_B':'ANH_banco_A',a[0],a[1],BAN[0],BAN[1]));
       [[54,70],[57,79]].forEach((a,i)=>prop('jm_pqPoste'+i,'ANH_poste_dois_globos_A',a[0],a[1],POS[0],POS[1]));
       [[58,85,'ANH_arvore_verde'],[51,93,'ANH_arvore_verde'],[59,95,'ANH_arbusto'],[53,96,'ANH_arbusto'],[58,89,'ANH_arbusto']].forEach((a,i)=>prop('jm_valeMato'+i,a[2],a[0],a[1],'Mato do vale',['Capim, mato e algumas árvores. O fundo do vale ainda não foi ocupado pela cidade.']));
-      placa('jm_placaGaleria',57,83,['“Aqui embaixo corre o Anhangabaú.”','O córrego entra num túnel de tijolos e passa por baixo do parque e das ruas. Do Largo da Memória para cima, ele está coberto desde 1900.','[O ponto exato onde a água sumia em 1922 não é conhecido. Aqui é uma reconstrução.]']);
+      placa('jm_placaGaleria',57,83,['“Aqui embaixo corre o Anhangabaú.”','O córrego entra num túnel de tijolos e passa por baixo do parque e das ruas. Do Largo da Memória para cima, ele foi canalizado e coberto no começo do século.','[O ponto exato onde a água sumia em 1922 não é conhecido. Aqui é uma reconstrução.]']);
       placa('jm_placaSaracura',53,86,['Vale do Saracura. O córrego ainda corre a céu aberto, entre capim, hortas, casebres e roupa quarando.','Desde 1919 a Prefeitura discute abrir aqui uma avenida. Em 1922 começam as desapropriações. A avenida só vai ficar pronta muitos anos depois. [Fonte: G. P. Rodrigues, “Vias públicas”, FAU-USP, 2008.]']);
       prop('jm_memArv0','ANH_arvore_verde',44,69,ARV[0],ARV[1]);prop('jm_memArv1','ANH_arvore_florida',50,69,ARV[0],ARV[1]);
       prop('jm_memBanco0','ANH_banco_A',44,73,'Banco de azulejos',['Um banco revestido de azulejos, da reforma do largo.']);prop('jm_memBanco1','ANH_banco_B',50,73,'Banco de azulejos',['Um banco revestido de azulejos, da reforma do largo.']);
@@ -19924,16 +19924,25 @@ window.__paulista82Ready=Promise.all(ready);
           if(rua(x-1,y)){g.fillStyle='#4a4038';g.fillRect(X,Y,4,16);g.fillStyle='#d8cdb2';g.fillRect(X+1,Y,2,16);}
           if(rua(x+1,y)){g.fillStyle='#4a4038';g.fillRect(X+12,Y,4,16);g.fillStyle='#d8cdb2';g.fillRect(X+13,Y,2,16);}}}
       /* ===== v173 — CENTRO DE 1922: BARRANCOS DESENHADOS — o desnível do terreno deixa de ser uma faixa marrom riscada e vira barranco de terra com capim em cima e sombra embaixo (pedido do professor, 20/11/2026) ===== */
-      try{const MM=window.__centro22.M,eC=(x,y)=>MM[y]&&MM[y][x]==='C';
-        for(let y=0;y<MM.length;y++)for(let x=0;x<MM[y].length;x++){if(MM[y][x]!=='C')continue;const X=x*16,Y=y*16,up=eC(x,y-1),dn=eC(x,y+1),lf=eC(x-1,y),rt=eC(x+1,y);
-          let n=0;for(let k=y;eC(x,k-1);k--)n++;let tot=n+1;for(let k=y;eC(x,k+1);k++)tot++;const f=tot>1?n/(tot-1):.5;
-          const cs=['#a58558','#987a50','#8c6f48','#806440','#745a39'];
-          for(let j=0;j<16;j+=4){const t=Math.min(4,Math.floor((f*(tot)+j/16)/tot*5));g.fillStyle=cs[t];g.fillRect(X,Y+j,16,4);g.fillStyle='rgba(50,30,15,.22)';g.fillRect(X,Y+j+3,16,1);}
-          for(let i=0;i<5;i++){const px=hi(x*5+i,y)%15,py=hi(x,y*7+i)%14;g.fillStyle=i%2?'rgba(60,40,20,.35)':'rgba(220,190,140,.30)';g.fillRect(X+px,Y+py,2,1);}
-          if(hi(x*3,y*11)%4===0){const px=2+hi(x,y*13)%10,py=3+hi(x*17,y)%9;g.fillStyle='#4f7a34';g.fillRect(X+px,Y+py,3,2);g.fillStyle='#78a850';g.fillRect(X+px+1,Y+py-1,1,2);}
-          if(!up){g.fillStyle='#5f9440';g.fillRect(X,Y,16,3);g.fillStyle='#86bb5c';g.fillRect(X,Y,16,1);g.fillStyle='#4a7632';for(let i=1;i<16;i+=3)g.fillRect(X+i,Y+3,1,1+(hi(x*9+i,y)%2));}
-          if(!dn){g.fillStyle='rgba(30,18,10,.45)';g.fillRect(X,Y+13,16,3);g.fillStyle='#3a2a1c';g.fillRect(X,Y+15,16,1);}
-          if(!lf){g.fillStyle='rgba(30,18,10,.30)';g.fillRect(X,Y,1,16);}if(!rt){g.fillStyle='rgba(30,18,10,.30)';g.fillRect(X+15,Y,1,16);}}
+      /* ===== v187 — CENTRO DE 1922: RELEVO CONFORME A GEOGRAFIA — sem paredão no lado sul (o terreno sobe para a Liberdade); descida suave ao norte; encostas de lado a leste (mais escura) e a oeste (mais clara); córrego do vale com 1 quadradinho (skill de geografia; pedido do professor, 20/11/2026) ===== */
+      try{const MM=window.__centro22.M,eC=(x,y)=>MM[y]&&MM[y][x]==='C',hj=(a,b)=>{let n=(Math.imul(a|0,374761393)^Math.imul(b|0,668265263))>>>0;n=Math.imul(n^(n>>>13),1274126177)>>>0;return (n^(n>>>16))>>>0;};
+        const mix=(c1,c2,t)=>{const a=parseInt(c1.slice(1),16),b=parseInt(c2.slice(1),16),f=(s)=>Math.round(((a>>s)&255)*(1-t)+((b>>s)&255)*t);return 'rgb('+f(16)+','+f(8)+','+f(0)+')';};
+        for(let y=0;y<MM.length;y++)for(let x=0;x<MM[y].length;x++){if(MM[y][x]!=='C')continue;const X=x*16,Y=y*16;
+          let l=0,rr=0,u=0,d=0;while(eC(x-l-1,y))l++;while(eC(x+rr+1,y))rr++;while(eC(x,y-u-1))u++;while(eC(x,y+d+1))d++;const hor=(l+rr)>=(u+d);
+          if(hor&&y>=60){/* sul: o terreno continua subindo, mais claro e seco; sem face de barranco */
+            g.fillStyle='#b7ad70';g.fillRect(X,Y,16,16);for(let i=0;i<10;i++){const q=hj(x*9+i,y*7+i);g.fillStyle=i%3===0?'#a39a5c':i%3===1?'#c6bd84':'#8f9a4e';g.fillRect(X+q%15,Y+(q>>5)%15,2,1);}
+            if(hj(x*3,y*5)%7===0){const q=hj(x,y*11);g.fillStyle='rgba(30,40,20,.25)';g.fillRect(X+3+q%7,Y+9,7,2);g.fillStyle='#5f8a3e';g.fillRect(X+3+q%7,Y+4,6,6);g.fillStyle='#7fa852';g.fillRect(X+4+q%7,Y+4,3,2);}
+            if(hj(x*13,y*3)%9===0){g.fillStyle='#8f8a7c';g.fillRect(X+5,Y+11,3,2);g.fillStyle='#b9b3a4';g.fillRect(X+5,Y+11,2,1);}
+          }else if(hor){/* norte: descida suave; em cima (mais baixo) o capim é mais escuro e úmido; degraus curtos e quebrados */
+            const t=(u+d)>0?u/(u+d):.5;for(let j=0;j<16;j+=4){g.fillStyle=mix('#5f8f44','#9fb866',Math.min(1,(t*(u+d)+j/16)/(u+d+1)));g.fillRect(X,Y+j,16,4);}
+            for(let i=0;i<7;i++){const q=hj(x*5+i,y*9+i);g.fillStyle=i%2?'rgba(40,70,30,.35)':'rgba(190,210,130,.30)';g.fillRect(X+q%15,Y+(q>>5)%15,2,1);}
+            if(hj(x*7,y*3)%3===0){const q=hj(x*11,y);g.fillStyle='rgba(70,50,25,.45)';g.fillRect(X+q%9,Y+4+(q>>4)%9,4+(q>>8)%4,1);g.fillStyle='rgba(40,60,25,.35)';g.fillRect(X+q%9,Y+5+(q>>4)%9,4+(q>>8)%4,1);}
+          }else{/* encosta de lado: a leste desce para a direita (mais escura); a oeste desce para a esquerda (mais clara) */
+            const leste=x>=100,t=(l+rr)>0?(leste?l/(l+rr):rr/(l+rr)):.5,c1=leste?'#6f9a48':'#9cc266',c2=leste?'#3f6a30':'#6f9a48';
+            for(let i=0;i<16;i+=4){const tt=Math.min(1,(t*(l+rr)+(leste?i:12-i)/16)/(l+rr+1));g.fillStyle=mix(c1,c2,tt);g.fillRect(X+i,Y,4,16);}
+            for(let i=0;i<6;i++){const q=hj(x*5+i,y*9+i);g.fillStyle=i%2?'rgba(30,55,25,.35)':'rgba(200,220,140,.25)';g.fillRect(X+q%15,Y+(q>>5)%15,1,2);}
+            if(hj(x*3,y*7)%3===0){const q=hj(x,y*13),yy=Y+2+q%11;g.fillStyle='rgba(80,55,30,.50)';g.fillRect(X+1,yy,13,1);g.fillStyle='rgba(120,90,55,.35)';g.fillRect(X+(leste?6:1),yy+1,8,1);}
+            if(hj(x*17,y*5)%8===0){g.fillStyle='#7d786e';g.fillRect(X+6,Y+8,4,3);g.fillStyle='#aaa598';g.fillRect(X+6,Y+8,3,1);}}}
         /* onde a rua desce o barranco: ladeira calçada com degraus de pedra, no lugar do riscado amarelo */
         for(let y=0;y<MM.length;y++)for(let x=0;x<MM[y].length;x++){if(MM[y][x]!=='S')continue;const X=x*16,Y=y*16;g.fillStyle='#8f8a80';g.fillRect(X,Y,16,16);
           for(let j=0;j<16;j+=4){g.fillStyle='#b4aea2';g.fillRect(X,Y+j,16,2);g.fillStyle='#9a958a';g.fillRect(X,Y+j+2,16,1);g.fillStyle='#5e5a52';g.fillRect(X,Y+j+3,16,1);for(let i=(j%8?3:7);i<16;i+=8){g.fillStyle='#7d786e';g.fillRect(X+i,Y+j,1,3);}}
