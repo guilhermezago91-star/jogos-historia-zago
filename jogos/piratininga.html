@@ -18510,6 +18510,57 @@ window.__paulista82Ready=Promise.all(ready);
     setInterval(()=>{try{document.body.classList.toggle('e1830',era===2);}catch(_){}},400);}catch(_){}
 })();
 
+/* ===== v151 — 1830: FONTE HISTÓRICA — LIVRES E ESCRAVIZADOS EM 1836 (Müller), no Palácio do Governo (pedido do professor, 19/11/2026) =====
+   Tabela e gráfico do levantamento de Daniel Pedro Müller (1836). Aparece sozinha na primeira vez que o aluno entra no
+   Salão do Palácio em 1830; depois fica numa mesa com papéis dentro do Palácio. Entra no diário como Fonte. */
+(function(){
+  const SALA='i_palacio',ID='fMuller30',DIARIO='População livre e escravizada em 1836 (levantamento de Daniel Pedro Müller): na cidade de São Paulo, 1 em cada 4 moradores era escravizado; em Campinas e em Bananal, mais da metade.';
+  const D=[['Campinas',2772,3917],['Bananal',3238,3470],['Itu',5713,5433],['Santos',3266,2597],['São Paulo',16614,5319],['Atibaia',7751,2460],['Sorocaba',8499,2634],['Bragança Paulista',9250,2368],['Santo Amaro',4634,497]];
+  const DEST=new Set(['Atibaia','Bragança Paulista']);
+  const n=v=>v.toLocaleString('pt-BR'),pc=(e,t)=>(100*e/t).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+  function mostra(){try{
+    mcqOpen=true;ovQuiz.hidden=false;const box=$('quizBox');box.innerHTML='';
+    const k=document.createElement('div');k.className='kicker';k.textContent='Fonte histórica: tabela de população';
+    const h=document.createElement('h2');h.textContent='Livres e escravizados em 1836';
+    const p=document.createElement('p');p.textContent='Seis anos depois de 1830, o governo da província mandou contar os moradores de cada vila e cidade. Veja quantas pessoas eram livres e quantas eram escravizadas.';
+    const tb=document.createElement('table');tb.style.cssText='width:100%;border-collapse:collapse;font-size:.78em;line-height:1.3;margin:6px 0;table-layout:auto';
+    const th='padding:3px 5px;border-bottom:2px solid #141b1b;text-align:right;white-space:nowrap',td='padding:3px 5px;border-bottom:1px solid rgba(20,27,27,.18);text-align:right;white-space:nowrap';
+    let html='<tr><th style="'+th+';text-align:left">Município</th><th style="'+th+'">Livres</th><th style="'+th+'">Escravizados</th><th style="'+th+'">Total</th><th style="'+th+'">% escravizada</th></tr>';
+    for(const [m,l,e] of D){const t=l+e;const b=m==='São Paulo'?'font-weight:bold;':'';html+='<tr><td style="'+td+';text-align:left;'+b+'">'+m+'</td><td style="'+td+'">'+n(l)+'</td><td style="'+td+'">'+n(e)+'</td><td style="'+td+'">'+n(t)+'</td><td style="'+td+';'+b+'">'+pc(e,t)+'</td></tr>';}
+    tb.innerHTML=html;
+    const g=document.createElement('div');g.style.cssText='margin:10px 0 4px;font-size:.82em';
+    const linhas=D.map(([m,l,e])=>[m,100*e/(l+e)]);
+    linhas.splice(4,0,['Província (total parcial)',29.5]);
+    for(const [m,v] of linhas){const r=document.createElement('div');r.style.cssText='display:flex;align-items:center;gap:6px;margin:3px 0';
+      const a=document.createElement('span');a.textContent=m;a.style.cssText='flex:0 0 34%;'+(m==='São Paulo'?'font-weight:bold':'');
+      const bar=document.createElement('span');bar.style.cssText='flex:1;height:12px;background:rgba(20,27,27,.08);border-radius:2px;position:relative';
+      const f=document.createElement('span');f.style.cssText='position:absolute;left:0;top:0;bottom:0;border-radius:2px;width:'+v.toFixed(1)+'%;background:'+(DEST.has(m)?'#b8520f':m==='São Paulo'?'#2a5a8a':'#64809e');bar.appendChild(f);
+      const c=document.createElement('span');c.textContent=v.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';c.style.cssText='flex:0 0 3.4em;text-align:right';
+      r.append(a,bar,c);g.appendChild(r);}
+    const q=document.createElement('p');q.className='small';q.textContent='Repare: na cidade de São Paulo, 1 em cada 4 moradores era escravizado. Em Campinas e Itu, que plantavam cana para fazer açúcar, e em Bananal, onde o café crescia, os escravizados eram quase metade ou mais da metade da população.';
+    const c=document.createElement('p');c.className='small';c.style.margin='0 0 8px';c.textContent='Fonte: Daniel Pedro Müller, Ensaio d’um quadro estatístico da Província de São Paulo, levantamento de 1836.';
+    const b=document.createElement('button');b.type='button';b.className='btn';b.textContent='Fechar';
+    b.onclick=()=>{ovQuiz.hidden=true;mcqOpen=false;if(!diary.some(d=>d.kind==='Fonte'&&d.text===DIARIO)){addDiary('Fonte',DIARIO);try{save();}catch(_){}}};
+    const row=document.createElement('div');row.className='row';row.appendChild(b);
+    box.append(k,h,p,tb,g,q,c,row);setTimeout(()=>b.focus(),30);
+  }catch(e){console.warn('fonte Müller 1830',e);}}
+  window.__muller30=mostra;
+  /* mesa com papéis e o quadro de população, dentro do Salão do Palácio */
+  const desenho=function(c,X,Y){const R=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
+    R(X+1,Y+13,14,3,'rgba(20,27,27,.18)');R(X+1,Y+6,14,7,'#141b1b');R(X+2,Y+7,12,5,'#7a4a26');R(X+2,Y+12,2,4,'#5a3418');R(X+12,Y+12,2,4,'#5a3418');
+    R(X+3,Y+1,10,8,'#141b1b');R(X+4,Y+2,8,6,'#f4ecd6');R(X+5,Y+3,1,4,'#64809e');R(X+7,Y+4,1,3,'#64809e');R(X+9,Y+5,1,2,'#b8520f');R(X+10,Y+3,1,4,'#64809e');R(X+4,Y+7,8,1,'#c8b890');};
+  function poe(){try{if(objects.some(o=>o.id===ID))return;const R0=SCN[SALA];if(!R0||!R0.map)return;const M=R0.map,H=M.length,W=M[0].length;
+    const ocupado=(x,y)=>objects.some(o=>o.scene===SALA&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===SALA&&n.x===x&&n.y===y);
+    const anda=(x,y)=>y>=0&&x>=0&&y<H&&x<W&&!SOLID.includes(M[y][x])&&!ocupado(x,y);
+    let alvo=null;for(let y=2;y<H-2&&!alvo;y++)for(let x=W-3;x>=2&&!alvo;x--){if(!anda(x,y))continue;let viz=0;for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]])if(anda(x+a,y+b))viz++;if(viz>=3&&(R0.door==null||Math.abs(x-(R0.door[0]||0))>1))alvo=[x,y];}
+    if(!alvo)return;objects.push({id:ID,scene:SALA,x:alvo[0],y:alvo[1],w:1,h:1,draw:desenho,name:'Quadro da população, 1836',text:['Papéis do governo da província com a contagem dos moradores.']});
+    if(cur===SALA){try{buildOcc();}catch(_){}}}catch(e){console.warn('mesa Müller 1830',e);}}
+  poe();setTimeout(poe,6000);
+  {const a0=questActionX;questActionX=function(tg){const o=tg&&tg.type==='obj'&&tg.o;if(o&&o.id===ID){mostra();return true;}return a0(tg);};}
+  /* aparece sozinha na primeira vez que o aluno entra no Palácio em 1830 */
+  try{const s0=setScene;setScene=function(to){const r=s0.apply(this,arguments);try{if(to===SALA&&!diary.some(d=>d.kind==='Fonte'&&d.text===DIARIO))setTimeout(()=>{if(cur===SALA&&!mcqOpen)mostra();},700);}catch(_){}return r;};}catch(_){}
+})();
+
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
