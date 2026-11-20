@@ -18953,7 +18953,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v182) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v184) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -19494,6 +19494,23 @@ window.__paulista82Ready=Promise.all(ready);
       gente('jm_caixeiroFA','h22_n|carregaArm1|5','Caixeiro',120,9,['Sou caixeiro do armazém. Chego às seis da manhã, varro a loja, arrumo a mercadoria e atendo os fregueses do interior.','Durmo num quartinho nos fundos. Um dia ainda abro meu próprio negócio.']);
       try{C.P.push({t:'R. FLORÊNCIO DE ABREU',x:100*16,y:9*16+8,w:118});}catch(_){}
       rel.r22=1;}
+     /* ===== v184 — CENTRO DE 1922: 25 DE MARÇO E ANHANGABAÚ — lojas dos sírios e libaneses no tamanho cheio, de frente para as travessas; beira do rio arborizada no lugar de metade da rua; parque e calçada da Líbero Badaró arborizados (pedido do professor, 20/11/2026) ===== */
+     /* 23ª RODADA. */
+     {const L2=id('br_loja2'),L56=id('br_loja56'),L187=id('br_loja187'),L72=id('br_loja72'),L50=id('br_loja50'),L52=id('br_loja52');
+      if(L2&&L56&&L187&&L72&&L50&&L52&&L2.x===133&&L187.x===133&&L50.x===133&&M[38][134]==='D'&&M[26][134]==='D'&&M[44][134]==='D'){
+       const set=(x0,y0,x1,y1,ch)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)M[y][x]=ch;};
+       const limpa=(x0,y0,x1,y1)=>{for(const q of objects)if(q.scene===S&&!q.enter&&!q.room&&/^pt_|^jm_tapa_/.test(q.id)&&toca(q,x0,y0,x1,y1)){for(let y=q.y;y<q.y+(q.h||1);y++)for(let x=q.x;x<q.x+(q.w||1);x++)marca.add(x+','+y);q.scene='__fora';}};
+       some(ini(108));some(ini(109));some(ini(120));
+       limpa(130,22,139,25);limpa(130,30,139,37);limpa(130,40,139,43);
+       ergue(L2,'g_loja_2x2_1',130,4,2,'BOTEQUIM',['t',TELHA[0]],26,4);ergue(L56,'g_loja_2x2_2',134,4,2,'DOCES',['t',TELHA[2]],26,4);
+       {const had=objects.find(o=>o.scene===S&&/ig_ortodoxa/.test(o.id)&&/Armarinho/.test(o.name||''));if(had){limpa(138,22,141,25);ergue(had,'g_loja_2x2_1',138,4,2,'ARMARINHO',['t',TELHA[1]],26,4);}}
+       ergue(L187,'g_loja_2x2_2',130,4,2,'TECIDOS',['p'],38,4);ergue(L72,'g_loja_2x2_1',134,4,2,'PADARIA',['t',TELHA[1]],38,4);
+       ergue(L50,'g_loja_2x2_1',130,4,2,'ARMAZÉM',['t',TELHA[3]],44,4);ergue(L52,'g_loja_2x2_2',134,4,2,'COMIDAS',['t',TELHA[0]],44,4);
+       /* metade da rua vira beira de rio com capim e árvores (onde não há ponte) */
+       for(let y=30;y<=67;y++)if(M[y][146]==='B'&&M[y][144]==='D'&&M[y][145]==='D'&&M[y][142]==='D'){M[y][144]='.';M[y][145]=',';}
+       for(const q of npcs)if(q.scene===S&&q.x>=130&&q.x<=139&&q.y>=22&&q.y<=43&&objects.some(z=>z.scene===S&&(z.w||1)>1&&q.x>=z.x&&q.x<z.x+z.w&&q.y>=z.y&&q.y<z.y+z.h)){const dd=perto(q.x,q.y,1);if(dd){rel.movidos.push(q.id+' '+q.x+','+q.y+' -> '+dd);q.x=dd[0];q.y=dd[1];q.px=dd[0]*T;q.py=dd[1]*T;}}
+       for(const q of objects)if(q.scene===S&&(q.w||1)*(q.h||1)===1&&!q.__jm&&q.x>=130&&q.x<=139&&q.y>=22&&q.y<=43&&objects.some(z=>z!==q&&z.scene===S&&(z.w||1)>1&&q.x>=z.x&&q.x<z.x+z.w&&q.y>=z.y&&q.y<z.y+z.h)){const dd=perto(q.x,q.y,1);if(dd){q.x=dd[0];q.y=dd[1];}}
+       rel.r23=1;}}
      rel.movidos.push('República e Municipal: 17ª rodada');}
     /* a Praça da Sé fica mais limpa na frente do Solar: uma banca vai para o Largo do Carmo e a árvore sai da frente */
     for(const [id,x,y] of [['rtp13',98,59],['rtp4',121,65]]){const o=objects.find(o=>o.scene===S&&o.id===id);if(o&&cabe(x,y,o.w||1)){rel.movidos.push(id+' '+o.x+','+o.y+' -> '+x+','+y);o.x=x;o.y=y;}}
@@ -19541,6 +19558,15 @@ window.__paulista82Ready=Promise.all(ready);
     const placa=(id,x,y,tx)=>{if(objects.some(o=>o.id===id))return;const q=livre(x,y)?[x,y]:perto(x,y,1);if(!q)return;objects.push({id,scene:S,x:q[0],y:q[1],w:1,h:1,draw:drawSign,name:'Placa',text:tx,__jm:1});rel.props++;};
     placa('jm_placaCarmo',126,64,['“Largo do Carmo.” Aqui ficam o convento e a igreja dos frades carmelitas, do tempo da colônia. [Eles não aparecem no jogo.]','Daqui a poucos anos, no fim da década de 1920, o convento e a igreja dos frades vão ser demolidos para dar lugar a prédios novos. Só a igreja da Ordem Terceira do Carmo vai continuar de pé.']);
     placa('jm_placaRemedios',119,80,['“Praça João Mendes.” Aqui fica a Igreja de Nossa Senhora dos Remédios. [Ela não aparece no jogo.]','Nos anos 1880, os caifazes de Antônio Bento se reuniam nela para ajudar escravizados a fugir. A igreja será demolida em 1943.']);
+    if(rel.r23){placa('jm_placa25',141,39,['Rua 25 de Março. Tem esse nome desde 1865. Antes era a “Rua de Baixo”, ou “Baixa de São Bento”, porque fica ao pé do morro do mosteiro, na beira do Tamanduateí.','Os sírios e libaneses chegaram no fim do século passado. Começaram como mascates, vendendo de porta em porta, e abriram aqui lojas de tecidos e armarinhos. [Fonte: Câmara Municipal de São Paulo, “25 de Março: memória da rua dos árabes”.]']);
+      placa('jm_placaPqDP2',141,69,['Do outro lado do rio fica a antiga Várzea do Carmo, que alagava todo verão. Ela foi aterrada e virou o Parque Dom Pedro II, inaugurado neste ano de 1922, com projeto do francês Bouvard.']);
+      for(let y=31;y<=66;y+=4)if(M[y]&&M[y][145]===',')prop('jm_rioArv'+y,(y%8<4)?'ANH_arvore_verde':'ANH_palmeira',145,y,'Árvore da beira do rio',['Árvores plantadas na beira do Tamanduateí, que foi endireitado e ganhou margens de pedra.']);
+      for(let y=33;y<=64;y+=8)if(M[y]&&M[y][144]==='.')prop('jm_rioBanco'+y,'ANH_banco_A',144,y,BAN[0],BAN[1]);
+      /* Parque Anhangabaú e calçada da Líbero Badaró */
+      [[55,15,'ANH_palmeira'],[57,18,'ANH_arvore_florida'],[55,32,'ANH_palmeira'],[58,34,'ANH_arvore_verde'],[55,37,'ANH_palmeira'],[57,40,'ANH_arvore_florida'],[51,31,'ANH_arvore_verde'],[51,39,'ANH_arvore_verde'],[62,16,'ANH_arvore_verde'],[63,33,'ANH_palmeira'],[63,39,'ANH_palmeira'],[62,48,'ANH_arvore_verde'],[51,47,'ANH_palmeira'],[62,53,'ANH_arvore_florida'],[55,62,'ANH_arvore_verde'],[63,62,'ANH_palmeira']].forEach((a,i)=>{if(M[a[1]]&&'.,f'.includes(M[a[1]][a[0]]))prop('jm_anhArvN'+i,a[2],a[0],a[1],'Árvore do parque',['O Parque Anhangabaú, feito pelo plano do urbanista francês Bouvard, por cima do ribeirão canalizado.']);});
+      [[54,16],[54,33],[59,36],[54,39],[59,17]].forEach((a,i)=>{if(M[a[1]]&&'.,f'.includes(M[a[1]][a[0]]))prop('jm_anhBancoN'+i,i%2?'ANH_banco_B':'ANH_banco_A',a[0],a[1],BAN[0],BAN[1]);});
+      [14,18,31,36,41,47,52,57].forEach((y,i)=>{if(M[y]&&M[y][66]==='p')prop('jm_lbArv'+i,i%2?'ANH_poste_dois_globos_A':'ANH_arvore_verde',66,y,i%2?POS[0]:'Árvore da calçada',i%2?POS[1]:['Árvores na calçada da Rua Líbero Badaró, que foi alargada e virou um mirante sobre o parque.']);});
+      placa('jm_placaPrates',67,40,['Palacetes Prates: dois prédios gêmeos do Conde Prates, projetados pelo engenheiro Samuel das Neves e por seu filho Cristiano.','Num deles funcionam a Câmara Municipal e a Prefeitura, do porão ao sótão. [Fonte: Câmara Municipal de São Paulo, Memória.]']);}
     if(rel.r22){placa('jm_placaBonde1900',93,24,['Largo de São Bento. Daqui saiu, em 1900, a primeira linha de bonde elétrico da cidade.','O mosteiro novo levou mais de dez anos para ficar pronto: as obras começaram em 1910 e a igreja foi consagrada agora, em 1922. O relógio da torre veio da Alemanha.']);
       placa('jm_placaViadSI',89,21,['Deste lado do largo sai o Viaduto Santa Ifigênia, inaugurado em 1913. A armação de ferro veio pronta da Bélgica, de navio, e foi montada aqui. Tem dois trilhos de bonde.','[Fonte: Assembleia Legislativa de São Paulo.]']);
       [[96,9],[114,9],[126,9],[110,19],[122,19]].forEach((a,i)=>prop('jm_sbPoste'+i,'ANH_poste_dois_globos_A',a[0],a[1],POS[0],POS[1]));
