@@ -18535,7 +18535,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v166) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v168) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -19019,7 +19019,26 @@ window.__paulista82Ready=Promise.all(ready);
       try{for(const q of C.P)if(q&&/SANTO AMARO/.test(q.t)){q.t='R. DE SANTO ANTÔNIO';q.w=Math.max(q.w||0,116);}
         C.P.push({t:'R. DE SANTO AMARO',x:48*16,y:94*16,w:104,v:1});C.P.push({t:'R. MAJOR QUEDINHO',x:15*16,y:77*16,w:108});}catch(_){}
       try{C.P.push({t:'LARGO DO RIACHUELO',x:47*16,y:89*16+8,w:104,largo:1});C.P.push({t:'R. QUIRINO DE ANDRADE',x:43*16,y:79*16,w:112,v:1});}catch(_){}
-      rel.r19=1;rel.r20=1;tapa(6,78,41,87,quintal);tapa(6,88,17,97);tapa(44,79,50,83,(x,y)=>x===50);tapa(44,90,50,97);}
+      /* ===== v168 — CENTRO DE 1922: BEXIGA, QUADRAS DE BAIXO — CASAS DE PORTA E JANELA, COCHEIRA E MARCENARIA DE FRENTE PARA TRAVESSAS DE TERRA, NO LUGAR DOS TELHADOS (pedido do professor, 20/11/2026) ===== */
+      /* 21ª RODADA. As três quadras de telhado do pé do mapa viram fileiras de casas: a rua das lojas (y88-89) continua até a Consolação;
+         uma travessa de terra (y94-95) corta as quadras; a Rua de Santo Antônio fica com 2 quadradinhos; a beira do vale volta a ser capim. */
+      let r21=false;if(M[92][20]==='p'&&M[92][40]==='p'&&M[90][34]!=='p'){r21=true;
+       marcaPt(6,84,50,97);tiraT(6,84,17,95);tiraT(18,90,35,95);tiraT(38,90,46,95);tiraT(49,90,50,97);
+       quadra(6,84,17,87);set(6,88,17,89,'D');quadra(6,90,35,93);set(6,94,35,95,'d');quadra(34,96,35,97);quadra(38,90,46,93);set(38,94,46,95,'d');set(49,90,50,97,'.');
+       const nomeado=(id,k,x,larg,base,rot,tel,rows,nome,texto)=>{const o={id,scene:S,x,y:base-1,w:1,h:1,name:nome,text:texto};objects.push(o);ergue(o,k,x,larg,null,rot,tel,base,rows);};
+       /* fileira de cima, de frente para a rua das lojas */
+       casaV('g_colonial_2x1_1',6,4,88,['t',TELHA[0]],4,VILA[0],VILA[1]);casaV('g_residencia_2x2_1',10,4,88,['t',TELHA[2]],4,'Sobradinho',['Um sobradinho estreito: a família do dono mora em cima e aluga os cômodos de baixo.','[Casa inventada para o jogo.]']);casaV('g_colonial_2x1_2',14,4,88,['t',TELHA[1]],4,VILA[0],VILA[1]);
+       /* fileira de baixo, de frente para a travessa de terra */
+       casaV('g_colonial_2x1_2',6,4,94,['t',TELHA[3]],4,VILA[0],VILA[1]);casaV('g_colonial_2x1_1',10,4,94,['t',TELHA[1]],4,VILA[0],VILA[1]);
+       nomeado('jm_cocheiraBx','g_armazem_3x1_1',14,6,94,'COCHEIRA',['z','#7e8a94'],3,'Cocheira',['Uma cocheira: aqui dormem as mulas e ficam guardadas as carroças. No Bexiga há muitas, quase todas nas ruas de Santo Amaro e de Santo Antônio.','[Cocheira inventada para o jogo. Fonte do tipo: S. Schneck, “Formação do bairro do Bexiga”, 2010.]']);
+       casaV('g_residencia_2x2_2',20,4,94,['t',TELHA[0]],4,'Sobradinho',['Um sobradinho estreito, com dois cômodos em cada andar.','[Casa inventada para o jogo.]']);casaV('g_colonial_2x1_1',24,4,94,['t',TELHA[2]],4,VILA[0],VILA[1]);
+       nomeado('jm_marcenariaBx','g_armazem_3x1_2',28,6,94,'MARCENARIA',['t',TELHA[3]],3,'Marcenaria',['Uma marcenaria. Dá para sentir o cheiro de serragem e de cola da calçada. Muitos italianos do Bexiga são marceneiros, pedreiros e sapateiros.','[Oficina inventada para o jogo. Fonte do tipo: S. Schneck, 2010.]']);
+       casaV('g_colonial_2x1_2',38,4,94,['t',TELHA[1]],4,VILA[0],VILA[1]);casaV('g_residencia_2x2_1',42,4,94,['t',TELHA[2]],4,'Sobradinho',['Um sobradinho estreito, parede com parede com os vizinhos.','[Casa inventada para o jogo.]']);
+       gente('jm_marceneiroBx','h22_n|portugues|4','Marceneiro',30,95,['Faço cadeira, mesa, guarda-roupa, o que encomendarem. Aprendi o ofício com meu pai, na Itália.','O serviço não falta: a cidade cresce, e toda casa nova precisa de móvel.']);
+       for(const q of npcs)if(q.scene===S&&q.x>=6&&q.x<=50&&q.y>=84&&q.y<=97&&M[q.y]&&M[q.y][q.x]==='p'){const dd=perto(q.x,q.y,1);if(dd){rel.movidos.push(q.id+' '+q.x+','+q.y+' -> '+dd);q.x=dd[0];q.y=dd[1];q.px=dd[0]*T;q.py=dd[1]*T;}}
+       rel.quintal18=(rel.quintal18||[]).filter(q=>!(q[1]===85)).concat([[34,90,2,4],[46,90,1,4],[12,96,3,2],[26,96,3,2],[40,96,3,2]]);rel.r21=1;}
+      const q21=(x,y)=>r21&&((x>=34&&x<=35&&y>=90&&y<=93)||(x===46&&y>=90&&y<=93)||(y>=96&&((x>=12&&x<=14)||(x>=26&&x<=28)||(x>=40&&x<=42))));
+      rel.r19=1;rel.r20=1;tapa(6,78,41,87,quintal);tapa(6,84,17,97,q21);tapa(18,90,46,97,q21);tapa(44,79,50,83,(x,y)=>x===50);tapa(44,90,50,97,q21);}
      rel.movidos.push('República e Municipal: 17ª rodada');}
     /* a Praça da Sé fica mais limpa na frente do Solar: uma banca vai para o Largo do Carmo e a árvore sai da frente */
     for(const [id,x,y] of [['rtp13',98,59],['rtp4',121,65]]){const o=objects.find(o=>o.scene===S&&o.id===id);if(o&&cabe(x,y,o.w||1)){rel.movidos.push(id+' '+o.x+','+o.y+' -> '+x+','+y);o.x=x;o.y=y;}}
@@ -19067,6 +19086,7 @@ window.__paulista82Ready=Promise.all(ready);
     const placa=(id,x,y,tx)=>{if(objects.some(o=>o.id===id))return;const q=livre(x,y)?[x,y]:perto(x,y,1);if(!q)return;objects.push({id,scene:S,x:q[0],y:q[1],w:1,h:1,draw:drawSign,name:'Placa',text:tx,__jm:1});rel.props++;};
     placa('jm_placaCarmo',126,64,['“Largo do Carmo.” Aqui ficam o convento e a igreja dos frades carmelitas, do tempo da colônia. [Eles não aparecem no jogo.]','Daqui a poucos anos, no fim da década de 1920, o convento e a igreja dos frades vão ser demolidos para dar lugar a prédios novos. Só a igreja da Ordem Terceira do Carmo vai continuar de pé.']);
     placa('jm_placaRemedios',119,80,['“Praça João Mendes.” Aqui fica a Igreja de Nossa Senhora dos Remédios. [Ela não aparece no jogo.]','Nos anos 1880, os caifazes de Antônio Bento se reuniam nela para ajudar escravizados a fugir. A igreja será demolida em 1943.']);
+    if(rel.r21){[[9,95],[22,95],[40,95]].forEach((a,i)=>prop('jm_b2Poste'+i,'ANH_poste_dois_globos_A',a[0],a[1],POS[0],POS[1]));prop('jm_b2Barris','FV_c_barris',20,94,'Barris',['Barris de água para as mulas da cocheira.']);prop('jm_b2Cx','CI_caixote',34,94,'Tábuas e caixotes',['Madeira empilhada na porta da marcenaria.']);prop('jm_valeArb0','ANH_arbusto',49,92,'Mato do vale',['Capim e mato na beira do vale.']);prop('jm_valeArb1','ANH_arvore_verde',50,96,'Mato do vale',['Capim e mato na beira do vale.']);}
     if(rel.r19){placa('jm_placaRiach',45,88,['Largo do Riachuelo. Até 1865 chamava-se Largo do Bexiga: aqui se juntavam o caminho de Sorocaba e o de Santo Amaro, e havia uma hospedaria para os viajantes.','Daqui saem a Rua de Santo Amaro e a Rua de Santo Antônio, as duas mais antigas do bairro. [Fonte: S. Schneck, FAU-USP, 2010.]']);
       prop('jm_riPoste0','ANH_poste_dois_globos_A',50,85,POS[0],POS[1]);prop('jm_riBar0','FV_c_barris',44,84,'Barris',['Barris na calçada do café.']);prop('jm_coVaso0','ANH_vaso_pedestal',29,84,'Vaso de planta',['Um vaso de planta na entrada do cortiço.']);prop('jm_coCx0','CI_caixote',30,84,'Caixote',['Um caixote que serve de banco.']);
       placa('jm_placaBexiga',5,83,['Daqui para baixo começa o Bexiga (o povo fala “Bixiga”).','Casas térreas, sobradinhos estreitos, oficinas, vilas e cortiços. Moram aqui trabalhadores, imigrantes italianos, famílias negras, pequenos comerciantes e artesãos.']);
@@ -19104,6 +19124,29 @@ window.__paulista82Ready=Promise.all(ready);
       delete rel.__a17;}}catch(e){console.warn('arremate r17',e);}
     try{if(window.__transito&&window.__transito.V)delete window.__transito.V[S];}catch(_){}
     try{if(typeof walkers!=='undefined')for(let i=walkers.length-1;i>=0;i--){const w=walkers[i];if(w.scene!==S||!w.path)continue;if(w.path.some(pt=>objects.some(q=>q.scene===S&&(q.w||1)*(q.h||1)>1&&pt[0]>=q.x&&pt[0]<q.x+(q.w||1)&&pt[1]>=q.y&&pt[1]<q.y+(q.h||1)))){walkers.splice(i,1);rel.pedestresFora=(rel.pedestresFora||0)+1;}}}catch(_){}
+    /* ===== v168 — CENTRO DE 1922: TELHADOS COM PAREDE E VOLUME — cada telhado de cenário vira um prédio visto de frente e de cima (telhado de duas águas, beiral, parede com janelas), menos zinco, lotes separados (pedido do professor, 20/11/2026) ===== */
+    try{const PAR=['#e9dfc6','#e2c9a6','#dccbbd','#e6d3a8','#d3d9d6','#e3bfae','#f0ead8','#d8c39a'],KK='#2a2420';
+      const hh=(a,b,c)=>{let n=(Math.imul(a,374761393)+Math.imul(b,668265263)+Math.imul(c,1442695041))|0;n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967296;};
+      const casa=(g,x0,w,H,sx,sy)=>{const alto=H>=32,wh=alto?12:6,rh=H+4-wh,t=hh(sx,sy,1),tipo=t<.74?'t':t<.84?'z':'p';
+        g.fillStyle=KK;g.fillRect(x0,0,w,H+4);
+        if(tipo==='t'){const base=TELHA[Math.floor(hh(sx,sy,2)*4)%4],yr=Math.max(3,Math.round(rh*.42));g.fillStyle=base;g.fillRect(x0+1,1,w-2,rh-1);
+          for(let y=1;y<rh;y++){const m=(y-1)%3;if(m===2){g.fillStyle='rgba(40,10,10,.30)';g.fillRect(x0+1,y,w-2,1);}else{g.fillStyle=m?'rgba(40,10,10,.14)':'rgba(255,210,150,.10)';for(let x=x0+1+((((y-1)/3)|0)%2?2:0);x<x0+w-1;x+=4)g.fillRect(x,y,1,1);}}
+          g.fillStyle='rgba(255,200,140,.07)';g.fillRect(x0+1,1,w-2,yr-1);g.fillStyle='rgba(30,10,20,.18)';g.fillRect(x0+1,yr,w-2,rh-yr);
+          g.fillStyle='rgba(255,235,200,.55)';g.fillRect(x0+1,yr-1,w-2,1);g.fillStyle='rgba(40,10,10,.45)';g.fillRect(x0+1,yr,w-2,1);
+          g.fillStyle='rgba(40,10,10,.35)';g.fillRect(x0+1,1,1,rh-1);g.fillRect(x0+w-2,1,1,rh-1);
+          if(hh(sx,sy,3)<.4&&w>=32&&yr>=9){const cx=x0+5+Math.floor(hh(sx,sy,4)*(w-14));g.fillStyle=KK;g.fillRect(cx-1,Math.max(0,yr-7),6,8);g.fillStyle='#e8dfc8';g.fillRect(cx,Math.max(1,yr-6),4,6);g.fillStyle='#bfb49a';g.fillRect(cx+3,Math.max(1,yr-6),1,6);g.fillStyle='#7a3020';g.fillRect(cx-1,Math.max(0,yr-7),6,2);}
+        }else if(tipo==='z'){g.fillStyle='#868d96';g.fillRect(x0+1,1,w-2,rh-1);for(let x=x0+4;x<x0+w-2;x+=5){g.fillStyle='#a3a9b1';g.fillRect(x,1,1,rh-1);g.fillStyle='#646a73';g.fillRect(x+1,1,1,rh-1);}g.fillStyle='rgba(255,255,255,.18)';g.fillRect(x0+1,1,w-2,2);g.fillStyle='rgba(0,0,0,.18)';g.fillRect(x0+1,rh-4,w-2,3);
+        }else{g.fillStyle='#cdbb90';g.fillRect(x0+1,1,w-2,rh-1);g.fillStyle='#b6a476';for(let y=4;y<rh-3;y+=4)for(let x=x0+3+((y>>2)%2)*3;x<x0+w-4;x+=6)g.fillRect(x,y,4,1);g.fillStyle='#e9ddb8';g.fillRect(x0+1,1,w-2,2);g.fillRect(x0+1,1,2,rh-1);g.fillStyle='#9a8a5e';g.fillRect(x0+w-3,1,2,rh-1);g.fillRect(x0+1,rh-2,w-2,2);
+          if(alto&&hh(sx,sy,5)<.5&&w>=32){const bx=x0+5+Math.floor(hh(sx,sy,6)*(w-18));g.fillStyle=KK;g.fillRect(bx-1,4,10,8);g.fillStyle='#8a8a82';g.fillRect(bx,5,8,6);g.fillStyle='#a8a8a0';g.fillRect(bx,5,8,2);}}
+        /* beiral e parede */
+        g.fillStyle=tipo==='t'?'#5a2018':'#4a4a50';g.fillRect(x0,rh-1,w,2);
+        const pc=PAR[Math.floor(hh(sx,sy,7)*PAR.length)%PAR.length];g.fillStyle=pc;g.fillRect(x0+1,rh+1,w-2,wh-2);g.fillStyle='rgba(20,10,20,.30)';g.fillRect(x0+1,rh+1,w-2,1);g.fillStyle='rgba(20,10,20,.14)';g.fillRect(x0+1,rh+2,w-2,1);g.fillStyle='rgba(60,40,30,.35)';g.fillRect(x0+1,H+4-2,w-2,1);
+        if(alto){for(let x=x0+5;x+6<=x0+w-4;x+=10){g.fillStyle='#f4ecd8';g.fillRect(x-1,rh+3,7,7);g.fillStyle='#2f3f58';g.fillRect(x,rh+4,5,5);g.fillStyle='#5f86a4';g.fillRect(x,rh+4,1,2);g.fillStyle='#f4ecd8';g.fillRect(x+2,rh+4,1,5);}}
+        else{for(let x=x0+4;x+4<=x0+w-3;x+=8){g.fillStyle='#2f3f58';g.fillRect(x,rh+2,3,2);g.fillStyle='#f4ecd8';g.fillRect(x-1,rh+4,5,1);}}};
+      let nT=0;for(const o of objects){if(o.scene!==S||o.enter||o.room||!/^pt_|^jm_tapa_|^jm_sul_/.test(o.id))continue;const W=o.w*16,H=(o.h||1)*16;let cv=null;nT++;
+        const faz=()=>{cv=document.createElement('canvas');cv.width=W;cv.height=H+4;const g=cv.getContext('2d');let x=0;while(x<o.w){let sw=(o.h||1)===1?(3+Math.floor(hh(o.x+x,o.y,9)*3)):(o.w>7?(3+Math.floor(hh(o.x+x,o.y,9)*3)):o.w);if(o.w-x-sw<2)sw=o.w-x;casa(g,x*16,sw*16,H,o.x+x,o.y);x+=sw;}};
+        o.draw=function(c,X,Y){if(!cv)faz();c.drawImage(cv,X,Y-4);};}
+      rel.telhados=nT;}catch(e){console.warn('telhados JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
@@ -19149,6 +19192,13 @@ window.__paulista82Ready=Promise.all(ready);
         for(const h of [[57,86,3,2],[58,93,2,3],[53,94,1,3]]){const x=h[0]*16,y=h[1]*16,w=h[2]*16,hh=h[3]*16;g.fillStyle='#6b4a2e';g.fillRect(x,y,w,hh);for(let j=2;j<hh;j+=5){g.fillStyle='#3f7a34';g.fillRect(x+1,y+j,w-2,2);g.fillStyle='#79b356';for(let i=2;i<w-2;i+=5)g.fillRect(x+i,y+j,2,1);}g.fillStyle='#8a7a5a';g.fillRect(x,y,w,1);g.fillRect(x,y+hh-1,w,1);g.fillRect(x,y,1,hh);g.fillRect(x+w-1,y,1,hh);}
         [[57,90,'#f2efe6'],[58,90,'#e8eef5'],[59,91,'#f2efe6'],[57,91,'#f0d8d0']].forEach(q=>{g.fillStyle='rgba(20,30,20,.25)';g.fillRect(q[0]*16+3,q[1]*16+5,11,8);g.fillStyle=q[2];g.fillRect(q[0]*16+2,q[1]*16+4,11,8);});
         g.fillStyle='#8a6f48';g.fillRect(54*16,90*16,32,2);g.fillRect(54*16,92*16-2,32,2);g.fillStyle='#3a3630';g.fillRect(54*16+11,90*16-3,10,4);g.fillRect(54*16+11,92*16-1,10,4);g.fillStyle='#3f6f8f';g.fillRect(54*16+13,90*16-2,6,2);g.fillRect(54*16+13,92*16,6,2);
+        if(rel.r21){/* fundos das casas do pé do mapa: quintais de terra com cerca, horta e varal, no lugar do gramado liso */
+          const MM=window.__centro22.M;for(let y=96;y<=97;y++)for(let x=8;x<=46;x++){if(x>=36&&x<=37)continue;const ch=MM[y]&&MM[y][x];if(ch!=='.'&&ch!==','&&ch!=='f')continue;const X=x*16,Y=y*16,s=Math.floor((x-8)/4);
+            g.fillStyle='#b79a72';g.fillRect(X,Y,16,16);for(let i=0;i<10;i++){g.fillStyle=i%2?'#a88a62':'#c4a880';g.fillRect(X+(hsh(x*7+i,y)%16),Y+(hsh(x,y*5+i)%16),1,1);}
+            if(s%3===1){g.fillStyle='#6b4a2e';g.fillRect(X,Y+2,16,13);for(let j=3;j<14;j+=4){g.fillStyle='#3f7a34';g.fillRect(X+1,Y+j,14,2);g.fillStyle='#79b356';g.fillRect(X+4,Y+j,2,1);g.fillRect(X+10,Y+j,2,1);}}
+            else if(s%3===2&&y===96){g.fillStyle='#6a6258';g.fillRect(X,Y+6,16,1);g.fillStyle=(x%2)?'#f2efe6':'#a8c0d8';g.fillRect(X+4,Y+7,6,6);}
+            if((x-8)%4===0){g.fillStyle='#7a6648';g.fillRect(X,Y,2,16);g.fillStyle='#9a8460';g.fillRect(X,Y,1,16);}
+            if(y===96){g.fillStyle='#7a6648';g.fillRect(X,Y,16,2);g.fillStyle='#9a8460';g.fillRect(X,Y,16,1);}}}
         if(rel.obras19){/* rua em obras: onde acaba a pedra e começa a terra */
           const x=21*16,y=82*16;g.fillStyle='#5a4a38';g.fillRect(x+10,y+2,3,28);for(let k=0;k<9;k++){g.fillStyle=k%2?'#8e8a84':'#a29e96';g.fillRect(x-6+(k%3)*7,y+3+Math.floor(k/3)*5,6,4);g.fillStyle='#55524e';g.fillRect(x-6+(k%3)*7,y+7+Math.floor(k/3)*5,6,1);}
           g.fillStyle='#d9c48c';g.fillRect(x-18,y+20,10,6);g.fillStyle='#c4ae76';g.fillRect(x-16,y+19,6,1);
