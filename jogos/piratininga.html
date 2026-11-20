@@ -2784,6 +2784,16 @@ const BINFO22X=[[/^labor$/,'Fábrica de Tecidos Labor',["Fábrica de Tecidos Lab
 BINFO22.armInglPatio=['Armazém da São Paulo Railway',["O armazém da Inglesa, no pátio do Pari. Aqui as sacas de café descansam antes de descer a serra até o porto de Santos.","Os ingleses mandam na ferrovia: cobram o frete de cada saca. Quem controla o trem controla o café."]];
 BINFO22.sacasPatio0=BINFO22.sacasPatio1=['Sacas de café',["Sacas de 60 quilos, empilhadas à espera do trem. Cada uma passa nas costas de um carregador.","O café ainda é a maior riqueza do Brasil: de cada 10 sacas vendidas no mundo, mais da metade sai do Brasil."]];
 /*__FERROVIAS22_A2_END__*/
+/*__BAIRROS22_A3_START__*/
+/* ===== v175 — BAIRROS DE 1922: NOMES QUE FALTAVAM (construções que apareciam como "Casa") (pedido do professor, 20/11/2026) ===== */
+/* Nada aqui pode estar dentro do retângulo do centro (colunas 58-132, linhas 64-116): o centro reconhece os prédios de lá pelo nome. */
+Object.assign(BINFO22,{
+  luz:['Mosteiro da Luz',["O Mosteiro da Luz, fundado por Frei Galvão no século XVIII. Hoje fica perto da estação de trem mais movimentada da cidade."]],
+  bras:['Igreja do Bom Jesus do Brás',["A igreja do Brás, bairro que cresceu muito com a chegada dos imigrantes.","O nome do bairro vem de José Brás, o morador que ergueu a primeira capela."]],
+  sacaN0:['Sacas de café',["Sacas de 60 quilos esperando o trem."]],sacaN1:['Sacas de café',["Sacas de café do Oeste Paulista."]],
+  sacaN2:['Sacas de café',["Café que vai descer a serra até o porto de Santos."]],sacaN3:['Sacas de café',["Mais sacas, empilhadas pelos carregadores."]],
+  fabPari1:['Fábrica no Pari',["Uma fábrica no Pari, colada na linha do trem: a matéria-prima chega de trem e o produto sai de trem."]]});
+/*__BAIRROS22_A3_END__*/
 SPMAP22.objs.forEach((o,i)=>{
   let inf=BINFO22[o.id];for(const [re,n,t] of BINFO22X)if(!inf&&re.test(o.id))inf=[n,t];let name,text;
   if(inf){name=inf[0];text=inf[1];}
@@ -13773,6 +13783,85 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
     o.draw=function(c,X,Y){const b=Y+H;c.fillStyle='rgba(20,14,8,.22)';c.fillRect(X+3,b,W-6,3);dm(c,'chamine_56',X+W-22,b-22);fum(c,X+W-14,b-80,5);dm(c,'galpao_deposito',X+2,b);};
     setT(o,'Companhia Mecânica e Importadora',["A Companhia Mecânica e Importadora, no Brás, junto à linha do trem: galpões altos de fundição.","Aqui se derrete ferro e bronze para fazer máquinas de beneficiar café e arroz, pregos, parafusos e tubos."]);}}
 })();
+/*__BAIRROS22_D_START__*/
+/* ===== v175 — BAIRROS DE 1922: LOTES VAZIOS VIRAM QUINTAL COM HORTA OU PÁTIO DE FÁBRICA; CASINHAS DE OPERÁRIOS; GENTE NOS BAIRROS VAZIOS (pedido do professor, 20/11/2026) ===== */
+/* Roda POR ÚLTIMO (depois que todos os blocos já arrumaram seus prédios): só preenche o que sobrou vazio, sem empurrar nada de lugar.
+   Nunca mexe perto do retângulo do centro (colunas 58-132, linhas 64-116 de sp22, com 8 de folga), nem na Paulista, no Jardim América e no Pacaembu. */
+setTimeout(function(){try{
+  if(typeof A==='undefined'||!SCN.sp22)return;const S='sp22',M=SCN.sp22.map,H=M.length,W=M[0].length;
+  const prot=(x,y)=>(x>=50&&x<=140&&y>=56&&y<=124)||(x>=86&&x<=124&&y>=53&&y<=65)||(x<=84&&y>=99&&y<=160);
+  const IM={};const img=k=>IM[k]||(IM[k]=(()=>{const i=new Image();i.src=A['IND_mod_'+k]||'';return i;})());
+  const dm=(c,k,x,base)=>{const i=img(k);if(i.complete&&i.naturalWidth)c.drawImage(i,Math.round(x),Math.round(base-i.height));return i.width||0;};
+  const h=(x,y,s)=>{let n=(x*374761393+y*668265263+s*1442695041)|0;n=(n^(n>>>13))*1274126177;return ((n^(n>>>16))>>>0)/4294967296;};
+  const hit=(q,x,y)=>x>=q.x&&x<q.x+(q.w||1)&&y>=q.y&&y<q.y+(q.h||1);
+  /* ocupação atual: prédios, objetos, personagens, itens */
+  const occ=new Set();for(const q of objects)if(q.scene===S&&!q.walker&&q.x!=null)for(let y=q.y;y<q.y+(q.h||1);y++)for(let x=q.x;x<q.x+(q.w||1);x++)occ.add(x+','+y);
+  for(const n of npcs)if(n.scene===S)occ.add(n.x+','+n.y);for(const n of ITEMS)if(n.scene===S&&!n.got)occ.add(n.x+','+n.y);
+  const livre=(x,y)=>x>=1&&y>=1&&x<W-1&&y<H-1&&M[y][x]==='p'&&!occ.has(x+','+y)&&!prot(x,y);
+  const FB=/Fábrica|Cotonifício|Moinho|Cervejaria|Companhia|Indústrias|Alpargatas|Mecânica|Tecelagem|Fiação|Juta|Armazém|Galpão|Usina|Oficinas/;
+  const fabs=objects.filter(q=>q.scene===S&&!q.walker&&FB.test(q.name||''));
+  const pertoFab=(x,y)=>fabs.some(o=>x>=o.x-1&&x<=o.x+(o.w||1)&&y>=o.y-1&&y<=o.y+(o.h||1));
+  const RUA='dDeRS',NOVOS=[],patio=[],casas=[];
+  const visto=new Set();
+  for(let y0=1;y0<H-1;y0++)for(let x0=1;x0<W-1;x0++){const k0=x0+','+y0;if(visto.has(k0)||!livre(x0,y0))continue;
+    const comp=[],fila=[[x0,y0]];visto.add(k0);
+    while(fila.length){const [x,y]=fila.pop();comp.push([x,y]);for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=x+dx,Y=y+dy,k=X+','+Y;if(!visto.has(k)&&livre(X,Y)){visto.add(k);fila.push([X,Y]);}}}
+    if(comp.length<2)continue;
+    const cset=new Set(comp.map(p=>p[0]+','+p[1]));
+    for(const [x,y] of comp)if(pertoFab(x,y)){patio.push([x,y]);occ.add(x+','+y);}       // encostado na fábrica: pátio calçado
+    const cabe=(x,y,w,hh)=>{for(let j=y;j<y+hh;j++)for(let i=x;i<x+w;i++)if(!cset.has(i+','+j)||occ.has(i+','+j))return false;return true;};
+    const ruaEmbaixo=(x,y,w)=>{for(let i=x;i<x+w;i++){const c=M[y]&&M[y][i];if(!c||!RUA.includes(c))return false;}return true;};
+    for(const [x,y] of comp){if(occ.has(x+','+y))continue;
+      const k=cabe(x,y,5,2)&&ruaEmbaixo(x,y+2,5)?'casa_operaria_dupla':(cabe(x,y,3,2)&&ruaEmbaixo(x,y+2,3)?'casa_operaria':null);
+      if(k&&A['IND_mod_'+k]){const w=k==='casa_operaria'?3:5;casas.push({x,y,w,k});for(let j=y;j<y+2;j++)for(let i=x;i<x+w;i++)occ.add(i+','+j);}}
+    for(const [x,y] of comp){if(occ.has(x+','+y))continue;const v=h(x,y,9);M[y][x]=v<.12?'d':(v<.27?',':'k');}   // quintal: horta, grama e terra
+  }
+  /* 1) casinhas geminadas de operários, de frente para a rua */
+  casas.forEach((c,i)=>{const o={id:'casaOp22_'+i,scene:S,x:c.x,y:c.y,w:c.w,h:2,name:c.w===5?'Casas de operários':'Casa de operário',
+      text:c.w===5?["Casas geminadas de operários: porta, janela e um quintal nos fundos, com horta e varal.","Muitas são alugadas por quem trabalha nas fábricas do bairro. Às vezes duas famílias dividem a mesma casa."]
+                  :["Uma casinha de operário, de porta e janela. Nos fundos, um quintal com horta: couve, tomate, um pé de laranja."],
+      draw:function(c2,X,Y){const b=Y+32;c2.fillStyle='rgba(20,14,8,.22)';c2.fillRect(X+3,b,c.w*16-6,3);const w=img(c.k).width||0;dm(c2,c.k,X+Math.round((c.w*16-w)/2),b);}};
+    objects.push(o);NOVOS.push(o);});
+  /* 2) pátio de fábrica: carvão, fardos, barris, caixotes, sacos e caixa-d'água */
+  const TP={carvao:['Monte de carvão',["Carvão para as caldeiras. As máquinas da fábrica andam a vapor: sem carvão, nada se move.","O carvão chega de trem, muitas vezes de navio, lá da Inglaterra."]],
+    fardos:['Fardos de algodão',["Fardos de algodão do interior paulista, esperando a vez de entrar na fiação."]],
+    barris:['Barris',["Barris de madeira empilhados no pátio."]],caixas:['Caixotes',["Caixotes de madeira com mercadoria pronta para a carroça ou para o trem."]],
+    sacos_farinha:['Sacos de farinha',["Sacos de farinha de trigo, prontos para as padarias do bairro."]],caixa_agua:['Caixa-d’água',["A caixa-d’água da fábrica: as caldeiras precisam de muita água."]]};
+  const KS=['carvao','fardos','carvao','caixas','barris','fardos','sacos_farinha'];let np=0;
+  /* pátios que outros blocos abriram em volta das fábricas também ganham peças */
+  {const ja=new Set(patio.map(p=>p[0]+','+p[1]));
+   for(const o of fabs)for(let y=o.y-4;y<=o.y+(o.h||1)+3;y++)for(let x=o.x-4;x<=o.x+(o.w||1)+3;x++){if(!M[y]||M[y][x]!=='p'||prot(x,y)||ja.has(x+','+y)||occ.has(x+','+y))continue;ja.add(x+','+y);patio.push([x,y]);}}
+  const pset=new Set(patio.map(p=>p[0]+','+p[1]));const usado=new Set();
+  for(const [x,y] of patio){if(np>=200||h(x,y,31)>.13)continue;
+    const k=h(x,y,37)<.08?'caixa_agua':KS[(h(x,y,41)*KS.length)|0],w=k==='caixa_agua'?1:2;
+    if(w===2&&!pset.has((x+1)+','+y))continue;if(usado.has(x+','+y)||(w===2&&usado.has((x+1)+','+y))||!A['IND_mod_'+k])continue;
+    if(objects.some(q=>q.scene===S&&!q.walker&&(hit(q,x,y)||(w===2&&hit(q,x+1,y)))))continue;
+    if(npcs.some(n=>n.scene===S&&n.y===y&&(n.x===x||(w===2&&n.x===x+1))))continue;
+    const t=TP[k];const o={id:'patio22_'+np,scene:S,x,y,w,h:1,name:t[0],text:t[1],draw:function(c2,X,Y){const i=img(k);dm(c2,k,X+Math.round((w*16-(i.width||0))/2),Y+16);}};
+    objects.push(o);NOVOS.push(o);usado.add(x+','+y);usado.add((x+1)+','+y);np++;}
+  /* 3) gente com fala nos bairros que estavam vazios */
+  const G=[[163,47,'lavadeira','Lavadeira do Canindé',["Lavo roupa para as famílias ricas dos Campos Elíseos. Estendo no varal do quintal e entrego a trouxa na cabeça.","Ganho pouco, mas trabalho em casa, perto dos meus filhos."]],
+    [167,44,'carregador','Carroceiro das olarias',["Levo tijolo e areia das olarias da várzea para as obras. A cidade não para de crescer: todo dia sobe uma casa nova."]],
+    [159,66,'operario','Operário da juta',["Trabalho na fábrica de sacos de juta aqui do Pari. Sem saco, o café não viaja até o porto de Santos."]],
+    [154,48,'dona','Moradora do Pari',["Do meu quintal eu vejo os trens da Inglesa passando o dia inteiro. A louça treme na prateleira!"]],
+    [202,66,'tecela','Tecelã do Belenzinho',["Moro perto da linha da Central. De manhã cedo o apito da fábrica e o apito do trem tocam quase juntos."]],
+    [206,70,'crianca','Menino do Belenzinho',["Depois da escola eu ajudo minha mãe na horta do quintal: couve, alface, cebolinha. O que sobra a gente troca com a vizinha."]],
+    [178,126,'operario','Pedreiro da Mooca',["Eu levanto casas geminadas, uma colada na outra: porta, janela e quintal nos fundos.","Cada casinha dessas vira o lar de uma família inteira, às vezes de duas."]],
+    [146,96,'dona','Nonna do quintal',["No quintal eu planto tomate e manjericão, como lá na Itália. Domingo tem macarrão para a família toda!"]],
+    [44,166,'caixeiro','Jardineiro do palacete',["Cuido do jardim do palacete: grama aparada, canteiro de flores, gradil de ferro.","Aqui ninguém planta couve no quintal! Quem planta couve são os operários, lá no Brás."]]];
+  G.forEach(([x,y,spr,name,lines],i)=>{const p=findFree(S,x,y,10);if(!p||prot(p[0],p[1]))return;
+    const sp=CHAR_ORDER.includes(spr)?spr:(CHAR_ORDER.includes('rt_'+spr)?'rt_'+spr:'colono');
+    addNPCs([{id:'lotes22_'+i,spr:sp,x:p[0],y:p[1],dir:'down',name,lines,diary:name+', 1922: '+lines[0]}],S);});
+  /* 4) nomes que se cobriam: o nome do bairro sobe um pouco; entre duas ruas, a segunda se afasta (nunca dentro do centro) */
+  try{const LB=LABELS_22.filter(l=>typeof l[0]==='string'),pc=(x,y)=>x>=56&&x<=134&&y>=62&&y<=118,cx=l=>l[0].length*.28;
+    const cobre=(a,b)=>Math.abs(a[1]-b[1])<cx(a)+cx(b)&&Math.abs(a[2]-b[2])<1;
+    for(let volta=0;volta<3;volta++)for(let i=0;i<LB.length;i++)for(let j=i+1;j<LB.length;j++){const a=LB[i],b=LB[j];if(!cobre(a,b))continue;
+      const bairro=l=>l[0]===l[0].toUpperCase();const m=bairro(a)&&!bairro(b)?a:b;
+      if(pc(m[1],m[2]))continue;m[2]+=(m===a?-1.2:1.2);}
+  }catch(e){console.warn('[bairros22] nomes',e);}
+  window.__lotes22log={casas:casas.length,patio:np,quintais:visto.size};
+}catch(e){console.warn('[bairros22]',e);}},0);
+/*__BAIRROS22_D_END__*/
 
 /* =========================================================
    NOMES DAS RUAS NO CHÃO E NO MAPA (1922)
