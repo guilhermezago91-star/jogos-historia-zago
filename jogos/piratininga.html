@@ -14330,6 +14330,271 @@ setTimeout(function(){try{
   window.__moocaS22log={quadras:Q.map(q=>[q.x0,q.y0,q.x1,q.y1].join(',')),novos:NOVOS.length,fabricas:IND.length,travessas:trav,patio:np,gente:ng};
 }catch(e){console.warn('[bairros22 mooca]',e);}},0);
 /*__BAIRROS22_I_END__*/
+/*__BAIRROS22_J_START__*/
+/* ===== v188 — ZONA OESTE DE 1922: MAPA NOVO À ESQUERDA DO MAPA DOS BAIRROS — ÁGUA BRANCA COM O COMPLEXO MATARAZZO GRANDE E O CAMPO DO PALESTRA ITÁLIA, LAPA COM ESTAÇÕES DA INGLESA E DA SOROCABANA, OFICINAS, FRIGORÍFICO E VIDRARIA, VILA ANASTÁCIO, POMPEIA, VILA ROMANA, ALTO DA LAPA E PERDIZES EM LOTEAMENTO, BUTANTÃ ABERTO, RIO PINHEIROS COM CURVAS ATÉ O TIETÊ (pedido do professor, 20/11/2026) ===== */
+/* Cena nova 'm_oeste22' (160 x 200). A coluna 159 encosta na coluna 0 do mapa dos bairros, na mesma linha: anda-se de um para o outro pela borda.
+   Nada do mapa dos bairros muda de lugar. O que era da Lapa e da Água Branca na faixa da esquerda (frigorífico, oficinas, vidraria, Matarazzo, Palestra)
+   vem para cá; no lugar fica um depósito do mesmo tamanho. Nomes genéricos onde a fonte não confirma. Ficha do terreno aprovada pelo professor em 20/11/2026. */
+(function(){try{
+  if(!SCN.sp22||SCN.m_oeste22||typeof LVL22==='undefined'||typeof spDraw!=='function')return;
+  const S='m_oeste22',W=160,H=200,M0=SCN.sp22.map;
+  const hs=(x,y,s)=>{let n=(x*374761393+y*668265263+s*1442695041)|0;n=(n^(n>>>13))*1274126177;return ((n^(n>>>16))>>>0)/4294967296;};
+  const M=[],LV=[];for(let y=0;y<H;y++){M.push(new Array(W).fill('.'));LV.push(new Array(W).fill('1'));}
+  const dSeg=(px,py,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;let t=L2?((px-a[0])*dx+(py-a[1])*dy)/L2:0;t=Math.max(0,Math.min(1,t));return Math.hypot(px-a[0]-t*dx,py-a[1]-t*dy);};
+  const dPol=(px,py,P)=>{let d=1e9;for(let i=0;i<P.length-1;i++)d=Math.min(d,dSeg(px,py,P[i],P[i+1]));return d;};
+  /* ---------- 1) chão: várzeas, Tietê e Pinheiros ---------- */
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const v=hs(x,y,1);M[y][x]=y>=134?(v<.035?'T':v<.055?'b':v<.3?',':'.'):(v<.03?'T':v<.06?'b':v<.22?',':'.');}
+  const tc=x=>26+Math.round(2*Math.sin((159-x)/13)+1*Math.sin((159-x)/5.3));
+  for(let x=0;x<W;x++){const c=tc(x);for(let y=0;y<H;y++){const d=y-c;
+    if(Math.abs(d)<=2)M[y][x]='W';else if(Math.abs(d)===3)M[y][x]='B';else if(y>=2&&d<0)M[y][x]=hs(x,y,2)<.72?'V':'.';else if(d>3&&d<=7)M[y][x]=hs(x,y,3)<.7?'V':',';
+    if(y>=2&&y<=c+7)LV[y][x]='0';}}
+  const PIN=[[160,125],[142,129],[124,122],[106,131],[88,124],[70,133],[52,126],[36,131],[24,120],[18,104],[24,88],[16,72],[21,58],[16,44],[20,33],[19,27]];
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const d=dPol(x+.5,y+.5,PIN);
+    if(d<=2.3)M[y][x]='W';else if(d<=3.3){if(M[y][x]!=='W')M[y][x]='B';}else if(d<=(y<110?5:7)){if(!'WB'.includes(M[y][x]))M[y][x]=hs(x,y,4)<.7?'V':',';}
+    if(d<=(y<110?5:7))LV[y][x]='0';}
+  /* ---------- 2) ferrovias: Inglesa (sobe para Pirituba e Jundiaí) e Sorocabana (segue para Osasco); ramal da Matarazzo ---------- */
+  const LIN={spr:{P:[[160,50],[40,50],[34,46],[31,38],[30,28],[29,-1]],vias:2,nome:'Inglesa'},soroc:{P:[[160,52],[40,52],[28,54],[14,57],[-1,60]],vias:2,nome:'Sorocabana'},
+    ramal:{P:[[157,52],[152,56],[103,56]],vias:1,nome:'ramal'}};
+  const RT=new Map();
+  for(const id in LIN){const P=LIN[id].P;for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(dPol(x+.5,y+.5,P)>1.01)continue;const ch=M[y][x],k=x+','+y;
+    if(!RT.has(k))RT.set(k,{id,bridge:'WB'.includes(ch)});M[y][x]='Y';}}
+  /* ---------- 3) ruas ---------- */
+  const rua=(x,y,ch)=>{if(x<0||y<0||x>=W||y>=H)return;const c=M[y][x],k=x+','+y;
+    if(RT.has(k)){const t=RT.get(k);if(t.bridge||t.id==='ramal')return;t.cross=true;t.dir=ch==='v'?'v':'h';M[y][x]='d';return;}
+    if('WB'.includes(c)){M[y][x]='R';return;}M[y][x]=ch==='e'?'e':'d';};
+  const hr=(y,a,b,ch)=>{for(let x=a;x<=b;x++)rua(x,y,ch||'d');},vr=(x,a,b)=>{for(let y=a;y<=b;y++)rua(x,y,'v');};
+  hr(34,24,159);hr(47,36,159);hr(48,36,159,'e');hr(54,40,99);hr(60,26,84);hr(66,26,84);hr(71,26,159);hr(72,26,159);hr(77,30,159);hr(78,30,159);hr(84,30,58);
+  hr(89,30,159);hr(90,30,159);hr(95,30,58);hr(96,96,159);hr(97,96,159);hr(99,96,159);hr(100,60,159);hr(106,30,158);hr(112,30,96);hr(118,96,158);hr(140,40,146);
+  for(const x of [40,58,84])vr(x,34,90);for(const x of [48,72])vr(x,54,72);vr(96,34,118);vr(33,57,72);
+  for(const x of [108,122,136,150])vr(x,34,47);for(const x of [110,120])vr(x,71,100);vr(150,71,118);for(const x of [130,142])vr(x,89,118);
+  vr(66,78,118);vr(80,78,112);vr(44,78,112);vr(146,118,140);vr(60,140,199);vr(112,140,170);
+  /* Largo da Lapa (calçado) */
+  for(let y=55;y<=59;y++)for(let x=59;x<=71;x++)M[y][x]='D';
+  /* borda leste: igual à coluna 0 do mapa dos bairros (a passagem não tem degrau) */
+  for(let y=0;y<H;y++){for(const x of [158,159]){M[y][x]=M0[y][0];LV[y][x]=(SPMAP22.lvl[y]||'1')[0]||'1';}if(M[y][159]==='Y'&&!RT.has('159,'+y))RT.set('159,'+y,{id:y<=50?'spr':'soroc'});}
+  const LVs=LV.map(r=>r.join(''));
+  SCN[S]={map:M,exp:new Uint8Array(W*H),label:'Zona Oeste: Água Branca, Lapa e Pinheiros',title:'Zona Oeste de São Paulo, 1922'};
+  /* ---------- 4) chão desenhado com o mesmo estilo de 1922, mais trilhos, pontes e porteiras ---------- */
+  const brita=['#7a6a58','#857462','#6e5f4f','#907e6a','#665748'];
+  const VIAS=[];for(const id in LIN){const L=LIN[id],P=L.P.map(p=>[p[0]*T,p[1]*T]),off=L.vias===2?[-8,8]:[0];
+    for(const o of off){const Q=P.map((p,i)=>{const a=P[Math.max(0,i-1)],b=P[Math.min(P.length-1,i+1)];let n1=null,n2=null;
+        if(i>0){const dx=p[0]-a[0],dy=p[1]-a[1],l=Math.hypot(dx,dy);n1=[-dy/l,dx/l];}if(i<P.length-1){const dx=b[0]-p[0],dy=b[1]-p[1],l=Math.hypot(dx,dy);n2=[-dy/l,dx/l];}
+        const n=n1&&n2?[n1[0]+n2[0],n1[1]+n2[1]]:(n1||n2),ln=Math.hypot(n[0],n[1]),nx=n[0]/ln,ny=n[1]/ln,k=n1&&n2?1/Math.max(.5,nx*n1[0]+ny*n1[1]):1;return [p[0]+nx*o*k,p[1]+ny*o*k];});
+      const Sx=[0];for(let i=1;i<Q.length;i++)Sx.push(Sx[i-1]+Math.hypot(Q[i][0]-Q[i-1][0],Q[i][1]-Q[i-1][1]));VIAS.push({id,Q,S:Sx,len:Sx[Sx.length-1]});}}
+  function trilhos(s){
+    for(const [k,t] of RT){const [x,y]=k.split(',').map(Number),X=x*T,Y=y*T;
+      if(t.cross){s.fillStyle='#8a6a48';s.fillRect(X,Y,T,T);s.fillStyle='#6a4e34';for(let i=0;i<T;i+=4)t.dir==='v'?s.fillRect(X,Y+i,T,1):s.fillRect(X+i,Y,1,T);continue;}
+      if(t.bridge){s.fillStyle='#4a3a2c';s.fillRect(X,Y,T,T);s.fillStyle='#5e4a36';for(let i=0;i<T;i+=4)s.fillRect(X,Y+i,T,2);s.fillStyle='#2e3236';s.fillRect(X,Y,T,1);s.fillRect(X,Y+T-1,T,1);continue;}
+      for(let j=0;j<T;j+=2)for(let i=0;i<T;i+=2){s.fillStyle=brita[(hash(x*8+i,y*8+j,3)*5)|0];s.fillRect(X+i,Y+j,2,2);}}
+    s.save();for(const {Q} of VIAS)for(let i=0;i<Q.length-1;i++){const a=Q[i],b=Q[i+1],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy),ux=dx/l,uy=dy/l,nx=-uy,ny=ux;
+      for(let d=2;d<l;d+=5){const x=a[0]+ux*d,y=a[1]+uy*d;s.strokeStyle='#3e2c1e';s.lineWidth=3;s.beginPath();s.moveTo(x-nx*6.5,y-ny*6.5+1);s.lineTo(x+nx*6.5,y+ny*6.5+1);s.stroke();
+        s.strokeStyle='#6e4e34';s.lineWidth=2;s.beginPath();s.moveTo(x-nx*6.5,y-ny*6.5);s.lineTo(x+nx*6.5,y+ny*6.5);s.stroke();}}
+    s.lineJoin='round';for(const {Q} of VIAS)for(const g of [-3.5,3.5]){s.beginPath();Q.forEach((p,i)=>{const a=Q[Math.max(0,i-1)],b=Q[Math.min(Q.length-1,i+1)],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy);const x=p[0]-dy/l*g,y=p[1]+dx/l*g;i?s.lineTo(x,y):s.moveTo(x,y);});
+      s.strokeStyle='#2e3236';s.lineWidth=2.6;s.stroke();s.strokeStyle='#d4d8dc';s.lineWidth=1;s.stroke();}s.restore();
+    for(const [k,t] of RT){if(!t.cross)continue;const [x,y]=k.split(',').map(Number),X=x*T,Y=y*T;for(const [dx,dy] of [[0,-1],[0,1]]){if(RT.has(x+','+(y+dy)))continue;const py=dy===1?Y+T+1:Y-3;
+      for(let i=0;i<T;i+=2){s.fillStyle=((i/2)|0)%3===2?'#d14b34':'#f4ecd0';s.fillRect(X+i,py,2,2);}}}}
+  const bs=buildStatic;buildStatic=function(){if(cur!==S)return bs.apply(this,arguments);
+    if(stat.width!==MW*T||stat.height!==MH*T){stat.width=MW*T;stat.height=MH*T;sc.imageSmoothingEnabled=false;}sc.clearRect(0,0,stat.width,stat.height);
+    const guarda=[];for(let y=0;y<H;y++){guarda.push(LVL22[y]);LVL22[y]=LVs[y];}
+    cur='sp22';try{for(let y=0;y<MH;y++)for(let x=0;x<MW;x++)ground(sc,x,y);}catch(e){console.warn('oeste22 chao',e);}finally{cur=S;for(let y=0;y<H;y++)LVL22[y]=guarda[y];}
+    try{trilhos(sc);}catch(e){console.warn('oeste22 trilhos',e);}};
+  /* ---------- 5) prédios e objetos ---------- */
+  const occ=new Set(),falhas=[];let ni=0;
+  const ok=(x,y,w,h,chao)=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++){if(i<0||j<0||i>=W||j>=H)return false;const c=M[j][i];if(occ.has(i+','+j)||RT.has(i+','+j)||'WBRdDeY'.includes(c)&&!(chao&&c==='D'))return false;}return true;};
+  const marca=(x,y,w,h,ch)=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++){occ.add(i+','+j);if(ch&&M[j][i]!=='D')M[j][i]=ch;}};
+  const add=(o,chao)=>{if(!ok(o.x,o.y,o.w,o.h,chao)){falhas.push(o.name+' '+o.x+','+o.y);return null;}o.scene=S;o.id=o.id||('zo22_'+(ni++));objects.push(o);marca(o.x,o.y,o.w,o.h,o.semChao?null:'p');return o;};
+  const poe=(sp,x,y,w,h,name,text,extra)=>add(Object.assign({x,y,w,h,draw:spDraw(sp,w,h),name,text},extra||{}),extra&&extra.chao);
+  const IMG2={};const im=k=>IMG2[k]||(IMG2[k]=(()=>{const i=new Image();i.src=(typeof A!=='undefined'&&A['IND_mod_'+k])||'';return i;})());
+  const ind=(k,x,y,w,h,name,text)=>add({x,y,w,h,name,text,draw:function(c,X,Y){const i=im(k);if(i.complete&&i.naturalWidth){const b=Y+h*T;c.fillStyle='rgba(20,14,8,.22)';c.fillRect(X+3,b-1,w*T-6,3);c.drawImage(i,Math.round(X+(w*T-i.width)/2),Math.round(b-i.height));}}});
+  const placa=(x,y,name,text)=>{if(typeof drawSign!=='function')return null;return add({x,y,w:1,h:1,draw:drawSign,name,text,semChao:true});};
+  const cham=objects.find(o=>o.id==='chamine17');const chamine=(x,y)=>cham?add({x,y,w:1,h:1,draw:cham.draw,name:'Chaminé de fábrica',text:cham.text,semChao:true}):null;
+  /* --- Água Branca: o complexo das Indústrias Reunidas Fábricas Matarazzo (muro, portão, ramal, galpões, chaminés) --- */
+  const MX0=99,MX1=157,MY0=53,MY1=70;
+  for(let y=MY0;y<=MY1;y++)for(let x=MX0;x<=MX1;x++){if(RT.has(x+','+y))continue;M[y][x]='p';}
+  const muroIm=im('muro_tijolos');let nmu=0;
+  for(let y=MY0;y<=MY1;y++)for(let x=MX0;x<=MX1;x++){const borda=y===MY0||y===MY1||x===MX0||x===MX1;if(!borda||RT.has(x+','+y))continue;if(y===MY1&&x>=125&&x<=130)continue;
+    const X0=x;add({id:'zoMuro_'+(nmu++),x,y,w:1,h:1,semChao:true,name:'Muro da Matarazzo',text:["O muro alto de tijolos do complexo Matarazzo. Lá dentro, galpões, caldeiras, depósitos e um ramal de trem só da fábrica."],
+      draw:function(c,X,Y){if(muroIm.complete&&muroIm.naturalWidth){c.fillStyle='rgba(20,14,8,.2)';c.fillRect(X,Y+14,16,3);c.drawImage(muroIm,(X0%4)*16,0,16,muroIm.height,X,Y+16-muroIm.height,16,muroIm.height);}}});}
+  const portao=(x)=>add({x,y:MY1,w:1,h:1,semChao:true,name:'Portão da Matarazzo',text:["O portão das Indústrias Reunidas Fábricas Matarazzo. Às seis da manhã, o apito chama: centenas de operários e operárias entram de uma vez.","Quem chega atrasado perde o dia, ou leva multa no salário."],
+    draw:(c,X,Y)=>{c.fillStyle='rgba(20,14,8,.25)';c.fillRect(X+2,Y+14,12,3);c.fillStyle='#8a3c2a';c.fillRect(X+4,Y-14,8,30);c.fillStyle='#a8503a';c.fillRect(X+5,Y-13,6,28);c.fillStyle='#e8dcc0';c.fillRect(X+3,Y-17,10,3);}});
+  portao(125);portao(130);
+  add({x:126,y:MY0+1,w:1,h:1,semChao:true,name:'Indústrias Reunidas Fábricas Matarazzo',text:["“Indústrias Reunidas Fábricas Matarazzo”: o conde Francesco Matarazzo começou com um armazém de banha e virou o maior industrial do Brasil.","Este complexo da Água Branca começou a ser montado em 1920, ao lado das linhas da Inglesa e da Sorocabana. O tamanho do terreno e o que se fazia em cada galpão ainda precisam ser conferidos nas fontes."],draw:drawSign});
+  {const pt=objects.find(o=>o.scene===S&&o.name==='Portão da Matarazzo');if(pt){const d0=pt.draw;pt.draw=(c,X,Y)=>{d0(c,X,Y);c.fillStyle='#2e2a26';c.fillRect(X+8,Y-24,80,12);c.fillStyle='#f1e4c4';c.fillRect(X+9,Y-23,78,10);
+    c.fillStyle='#7a2a1c';c.font='700 7px "DejaVu Sans",sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('I.R.F. MATARAZZO',X+48,Y-18);};}}
+  const TXT=(a)=>[a,"Muitas seções podiam dividir o mesmo galpão: sabão, óleo, velas, pregos, sacos... O que exatamente se fazia aqui em 1922 ainda precisa ser conferido."];
+  poe('fabricaG',102,58,11,3,'Galpão de produção',TXT("Um galpão comprido de tijolos com janelas largas: máquinas movidas por correias, o barulho não para."),{});
+  poe('galpao',115,58,8,3,'Galpão de produção',TXT("Galpão com telhado em serra, para entrar luz sem esquentar demais."));
+  poe('galpao',125,58,8,3,'Depósito de matéria-prima',["Aqui chegam, de trem, os fardos, os sacos e os barris que as seções da fábrica vão transformar."]);
+  poe('fabricaG',135,58,11,3,'Galpão de produção',TXT("Outro galpão enorme. Num complexo como este trabalham centenas de pessoas, homens, mulheres e muitas crianças."));
+  poe('armazem',148,58,6,3,'Expedição',["Daqui saem as mercadorias prontas: as carroças levam para a cidade e os vagões levam para o interior e para o porto."]);
+  poe('fabrica',102,63,7,4,'Casa das caldeiras',["As caldeiras queimam carvão e lenha dia e noite. O vapor move as máquinas de todos os galpões.","O foguista trabalha no calor mais forte da fábrica."]);
+  poe('fabricaG8',111,63,8,3,'Oficina mecânica da fábrica',["Mecânicos consertam as máquinas e fazem peças. Muitos aprenderam o ofício na Itália."]);
+  poe('moinho',133,63,7,4,'Galpão de beneficiamento',["Prédio alto de vários andares, onde a matéria-prima é limpa, moída ou prensada antes de ir para as seções."]);
+  poe('galpao',142,63,8,3,'Depósito',["Depósito de caixas, sacos e barris prontos para embarcar."]);
+  poe('casa4b',151,64,4,3,'Escritório da fábrica',["O escritório: contadores, guarda-livros e o apontador, que anota a hora de entrada e de saída de cada operário."]);
+  chamine(110,62);chamine(141,62);chamine(155,57);
+  {const KS=['carvao','fardos','caixas','barris','sacos_farinha'],TP={carvao:'Monte de carvão',fardos:'Fardos',caixas:'Caixotes',barris:'Barris',sacos_farinha:'Sacos'};let np=0;
+   for(let y=MY0+1;y<MY1;y++)for(let x=MX0+1;x<MX1-1;x++){if(np>=26||M[y][x]!=='p'||M[y][x+1]!=='p'||occ.has(x+','+y)||occ.has((x+1)+','+y)||hs(x,y,7)>.1)continue;if(y>=MY1-2&&x>=122&&x<=133)continue;
+     const k=KS[(hs(x,y,8)*KS.length)|0];if(typeof A==='undefined'||!A['IND_mod_'+k])continue;if(ind(k,x,y,2,1,TP[k],["Mercadoria no pátio da Matarazzo, esperando a vez de entrar no galpão ou de embarcar no trem."]))np++;}}
+  /* vagões parados no ramal */
+  const CARRO={loco:34,tender:20,cafe:32,pass:36,carga:32};
+  function carro(c,k,frente){const L=CARRO[k],w=13,x0=-L/2,y0=-w/2;c.fillStyle='rgba(20,20,20,.28)';c.fillRect(x0+2,y0+3,L,w);
+    if(k==='loco'){c.fillStyle='#22292a';c.fillRect(x0,y0,L,w);c.fillStyle='#3a4644';c.fillRect(x0+L*.3,y0+2,L*.62,w-4);c.fillStyle='#596866';c.fillRect(x0+L*.3,y0+3,L*.62,2);c.fillStyle='#1a1e1e';c.fillRect(x0,y0-1,L*.3,w+2);
+      c.fillStyle='#141818';c.beginPath();c.arc(x0+L*.8,0,2.6,0,7);c.fill();c.fillStyle='#c8a048';c.beginPath();c.arc(x0+L*.55,0,2,0,7);c.fill();c.fillStyle='#b02a20';c.fillRect(x0+L-2,y0,2,w);if(frente){c.fillStyle='#f4e8a0';c.fillRect(x0+L-1,-1,1,2);}return;}
+    if(k==='tender'){c.fillStyle='#22292a';c.fillRect(x0,y0,L,w);for(let i=1;i<L-1;i+=2)for(let j=2;j<w-2;j+=2){c.fillStyle=((i*7+j*3)%5)<2?'#3a3632':'#262422';c.fillRect(x0+i,y0+j,2,2);}return;}
+    if(k==='cafe'){c.fillStyle='#6e3426';c.fillRect(x0,y0,L,w);c.fillStyle='#8f4534';c.fillRect(x0+1,y0+1,L-2,w-2);for(let i=2;i<L-4;i+=5)for(let j=2;j<w-3;j+=4){c.fillStyle=((i+j)%3)?'#c2a676':'#a88e60';c.fillRect(x0+i,y0+j,4,3);}return;}
+    if(k==='carga'){c.fillStyle='#5e3428';c.fillRect(x0,y0,L,w);c.fillStyle='#7a4a3a';c.fillRect(x0+1,y0+1,L-2,w-2);c.fillStyle='#6a3e30';for(let i=3;i<L;i+=4)c.fillRect(x0+i,y0+1,1,w-2);return;}
+    c.fillStyle='#2e3a32';c.fillRect(x0,y0,L,w);c.fillStyle='#5e6e62';c.fillRect(x0+1,y0+1,L-2,w-2);c.fillStyle='#8a9a8e';c.fillRect(x0+4,-2,L-8,4);}
+  for(const [x0,n] of [[108,3],[124,2]]){const o={id:'zoVagoes_'+x0,scene:S,x:x0,y:55,w:n*2+1,h:1,name:'Vagões no ramal da fábrica',text:["Vagões de carga no ramal particular da Matarazzo: a matéria-prima chega e a mercadoria sai sem passar pela rua."],
+      draw:(c,X,Y)=>{for(let i=0;i<n;i++){c.save();c.translate(Math.round(X+16+i*35),Math.round(Y+16));carro(c,'carga',false);c.restore();}}};objects.push(o);}
+  /* --- Parque Antarctica: o campo do Palestra Itália (comprado em 1920) --- */
+  for(let y=79;y<=88;y++)for(let x=122;x<=148;x++)if(!'dDeY'.includes(M[y][x]))M[y][x]=(y===79||y===88||x===122||x===148)?(hs(x,y,9)<.5?'T':'.'):'q';
+  if(typeof drawCampo==='function')add({id:'zoCampoPalestra',x:125,y:81,w:20,h:6,semChao:true,name:'Campo do Palestra Itália (Parque Antarctica)',
+    text:["O Parque Antarctica, comprado pelo Palestra Itália em 1920. O clube foi fundado em 1914 por imigrantes italianos.","Em 1922 ainda não há o estádio grande: só o campo, a cerca e arquibancadas simples de madeira. Domingo de jogo, a colônia italiana inteira vem torcer."],
+    draw:(c,X,Y)=>drawCampo(c,X,Y,20,6,true)});
+  /* --- Água Branca, lado de cima da linha: vidraria, olarias, casas, armazéns --- */
+  poe('casa3a',109,44,3,3,'Casa',["Casa de quem trabalha na Água Branca: na vidraria, nas olarias ou na ferrovia."]);poe('casa3b',112,44,3,3,'Casa',["Casa com quintal nos fundos e um varal sempre cheio."]);
+  poe('loja3',115,44,3,3,'Venda da Água Branca',["Venda de tudo um pouco: pão, querosene, sabão, fumo e cachaça. Muito se compra fiado, na caderneta."]);poe('casa3c',118,44,3,3,'Casa',["Casa de operário, de porta e janela."]);
+  poe('casa3a',123,44,3,3,'Casa',["Casa de família italiana. Atrás, a horta e o galinheiro."]);poe('loja3b',126,44,3,3,'Barbearia',["Barbearia: corte de cabelo, barba e conversa sobre o Palestra."]);poe('casa3b',129,44,3,3,'Casa',["Casa de ferroviário."]);poe('casa3c',132,44,3,3,'Casa',["Casa de operária da Matarazzo."]);
+  poe('armazem',137,44,6,3,'Armazém de cereais',["Armazém de cereais na beira da linha: os sacos chegam do interior pela Sorocabana."]);poe('armazem',143,44,6,3,'Depósito de café',["Depósito de sacas de café esperando o trem para Santos."]);
+  poe('casa3a',151,44,3,3,'Casa',["Casa na divisa da Água Branca com a Barra Funda."]);poe('casa3c',154,44,3,3,'Casa',["Casa com porão, onde mora outra família."]);
+  poe('olaria',110,36,4,3,'Olaria da Água Branca',["Olaria na beira da várzea: o barro do Tietê vira tijolo e telha para a cidade que cresce."]);poe('olaria',118,36,4,3,'Olaria',["Os tijolos secam ao sol em fileiras antes de ir para o forno."]);
+  poe('galpao',97,42,8,3,'Fornos da vidraria',["Os fornos da vidraria ficam acesos dia e noite. O vidro derretido brilha como fogo."]);chamine(105,42);
+  /* --- Lapa: frigorífico, oficinas e estação da Inglesa (lado de cima da linha) --- */
+  poe('galpao',43,42,8,3,'Câmaras frias do frigorífico',["Câmaras frias: a carne fica guardada no gelo até embarcar no trem."]);chamine(53,38);
+  poe('galpao',68,43,8,3,'Galpão das locomotivas',["Galpão onde as locomotivas da Inglesa são lavadas, consertadas e abastecidas."]);
+  poe('estnorte',77,44,7,3,'Estação da Lapa (Inglesa)',["A estação da Lapa, da São Paulo Railway, a “Inglesa”. Daqui a linha sobe para Pirituba e Jundiaí, cruzando o Tietê.","Em volta da estação cresceu o bairro: olarias, oficinas da ferrovia, comércio e casas de ferroviários."]);
+  poe('olaria',60,36,4,3,'Olaria da Lapa',["Foi o barro da beira do Tietê que trouxe as primeiras olarias para a Lapa, antes mesmo da ferrovia."]);poe('olaria',66,36,4,3,'Olaria',["Oleiros moldam tijolo à mão, um por um."]);poe('olaria',72,36,4,3,'Olaria',["Forno de olaria: dois dias queimando tijolo."]);
+  /* --- Lapa, lado de baixo da linha: estação da Sorocabana, Largo da Lapa e rua comercial --- */
+  poe('estnorte',49,55,7,3,'Estação da Sorocabana (Lapa)',["Estação da Estrada de Ferro Sorocabana. Os trens seguem para Osasco e para o interior: Sorocaba, Botucatu e as terras novas do café e do algodão.","As duas ferrovias correm lado a lado aqui, mas são companhias diferentes, com trens e estações diferentes."]);
+  poe('banca',64,57,2,1,'Banca do Largo da Lapa',["Banca de jornais e revistas no Largo da Lapa."],{chao:true,semChao:true});
+  poe('loja3',59,63,3,3,'Armarinho',["Linha, agulha, botão, fita e tecido: o armarinho do largo."]);poe('loja3b',62,63,3,3,'Padaria da Lapa',["Pão quente às cinco da manhã, para os ferroviários que entram cedo nas oficinas."]);
+  poe('loja4',65,63,4,3,'Armazém de secos e molhados',["Arroz, feijão, bacalhau, banha e querosene, tudo pesado na hora."]);poe('loja3u',69,63,3,3,'Alfaiataria',["Terno sob medida para o domingo e para os bailes da cooperativa."]);
+  poe('casa4b',73,56,4,3,'Cooperativa dos Operários da Ferrovia',["A Cooperativa dos Operários da Ferrovia, fundada em 1908: os ferroviários juntaram dinheiro para comprar mais barato e se ajudar.","Aqui também tem baile, reunião e escola noturna."]);
+  poe('sob5a',78,55,5,4,'Sobrado com loja',["Embaixo, a loja; em cima, a família do dono. O sobrado é dos mais altos do largo."]);
+  poe('casa3a',73,63,3,3,'Casa',["Casa de ferroviário, perto das oficinas."]);poe('casa3b',77,63,3,3,'Casa',["Casa com jardim na frente."]);poe('loja3',80,63,3,3,'Botequim',["Botequim da esquina: depois do turno, os ferroviários param para um copo de vinho."]);
+  poe('casa3c',41,57,3,3,'Casa',["Casa da Lapa de Baixo."]);poe('casa3a',44,57,3,3,'Casa',["Casa de família vinda da Itália."]);poe('casa3b',41,63,3,3,'Casa',["Casa de oleiro."]);poe('casa3c',44,63,3,3,'Casa',["Casa com quintal e pé de laranja."]);
+  poe('loja4',49,63,4,3,'Empório',["Empório: vinho, azeite, queijo e salame, como na Itália."]);poe('casa3a',54,63,3,3,'Casa',["Casa de operária da vidraria."]);
+  /* casinhas de operários de frente para a avenida */
+  const casaLinha=(x0,x1,y)=>{let n=0;for(let x=x0;x<=x1;x++){if(typeof A==='undefined'||!A.IND_mod_casa_operaria_dupla)break;if(!ok(x,y,5,2)||!'dDe'.includes(M[y+2]&&M[y+2][x]||'#')||!'dDe'.includes(M[y+2]&&M[y+2][x+4]||'#'))continue;
+      ind('casa_operaria_dupla',x,y,5,2,'Casas de operários',["Casinhas geminadas: porta, janela e um quintal nos fundos. Quem mora aqui trabalha nas oficinas, na vidraria ou na Matarazzo."]);x+=5;n++;}return n;};
+  casaLinha(41,47,69);casaLinha(49,57,69);casaLinha(59,71,69);casaLinha(73,83,69);
+  /* --- Vila Anastácio: poucas casas, rua principal, cercas --- */
+  for(const [x,y] of [[28,58],[34,58],[28,64],[34,64],[28,68]])if(typeof A!=='undefined'&&A.IND_mod_casa_operaria)ind('casa_operaria',x,y,3,2,'Casa da Vila Anastácio',["A Vila Anastácio foi aberta em 1919. Muitas famílias vieram do Leste Europeu e trabalham nas fábricas e nos frigoríficos perto do Tietê."]);
+  for(let y=57;y<=70;y++)if(M[y][26]==='.'||M[y][26]===',')M[y][26]='P';
+  /* --- Pompeia, Vila Romana, Alto da Lapa: loteamentos ainda vazios --- */
+  poe('casa3a',62,80,3,3,'Casa isolada',["Uma das poucas casas do loteamento. Em volta, ruas marcadas no chão e terreno vazio."]);poe('chacara',68,81,6,3,'Chácara',["Chácara de verdura e fruta. Daqui a uns anos, tudo isto vira rua e casa."]);
+  poe('casa3b',86,92,3,3,'Casa isolada',["Casa com cerca de bambu e cachorro no portão."]);poe('casa3a',100,80,3,3,'Casa',["Casa nova de tijolo, ainda sem reboco."]);poe('casa3c',112,92,3,3,'Casa',["Casa de quem trabalha no Palestra e na Matarazzo."]);
+  poe('casa4a',70,102,4,3,'Casa da Vila Romana',["A Vila Romana foi loteada no fim do século XIX. Em 1922 ainda tem mais terreno vazio do que casa."]);poe('chacara',98,107,6,3,'Chácara da Vila Romana',["Chácara com pomar e vaca leiteira."]);
+  poe('chacara',82,113,6,3,'Chácara',["Chácara de italianos: parreira, tomate e couve."]);poe('casa3b',102,113,3,3,'Casa',["Casa de chacareiro."]);
+  poe('casa4a',46,85,4,3,'Casa do Alto da Lapa',["Uma casa recém-construída no Alto da Lapa. A Companhia City está abrindo o loteamento nos anos 1920."]);poe('casa3a',34,96,3,3,'Casa',["Casa isolada no alto, com vista para a várzea do Tietê."]);poe('casa3c',50,107,3,3,'Casa',["Casa de mestre de obras."]);
+  /* --- Perdizes: ruas em subida, casas com jardim e dois palacetes --- */
+  poe('palacete',123,91,6,4,'Palacete de Perdizes',["Casa grande com jardim e varanda, no alto de Perdizes. Daqui se vê a várzea do Tietê."]);poe('palacete',143,101,6,4,'Palacete com jardim',["Residência com jardim, gradil e árvores frutíferas."]);
+  poe('casa3a',132,91,3,3,'Casa',["Casa de Perdizes, na rua em subida."]);poe('casa3c',136,91,3,3,'Casa',["Casa com jardinzinho na frente."]);poe('casa3b',152,91,3,3,'Casa',["Casa de família portuguesa."]);
+  poe('casa4a',124,101,4,3,'Casa',["Casa com varanda lateral."]);poe('casa3a',132,107,3,3,'Casa',["Casa em rua de terra, em subida."]);poe('casa3c',152,107,3,3,'Casa',["Casa nova de Perdizes."]);
+  for(const [x0,y0] of [[123,95],[143,105]])for(let x=x0;x<x0+6;x++)if(M[y0][x]==='.'||M[y0][x]===',')M[y0][x]='f';
+  /* --- Butantã: aberto, chácaras e caminhos --- */
+  poe('chacara',64,145,6,3,'Chácara do Butantã',["Chácara na beira do caminho do Butantã. Daqui saem verdura, ovos e leite para a cidade."]);poe('chacara',100,150,6,3,'Chácara',["Sítio com pasto e galinheiro."]);poe('chacara',30,170,6,3,'Chácara',["Chácara isolada no alto do Butantã."]);
+  poe('casa3a',90,143,3,3,'Casa de sitiante',["Casa de pau a pique com telhado de telha: aqui ainda é roça."]);poe('casa3c',120,160,3,3,'Casa',["Casa de sitiante na beira da estrada."]);poe('casa3b',70,180,3,3,'Casa',["Casa no caminho de Cotia."]);
+  /* --- além do Pinheiros: Remédios e Osasco, só a sugestão --- */
+  poe('chacara',2,80,6,3,'Chácara para os lados de Remédios',["Para lá do rio Pinheiros: chácaras, pasto e o caminho para Osasco e Remédios."]);poe('casa3a',4,100,3,3,'Casa',["Casa isolada além do rio."]);
+  /* carroças */
+  for(const [x,y,n,t] of [[66,61,'Carroça de verdura',"Carroça de verdura das chácaras do Butantã a caminho do Largo da Lapa."],[118,73,'Carroça da fábrica',"Carroça carregada de caixotes saindo da Matarazzo."],[62,141,'Carroça para Cotia',"Carroça de tropeiro no caminho de Cotia, levando sal, querosene e tecido."]])
+    poe('carrocacafe',x,y,2,1,n,[t],{semChao:true});
+  /* placas */
+  placa(158,33,'Mapa dos bairros',["Por aqui se volta para a Barra Funda e o centro: siga para a direita."]);
+  placa(1,61,'Para Osasco',["A Sorocabana segue para Osasco e para o interior: Sorocaba, Botucatu, as terras novas do oeste."]);
+  placa(32,3,'Para Pirituba e Jundiaí',["A Inglesa sobe para Pirituba e Jundiaí. Lá, o café do interior entra na linha que desce para Santos."]);
+  placa(147,117,'Ponte de Pinheiros',["A ponte sobre o rio Pinheiros, no caminho do Butantã e de Cotia. (Data e forma da ponte em 1922: a conferir.)"]);
+  placa(97,119,'Rio Pinheiros',["O rio Pinheiros em 1922 ainda faz muitas curvas: tinha uns 42 km. Depois da retificação, feita entre 1934 e 1957, ficou com uns 25 km.","Na várzea há brejo, capim alto e portos de areia: barcos levam areia para as obras da cidade."]);
+  placa(80,31,'Rio Tietê',["O rio Tietê corre para o oeste, para o interior. Nas cheias, a várzea inteira vira lagoa."]);
+  placa(42,79,'Loteamento do Alto da Lapa',["Companhia City: vendem-se terrenos. As ruas já estão marcadas, mas quase tudo ainda é vazio."]);placa(98,79,'Vendem-se terrenos',["Lotes à venda na Pompeia, a prestação. Muitos operários sonham com a casa própria."]);
+  /* ---------- 6) gente ---------- */
+  const SP=s=>CHAR_ORDER.includes(s)?s:'colono';
+  const G=[[128,73,'colono','Operário da Matarazzo',["Entro pelo portão às seis da manhã e saio às seis da tarde. O apito da fábrica manda no bairro inteiro.","Aqui dentro tem de tudo: caldeira, galpão, oficina, até trem particular!"]],
+    [122,66,'lavadeira','Operária da Matarazzo',["Trabalho numa das seções da fábrica desde os catorze anos. A maioria aqui é italiana, como eu, mas tem brasileira, espanhola e portuguesa também."]],
+    [145,69,'caixeiro','Apontador da fábrica',["Anoto a hora de entrada de cada um. Três atrasos no mês e o patrão desconta do salário."]],
+    [150,56,'tropeiro','Carroceiro do ramal',["Eu levo a mercadoria do ramal para a cidade. Num dia bom são dez viagens até o Brás."]],
+    [134,90,'crianca','Menino do Palestra',["Domingo eu venho ver o Palestra jogar! Pulo a cerca quando ninguém está olhando..."]],
+    [80,48,'ferreiro','Mecânico das oficinas da Inglesa',["Nas oficinas da Lapa a gente conserta locomotiva inteira, peça por peça. Os chefes são ingleses; os mecânicos, de todo lugar."]],
+    [64,60,'quitandeira','Verdureira do Largo da Lapa',["Verdura fresca do Butantã! Chegou de carroça agora de madrugada."]],
+    [58,53,'soldado','Guarda da porteira da Lapa',["Aqui passam duas ferrovias, a Inglesa e a Sorocabana. Atravessar sem olhar é pedir para morrer!"]],
+    [46,45,'operario','Operário do frigorífico',["No frigorífico a gente trabalha no frio o dia inteiro. A carne sai daqui de trem."]],
+    [30,62,'dona','Moradora da Vila Anastácio',["Viemos da Europa do Leste com a roupa do corpo. Aqui na Vila Anastácio cada vizinho fala uma língua, mas todo mundo se entende no trabalho."]],
+    [100,46,'crianca','Menino da vidraria',["Eu carrego garrafa quente da boca do forno até a mesa de esfriar. Queima a mão, mas é o meu primeiro emprego."]],
+    [114,40,'tropeiro','Oleiro da Água Branca',["O barro bom fica na beira do Tietê. Na cheia, a olaria inteira fica debaixo d'água."]],
+    [60,30,'lavadeira','Lavadeira do Tietê',["Lavo roupa na beira do Tietê e estendo no capim. A água ainda é limpa o bastante."]],
+    [88,33,'colono','Areeiro do Tietê',["Tiro areia do fundo do rio com a pá e encho o barco. Essa areia vira parede de casa no centro."]],
+    [100,120,'colono','Barqueiro de areia do Pinheiros',["O Pinheiros faz tanta curva que a areia se junta nas margens. A gente vende barcada para as obras."]],
+    [74,86,'caixeiro','Corretor de terrenos',["Terreno na Pompeia, a prestação! Daqui a dez anos isto aqui vai estar cheio de casa, pode acreditar."]],
+    [46,90,'funcionario','Agrimensor da Companhia City',["Estou marcando as ruas do Alto da Lapa. A Companhia City planeja bairros inteiros, com ruas largas e jardins."]],
+    [140,96,'jardineiro','Jardineiro de Perdizes',["As ruas de Perdizes são uma subida só! Mas lá de cima se vê a várzea do Tietê inteira."]],
+    [70,147,'tropeiro','Tropeiro de Cotia',["Desço com a tropa de burros pelo caminho do Butantã, cruzo a ponte de Pinheiros e sigo para a cidade."]],
+    [104,154,'fazendeiro','Sitiante do Butantã',["Aqui ainda é roça: pasto, mato e algumas chácaras. A cidade parece longe, mas cresce a cada ano."]],
+    [10,64,'estudante','Viajante para Osasco',["Vou de Sorocabana até Osasco, onde moro. Lá também tem fábrica e olaria."]]];
+  for(const [x,y,spr,name,lines] of G){const p=findFree(S,x,y,6);if(!p)continue;addNPCs([{id:'zo22n_'+(ni++),spr:SP(spr),x:p[0],y:p[1],dir:'down',name,lines,diary:name+', 1922: '+lines[0]}],S);}
+  /* ---------- 7) placas de rua na cena ---------- */
+  const RU=[['R. DA LAPA',90,34],['AV. ÁGUA BRANCA',130,71.5],['R. GUAICURUS',75,60],['LARGO DA LAPA',65,55],['ESTRADA DO BUTANTÃ',90,140],['R. DA ÁGUA BRANCA',125,47.5]];
+  const FT='700 8px "Cinzel","DejaVu Serif",serif';
+  const wo=(typeof waterOverlay==='function')?waterOverlay:null;
+  waterOverlay=function(camX,camY){if(wo)wo.apply(this,arguments);if(cur!==S)return;try{ctx.save();ctx.font=FT;ctx.textAlign='center';ctx.textBaseline='middle';
+      for(const [t,x,y] of RU){const w=ctx.measureText(t).width+10,X=x*T-camX,Y=y*T-camY;if(X<-w||X>VW+w||Y<-10||Y>VH+10)continue;
+        ctx.fillStyle='#f4f1e6';ctx.fillRect(X-w/2,Y-6,w,12);ctx.fillStyle=/LARGO/.test(t)?'#7a2a1c':'#17357e';ctx.fillRect(X-w/2+1,Y-5,w-2,10);ctx.fillStyle='#fff';ctx.fillText(t,X,Y+.5);}
+      ctx.restore();}catch(_){}};
+  /* ---------- 8) trens passando ---------- */
+  const TR=[{v:VIAS.find(v=>v.id==='spr'),comp:['loco','tender','cafe','cafe','cafe','cafe','cafe'],vel:52,ida:1,s:0,wait:4},
+    {v:VIAS.filter(v=>v.id==='soroc')[1],comp:['loco','tender','pass','pass','pass'],vel:46,ida:-1,s:0,wait:20}];
+  for(const t of TR){t.len=t.comp.reduce((a,c)=>a+CARRO[c]+3,0);t.s=t.ida>0?-t.len:t.v.len+t.len;}
+  const pto=(v,s)=>{const {Q,S:Sx,len}=v;let i=0;if(s<=0)i=0;else if(s>=len)i=Q.length-2;else while(i<Q.length-2&&Sx[i+1]<s)i++;const a=Q[i],b=Q[i+1],l=Sx[i+1]-Sx[i],t=(s-Sx[i])/l;return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,Math.atan2(b[1]-a[1],b[0]-a[0])];};
+  if(typeof trainXUpdate==='function'){const u0=trainXUpdate;trainXUpdate=function(dt){u0(dt);if(cur!==S)return;for(const t of TR){if(!t.v)continue;if(t.wait>0){t.wait-=dt;continue;}t.s+=t.ida*t.vel*dt;
+      if(t.ida>0?t.s>t.v.len+t.len+40:t.s<-t.len-40){t.s=t.ida>0?-t.len:t.v.len+t.len;t.wait=15+Math.random()*20;}}};}
+  if(typeof trainXRender==='function'){const r0=trainXRender;trainXRender=function(list,camX,camY){r0(list,camX,camY);if(cur!==S)return;
+      for(const t of TR){if(!t.v||t.wait>0)continue;let d=0;t.comp.forEach((k,i)=>{const L=CARRO[k],s=t.s-t.ida*(d+L/2);d+=L+3;if(s<0||s>t.v.len)return;const p=pto(t.v,s),X=p[0]-camX,Y=p[1]-camY;
+        if(X<-60||Y<-60||X>VW+60||Y>VH+60)return;const ang=p[2]+(t.ida<0?Math.PI:0);list.push({z:p[1]+10,f:()=>{ctx.save();ctx.translate(Math.round(X),Math.round(Y));ctx.rotate(ang);carro(ctx,k,i===0);ctx.restore();}});});}};}
+  /* ---------- 9) passagem pela borda: mapa dos bairros <-> zona oeste ---------- */
+  let viu=false,ocup2=false;
+  setInterval(()=>{try{if(!started||dialog||ocup2||(typeof sceneFade!=='undefined'&&sceneFade))return;
+      if(cur==='sp22'&&player.x===0&&!player.moving){ocup2=true;const y=player.y;goScene(S,158,y,'left',()=>{ocup2=false;if(!viu){viu=true;say('Zona Oeste, 1922',["Você saiu para a zona oeste: Água Branca, Lapa, Pompeia, Perdizes e, depois do rio Pinheiros, o Butantã.","Aqui as fábricas grandes, como a Matarazzo, ficam coladas nas duas ferrovias: a Inglesa e a Sorocabana. Para voltar, ande até a borda da direita."],null,'player');}});return;}
+      if(cur===S&&player.x>=159&&!player.moving){ocup2=true;const y=player.y;goScene('sp22',1,y,'right',()=>{ocup2=false;});}}catch(_){ocup2=false;}},150);
+  /* ---------- 10) mapa (botão MAPA) desta cena ---------- */
+  const LAB=[['ÁGUA BRANCA',126,40,'#f1c471',1],['LAPA',66,62,'#f1c471',1],['VILA ANASTÁCIO',31,63,'#f1c471'],['POMPEIA',88,84,'#f1c471',1],['VILA ROMANA',80,108,'#f1c471'],
+    ['ALTO DA LAPA',44,92,'#f1c471'],['PERDIZES',138,98,'#f1c471',1],['BUTANTÃ',90,170,'#f1c471',1],['Rio Tietê',90,23,'#a8d8f8'],['Rio Pinheiros',90,126,'#a8d8f8'],['Várzea do Tietê',125,12,'#a8d8f8'],
+    ['Matarazzo',128,61,'#e3f1f5'],['Palestra Itália',135,78,'#e3f1f5'],['Estação da Lapa',80,42,'#e3f1f5'],['Sorocabana → Osasco',12,66,'#e3f1f5'],['Inglesa → Pirituba',36,8,'#e3f1f5'],['Barra Funda e centro →',146,60,'#e3f1f5']];
+  if(typeof drawMap==='function'){const dm=drawMap;drawMap=function(){const base=SCN[cur]&&SCN[cur].room?SCN[cur].parent:cur;if(base!==S)return dm.apply(this,arguments);
+    const c=mpc,K2=640/(W*T),H2=Math.round(50+H*T*K2);if(mapCv.height!==H2)mapCv.height=H2;
+    const off=document.createElement('canvas');off.width=W*T;off.height=H*T;const oc=off.getContext('2d');oc.imageSmoothingEnabled=false;drawSceneInto(oc,S,0,true);buildStatic();
+    c.clearRect(0,0,640,H2);c.imageSmoothingEnabled=true;c.drawImage(off,0,50,640,H*T*K2);c.imageSmoothingEnabled=false;c.textAlign='center';c.textBaseline='middle';c.lineJoin='round';
+    for(const [t,x,y,col,big] of LAB){c.font=(big?'600 20px':'600 14px')+' "Pixelify Sans", sans-serif';c.lineWidth=big?6:4;c.strokeStyle='#141b1b';c.strokeText(t,x*T*K2,y*T*K2+50);c.fillStyle=col;c.fillText(t,x*T*K2,y*T*K2+50);}
+    const px=player.x*T*K2,py=player.y*T*K2+50;c.fillStyle='#141b1b';c.beginPath();c.arc(px,py,7,0,7);c.fill();c.fillStyle='#f15a3a';c.beginPath();c.arc(px,py,5,0,7);c.fill();
+    c.fillStyle='rgba(20,27,27,.92)';c.fillRect(0,0,640,50);c.textAlign='left';c.font='600 24px "Pixelify Sans", sans-serif';c.fillStyle='#f1c471';c.fillText('ZONA OESTE DE SÃO PAULO, 1922',12,17);
+    c.font='16px "Pixelify Sans", sans-serif';c.fillStyle='#f2eaf1';c.fillText('Para voltar ao mapa dos bairros, ande até a borda da direita.',12,38);};}
+  window.__oeste22={S,W,H,falhas,objetos:objects.filter(o=>o.scene===S).length,gente:npcs.filter(n=>n.scene===S).length,RT,LIN};
+  /* ---------- 11) no mapa dos bairros: o que era da Lapa e da Água Branca vem para cá ---------- */
+  setTimeout(()=>{try{const R=window.__oeste22.mudou={obj:[],npc:[],fill:[]};
+    const mv=(id,x,y)=>{const o=objects.find(q=>q.scene==='sp22'&&q.id===id);if(!o)return null;const p=(o.w||1)>1||(o.h||1)>1?(ok(x,y,o.w,o.h)?[x,y]:null):findFree(S,x,y,5);if(!p)return null;
+      const w=o.w||1,h=o.h||1,ox=o.x,oy=o.y;o.__zoOld=[ox,oy];o.scene=S;o.x=p[0];o.y=p[1];marca(p[0],p[1],w,h,(w>1||h>1)?'p':null);R.obj.push(id);return {o,ox,oy,w,h};};
+    const enche=(r,sp,name,text)=>{if(!r||r.w<2)return;objects.push({id:'zoFill_'+r.o.id,scene:'sp22',x:r.ox,y:r.oy,w:r.w,h:r.h,draw:spDraw(sp,r.w,r.h),name,text});R.fill.push(r.o.id);};
+    const DEP=["Armazém de mercadorias perto da linha do trem. Mais para oeste ficam a Água Branca e a Lapa, com as grandes fábricas: siga pela borda esquerda do mapa."];
+    enche(mv('armour',43,37),'galpao','Depósito',DEP);enche(mv('oficinasSPR',59,43),'galpao','Depósito da ferrovia',DEP);
+    enche(mv('santaMarina',97,37),'armazem','Armazém',DEP);
+    {const o=objects.find(q=>q.scene==='sp22'&&q.id==='matarazzoAB');if(o){objects.push({id:'zoFill_matarazzoAB',scene:'sp22',x:o.x,y:o.y,w:o.w,h:o.h,draw:spDraw('galpao',o.w,o.h),name:'Depósito',text:DEP});
+      objects.splice(objects.indexOf(o),1);R.fill.push('matarazzoAB');}}
+    {const o=objects.find(q=>q.scene==='sp22'&&q.id==='campoPalestra');if(o){objects.splice(objects.indexOf(o),1);R.obj.push('campoPalestra(saiu)');}}
+    for(const [id,x,y] of [['santaMarina_m0',100,41],['fvTorreLapa',66,42],['fvGuindLapa',64,46],['fvRodaLapa',62,46]])mv(id,x,y);
+    {const r=mv('ponto_lapa_22',63,61);if(r&&r.o.ponto22){const q=r.o;q.ponto22.sc=S;q.ponto22.x=q.x;q.ponto22.y=q.y;let t=null;try{t=findFree(S,q.x,q.y+1,3);}catch(_){}q.ponto22.to=t||[q.x,q.y+1];}}
+    for(const [id,x,y] of [['palestrino',130,90],['torcedorPalestra',140,90],['vidreiro',103,46],['bairro22_8',99,46],['bairro22_6',70,48],['moradoraLapa',52,61],['bairro22_7',56,61]]){
+      const n=npcs.find(q=>q.id===id&&q.scene==='sp22');if(!n)continue;const p=findFree(S,x,y,6);if(!p)continue;n.__zoOld=[n.x,n.y];n.scene=S;n.x=p[0];n.y=p[1];if(n.px!==undefined){n.px=n.x*T;n.py=n.y*T;}R.npc.push(id);}
+    if(typeof ROTEIRO!=='undefined'&&ROTEIRO[4])for(const p of ROTEIRO[4]){if(p.sc==='sp22'&&p.obj&&R.obj.includes(p.obj))p.sc=S;}
+    /* nomes do mapa dos bairros */
+    for(let i=LABELS_22.length-1;i>=0;i--){const L=LABELS_22[i];if(L[0]==='LAPA'||L[0]==='ÁGUA BRANCA'||L[0]==='Parque Antarctica')LABELS_22.splice(i,1);}
+    LABELS_22.push(['← LAPA E ÁGUA BRANCA',13,44,'#f1c471']);
+    {const P=LABELS_22.find(l=>l[0]==='PINHEIROS');if(P){P[1]=26;P[2]=146;}LABELS_22.push(['BUTANTÃ',9,182,'#f1c471']);}
+    /* placas na borda esquerda do mapa dos bairros */
+    for(const y of [33,46,70,76,88]){let p=null;for(const x of [1,2,3])if(freeAt('sp22',x,y)&&!'dDeRY'.includes(M0[y][x])&&!objects.some(o=>o.scene==='sp22'&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))){p=[x,y];break;}
+      if(p&&typeof drawSign==='function')objects.push({id:'zoPlaca_'+y,scene:'sp22',x:p[0],y:p[1],w:1,h:1,draw:drawSign,name:'Para a zona oeste',text:["Siga para a esquerda: Água Branca (com as Indústrias Matarazzo e o Palestra Itália), Lapa, Pompeia, Perdizes e, depois do rio Pinheiros, o Butantã."]});}
+  }catch(e){console.warn('oeste22 muda',e);}},0);
+}catch(e){console.warn('oeste22',e);}})();
+/*__BAIRROS22_J_END__*/
 
 /* =========================================================
    NOMES DAS RUAS NO CHÃO E NO MAPA (1922)
