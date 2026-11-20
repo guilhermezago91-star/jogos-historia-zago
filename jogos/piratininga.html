@@ -15424,6 +15424,9 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
       const p=(()=>{const c0=cur,m0=map;return [88,49];})();goScene(S,p[0],p[1],'down',()=>{try{const q=ini();player.x=q[0];player.y=q[1];player.px=q[0]*T;player.py=q[1]*T;toast('Centro ampliado (prévia): só chão, ruas e prédios. Use "Viajar" para voltar à cidade.');}catch(_){}});}catch(_){}} ,700);
   window.__centro22={S,X0,Y0,K,W,H,conv,predios:nb,placas:P.length,ini,P,M};
 }catch(e){console.warn('centro22',e);}})();
+/* ===== v166 — CENTRO DE 1922: BASE DO CENTRO ESTÁVEL — a faixa do trilho antigo (x130-131) fica reservada durante a montagem, para as ferrovias largas dos bairros não embaralharem os prédios do centro (pedido do professor, 20/11/2026) ===== */
+(function(){try{const C=window.__centro22;if(!C||C.__faixa)return;const g=[];for(let y=0;y<C.H;y++)for(const x of [130,131])if(C.M[y]&&C.M[y][x]!=='L'){g.push([x,y,C.M[y][x]]);C.M[y][x]='L';}C.__faixa=g;}catch(e){console.warn('centro22 faixa',e);}})();
+
 
 /* =========================================================
    RUAS DO CENTRO EM 1922 — nomes corrigidos e ruas que faltavam
@@ -18530,7 +18533,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v157) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v166) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -18932,7 +18935,7 @@ window.__paulista82Ready=Promise.all(ready);
       const fig=(id,k,x,y,w,h,nm,tx)=>{if(!A[k])return null;const im=new Image();im.src=A[k];const o={id,scene:S,x,y,w,h,name:nm,text:tx,__jm:1,draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;c.drawImage(im,Math.round(X+w*8-im.naturalWidth/2),Y+h*16-im.naturalHeight);}};objects.push(o);return o;};
       /* (1) parque no lugar do rio: gramado com caminhos de saibro */
       set(51,82,60,97,'.');set(53,70,58,79,'.');
-      set(55,70,56,79,'d');set(52,82,52,97,'d');set(55,84,56,88,'W');set(54,89,55,92,'W');set(55,93,56,97,'W');set(53,90,56,90,'d');
+      set(55,70,56,79,'d');set(52,82,52,97,'d');set(55,84,56,88,'W');set(54,89,55,92,'W');set(55,93,56,97,'W');set(53,90,56,91,'d');
       objects.push({id:'jm_bocaGaleria',scene:S,x:55,y:83,w:2,h:1,name:'Boca da galeria',__jm:1,text:['Aqui o córrego some: entra num túnel de tijolos e segue por baixo do parque e das ruas até o rio Tamanduateí.','Do Largo do Riachuelo para cima, o Anhangabaú foi canalizado. Daqui para baixo, o Saracura ainda corre a céu aberto, no meio do capim.'],
         draw(c,X,Y){c.fillStyle='#7a3f2c';c.fillRect(X-2,Y-6,36,22);c.fillStyle='#96523a';for(let j=0;j<22;j+=4)for(let i=(j%8?0:4);i<36;i+=8)c.fillRect(X-2+i,Y-6+j,6,3);c.fillStyle='#b9b3a4';c.fillRect(X-3,Y-8,38,3);c.fillStyle='#14161c';c.fillRect(X+6,Y+2,20,14);c.fillRect(X+8,Y,16,2);c.fillRect(X+11,Y-2,10,2);c.fillStyle='#3f6f8f';c.fillRect(X+8,Y+13,16,3);}});
       objects.push({id:'jm_gradeAnh',scene:S,x:57,y:74,w:1,h:1,name:'Grade da galeria',__jm:1,text:['Uma grade de ferro no chão do parque. Encostando o ouvido, dá para ouvir água correndo lá embaixo, no escuro.','É o ribeirão Anhangabaú. No começo do século ele foi canalizado: fechado num túnel de tijolos. Por cima ficaram o parque e as ruas.'],
@@ -18942,7 +18945,7 @@ window.__paulista82Ready=Promise.all(ready);
       /* palacetes com jardim, muro e portão (o desenho já traz o jardim da frente) */
       set(6,67,23,75,'.');
       fig('jm_palacete1','PAUL_palacete_01',6,73,10,3,'Palacete',['Um palacete isolado no meio do jardim, com muro, grade e portão de ferro. Nesta parte da cidade moram poucas famílias, e muito ricas.','[Casa inventada para o jogo, no estilo dos palacetes da época.]']);
-      fig('jm_chacaraVelha','PAUL_palacete_04',16,73,8,3,'Chácara Velha',['A “Chácara Velha”. Era uma casa antiga, de taipa. Na reforma do fim do século passado ganhou platibanda, alpendre na frente com terraço em cima e enfeites à moda da Europa.','A dois passos daqui ficam as lojas e os bondes. Aqui dentro, só jardim e silêncio.','[Desenho aproximado, posto para o jogo.]']);
+      fig('jm_chacaraVelha','PAUL_palacete_04',16,73,8,3,'Chácara Velha',['A “Chácara Velha”, antiga sede de uma chácara da família Souza Queiroz. Em 1922 mora aqui um casal da família, numa casa cercada de árvores.','A dois passos ficam as lojas e os bondes. Aqui dentro, só jardim e silêncio.','[A casa e os moradores são de 1922. O desenho é aproximado. Fonte: J. E. Lefèvre, “De beco a avenida”, 2006.]']);
       for(let x=6;x<=23;x++)fig('jm_sebeN'+x,x%4===1?'ANH_arbusto_florido':'ANH_arbusto',x,67,1,1,'Sebe',['A sebe do jardim do palacete.']);
       for(let y=68;y<=72;y++){fig('jm_sebeO'+y,'ANH_arbusto',6,y,1,1,'Sebe',['A sebe do jardim do palacete.']);fig('jm_sebeL'+y,'ANH_arbusto',23,y,1,1,'Sebe',['A sebe do jardim do palacete.']);}
       if(!npcs.some(n=>n.id==='jm_mordomo'))npcs.push({id:'jm_mordomo',spr:'h22_n|hoteleiro|1',name:'Mordomo',lines:['Sou o mordomo da casa. A rua aqui é sossegada... até demais. Passa um automóvel por dia, e é o do patrão.','Lá embaixo, perto do Theatro, é loja, bonde e gente o dia inteiro. Aqui só se ouve passarinho.'],x:20,y:76,dir:'down',scene:S,talked:false,px:20*T,py:76*T});
@@ -18957,10 +18960,10 @@ window.__paulista82Ready=Promise.all(ready);
         draw(c,X,Y){c.fillStyle='rgba(20,16,24,.22)';c.fillRect(X+1,Y+14,46,3);c.fillStyle='#d9d2c0';c.fillRect(X,Y-14,48,30);c.fillStyle='#ece6d6';c.fillRect(X+1,Y-13,46,28);c.fillStyle='#d9d2c0';c.fillRect(X+10,Y-18,28,4);c.fillStyle='#ece6d6';c.fillRect(X+12,Y-17,24,3);c.fillRect(X+18,Y-20,12,3);
           c.fillStyle='#2f5a9c';c.fillRect(X+8,Y-9,32,18);c.fillStyle='#e9eef5';c.fillRect(X+9,Y-8,30,16);c.fillStyle='#4f7fc0';for(let j=0;j<16;j+=4)for(let i=0;i<30;i+=4)if((i+j)%8===0)c.fillRect(X+9+i,Y-8+j,2,2);
           c.fillStyle='#2f5a9c';c.fillRect(X+14,Y+1,6,5);c.fillRect(X+22,Y-1,3,7);c.fillRect(X+28,Y+2,7,4);c.fillRect(X+12,Y-5,20,1);c.fillStyle='#a79f8c';c.fillRect(X,Y+14,48,2);c.fillRect(X+2,Y-13,3,27);c.fillRect(X+43,Y-13,3,27);}});
-      objects.push({id:'jm_obeliscoMem',scene:S,x:45,y:71,w:1,h:1,name:'Obelisco da Memória',__jm:1,text:['O obelisco de pedra do Largo da Memória, de 1814. É o monumento mais antigo da cidade. O povo chamava de “Pirâmide do Piques”.','Em 1830 este largo era a entrada de São Paulo: aqui chegavam as tropas de mulas. Depois veio a estrada de ferro, e a porta da cidade mudou para a Luz.'],
+      objects.push({id:'jm_obeliscoMem',scene:S,x:47,y:73,w:1,h:1,name:'Obelisco da Memória',__jm:1,text:['O obelisco de pedra do Largo da Memória, de 1814. É o monumento mais antigo da cidade. O povo chamava de “Pirâmide do Piques”.','Em 1830 este largo era a entrada de São Paulo: aqui chegavam as tropas de mulas. Depois veio a estrada de ferro, e a porta da cidade mudou para a Luz.'],
         draw(c,X,Y){c.fillStyle='rgba(20,16,24,.22)';c.fillRect(X,Y+14,16,3);c.fillStyle='#4a4648';c.fillRect(X-1,Y+9,18,7);c.fillStyle='#77726f';c.fillRect(X,Y+10,16,5);c.fillStyle='#8f8a86';c.fillRect(X+2,Y+5,12,5);c.fillStyle='#4a4648';c.fillRect(X+1,Y+4,14,1);
           for(let j=0;j<36;j++){const w=j<4?2+j:6+Math.floor(j/12),x0=X+8-Math.ceil(w/2);c.fillStyle='#4a4648';c.fillRect(x0-1,Y-31+j,w+2,1);c.fillStyle='#a9a5a0';c.fillRect(x0,Y-31+j,Math.ceil(w/2),1);c.fillStyle='#7d7976';c.fillRect(x0+Math.ceil(w/2),Y-31+j,Math.floor(w/2),1);}}});
-      fig('jm_chafarizMem','AL_chafariz',47,73,4,1,'Chafariz',['O chafariz do largo. Antes da água encanada, era aqui que se enchiam os potes e se dava de beber às mulas.']);
+      fig('jm_chafarizMem','AL_chafariz',45,71,4,1,'Chafariz',['O chafariz do largo. Antes da água encanada, era aqui que se enchiam os potes e se dava de beber às mulas.']);
       try{for(let i=C.P.length-1;i>=0;i--){const q=C.P[i];if(!q)continue;if(/MEM[ÓO]RIA/.test(q.t)&&q.largo){q.x=47.5*16;q.y=75*16+8;}else if(/ANHANGABA/.test(q.t)&&q.x>=52*16&&q.x<=61*16&&q.y>=69*16&&q.y<=80*16)C.P.splice(i,1);}
         C.P.push({t:'PARQUE ANHANGABAÚ',x:56*16,y:81*16,w:98,largo:1});}catch(_){}
       for(const q of npcs)if(q.scene===S&&q.id!=='jm_mordomo'&&((q.x>=6&&q.x<=41&&q.y>=67&&q.y<=75&&!(q.x>=24&&q.x<=25))||objects.some(z=>z.scene===S&&z.__jm&&q.x>=z.x&&q.x<z.x+(z.w||1)&&q.y>=z.y&&q.y<z.y+(z.h||1)&&z.y>=66&&z.x<=60))){const dd=perto(q.x,q.y,1);if(dd){rel.movidos.push(q.id+' '+q.x+','+q.y+' -> '+dd);q.x=dd[0];q.y=dd[1];q.px=dd[0]*T;q.py=dd[1]*T;}}
@@ -18988,7 +18991,9 @@ window.__paulista82Ready=Promise.all(ready);
       /* lojas no tamanho cheio, de frente para a rua de baixo (y88) */
       ergue(ini(60),'g_loja_2x2_1',17,4,2,'RELOJOARIA',['p'],88,4);
       ergue(ini(61),'g_loja_2x2_2',21,4,2,'TECIDOS',['t',TELHA[3]],88,4);
-      ergue(ini(65),'g_sobrado_3x2_2',35,6,3,'CALÇADOS',['t',TELHA[0]],88,4);
+      /* ===== v166 — CENTRO DE 1922: LARGO DO RIACHUELO COM O JORNAL “O COMBATE”, PONTO DE AUTOMÓVEIS E ARMAZÉM; BARBEIRO DO BEXIGA; RUAS DE SANTO ANTÔNIO, SANTO AMARO E MAJOR QUEDINHO (pedido do professor, 20/11/2026) ===== */
+      some(ini(65));
+      {const o={id:'jm_oCombate',scene:S,x:35,y:87,w:1,h:1,name:'Jornal “O Combate”',text:['Largo do Riachuelo, 26-A. Aqui ficam a redação, a administração e as oficinas do jornal “O Combate”. Da calçada dá para ouvir as máquinas de imprimir.','[O jornal e o endereço são de 1922. A fachada e a posição do prédio no largo são reconstrução. Fonte: “O Combate”, 28/8/1922.]']};objects.push(o);ergue(o,'g_sobrado_3x2_2',35,6,null,'O COMBATE',['t',TELHA[0]],88,4);}
       const quintal=(x,y)=>(x>=20&&x<=21&&y>=79&&y<=81)||(x>=38&&x<=40&&y>=79&&y<=80)||(x>=8&&x<=9&&y>=85&&y<=86)||(x>=13&&x<=15&&y>=85&&y<=86)||(x>=29&&x<=30&&y>=84&&y<=87);
       rel.quintal18=(rel.quintal18||[]).concat([[20,79,2,3],[38,79,3,2],[8,85,2,2],[13,85,3,2]]);
       for(const q of npcs)if(q.scene===S&&q.x>=6&&q.x<=41&&q.y>=78&&q.y<=87&&M[q.y][q.x]==='p'){const dd=perto(q.x,q.y,1);if(dd){rel.movidos.push(q.id+' '+q.x+','+q.y+' -> '+dd);q.x=dd[0];q.y=dd[1];q.px=dd[0]*T;q.py=dd[1]*T;}}
@@ -18998,11 +19003,21 @@ window.__paulista82Ready=Promise.all(ready);
       gente('jm_criancaCort','h22_n|criancasBx|3','Menino do cortiço',30,86,['A gente brinca aqui no corredor. Lá no fundo moram oito famílias. Cada uma tem um quarto.','O tanque e a privada são de todo mundo. De manhã tem fila!']);
       /* Largo do Riachuelo (antigo Pátio do Bexiga): cruzamento alargado, café térreo de esquina e cocheiro */
       marcaPt(44,79,50,97);tiraT(44,79,50,89);quadra(44,79,50,83);set(44,84,50,89,'D');
-      {const o={id:'jm_cafeRiach',scene:S,x:44,y:83,w:1,h:1,name:'Café e restaurante',text:['Um café de esquina, térreo, com toldo. No Largo do Riachuelo param carroceiros, cocheiros e gente que sobe e desce do Bexiga.','[Casa inventada para o jogo, a partir de uma foto do largo feita pela Light em 1931.]']};objects.push(o);ergue(o,'g_armazem_3x1_2',44,6,null,'CAFÉ',['t',TELHA[0]],84,3);}
+      {const o={id:'jm_cafeRiach',scene:S,x:44,y:83,w:1,h:1,name:'Armazém de Francisco Grillo',text:['O armazém de Francisco Grillo, no Largo do Riachuelo. Em 1922 ele anunciava no jornal: café, queijos, conservas e bebidas.','[O armazém e o dono são de 1922. O número da porta e a fachada são reconstrução. Fonte: anúncio em “O Combate”, 20/3/1922.]']};objects.push(o);ergue(o,'g_armazem_3x1_2',44,6,null,'ARMAZÉM',['t',TELHA[0]],84,3);}
       gente('jm_cocheiroRiach','h22_n|carregaArm1|5','Cocheiro',47,86,['Tenho carroça e duas mulas. A cocheira fica ali na Rua de Santo Amaro. Carrego lenha, mudança, o que aparecer.','Dizem que o automóvel vai acabar com a gente. Por enquanto, quem sobe ladeira com carga ainda é mula.']);
       gente('jm_lavadeiraVale','h22_n|espanhola|5','Lavadeira',58,91,['Lavo roupa no córrego e estendo no capim para quarar ao sol. Minha mãe já lavava aqui, e a mãe dela também.','Lá para cima taparam o rio e fizeram jardim. Aqui embaixo ninguém da Prefeitura aparece. Só agora, que querem abrir avenida.']);
+      gente('jm_tipografo','h22_x|reparador_de_maquinas_de_escrever|1','Tipógrafo',38,88,['Sou tipógrafo de “O Combate”. Monto a página letra por letra, com tipos de chumbo, tudo de trás para a frente.','O jornal fecha de noite e sai de madrugada. Quem lê não imagina o trabalho que dá.']);
+      gente('jm_jornaleiroComb','h22_n|jornaleiro|3','Jornaleiro',41,89,['Olha “O Combate”! Saiu agora da oficina, ainda com cheiro de tinta!']);
+      gente('jm_choferRiach','h22_x|vendedor_de_gasolina|0','Chofer de praça',49,88,['Sou chofer de praça. Fico aqui no ponto esperando freguês. Quem tem pressa e dinheiro vai de automóvel. O resto vai de bonde.','O cocheiro ali do lado não gosta de mim. Diz que o automóvel assusta as mulas.']);
+      gente('jm_barbeiroMuss','x22_barbeiro','Victor Mussumecci, barbeiro',36,90,['Victor Mussumecci, barbeiro, às ordens! Minha barbearia fica aqui na Rua de Santo Antônio.','Corto cabelo de italiano, de brasileiro, de português. Na cadeira do barbeiro todo mundo conta a vida.','[Victor Mussumecci aparece como barbeiro na Rua de Santo Antônio em registros de 1909 a 1927. As falas são inventadas. Fonte: S. Schneck, 2016.]']);
+      gente('jm_chacareiroPt','h22_n|portugues|3','Chacareiro português',52,87,['Planto couve, alface e cheiro-verde aqui na baixada e vendo de porta em porta, lá em cima.','A terra é boa. Mas quando o córrego enche, leva a horta inteira.']);
+      for(const c of [['jm_auto0','V22_ford_preto_left',44,87,2],['jm_auto1','V22_ford_vinho_left',47,88,2],['jm_auto2','V22_ford_verde_down',50,87,1]]){const im=new Image();im.src=A[c[1]]||'';if(A[c[1]])objects.push({id:c[0],scene:S,x:c[2],y:c[3],w:c[4],h:1,name:'Automóvel de praça',__jm:1,text:['Um Ford de aluguel à espera de freguês. Em janeiro de 1922 a Prefeitura marcou lugar para vinte automóveis no Largo do Riachuelo.','[Fonte: Ato nº 1.706, de 12/1/1922.]'],draw(k,X,Y){if(!im.complete||!im.naturalWidth)return;k.fillStyle='rgba(20,16,24,.25)';k.fillRect(X+2,Y+13,c[4]*16-4,3);k.drawImage(im,Math.round(X+c[4]*8-im.naturalWidth/2),Y+16-im.naturalHeight);}});}
+      /* a rua que desce à esquerda do largo é a de Santo Antônio; a de Santo Amaro desce à direita (rua nova, 2 quadradinhos) */
+      marcaPt(44,90,50,97);rua(47,90,48,97);
+      try{for(const q of C.P)if(q&&/SANTO AMARO/.test(q.t)){q.t='R. DE SANTO ANTÔNIO';q.w=Math.max(q.w||0,116);}
+        C.P.push({t:'R. DE SANTO AMARO',x:48*16,y:94*16,w:104,v:1});C.P.push({t:'R. MAJOR QUEDINHO',x:15*16,y:77*16,w:108});}catch(_){}
       try{C.P.push({t:'LARGO DO RIACHUELO',x:47*16,y:89*16+8,w:104,largo:1});C.P.push({t:'R. QUIRINO DE ANDRADE',x:43*16,y:79*16,w:112,v:1});}catch(_){}
-      rel.r19=1;tapa(6,78,41,87,quintal);tapa(6,88,17,97);tapa(44,79,50,83,(x,y)=>x===50);tapa(44,90,50,97);}
+      rel.r19=1;rel.r20=1;tapa(6,78,41,87,quintal);tapa(6,88,17,97);tapa(44,79,50,83,(x,y)=>x===50);tapa(44,90,50,97);}
      rel.movidos.push('República e Municipal: 17ª rodada');}
     /* a Praça da Sé fica mais limpa na frente do Solar: uma banca vai para o Largo do Carmo e a árvore sai da frente */
     for(const [id,x,y] of [['rtp13',98,59],['rtp4',121,65]]){const o=objects.find(o=>o.scene===S&&o.id===id);if(o&&cabe(x,y,o.w||1)){rel.movidos.push(id+' '+o.x+','+o.y+' -> '+x+','+y);o.x=x;o.y=y;}}
@@ -19060,11 +19075,11 @@ window.__paulista82Ready=Promise.all(ready);
       [[54,74],[57,76]].forEach((a,i)=>prop('jm_pqBanco'+i,i%2?'ANH_banco_B':'ANH_banco_A',a[0],a[1],BAN[0],BAN[1]));
       [[54,70],[57,79]].forEach((a,i)=>prop('jm_pqPoste'+i,'ANH_poste_dois_globos_A',a[0],a[1],POS[0],POS[1]));
       [[58,85,'ANH_arvore_verde'],[51,93,'ANH_arvore_verde'],[59,95,'ANH_arbusto'],[53,96,'ANH_arbusto'],[58,89,'ANH_arbusto']].forEach((a,i)=>prop('jm_valeMato'+i,a[2],a[0],a[1],'Mato do vale',['Capim, mato e algumas árvores. O fundo do vale ainda não foi ocupado pela cidade.']));
-      placa('jm_placaGaleria',57,83,['“Aqui embaixo corre o Anhangabaú.”','Neste ponto o córrego entra num túnel de tijolos e passa por baixo do parque e das ruas. Em 1830 havia lavadeiras e chácaras na beira dele.']);
+      placa('jm_placaGaleria',57,83,['“Aqui embaixo corre o Anhangabaú.”','O córrego entra num túnel de tijolos e passa por baixo do parque e das ruas. Do Largo da Memória para cima, ele está coberto desde 1900.','[O ponto exato onde a água sumia em 1922 não é conhecido. Aqui é uma reconstrução.]']);
       placa('jm_placaSaracura',53,86,['Vale do Saracura. O córrego ainda corre a céu aberto, entre capim, hortas, casebres e roupa quarando.','Desde 1919 a Prefeitura discute abrir aqui uma avenida. Em 1922 começam as desapropriações. A avenida só vai ficar pronta muitos anos depois. [Fonte: G. P. Rodrigues, “Vias públicas”, FAU-USP, 2008.]']);
       prop('jm_memArv0','ANH_arvore_verde',44,69,ARV[0],ARV[1]);prop('jm_memArv1','ANH_arvore_florida',50,69,ARV[0],ARV[1]);
-      prop('jm_memBanco0','ANH_banco_A',44,73,'Banco de azulejos',['Um banco revestido de azulejos, da reforma do largo.']);prop('jm_memBanco1','ANH_banco_B',48,70,'Banco de azulejos',['Um banco revestido de azulejos, da reforma do largo.']);
-      prop('jm_memPoste0','ANH_poste_dois_globos_A',44,74,POS[0],POS[1]);prop('jm_memPoste1','ANH_poste_dois_globos_A',49,71,POS[0],POS[1]);
+      prop('jm_memBanco0','ANH_banco_A',44,73,'Banco de azulejos',['Um banco revestido de azulejos, da reforma do largo.']);prop('jm_memBanco1','ANH_banco_B',50,73,'Banco de azulejos',['Um banco revestido de azulejos, da reforma do largo.']);
+      prop('jm_memPoste0','ANH_poste_dois_globos_A',44,74,POS[0],POS[1]);prop('jm_memPoste1','ANH_poste_dois_globos_A',50,71,POS[0],POS[1]);
       [[9,69,'ANH_arvore_verde'],[13,70,'PAUL_arvore_01'],[18,69,'ANH_arvore_florida'],[21,70,'ANH_palmeira'],[11,71,'ANH_canteiro_florido'],[16,71,'ANH_canteiro_retangular']].forEach((a,i)=>prop('jm_jdPal'+i,a[2],a[0],a[1],'Jardim do palacete',['O jardim de um palacete: árvores, canteiros e muito espaço livre, bem diferente do comércio apertado a dois passos daqui.']));}
     /* telhados-cenário do outro lado da rua: mesmas peças, pintura nova (menos vermelho: telha escura, zinco e terraço) */
     for(const o of objects){if(o.scene!==S||!/^pt_/.test(o.id)||o.__gen||o.x<66||o.x>127||!((o.y>=94&&o.y<=97)||(o.x>=110&&o.y>=50&&o.y<=56)||(o.x>=88&&o.x<=105&&o.y>=33&&o.y<=49)))continue;const q=(o.x*7+o.y*13)%10,tp=q<4?'t':q<7?'z':'p';let cv=null;
@@ -19087,6 +19102,8 @@ window.__paulista82Ready=Promise.all(ready);
       delete rel.__a17;}}catch(e){console.warn('arremate r17',e);}
     try{if(window.__transito&&window.__transito.V)delete window.__transito.V[S];}catch(_){}
     try{if(typeof walkers!=='undefined')for(let i=walkers.length-1;i>=0;i--){const w=walkers[i];if(w.scene!==S||!w.path)continue;if(w.path.some(pt=>objects.some(q=>q.scene===S&&(q.w||1)*(q.h||1)>1&&pt[0]>=q.x&&pt[0]<q.x+(q.w||1)&&pt[1]>=q.y&&pt[1]<q.y+(q.h||1)))){walkers.splice(i,1);rel.pedestresFora=(rel.pedestresFora||0)+1;}}}catch(_){}
+    /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
+    try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
     return true;};
   /* ---- calçada com meio-fio e canteiros (pintados por cima do chão, uma vez, no desenho guardado do mapa) ---- */
@@ -19129,7 +19146,7 @@ window.__paulista82Ready=Promise.all(ready);
         /* vale do Saracura: hortas em fileiras, roupa quarando no capim e pinguela de tábuas */
         for(const h of [[57,86,3,2],[58,93,2,3],[53,94,1,3]]){const x=h[0]*16,y=h[1]*16,w=h[2]*16,hh=h[3]*16;g.fillStyle='#6b4a2e';g.fillRect(x,y,w,hh);for(let j=2;j<hh;j+=5){g.fillStyle='#3f7a34';g.fillRect(x+1,y+j,w-2,2);g.fillStyle='#79b356';for(let i=2;i<w-2;i+=5)g.fillRect(x+i,y+j,2,1);}g.fillStyle='#8a7a5a';g.fillRect(x,y,w,1);g.fillRect(x,y+hh-1,w,1);g.fillRect(x,y,1,hh);g.fillRect(x+w-1,y,1,hh);}
         [[57,90,'#f2efe6'],[58,90,'#e8eef5'],[59,91,'#f2efe6'],[57,91,'#f0d8d0']].forEach(q=>{g.fillStyle='rgba(20,30,20,.25)';g.fillRect(q[0]*16+3,q[1]*16+5,11,8);g.fillStyle=q[2];g.fillRect(q[0]*16+2,q[1]*16+4,11,8);});
-        g.fillStyle='#7a5a38';g.fillRect(53*16,90*16+3,64,10);g.fillStyle='#5c4228';for(let i=0;i<64;i+=6)g.fillRect(53*16+i,90*16+3,1,10);g.fillStyle='#9a7648';g.fillRect(53*16,90*16+3,64,1);
+        g.fillStyle='#8a6f48';g.fillRect(54*16,90*16,32,2);g.fillRect(54*16,92*16-2,32,2);g.fillStyle='#3a3630';g.fillRect(54*16+11,90*16-3,10,4);g.fillRect(54*16+11,92*16-1,10,4);g.fillStyle='#3f6f8f';g.fillRect(54*16+13,90*16-2,6,2);g.fillRect(54*16+13,92*16,6,2);
         if(rel.obras19){/* rua em obras: onde acaba a pedra e começa a terra */
           const x=21*16,y=82*16;g.fillStyle='#5a4a38';g.fillRect(x+10,y+2,3,28);for(let k=0;k<9;k++){g.fillStyle=k%2?'#8e8a84':'#a29e96';g.fillRect(x-6+(k%3)*7,y+3+Math.floor(k/3)*5,6,4);g.fillStyle='#55524e';g.fillRect(x-6+(k%3)*7,y+7+Math.floor(k/3)*5,6,1);}
           g.fillStyle='#d9c48c';g.fillRect(x-18,y+20,10,6);g.fillStyle='#c4ae76';g.fillRect(x-16,y+19,6,1);
