@@ -12747,6 +12747,63 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
   if(cd&&Array.isArray(cd.lines)&&!cd.lines.some(s=>s.includes('319')))cd.lines.push("Em 1877 a cidade já tinha 7 linhas de bonde, 25 quilômetros de trilhos, 43 carros e 319 burros. É um milhão e meio de passageiros por ano!");
 }catch(e){console.warn('nomes 1888',e);}})();
 
+/* ===== v152 — COLINA DO CENTRO SEM MURALHA: BARRANCOS E LADEIRAS (pedido do professor, 19/11/2026) ===== */
+/* Rodada 2 das correções de 1888. A borda escura em volta do centro parecia uma muralha, e São Paulo não tinha muralha.
+   Agora a borda é desenhada como barranco de terra e capim: o centro fica no alto da colina, entre o vale do
+   Anhangabaú (oeste) e a várzea do Tamanduateí (leste). Os caminhos que sobem pelas aberturas são as ladeiras.
+   Só muda o desenho: o barranco continua sem passagem, como antes. */
+(function(){try{
+  if(!SCN.sp88)return;
+  const M=SCN.sp88.map;
+  const G='#00a844',GL='#38c860',GD='#00863a',GDD='#006a2e',E1='#9c8156',E2='#7d6640',E3='#5e3a1e',RK='#96928c',RK2='#6e6a64';
+  const hsh=(x,y,s)=>{const v=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return v-Math.floor(v);};
+  const px=(c,X,Y,x,y,col)=>{c.fillStyle=col;c.fillRect(X+x,Y+y,1,1);};
+  const ehC=(x,y)=>M[y]&&M[y][x]==='C';
+  const dentro=(x,y)=>x>PLAT88.x0&&x<PLAT88.x1&&y>PLAT88.y0&&y<PLAT88.y1-1;
+  /* face voltada para o oeste ou leste (morro de lado) */
+  const lado=(c,X,Y,x,y,oeste)=>{
+    for(let j=0;j<16;j++)for(let i=0;i<16;i++){const k=oeste?i:15-i;/* k: 0 = pé do barranco, 15 = alto */
+      const h=hsh(x*16+i,y*16+j,3);let col;
+      if(k>=14)col=(h<.05?GD:G);
+      else if(k===13)col=(h<.35?GD:GL);/* beirada de capim */
+      else if(k===12)col=GDD;
+      else if(k>=2){col=((k+((y*16+j)>>2))%3===0)?E2:E1;if(h<.12)col=E3;if((j+y*5+k)%9===0)col=E2;if(k<=4&&h<.3)col=E2;}/* terra do barranco */
+      else col=E3;
+      c.fillStyle=col;c.fillRect(X+i,Y+j,1,1);}
+    for(let t=0;t<4;t++){const ty=(hsh(x,y,30+t)*14)|0,tx=oeste?12:3;px(c,X,Y,tx,ty,GD);px(c,X,Y,oeste?tx-1:tx+1,ty+1,GD);}
+    for(let t=0;t<2;t++){if(hsh(x,y,9+t)<.6){const rx=oeste?4+t*4:6-t*3,ry=(hsh(x,y,6+t)*12)|0;c.fillStyle=E3;c.fillRect(X+rx-1,Y+ry-1,5,4);c.fillStyle=RK2;c.fillRect(X+rx,Y+ry,3,2);c.fillStyle=RK;c.fillRect(X+rx,Y+ry,2,1);}}};
+  /* borda de cima: o morro desce para o norte, a encosta quase não aparece */
+  const norte=(c,X,Y,x,y)=>{for(let j=0;j<16;j++)for(let i=0;i<16;i++){let col=j<=3?GD:j===4?GL:G;const h=hsh(x*16+i,y*16+j,4);if(j<=3&&h<.12)col=E2;if(j<=1)col=GDD;c.fillStyle=col;c.fillRect(X+i,Y+j,1,1);}};
+  /* borda de baixo: barranco de terra visto de frente, em duas fileiras */
+  const sulAlto=(c,X,Y,x,y)=>{for(let j=0;j<16;j++)for(let i=0;i<16;i++){const h=hsh(x*16+i,y*16+j,7);
+      let col=j<=3?G:j===4?GL:j<=9?GD:(h<.35+(j-10)*.1?E1:GD);if(j>=5&&j<=9&&h<.08)col=E2;c.fillStyle=col;c.fillRect(X+i,Y+j,1,1);}
+    for(let t=0;t<4;t++){const tx=(hsh(x,y,40+t)*15)|0;px(c,X,Y,tx,3,GL);px(c,X,Y,tx,2,GD);}};
+  const sulBaixo=(c,X,Y,x,y)=>{for(let j=0;j<16;j++)for(let i=0;i<16;i++){const h=hsh(x*16+i,y*16+j,8);
+      let col=j<=8?(h<.5?E1:E2):j<=10?E2:j<=12?E3:j<=13?GDD:GD;
+      if(j<=8&&(i+j*2+x)%7===0)col=E3;/* raízes e riscos da terra */
+      if(j<=1&&h<.5)col=GD;/* capim pendurado */
+      c.fillStyle=col;c.fillRect(X+i,Y+j,1,1);}
+    if(hsh(x,y,11)<.55){const rx=2+((hsh(x,y,12)*10)|0),ry=3+((hsh(x,y,13)*4)|0);c.fillStyle=RK2;c.fillRect(X+rx,Y+ry,4,3);c.fillStyle=RK;c.fillRect(X+rx,Y+ry,3,2);}};
+  const barrancos=c=>{
+    for(let y=0;y<M.length;y++)for(let x=0;x<M[0].length;x++){if(M[y][x]!=='C')continue;const X=x*T,Y=y*T;
+      if(y>=PLAT88.y1-1){(y===PLAT88.y1?sulBaixo:sulAlto)(c,X,Y,x,y);continue;}
+      if(x===PLAT88.x0){lado(c,X,Y,x,y,true);continue;}
+      if(x===PLAT88.x1){lado(c,X,Y,x,y,false);continue;}
+      if(y===PLAT88.y0){norte(c,X,Y,x,y);continue;}
+      /* qualquer outro pedaço de borda: decide pelo lado onde fica o alto */
+      if(dentro(x+1,y))lado(c,X,Y,x,y,true);else if(dentro(x-1,y))lado(c,X,Y,x,y,false);else if(dentro(x,y+1))norte(c,X,Y,x,y);else sulAlto(c,X,Y,x,y);}
+    /* sombra no pé do morro, no chão de fora */
+    for(let y=0;y<M.length;y++)for(let x=0;x<M[0].length;x++){if(M[y][x]!=='C')continue;
+      const pe=(nx,ny,dx,dy)=>{if(!M[ny]||!'.,'.includes(M[ny][nx]))return;const X=nx*T,Y=ny*T;
+        /* pé do morro: capim mais escuro e terra solta, que vai sumindo */
+        for(let j=0;j<16;j++)for(let i=0;i<16;i++){const d=dx<0?15-i:dx>0?i:j;if(d>8)continue;const h=hsh(nx*16+i,ny*16+j,15);
+          if(h>(1-d/9)*.9)continue;c.fillStyle=d<2?GDD:(h<.15?E2:GD);c.fillRect(X+i,Y+j,1,1);}};
+      if(x===PLAT88.x0)pe(x-1,y,-1,0);if(x===PLAT88.x1)pe(x+1,y,1,0);if(y===PLAT88.y1)pe(x,y+1,0,1);}};
+  const ro=railsOverlay88;railsOverlay88=function(c){barrancos(c);ro(c);};
+  /* o que se lê ao olhar o barranco */
+  const c0=TILE_INFO.C;TILE_INFO.C=(x,y)=>cur==='sp88'?{name:'Barranco da colina',text:["Um barranco de terra e capim. O centro de São Paulo fica no alto de uma colina, entre o vale do Anhangabaú e a várzea do Tamanduateí.","Para subir ou descer, só pelas ladeiras: Ladeira do Carmo, Porto Geral, São João, do Piques..."]}:c0(x,y);
+}catch(e){console.warn('relevo 1888',e);}})();
+
 /* =========================================================
    IPIRANGA 1922 — setor monumental (Museu, jardim, Monumento, riacho),
    fábrica Jafet a leste, moradias e Casa do Grito.
