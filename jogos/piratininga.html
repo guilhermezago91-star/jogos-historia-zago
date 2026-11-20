@@ -12886,6 +12886,44 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
   try{if(cur==='sp88'){buildOcc();buildStatic();}}catch(_){}
 }catch(e){console.warn('rios 1888',e);}})();
 
+/* ===== v155 — LESTE DE 1888 MAIS RURAL: PARI, MOOCA, CAMBUCI E IPIRANGA (pedido do professor, 20/11/2026) ===== */
+/* Rodada 4 das correções de 1888. Em 1888, fora do Brás (perto das estações e da Rua do Brás), o leste da cidade
+   era de chácaras, pasto, pomares e casas espalhadas. As fábricas grandes com chaminé do Pari ficam para 1922.
+   As ruas continuam (já estavam abertas nas plantas da época); só as casas ficam mais raras. */
+(function(){try{
+  if(!SCN.sp88)return;
+  const M=SCN.sp88.map,H=M.length,W=M[0].length;
+  const ob=id=>objects.find(o=>o.id===id&&(o.scene||'pira')==='sp88');
+  /* 1) fábricas do Pari saem de 1888 (a fumaça delas some junto: elas vão para longe, fora do mapa) */
+  for(const id of ['fabPari1','fabPari2','chamPari']){const o=ob(id);if(!o)continue;o.scene='fora88';o.x=-400;o.y=-400;}
+  /* 2) casas: o Brás perto das estações fica como está; no resto do leste, menos casas */
+  const hsh=(x,y,s)=>{const v=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return v-Math.floor(v);};
+  const nucleoBras=(o)=>o.x>=102&&o.x<=134&&o.y>=54&&o.y<=90;
+  const tirados=[];
+  for(const o of objects.slice()){if((o.scene||'pira')!=='sp88'||!/^n\d+$/.test(o.id)||o.x<104||nucleoBras(o))continue;
+    if(hsh(o.x,o.y,77)<.32)continue;/* fica uma casa espalhada aqui e ali */
+    objects.splice(objects.indexOf(o),1);tirados.push([o.x,o.y,o.w||1,o.h||1]);}
+  /* 3) no lugar: chácaras, pomares, capim e algumas árvores */
+  const OCC=new Set();const k=(x,y)=>x+','+y;
+  for(const n of npcs)if(n.scene==='sp88')OCC.add(k(n.x,n.y));
+  for(const w of walkers){if(w.scene!=='sp88'||!w.path)continue;const P=w.path;for(let i=0;i<P.length-1;i++){let [x,y]=P[i];const [x1,y1]=P[i+1];
+    while(true){OCC.add(k(x,y));if(x===x1&&y===y1)break;if(x!==x1)x+=Math.sign(x1-x);else y+=Math.sign(y1-y);}}}
+  if(window.__RAIL88)for(const q of window.__RAIL88.keys())OCC.add(q);
+  const ocupado=(x,y)=>objects.some(o=>(o.scene||'pira')==='sp88'&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+  const ch2=ob('chacara2');const desenhoChacara=ch2&&ch2.draw;
+  const TXT=[["Uma chácara: casa simples, pomar, horta e um pasto com animais. O leste da cidade ainda é quase todo assim.","Daqui saem frutas, verduras, leite e lenha para vender no mercado da Rua 25 de Março."],
+    ["Uma chácara de imigrantes. Plantam verduras para vender na cidade e criam galinhas e porcos.","Muitas dessas terras ainda vão virar ruas e casas de operários nas próximas décadas."],
+    ["Pasto e pomar. Por aqui passam tropeiros e carroças vindo dos arredores para o Brás."]];
+  let nc=0;
+  for(const [x,y,w,h] of tirados){
+    if(desenhoChacara&&w>=5&&nc<14&&hsh(x,y,78)<.45){let ok=true;for(let yy=y;yy<y+3;yy++)for(let xx=x;xx<x+6;xx++){if(!M[yy]||!'.,TbV'.includes(M[yy][xx])||OCC.has(k(xx,yy))||ocupado(xx,yy))ok=false;}
+      if(ok){objects.push({id:'chacaraL'+nc,scene:'sp88',x,y,w:6,h:3,name:'Chácara',draw:desenhoChacara,text:TXT[nc%3]});for(let yy=y;yy<y+3;yy++)for(let xx=x;xx<x+6;xx++)if('Tb'.includes(M[yy][xx]))M[yy][xx]='.';nc++;continue;}}
+    for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++){if(!M[yy]||M[yy][xx]!=='.'||OCC.has(k(xx,yy))||ocupado(xx,yy))continue;
+      const r=hsh(xx,yy,79);M[yy][xx]=r<.16?'T':r<.24?'b':r<.5?',':'.';}}
+  window.__leste88={tirados:tirados.length,chacaras:nc};
+  try{if(cur==='sp88'){buildOcc();buildStatic();}}catch(_){}
+}catch(e){console.warn('leste 1888',e);}})();
+
 /* =========================================================
    IPIRANGA 1922 — setor monumental (Museu, jardim, Monumento, riacho),
    fábrica Jafet a leste, moradias e Casa do Grito.
