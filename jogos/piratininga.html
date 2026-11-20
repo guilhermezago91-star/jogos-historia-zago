@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=d9db775b","kb":788,"m":1},{"f":"pac_e1234.js?v=56ee25a1","kb":2140,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=9e50ae28","kb":1400,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=2d6a3124","kb":4154,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=d9db775b","kb":788,"m":1},{"f":"pac_e1234.js?v=56ee25a1","kb":2140,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=9e50ae28","kb":1400,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=14f9cfed","kb":4150,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -19432,7 +19432,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v190) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v191) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -20145,10 +20145,39 @@ window.__paulista82Ready=Promise.all(ready);
           objects.push({id:'jm_q_'+x+'_'+y,scene:S,x,y,w:x1-x+1,h:1,name:'Quintal',text:['O quintal dos fundos de uma casa: horta, varal, tanque, galinheiro.'],__jm:1,__q:1,draw(){}});nQ++;for(let i=x;i<=x1;i++)Q.push([i,y]);x=x1+1;}}
       rel.quintais=Q;rel.semTelhado=[nF,nTr,nQ,Q.length];}catch(e){console.warn('sem telhado JM',e);}
     /* ===== v190 — CENTRO DE 1922: FACHADAS NOVAS DO CANVA — Igreja de Santa Ifigênia no estilo novo (desenho aprovado pelo professor), no tamanho de 8 quadradinhos de frente (pedido do professor, 20/11/2026) ===== */
-    try{const troca=(re,key,larg,fundo,porta)=>{const o=objects.find(q=>q.scene===S&&q.enter&&re.test(q.name||''));if(!o||!A[key])return 0;const base=o.y+(o.h||1),cx=o.x+(o.w||1)/2,im=new Image();im.src=A[key];
-        o.x=Math.round(cx-larg/2);o.w=larg;o.h=fundo;o.y=base-fundo;o.door=porta;o.__canva=1;
+    try{const troca=(re,key,larg,fundo,porta,xx)=>{const o=objects.find(q=>q.scene===S&&q.enter&&re.test(q.name||''));if(!o||!A[key])return 0;const base=o.y+(o.h||1),cx=o.x+(o.w||1)/2,im=new Image();im.src=A[key];
+        o.x=xx!=null?xx:Math.round(cx-larg/2);o.w=larg;o.h=fundo;o.y=base-fundo;o.door=porta;o.__canva=1;
         o.draw=function(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth/2,h=im.naturalHeight/2;c.drawImage(im,Math.round(X+larg*8-w/2),Math.round(Y+fundo*16-h),w,h);};return 1;};
-      rel.canva=[troca(/Santa Ifig/,'JM22_ig_santa_ifigenia',8,5,4)];}catch(e){console.warn('fachadas canva JM',e);}
+      rel.canva=[troca(/Santa Ifig/,'JM22_ig_santa_ifigenia',8,6,4,37)];}catch(e){console.warn('fachadas canva JM',e);}
+    /* ===== v191 — CENTRO DE 1922: LARGO DE SANTA IFIGÊNIA — igreja refeita conforme as fontes (pedra cinza, uma torre central alta e duas torrinhas), de frente para um largo calçado e arborizado ligado à cabeceira do viaduto; casas e sobrados no lugar do quintal solto e do gramado (pedido do professor, 20/11/2026) ===== */
+    try{const ig=objects.find(q=>q.scene===S&&q.__canva&&/Santa Ifig/.test(q.name||''));if(ig&&M[22]&&M[22][45]!==undefined){
+      const den=(x,y)=>(x>=24&&x<=45&&y>=6&&y<=19)||(x>=35&&x<=45&&y>=20&&y<=21)||(y===22&&((x>=35&&x<=40)||x===45));
+      /* sai o quintal solto e o gramado em volta da igreja */
+      for(const q of objects.slice()){if(q.scene!==S||q===ig||q.enter||!/^jm_q_|^jm_fx_|^jm_tapa_|^pt_/.test(q.id))continue;const w=q.w||1,h=q.h||1;if(h!==1){if(den(q.x,q.y)&&den(q.x+w-1,q.y+h-1))q.scene='__fora';continue;}
+        let a=q.x,b=q.x+w-1;while(b>=a&&den(b,q.y))b--;while(a<=b&&den(a,q.y))a++;if(b<a)q.scene='__fora';else{q.x=a;q.w=b-a+1;}}
+      if(rel.quintais)rel.quintais=rel.quintais.filter(q=>!den(q[0],q[1]));
+      for(let y=6;y<=22;y++)for(let x=24;x<=45;x++)if(den(x,y))M[y][x]='p';
+      for(let x=24;x<=36;x++){M[12][x]='D';M[13][x]='D';}
+      /* casas e sobrados: uma fileira de frente para a passagem do largo, outra de frente para a travessa de trás */
+      const casa=(k,x,larg,base,sob)=>{if(!MAN[k]||!A['PC_'+k])return;const o={id:'jm_fx_si_'+x+'_'+base,scene:S,x,y:base-4,w:1,h:1,name:sob?'Sobrado':'Casa',text:sob?['Um sobrado: comércio embaixo, moradia ou escritório em cima.']:['Uma casa de moradia, parede com parede com as vizinhas.']};objects.push(o);
+        grande(o,k,x,base-4,larg,null,null,[(x+base)%3?'t':'p',TELHA[(x+base)%4]],base);o.__gen=1;};
+      casa('g_sobrado_3x2_1',24,6,18,1);casa('g_sobrado_3x2_2',30,6,18,1);
+      casa('g_residencia_2x2_1',24,4,12,0);casa('g_colonial_2x1_1',28,4,12,0);casa('g_residencia_2x2_2',32,4,12,0);
+      /* atrás da igreja a cidade continua: mais duas casas, que aparecem por cima das torrinhas */
+      casa('g_colonial_2x1_2',37,4,12,0);casa('g_residencia_2x2_1',41,4,12,0);
+      /* fundo de quintal estreito atrás da fileira de trás */
+      const QQ=rel.quintais||(rel.quintais=[]);for(let y=6;y<=7;y++){const x0=24,x1=44;objects.push({id:'jm_q_si_'+y,scene:S,x:x0,y,w:x1-x0+1,h:1,name:'Quintal',text:['O quintal dos fundos de uma casa: horta, varal, tanque, galinheiro.'],__jm:1,__q:1,draw(){}});for(let x=x0;x<=x1;x++)QQ.push([x,y]);}
+      /* largo: árvores, bancos, postes e placa */
+      const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+      const pp=(id,k,x,y,nm,tx)=>{if(!A[k]||ocp(x,y)||objects.some(o=>o.id===id))return;const im=new Image();im.src=A[k];
+        objects.push({id,scene:S,x,y,w:1,h:1,name:nm,text:tx,__jm:1,draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth,h=im.naturalHeight;c.fillStyle='rgba(20,16,24,.22)';c.fillRect(Math.round(X+8-w*.3),Y+13,Math.round(w*.6),3);c.drawImage(im,Math.round(X+8-w/2),Y+16-h);}});};
+      const AR=['Árvore do largo',['Uma árvore plantada pela Prefeitura no largo da igreja.']],BA=['Banco de praça',['Um banco de madeira e ferro. Bom lugar para ver o bonde chegar pelo viaduto.']],PO=['Poste de luz elétrica',['A luz elétrica chegou às ruas do centro com a Light, no começo do século.']];
+      pp('jm_siArv1','ANH_arvore_florida',37,21,AR[0],AR[1]);pp('jm_siArv2','ANH_arvore_florida',43,21,AR[0],AR[1]);
+      pp('jm_siBan1','ANH_banco_A',38,21,BA[0],BA[1]);pp('jm_siBan2','ANH_banco_A',42,21,BA[0],BA[1]);
+      pp('jm_siPos1','ANH_poste_dois_globos_A',35,22,PO[0],PO[1]);pp('jm_siPos2','ANH_poste_dois_globos_A',44,20,PO[0],PO[1]);
+      if(typeof drawSign==='function'&&!ocp(36,20))objects.push({id:'jm_siPlaca',scene:S,x:36,y:20,w:1,h:1,draw:drawSign,name:'Placa',text:['Largo de Santa Ifigênia. A igreja nova, de pedra cinza, foi desenhada pelo arquiteto austríaco Johann Lorenz Madein e levantada no lugar da capela antiga. Tem uma torre central alta e duas torrinhas.','A obra começou em 1904 e a igreja abriu ainda inacabada em 1910. A data do fim da obra muda conforme a fonte: 1913 ou 1922.','O viaduto de ferro, aqui ao lado, liga o largo ao Largo de São Bento desde 1913.','[A travessa atrás da igreja e a passagem até os Correios foram postas para o jogo.]'],__jm:1});
+      try{if(!C.P.some(q=>q&&/IFIG/.test(q.t||'')))C.P.push({t:'LARGO DE STA. IFIGÊNIA',x:40*16+8,y:18*16+10,w:124,largo:1});}catch(_){}
+      rel.largoSI=1;}}catch(e){console.warn('largo Santa Ifigenia JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
