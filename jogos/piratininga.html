@@ -12924,6 +12924,84 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
   try{if(cur==='sp88'){buildOcc();buildStatic();}}catch(_){}
 }catch(e){console.warn('leste 1888',e);}})();
 
+/* ===== v156 — PRÉDIOS DE 1888: ESTAÇÃO DA LUZ DE 1867, JARDIM DA LUZ, MONUMENTO EM OBRAS E OUTROS (pedido do professor, 20/11/2026) ===== */
+/* Rodada 5 das correções de 1888.
+   - Estação da Luz: o prédio simples da São Paulo Railway (1867), térreo e sem torre. O prédio inglês com torre é de 1901.
+   - Jardim da Luz: ao lado da estação, ao sul da ferrovia inglesa (como na planta de 1890).
+   - Monumento do Ipiranga com andaimes (obra de 1885 a 1890).
+   - Chácara Dulley: campo de críquete do São Paulo Athletic Club (fundado em 1888). Nada de futebol.
+   - Igreja do Rosário dos Homens Pretos com irmão da irmandade e caifaz; Largo da Memória (Piques) com o obelisco de 1814;
+     Ordem Terceira do Carmo junto ao convento; São Pedro dos Clérigos; Tendal Municipal da Glória. */
+(function(){try{
+  if(!SCN.sp88)return;
+  const M=SCN.sp88.map;
+  const ob=id=>objects.find(o=>o.id===id&&(o.scene||'pira')==='sp88');
+  const mk=s=>{const i=new Image();i.src=s;return i;};const ok=i=>i&&i.complete&&i.naturalWidth;
+  const trilho=(x,y)=>window.__RAIL88&&window.__RAIL88.has(x+','+y);
+  const livreR=(x,y,w,h)=>{for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)if(trilho(xx,yy))return false;return true;};
+  const acha=(cx,cy,w,h,R)=>{for(const r of [R,R+4,R+8]){const q=findFreeRect('sp88',cx,cy,w,h,r);if(q&&livreR(q[0],q[1],w,h))return q;}return null;};
+  const L=LABELS_88,tira=n=>{for(let i=L.length-1;i>=0;i--)if(L[i][0]===n)L.splice(i,1);};
+  const feito=[];
+  /* 1) Estação da Luz de 1867 */
+  {const e=ob('estacao');if(e){const im=mk("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJAAAABECAYAAABu6byBAAAFeklEQVR4Xu2cPWgcRxTHJ0YEYcRhjsMYcxxCCBGMMEGIK1IEYVSFFMGIkMqEEIIJKUMIIaQwJojUIYgULlSlEMIEk8qYkCKFMCpCMEIYIY4rhBCHEIcwQsThrTx3szOzs2/m7e7tnt4PDp1252vf/Pe9mdm5FYJhGIZhGIZhGC/eUlMvzrRee+VmLiXP9zoD3UzoFli/t3ApjcLguLe+HUtoCKi7d2yU9OzKpLjz3ytcDSOmqLbmWQ+2bGy6PDEEdNQ/M+q7Lc7EUZ6tEEL8U6uJ2ycnibWknZcU0VYgz3qSytZtkGcbsFzRE06cn0afuebVwXd5zHUcLk5N51vOQu/AWf5K7ZxUvm97ypgebOTbL0npQ/tLxxhEfzNfx4qvlGzXb0SGTsOWzpUXWy6FIuqg8tO/Pfcg2hbCOq2WaHU61LrRkOqrC+s16LT6HSMs245JXOeyoog6ssYYA7Xnb4q9/fiIp9E7EDPKcfVOmZluGOkB23HIB6FIL19PD/WJqbcTy0kqH2jXzsVGq2V4IZ92usqvYjmh/eWyg6QUIawI1+1bB7jqtZ+/jOx0/6tfRNVDuwsf2+ghzBDQZ9NTqV5OhhhSqFEIKSckD4ZH+/2BcHRASBj7jDNgH+dCYuNN6JDYXLYMaY39YaiRKg5x8Wo5rnpVl6qGuSxCjvQ4bUfv2zxSyPWmhXAVavmYftk4mUCHfJ3MQxg0GMDMhPJAGszXLUtxYFHDGrYubLoyk0kIo5BX6AnBFa6wgJCW379VyCy1DLZDhzDVdfqO4l3pZeihumZsqNOBeu8/2Y08jitcYdHDWpKX0a8XE1rSZsNASDlZhHxJ5iGMQhEuHlxwfWq4evHj6hdGk7/79tfBMdd5/dwoZmtF2EwFvZA4Cnfps5Dm0z5I+/SvF5G3WBMiEohNGCpwXhWSjjyvlqN6o9DZms91AT42y4PEhUQINdvKgtwoQ45t1gILhnvajFF3zXB3RsL5ekmsfLwUs58UR5KQXOIBXCJUhbT24ZzXrAtzXSqj6pdMQljR7tMXdTHQRpII0jyUPJ+WDhhFWJPk8WwPHcLSkK42720eIcjZFYSrJOHopIkh9LxvWPMNYS6KeLY3dltafddzigY8UtVRV6JjAgI+Wpit3L7o7vGZ2Nx4UKl+ubvyg2heu3hgXCUeb7+MacYYRFcV6BCmeGICgl9lfP/w86gV3W76piyVZvPiEcY45Hu4uimebj2Lrme5fSf6Dn8hPI7D9dnA9l93dfO1GsKMLa0M40NiCFtYfNenHHF4cOGxqpiv1mjFrhU8kER6ImB2vi1m54dJT47Sd2lW2S52hrYBxmYMRGF56VMjO4QsHT1d1QbueYASkH6H6tjuxDLnsTF5FWWKAa9Oz1H9AV7LRZLtXPZz2TspX1of2fJhPCzKarY7VMV2J5Y5j43p+iRKEJKd0z4qfZntENI2Hfwgevo9IT+P1h8Mvjspcx4kh8c4oVTWDiF9pIDyQED9ZnygKf/v7f+daLsy5ymSMtshpG0qeA8Eq9Sf3PW2e5nzFEmZ7RDSNomXgB7/Fp/CYShzniIpsx1C2hYkIIbR8fJADMMCYjKFPRBDggXEkGABMSRYQAwJFhBDggXEkDB+lSF/1XD9xsUWVSxy41QV88F+6nea9vciwcPU69fMczvdPmo/UJXtYgNsxVtamczgEMaQYAExJFhADAkWEEOCBcSQYAExJFhADAkWEEOCBcSQYAExJFhADAkWEEPC+GXq1tbOmwLlX1/GPd+QJ7//6WGc8bQLeyCGBAuIITF2r/ll8sf5mt8Xz/+o3Gt+KezuvqRkF3Nzs6T8VePW4gfu1/z2jg6rdk0j5bLbi8dADAkeAzHeqGOg/wHu4ZiCrnO3kQAAAABJRU5ErkJggg==");const d0=e.draw;
+    e.draw=function(c,X,Y){if(!ok(im))return d0.call(this,c,X,Y);const w=e.w*T,h=e.h*T;c.fillStyle='rgba(20,27,27,.25)';c.fillRect(X+4,Y+h-1,w-8,3);c.drawImage(im,X+Math.round((w-im.width)/2),Y+h-im.height+2);};
+    e.text=["A Estação da Luz da São Paulo Railway, a ferrovia inglesa, aberta em 1867. É um prédio simples, térreo, com a plataforma para os trens do lado de trás.","Por aqui passam o café que desce para Santos e os imigrantes que chegam. O prédio grande, com a torre do relógio, só vai ficar pronto em 1901."];
+    feito.push('estacao');}}
+  /* 2) Jardim da Luz: o jardim gradeado que já existe a oeste da estação, ao sul da ferrovia (como na planta de 1890) */
+  {tira('Jardim da Luz');L.push(['Jardim da Luz',59,30.4,'#d8f0a0']);feito.push('jardimLuz');}
+  /* 3) andaimes no Monumento do Ipiranga */
+  {const m=ob('monumento');if(m){const d0=m.draw;
+    m.draw=function(c,X,Y){d0.call(this,c,X,Y);const w=m.w*T,h=m.h*T;
+      /* o lado direito ainda não tem fachada: só paredes de tijolo à mostra */
+      c.fillStyle='rgba(150,80,56,.85)';c.fillRect(X+w*.62,Y-6,w*.36,h*.8);
+      c.fillStyle='#7a3a26';for(let yy=Y-6;yy<Y-6+h*.8;yy+=4)for(let xx=X+w*.62+((yy/4)%2?2:0);xx<X+w*.98;xx+=6)c.fillRect(xx,yy,4,1);
+      /* andaimes de madeira */
+      c.fillStyle='#8a5c34';for(let xx=X+w*.55;xx<X+w;xx+=10)c.fillRect(xx,Y-14,2,h+8);
+      for(let yy=Y-10;yy<Y+h-6;yy+=11){c.fillStyle='#6a4426';c.fillRect(X+w*.55,yy,w*.45,2);c.fillStyle='#a8743e';c.fillRect(X+w*.55,yy,w*.45,1);}
+      c.strokeStyle='#6a4426';c.lineWidth=1;c.beginPath();for(let xx=X+w*.55;xx<X+w-10;xx+=20){c.moveTo(xx,Y+h-6);c.lineTo(xx+10,Y-10);}c.stroke();
+      /* guindaste e pilha de tijolos */
+      c.fillStyle='#5a3a24';c.fillRect(X+w-6,Y-28,2,26);c.fillRect(X+w-22,Y-28,18,2);c.fillStyle='#2a2a30';c.fillRect(X+w-21,Y-26,1,10);
+      c.fillStyle='#a84a2e';c.fillRect(X+4,Y+h-6,12,5);c.fillStyle='#c26a44';c.fillRect(X+5,Y+h-6,10,1);};
+    m.text=["O Edifício-Monumento do Ipiranga, em obras desde 1885, no lugar onde D. Pedro declarou a independência em 1822.","O projeto é do arquiteto italiano Tommaso Gaudenzio Bezzi. Ainda tem andaime para todo lado: o prédio só vai ficar pronto em 1890 e vai virar museu em 1895."];
+    feito.push('monumento');}}
+  /* 4) críquete na Chácara Dulley */
+  {tira('Chácara Dulley');L.push(['Chácara Dulley (críquete)',71,12.6]);
+   const p=ob('pavilhao');if(p)p.text=["O pavilhão do São Paulo Athletic Club, fundado em 1888 pelos ingleses da ferrovia e das casas comerciais.","Aqui, no campo da Chácara Dulley, eles jogam críquete. O futebol só vai chegar à cidade em 1895, trazido por Charles Miller."];feito.push('criquete');}
+  /* 5) Igreja do Rosário dos Homens Pretos */
+  {const r=ob('rosario');if(r){L.push(['Igreja do Rosário',r.x+r.w/2,r.y-0.8,'#f1c471']);
+    r.text=["A Igreja de Nossa Senhora do Rosário dos Homens Pretos, da irmandade dos negros de São Paulo, de 1737.","Aqui se reúnem negros livres, libertos e escravizados. Em 1888, a igreja e o largo são lugares dos abolicionistas: os caifazes de Antônio Bento escondem fugitivos e os levam até o quilombo do Jabaquara, em Santos."];
+    const q=findFree('sp88',r.x+r.w,r.y+r.h,3);
+    if(q&&!trilho(q[0],q[1])&&!npcs.some(n=>n.id==='irmaoRos88'))addNPCs([{id:'irmaoRos88',spr:'aguadeiro',x:q[0],y:q[1],dir:'down',name:'Irmão da Irmandade do Rosário',
+      lines:["Sou irmão da Irmandade do Rosário dos Homens Pretos. A irmandade ajuda a comprar a liberdade dos irmãos e enterra os mortos com dignidade.","Hoje é 13 de maio. Se a lei for mesmo assinada no Rio, vai ter missa e festa aqui no largo!","Os caifazes de Antônio Bento passam por aqui. Eles tiram os escravizados das fazendas e os escondem até chegarem a Santos."],
+      diary:"Igreja do Rosário dos Homens Pretos (1737): irmandade dos negros de São Paulo; em 1888, lugar dos abolicionistas e dos caifazes."}],'sp88');
+    feito.push('rosario');}}
+  /* 6) Largo da Memória: o obelisco do Piques */
+  {for(const l of L)if(l[0]==='Largo do Piques')l[0]='Largo da Memória (Piques)';
+   const o=ob('piramide');if(o){o.name='Obelisco do Largo da Memória';o.text=["O obelisco do Largo da Memória, de 1814, o monumento mais antigo da cidade. O povo chama de Pirâmide do Piques.","Aqui chegavam as tropas de mulas, e o chafariz dava água para os animais e para quem chegava à cidade."];feito.push('memoria');}}
+  /* 7) Ordem Terceira do Carmo, junto ao convento */
+  {const c=ob('carmo');if(c){c.name='Convento do Carmo e Ordem Terceira';
+    c.text=["O Convento do Carmo, dos frades carmelitas, e ao lado a Igreja da Ordem Terceira do Carmo, dos leigos. Os carmelitas estão em São Paulo desde 1594.","Da beira da colina, o convento olha para a Várzea do Carmo e o Tamanduateí lá embaixo."];feito.push('ordemTerceira');}}
+  /* 8) São Pedro dos Clérigos, perto da Sé */
+  {const base=ob('santoantonio')||ob('saogoncalo');const s=ob('sé')||ob('se');
+    let q=null;for(const [ax,ay] of [[68,76],[74,80],[60,78],[84,82]]){const c=findFreeRect('sp88',ax,ay,3,3,3);if(c&&livreR(c[0],c[1],3,3)&&c[0]>=PLAT88.x0+1&&c[0]+3<=PLAT88.x1&&c[1]>PLAT88.y0&&c[1]+3<PLAT88.y1){q=c;break;}}
+    if(base&&q&&!ob('saopedro88')){objects.push({id:'saopedro88',scene:'sp88',x:q[0],y:q[1],w:3,h:3,name:'Igreja de São Pedro dos Clérigos',draw:base.draw,
+      text:["A Igreja de São Pedro dos Clérigos, da irmandade dos padres, no largo de São Pedro, pertinho da Sé.","É uma igreja pequena e antiga. Quando a Praça da Sé for aumentada, no século XX, ela vai ser demolida."]});
+      L.push(['São Pedro',q[0]+1.5,q[1]-0.6]);feito.push('saopedro');}}
+  /* 9) Tendal Municipal da Glória: a carne chega do Matadouro */
+  {const q=acha(80,104,4,3,6);
+    if(q&&!ob('tendal88')){const [tx,ty]=q;
+      objects.push({id:'tendal88',scene:'sp88',x:tx,y:ty,w:4,h:3,name:'Tendal Municipal da Glória',
+        text:["O Tendal Municipal da Glória: aqui chega a carne do Matadouro da Vila Mariana, e daqui os açougueiros levam para os açougues da cidade.","A carne vem de carroça e pelo trenzinho de Santo Amaro, bem cedo, antes do calor."],
+        draw(c,X,Y){const w=4*T,h=3*T;c.fillStyle='rgba(20,27,27,.25)';c.fillRect(X+2,Y+h-1,w-4,3);
+          c.fillStyle='#30222a';c.fillRect(X+1,Y+8,w-2,h-8);c.fillStyle='#e8dcc0';c.fillRect(X+2,Y+14,w-4,h-15);
+          c.fillStyle='#30222a';c.fillRect(X,Y+2,w,10);c.fillStyle='#9a4a2e';c.fillRect(X+1,Y+3,w-2,8);c.fillStyle='#b25e3a';for(let i=1;i<w-1;i+=4)c.fillRect(X+i,Y+4,2,6);
+          c.fillStyle='#5a3a24';for(const dx of [6,22,40])c.fillRect(X+dx,Y+20,10,h-21);c.fillStyle='#3a2416';for(const dx of [6,22,40])c.fillRect(X+dx+4,Y+20,1,h-21);
+          c.fillStyle='#4e6a8a';c.fillRect(X+w-10,Y+17,6,6);c.fillStyle='#f1c471';c.fillRect(X+14,Y+14,36,3);}});
+      L.push(['Tendal da Glória',tx+2,ty+3.5]);feito.push('tendal');}}
+  window.__predios88=feito;
+  try{if(cur==='sp88'){buildOcc();buildStatic();}}catch(_){}
+}catch(e){console.warn('predios 1888',e);}})();
+
 /* =========================================================
    IPIRANGA 1922 — setor monumental (Museu, jardim, Monumento, riacho),
    fábrica Jafet a leste, moradias e Casa do Grito.
