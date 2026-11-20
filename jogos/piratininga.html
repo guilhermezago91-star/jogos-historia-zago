@@ -13976,6 +13976,57 @@ setTimeout(function(){try{
   window.__lotes22log={casas:casas.length,patio:np,quintais:visto.size};
 }catch(e){console.warn('[bairros22]',e);}},0);
 /*__BAIRROS22_D_END__*/
+/*__BAIRROS22_E_START__*/
+/* ===== v179 — BAIRROS DE 1922: BOM RETIRO, BELENZINHO E CANINDÉ COM COMÉRCIO E GENTE; CEMITÉRIO DO ARAÇÁ (pedido do professor, 20/11/2026) ===== */
+/* Roda por último. Lojas: casas genéricas que viram comércio no MESMO lugar e tamanho (nada muda de lugar).
+   O Araçá entra num terreno que estava livre. Nada perto do retângulo do centro. */
+setTimeout(function(){try{
+  if(!SCN.sp22)return;const S='sp22',ob=id=>objects.find(o=>o.scene===S&&o.id===id);
+  const LOJAS=[
+    // Bom Retiro: imigrantes italianos e judeus, costura e roupa feita
+    ['n1001','loja3u',63,'Oficina de costura',["Numa sala apertada, seis máquinas de costura. Costureiras italianas e judias fazem calças e paletós por peça, para as lojas do centro.","Ganha-se por peça pronta: quem costura mais depressa leva mais dinheiro para casa."]],
+    ['n1104','loja3b',33,'Alfaiataria do Bom Retiro',["O alfaiate chegou da Europa do Leste há poucos anos. Fala iídiche em casa, português com os fregueses e um pouco de italiano com os vizinhos.","Faz terno sob medida e conserta roupa usada."]],
+    // Canindé: beira da várzea, lavadeiras, olarias e carroceiros
+    ['n6','loja3',71,'Venda do Canindé',["Venda na beira da várzea: cachaça, fumo de rolo, querosene, sabão em barra para as lavadeiras e pão do dia.","Muita coisa é vendida fiado: o dono anota numa caderneta e o freguês paga no fim do mês."]],
+    ['n9','loja3b',34,'Sapateiro',["O sapateiro conserta botina de operário e de carroceiro. Sola nova sai mais barato que um par novo."]],
+    ['n10','loja4',72,'Carvão e lenha',["Depósito de carvão e lenha. Quase toda cozinha da cidade ainda é a lenha ou a carvão: o fogão a gás é coisa de casa rica."]],
+    // Belenzinho: italianos e portugueses, operários das fábricas da linha da Central
+    ['n1339','loja3',30,'Padaria',["Padaria do bairro: pão italiano, filão e rosca. O padeiro começa a trabalhar às três da manhã."]],
+    ['n1341','loja3b',28,'Quitanda',["Quitanda: verdura, fruta e ovos que vêm das chácaras em volta da cidade, de carroça, toda madrugada."]],
+    ['n1343','loja4',7,'Armazém de secos e molhados',["Arroz, feijão, bacalhau, azeite, banha e querosene, tudo pesado na hora.","As famílias operárias compram fiado e pagam quando sai o salário da fábrica."]],
+    ['n1347','loja4',31,'Botequim',["Botequim da esquina: depois do turno, os operários param para um copo de vinho e uma conversa sobre o patrão, o salário e o futebol."]],
+    ['n1342','loja3',64,'Engomadeira',["Aqui se lava e se passa roupa para fora, com ferro de brasa. Trabalho de mulher, pago por peça."]]];
+  for(const [id,sp,ic,name,text] of LOJAS){const o=ob(id);if(!o||!/^n\d+$/.test(o.id))continue;
+    const base=spDraw(sp,o.w,o.h),dx=Math.max(0,Math.floor(o.w/2)-1);o.sp22=sp;o.name=name;
+    Object.defineProperty(o,'text',{configurable:true,writable:true,value:text});
+    o.draw=(c,X,Y)=>{base(c,X,Y);signBoard(c,X+dx*T+8,Y+o.h*T-36,ic);};}
+  {const o=ob('n117');if(o){o.name='Sobrado de imigrantes';Object.defineProperty(o,'text',{configurable:true,writable:true,value:["Um sobrado dividido: embaixo, uma loja; em cima, quartos alugados para famílias que acabaram de chegar. Italianos, judeus, portugueses e sírios moram na mesma rua."]});}}
+  
+  {const cem=ob('cemConsolacao'),x=26,y=109,M=SCN.sp22.map;
+   const livre=()=>{for(let j=y;j<y+4;j++)for(let i=x;i<x+6;i++){const ch=M[j]&&M[j][i];if(!ch||!'.,pTb'.includes(ch))return false;if(objects.some(q=>q.scene===S&&!q.walker&&i>=q.x&&i<q.x+(q.w||1)&&j>=q.y&&j<q.y+(q.h||1)))return false;if(npcs.some(n=>n.scene===S&&n.x===i&&n.y===j))return false;}return true;};
+   if(cem&&cem.draw&&!ob('cemAraca')&&livre()){for(let j=y-1;j<=y+4;j++)for(let i=x-1;i<=x+6;i++)if(M[j]&&'Tb'.includes(M[j][i]))M[j][i]='.';   // as árvores do terreno saem
+     objects.push({id:'cemAraca',scene:S,x,y,w:6,h:4,draw:cem.draw,name:'Cemitério do Araçá',
+     text:["O Cemitério do Araçá, aberto em 1897 no caminho da Avenida Doutor Arnaldo, quando o da Consolação começou a ficar pequeno para a cidade que crescia.","Nas lápides aparecem nomes italianos, portugueses, espanhóis, árabes e japoneses: a cidade dos imigrantes também está aqui."]});}}
+  /* gente */
+  const G=[[100,40,'caixeiro','Mascate da prestação',["Vendo cortes de tecido, toalhas e cobertores de porta em porta. A freguesa paga um pouquinho por semana: eu anoto tudo nesta caderneta.","Comecei com uma mala nas costas. Quem sabe um dia abro uma loja na Rua dos Imigrantes?"]],
+    [110,44,'tecela','Costureira do Bom Retiro',["Costuro por peça, em casa, até tarde da noite. A máquina de costura eu comprei a prestação.","Minha mãe veio da Itália; a vizinha veio da Polônia. A gente se entende meio por gestos, meio em português."]],
+    [96,36,'crianca','Menina do Bom Retiro',["Na minha rua tem família italiana, judia, portuguesa e síria. Na escola a gente aprende português, e em casa cada um fala a sua língua."]],
+    [150,40,'colono','Pescador do Tietê',["Ainda dá para pescar no Tietê: lambari, mandi, às vezes um bagre. Nas cheias a várzea inteira vira lagoa."]],
+    [175,46,'operario','Jogador de várzea',["Domingo tem jogo no campo da várzea: time de fábrica contra time de fábrica. A bola é de couro costurado e o campo é de terra.","O futebol começou como jogo de rico, de clube inglês. Agora a várzea é do povo."]],
+    [212,74,'operario','Operário leitor',["Na hora do almoço eu leio A Plebe em voz alta para os companheiros que não sabem ler.","O jornal fala de salário, de jornada de oito horas e da greve de 1917, que parou a cidade inteira."]],
+    [194,104,'caixeiro','Padeiro do Belenzinho',["Acordo às três da manhã para o pão ficar pronto antes do apito das fábricas. Operário com fome não trabalha!"]]];
+  G.forEach(([x,y,spr,name,lines],i)=>{const p=findFree(S,x,y,10);if(!p)return;
+    const sp=CHAR_ORDER.includes(spr)?spr:(CHAR_ORDER.includes('rt_'+spr)?'rt_'+spr:'colono');
+    addNPCs([{id:'vida22_'+i,spr:sp,x:p[0],y:p[1],dir:'down',name,lines,diary:name+', 1922: '+lines[0]}],S);});
+  /* gente andando na rua */
+  const WK=['dona','operario','crianca','tecela','colono','lavadeira'],W=[];
+  [[100,42,'Bom Retiro'],[112,38,'Bom Retiro'],[160,44,'Canindé'],[178,44,'Canindé'],[200,70,'Belenzinho'],[222,92,'Belenzinho'],[206,104,'Belenzinho']].forEach(([x,y,b],k)=>{const p=findFree(S,x,y,8);if(!p)return;
+    const spr=WK[k%WK.length],sp=CHAR_ORDER.includes(spr)?spr:(CHAR_ORDER.includes('rt_'+spr)?'rt_'+spr:'colono');
+    W.push({id:'vidaW22_'+k,spr:sp,name:'Morador do '+b,wander:[p[0]-3,p[1]-2,p[0]+3,p[1]+2],speed:.9,lines:[`Bom dia! No ${b} todo mundo se conhece.`]});});
+  addWalkers(S,W);
+  window.__vida22log={lojas:LOJAS.filter(l=>ob(l[0])&&ob(l[0]).name===l[3]).length,araca:!!ob('cemAraca')};
+}catch(e){console.warn('[bairros22 vida]',e);}},0);
+/*__BAIRROS22_E_END__*/
 
 /* =========================================================
    NOMES DAS RUAS NO CHÃO E NO MAPA (1922)
