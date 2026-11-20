@@ -18892,7 +18892,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v173) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v182) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -19396,6 +19396,43 @@ window.__paulista82Ready=Promise.all(ready);
        rel.quintal18=(rel.quintal18||[]).filter(q=>!(q[1]===85)).concat([[34,90,2,4],[46,90,1,4],[12,96,3,2],[26,96,3,2],[40,96,3,2]]);rel.r21=1;}
       const q21=(x,y)=>r21&&((x>=34&&x<=35&&y>=90&&y<=93)||(x===46&&y>=90&&y<=93)||(y>=96&&((x>=12&&x<=14)||(x>=26&&x<=28)||(x>=40&&x<=42))));
       rel.r19=1;rel.r20=1;tapa(6,78,41,87,quintal);tapa(6,84,17,97,q21);tapa(18,90,46,97,q21);tapa(44,79,50,83,(x,y)=>x===50);tapa(44,90,50,97,q21);}
+     /* ===== v182 — CENTRO DE 1922: SÃO BENTO — RUA FLORÊNCIO DE ABREU COM A CASA DA BÓIA E O PALACETE DA MARQUESA DE ITU, COLÉGIO DE SÃO BENTO, LARGO CALÇADO, NO LUGAR DOS QUARTEIRÕES DE CENÁRIO (pedido do professor, 20/11/2026) ===== */
+     /* 22ª RODADA. Norte do mosteiro: rua nova (y8-9) no alto do barranco, com fileira de sobrados de comércio de frente para ela; quintais atrás.
+        Atrás da loja A Cidade de Londres: rua nova (y18-19) com o Colégio de São Bento; o Café da praça passa a ter acesso. O jardim do largo sai (é dos anos 1970). */
+     if(M[6][92]==='p'&&M[8][100]==='p'&&M[5][104]==='.'&&M[15][112]==='p'&&id('saobento')&&id('cafeAP1')){
+      const set=(x0,y0,x1,y1,ch)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)M[y][x]=ch;};
+      const marcaPt=(x0,y0,x1,y1)=>{for(const q of objects)if(q.scene===S&&/^pt_/.test(q.id)&&!q.enter&&toca(q,x0,y0,x1,y1))for(let y=q.y;y<q.y+(q.h||1);y++)for(let x=q.x;x<q.x+(q.w||1);x++)marca.add(x+','+y);};
+      const predio=(id,k,x,larg,base,rot,tel,rows,nome,texto)=>{const o={id,scene:S,x,y:base-1,w:1,h:1,name:nome,text:texto};objects.push(o);ergue(o,k,x,larg,null,rot,tel,base,rows);};
+      const gente=(id,spr,nome,x,y,lines)=>{if(!npcs.some(n=>n.id===id))npcs.push({id,spr,name:nome,lines,x,y,dir:'down',scene:S,talked:false,px:x*T,py:y*T});};
+      const muda2=(i,x,y)=>{const o=objects.find(q=>q.scene===S&&q.id===i)||npcs.find(q=>q.scene===S&&q.id===i);if(o){o.x=x;o.y=y;if(o.px!==undefined){o.px=x*T;o.py=y*T;}}};
+      const INV='[Casa inventada para o jogo, no estilo do comércio da rua.]';
+      /* (a) norte do mosteiro */
+      marcaPt(88,0,129,9);tiraT(88,4,129,9);tiraT(110,0,129,3);for(const q of objects)if(q.scene===S&&/^jm_tapa_/.test(q.id)&&toca(q,88,0,129,9))q.scene='__fora';
+      quadra(88,4,109,7);quadra(110,0,129,7);set(88,8,129,9,'D');
+      muda2('rtp8',100,9);muda2('mesaCafe0',108,1);muda2('rizkallah22',91,8);
+      predio('jm_casaBoia','g_sobrado_3x2_1',88,6,8,'CASA DA BÓIA',['t',TELHA[0]],4,'Casa da Bóia',['A Casa da Bóia, de Rizkallah Jorge, imigrante sírio. A firma existe desde 1898 e está neste casarão da Rua Florêncio de Abreu desde 1909.','Começou com objetos de cobre. Depois passou a fazer boias para caixa-d’água e material sanitário, numa cidade que ganhava água encanada.','[A firma e o endereço são reais. A fachada é desenho aproximado.]']);
+      predio('jm_ferragensFA','g_loja_2x2_1',94,4,8,'FERRAGENS',['p'],4,'Loja de ferragens',['Pregos, ferramentas, fechaduras, arame. A Rua Florêncio de Abreu é a rua das ferragens desde o fim do século passado.',INV]);
+      predio('jm_marquesaItu','g_residencia_3x2_1',98,6,8,null,['t',TELHA[2]],4,'Palacete da Marquesa de Itu',['O palacete da Marquesa de Itu, construído nos anos 1890. Em 1900 um visitante do Rio de Janeiro elogiou o “belo prédio”.','Quando foi feito, esta era uma rua de gente rica. Aos poucos as famílias foram embora e o comércio tomou conta.','[O palacete existiu. O desenho é aproximado. Fonte: E. Campos, “Nos caminhos da Luz”, 2005.]']);
+      predio('jm_arreiosFA','g_loja_2x2_2',104,4,8,'ARREIOS',['t',TELHA[1]],4,'Selaria',['Selas, arreios, rédeas e chicotes. Com tanta carroça e tanta mula na cidade, selaria não fica sem freguês.',INV]);
+      predio('jm_maquinasFA','g_ecletico_4x3_2',110,8,8,'MÁQUINAS',['p'],6,'Casa importadora de máquinas',['Uma casa importadora: máquinas de costura, bombas-d’água, motores, tudo vindo de navio da Europa e dos Estados Unidos.',INV]);
+      predio('jm_atacadoFA','g_armazem_3x1_1',118,6,8,'ATACADO',['z','#7e8a94'],3,'Armazém de atacado',['Um armazém que vende por atacado para os comerciantes do interior. A mercadoria chega de trem, pela Estação da Luz, aqui perto.',INV]);
+      predio('jm_armarinhoFA','g_loja_2x2_1',124,4,8,'ARMARINHOS',['t',TELHA[3]],4,'Armarinho',['Botões, linhas, fitas, rendas. Muitas lojas assim são de sírios e libaneses, que começaram como mascates.',INV]);
+      const q22a=(x,y)=>(x>=108&&x<=109&&y>=4&&y<=7)||(x>=128&&x<=129&&y>=4&&y<=7)||(y>=0&&y<=1&&((x>=119&&x<=121)||(x>=126&&x<=128)))||(y>=2&&y<=3&&x>=118&&x<=119);
+      rel.quintal18=(rel.quintal18||[]).concat([[108,4,2,4],[128,4,2,4],[119,0,3,2],[126,0,3,2]]);
+      tapa(110,0,129,7,q22a);tapa(88,4,109,7,q22a);
+      /* (b) atrás da loja A Cidade de Londres: rua nova e Colégio de São Bento */
+      marcaPt(106,12,127,19);tiraT(106,12,127,19);for(const q of objects)if(q.scene===S&&/^jm_tapa_/.test(q.id)&&toca(q,106,12,127,19))q.scene='__fora';quadra(108,12,127,17);set(106,18,127,19,'D');
+      predio('jm_colegioSB','g_ecletico_4x3_1',108,8,18,'COLÉGIO',['t',TELHA[1]],6,'Colégio de São Bento',['O Colégio de São Bento, dos monges beneditinos, fundado em 1903. Aqui também funciona, desde 1908, a primeira Faculdade de Filosofia do país.','[O colégio é real e fica junto do mosteiro. A posição exata e a fachada são reconstrução.]']);
+      predio('jm_chapeusSB','g_loja_2x2_2',116,4,18,'CHAPÉUS',['t',TELHA[0]],4,'Chapelaria',['Chapéus de feltro e de palha. Em 1922 ninguém sai à rua de cabeça descoberta.',INV]);
+      const q22b=(x,y)=>(x>=120&&x<=122&&y>=14&&y<=17)||(x>=126&&x<=127&&y>=14&&y<=17);rel.quintal18=rel.quintal18.concat([[120,14,3,4],[126,14,2,4]]);
+      tapa(108,12,127,17,q22b);
+      /* (c) Largo de São Bento calçado, sem jardim */
+      some(id('jardimSB'));
+      for(const q of npcs)if(q.scene===S&&q.x>=88&&q.x<=129&&q.y<=19&&M[q.y]&&M[q.y][q.x]==='p'){const dd=perto(q.x,q.y,1);if(dd){rel.movidos.push(q.id+' '+q.x+','+q.y+' -> '+dd);q.x=dd[0];q.y=dd[1];q.px=dd[0]*T;q.py=dd[1]*T;}}
+      gente('jm_alunoSB','h22_n|criancasBx|3','Aluno do colégio',112,19,['Estudo no Colégio de São Bento. Os professores são monges, e quase todos vieram da Alemanha.','Quando o relógio da torre bate, a gente sabe que acabou o recreio.']);
+      gente('jm_caixeiroFA','h22_n|carregaArm1|5','Caixeiro',120,9,['Sou caixeiro do armazém. Chego às seis da manhã, varro a loja, arrumo a mercadoria e atendo os fregueses do interior.','Durmo num quartinho nos fundos. Um dia ainda abro meu próprio negócio.']);
+      try{C.P.push({t:'R. FLORÊNCIO DE ABREU',x:100*16,y:9*16+8,w:118});}catch(_){}
+      rel.r22=1;}
      rel.movidos.push('República e Municipal: 17ª rodada');}
     /* a Praça da Sé fica mais limpa na frente do Solar: uma banca vai para o Largo do Carmo e a árvore sai da frente */
     for(const [id,x,y] of [['rtp13',98,59],['rtp4',121,65]]){const o=objects.find(o=>o.scene===S&&o.id===id);if(o&&cabe(x,y,o.w||1)){rel.movidos.push(id+' '+o.x+','+o.y+' -> '+x+','+y);o.x=x;o.y=y;}}
@@ -19443,6 +19480,10 @@ window.__paulista82Ready=Promise.all(ready);
     const placa=(id,x,y,tx)=>{if(objects.some(o=>o.id===id))return;const q=livre(x,y)?[x,y]:perto(x,y,1);if(!q)return;objects.push({id,scene:S,x:q[0],y:q[1],w:1,h:1,draw:drawSign,name:'Placa',text:tx,__jm:1});rel.props++;};
     placa('jm_placaCarmo',126,64,['“Largo do Carmo.” Aqui ficam o convento e a igreja dos frades carmelitas, do tempo da colônia. [Eles não aparecem no jogo.]','Daqui a poucos anos, no fim da década de 1920, o convento e a igreja dos frades vão ser demolidos para dar lugar a prédios novos. Só a igreja da Ordem Terceira do Carmo vai continuar de pé.']);
     placa('jm_placaRemedios',119,80,['“Praça João Mendes.” Aqui fica a Igreja de Nossa Senhora dos Remédios. [Ela não aparece no jogo.]','Nos anos 1880, os caifazes de Antônio Bento se reuniam nela para ajudar escravizados a fugir. A igreja será demolida em 1943.']);
+    if(rel.r22){placa('jm_placaBonde1900',93,24,['Largo de São Bento. Daqui saiu, em 1900, a primeira linha de bonde elétrico da cidade.','O mosteiro novo levou mais de dez anos para ficar pronto: as obras começaram em 1910 e a igreja foi consagrada agora, em 1922. O relógio da torre veio da Alemanha.']);
+      placa('jm_placaViadSI',89,21,['Deste lado do largo sai o Viaduto Santa Ifigênia, inaugurado em 1913. A armação de ferro veio pronta da Bélgica, de navio, e foi montada aqui. Tem dois trilhos de bonde.','[Fonte: Assembleia Legislativa de São Paulo.]']);
+      [[96,9],[114,9],[126,9],[110,19],[122,19]].forEach((a,i)=>prop('jm_sbPoste'+i,'ANH_poste_dois_globos_A',a[0],a[1],POS[0],POS[1]));
+      prop('jm_sbBarris','FV_c_barris',122,8,'Barris',['Barris na porta do armazém.']);prop('jm_sbCx','CI_caixote',97,8,'Caixotes',['Caixotes de ferragens recém-chegados.']);}
     if(rel.r21){[[9,95],[22,95],[40,95]].forEach((a,i)=>prop('jm_b2Poste'+i,'ANH_poste_dois_globos_A',a[0],a[1],POS[0],POS[1]));prop('jm_b2Barris','FV_c_barris',20,94,'Barris',['Barris de água para as mulas da cocheira.']);prop('jm_b2Cx','CI_caixote',34,94,'Tábuas e caixotes',['Madeira empilhada na porta da marcenaria.']);prop('jm_valeArb0','ANH_arbusto',49,92,'Mato do vale',['Capim e mato na beira do vale.']);prop('jm_valeArb1','ANH_arvore_verde',50,96,'Mato do vale',['Capim e mato na beira do vale.']);}
     if(rel.r19){placa('jm_placaRiach',45,88,['Largo do Riachuelo. Até 1865 chamava-se Largo do Bexiga: aqui se juntavam o caminho de Sorocaba e o de Santo Amaro, e havia uma hospedaria para os viajantes.','Daqui saem a Rua de Santo Amaro e a Rua de Santo Antônio, as duas mais antigas do bairro. [Fonte: S. Schneck, FAU-USP, 2010.]']);
       prop('jm_riPoste0','ANH_poste_dois_globos_A',50,85,POS[0],POS[1]);prop('jm_riBar0','FV_c_barris',44,84,'Barris',['Barris na calçada do café.']);prop('jm_coVaso0','ANH_vaso_pedestal',29,84,'Vaso de planta',['Um vaso de planta na entrada do cortiço.']);prop('jm_coCx0','CI_caixote',30,84,'Caixote',['Um caixote que serve de banco.']);
@@ -19508,6 +19549,35 @@ window.__paulista82Ready=Promise.all(ready);
             g.restore();y+=sh;}};
         o.draw=function(c,X,Y){if(!cv)faz();c.drawImage(cv,X,Y-4);};}
       rel.telhados=nT;}catch(e){console.warn('telhados JM',e);}
+    /* ===== v182 — CENTRO DE 1922: NENHUM TELHADO DE CENÁRIO — todo telhado de enchimento sai; onde ele dava para uma rua entra uma fachada de casa ou sobrado no tamanho cheio; o miolo das quadras vira quintal murado com horta, árvore, varal e tanque (pedido do professor, 20/11/2026) ===== */
+    try{const R=new Set(),via=c=>'dDeSR'.includes(c),K2=(x,y)=>x+','+y,HH=M.length,WW=M[0].length;
+      const h3=(a,b,c)=>{let n=(Math.imul(a,374761393)+Math.imul(b,668265263)+Math.imul(c,1442695041))|0;n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967296;};
+      for(const o of objects){if(o.scene!==S||o.enter||o.room||!/^pt_|^jm_tapa_|^jm_sul_/.test(o.id))continue;for(let y=o.y;y<o.y+(o.h||1);y++)for(let x=o.x;x<o.x+(o.w||1);x++)R.add(K2(x,y));o.scene='__fora';}
+      const oc=new Set();for(const o of objects)if(o.scene===S)for(let y=o.y;y<o.y+(o.h||1);y++)for(let x=o.x;x<o.x+(o.w||1);x++)oc.add(K2(x,y));
+      for(const k of [...R])if(oc.has(k))R.delete(k);
+      const ART=[['g_loja_2x2_1',4,1],['g_loja_2x2_2',4,1],['g_residencia_2x2_1',4,0],['g_residencia_2x2_2',4,0],['g_colonial_2x1_1',4,0],['g_colonial_2x1_2',4,0],['g_sobrado_3x2_1',6,1],['g_sobrado_3x2_2',6,1],['g_residencia_3x2_1',6,0],['g_residencia_3x2_2',6,0]].filter(a=>MAN[a[0]]&&A['PC_'+a[0]]);
+      let nF=0,nTr=0;
+      /* põe fachadas ao longo de um trecho [x0..x1] cuja linha de baixo é y (precisa de 4 quadradinhos de fundo) */
+      const poe=(x0,x1,y)=>{let cx=x0;while(cx<=x1){const rest=x1-cx+1;let pos=ART.filter(a=>a[1]<=rest),feito=false;
+          if(pos.length){let c2=pos.filter(a=>{const r=rest-a[1];return r===0||r>=4;});if(!c2.length)c2=pos;const a=c2[Math.floor(h3(cx,y,31)*c2.length)%c2.length];
+            let ok=true;for(let j=0;j<4&&ok;j++)for(let i=0;i<a[1];i++)if(!R.has(K2(cx+i,y-j))){ok=false;break;}
+            if(ok){const o={id:'jm_fx_'+cx+'_'+y,scene:S,x:cx,y:y-3,w:1,h:1,name:a[2]?'Sobrado':'Casa',text:a[2]?['Um sobrado: comércio embaixo, moradia ou escritório em cima.']:['Uma casa de moradia, parede com parede com as vizinhas.']};objects.push(o);
+              grande(o,a[0],cx,y-3,a[1],null,null,[h3(cx,y,5)<.25?'p':'t',TELHA[Math.floor(h3(cx,y,6)*4)%4]],y+1);o.__gen=1;for(let j=0;j<4;j++)for(let i=0;i<a[1];i++){R.delete(K2(cx+i,y-j));oc.add(K2(cx+i,y-j));}nF++;cx+=a[1];feito=true;}}
+          if(!feito)cx++;}};
+      const livreC=(x,y)=>M[y]&&M[y][x]!==undefined&&!R.has(K2(x,y))&&!oc.has(K2(x,y))&&(via(M[y][x])||M[y][x]==='p');
+      if(ART.length){
+        /* (1) onde o cenário dava para uma rua ou calçada: fachadas */
+        for(let y=HH-2;y>=4;y--){let x=0;const fr=(a,b)=>R.has(K2(a,b))&&livreC(a,b+1);while(x<WW){if(!fr(x,y)){x++;continue;}let x1=x;while(x1+1<WW&&fr(x1+1,y))x1++;poe(x,x1,y);x=x1+1;}}
+        /* (2) miolo de quadra: abre uma travessa de terra de 2 quadradinhos, ligada à rua do lado, e põe uma fileira de casas de frente para ela */
+        for(let y=HH-2;y>=6;y--){let x=0;const two=a=>R.has(K2(a,y))&&R.has(K2(a,y-1));while(x<WW){if(!two(x)){x++;continue;}let x1=x;while(x1+1<WW&&two(x1+1))x1++;const L=x1-x+1;
+            let prof=0;for(let a=x;a<=x1;a++){let okc=true;for(let j=2;j<=5;j++)if(!R.has(K2(a,y-j))){okc=false;break;}if(okc)prof++;}
+            const lig=livreC(x-1,y)||livreC(x-1,y-1)||livreC(x1+1,y)||livreC(x1+1,y-1);
+            if(L>=8&&prof>=8&&prof>=L*.5&&lig){for(let a=x;a<=x1;a++){M[y][a]='d';M[y-1][a]='d';R.delete(K2(a,y));R.delete(K2(a,y-1));}nTr++;poe(x,x1,y-2);}
+            x=x1+1;}}}
+      /* o que sobrou vira quintal: não se anda nele; o desenho vai no chão */
+      const Q=[];let nQ=0;for(let y=0;y<HH;y++){let x=0;while(x<WW){if(!R.has(K2(x,y))){x++;continue;}let x1=x;while(x1+1<WW&&R.has(K2(x1+1,y)))x1++;
+          objects.push({id:'jm_q_'+x+'_'+y,scene:S,x,y,w:x1-x+1,h:1,name:'Quintal',text:['O quintal dos fundos de uma casa: horta, varal, tanque, galinheiro.'],__jm:1,__q:1,draw(){}});nQ++;for(let i=x;i<=x1;i++)Q.push([i,y]);x=x1+1;}}
+      rel.quintais=Q;rel.semTelhado=[nF,nTr,nQ,Q.length];}catch(e){console.warn('sem telhado JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
@@ -19555,7 +19625,7 @@ window.__paulista82Ready=Promise.all(ready);
         g.fillStyle='#8a6f48';g.fillRect(54*16,90*16,32,2);g.fillRect(54*16,92*16-2,32,2);g.fillStyle='#3a3630';g.fillRect(54*16+11,90*16-3,10,4);g.fillRect(54*16+11,92*16-1,10,4);g.fillStyle='#3f6f8f';g.fillRect(54*16+13,90*16-2,6,2);g.fillRect(54*16+13,92*16,6,2);
         if(rel.r21){/* fundos das casas do pé do mapa: quintais de terra com cerca, horta e varal, no lugar do gramado liso */
           const MM=window.__centro22.M;for(let y=96;y<=97;y++)for(let x=8;x<=46;x++){if(x>=36&&x<=37)continue;const ch=MM[y]&&MM[y][x];if(ch!=='.'&&ch!==','&&ch!=='f')continue;const X=x*16,Y=y*16,s=Math.floor((x-8)/4);
-            g.fillStyle='#b79a72';g.fillRect(X,Y,16,16);for(let i=0;i<10;i++){g.fillStyle=i%2?'#a88a62':'#c4a880';g.fillRect(X+(hsh(x*7+i,y)%16),Y+(hsh(x,y*5+i)%16),1,1);}
+            g.fillStyle='#b79a72';g.fillRect(X,Y,16,16);for(let i=0;i<10;i++){g.fillStyle=i%2?'#a88a62':'#c4a880';g.fillRect(X+(Math.floor(hsh(x*7+i,y)*1000003)%16),Y+(Math.floor(hsh(x,y*5+i)*1000003)%16),1,1);}
             if(s%3===1){g.fillStyle='#6b4a2e';g.fillRect(X,Y+2,16,13);for(let j=3;j<14;j+=4){g.fillStyle='#3f7a34';g.fillRect(X+1,Y+j,14,2);g.fillStyle='#79b356';g.fillRect(X+4,Y+j,2,1);g.fillRect(X+10,Y+j,2,1);}}
             else if(s%3===2&&y===96){g.fillStyle='#6a6258';g.fillRect(X,Y+6,16,1);g.fillStyle=(x%2)?'#f2efe6':'#a8c0d8';g.fillRect(X+4,Y+7,6,6);}
             if((x-8)%4===0){g.fillStyle='#7a6648';g.fillRect(X,Y,2,16);g.fillStyle='#9a8460';g.fillRect(X,Y,1,16);}
@@ -19567,15 +19637,32 @@ window.__paulista82Ready=Promise.all(ready);
           g.fillStyle='#6a6258';g.fillRect(29*16+1,85*16+6,30,1);[['#f2efe6',3],['#d8b0a0',10],['#a8c0d8',17],['#f2efe6',24]].forEach(v=>{g.fillStyle=v[0];g.fillRect(29*16+v[1],85*16+7,5,6);});
           g.fillStyle='#8f897c';g.fillRect(29*16+2,87*16+4,11,9);g.fillStyle='#5f8fae';g.fillRect(29*16+4,87*16+6,7,5);}
         for(let j=0;j<32;j+=4){g.fillStyle='#c9c2b2';g.fillRect(51*16,72*16+j,32,3);g.fillStyle='#8f8878';g.fillRect(51*16,72*16+j+3,32,1);}}
+      const hi=(a,b)=>{let n=(Math.imul(a|0,374761393)^Math.imul(b|0,668265263))>>>0;n=Math.imul(n^(n>>>13),1274126177)>>>0;return (n^(n>>>16))>>>0;};
+      if(rel.quintais){/* quintais no miolo das quadras */
+        const MM=window.__centro22.M,qs=new Set(rel.quintais.map(q=>q[0]+','+q[1])),rua=(x,y)=>MM[y]&&'dDeSR'.includes(MM[y][x]),eq=(x,y)=>qs.has(x+','+y);
+        for(const q of rel.quintais){const x=q[0],y=q[1],X=x*16,Y=y*16,r=hi(x*3+1,y*5+2)%30;
+          g.fillStyle='#b99c74';g.fillRect(X,Y,16,16);for(let i=0;i<9;i++){g.fillStyle=i%3===0?'#a98b63':i%3===1?'#c6aa82':'#8fa05a';g.fillRect(X+(hi(x*7+i,y)%16),Y+(hi(x,y*5+i)%16),i%3===2?2:1,1);}
+          if(r<4){g.fillStyle='#6b4a2e';g.fillRect(X+1,Y+2,14,12);for(let j=3;j<13;j+=4){g.fillStyle='#3f7a34';g.fillRect(X+2,Y+j,12,2);g.fillStyle='#86bb5c';g.fillRect(X+4,Y+j,2,1);g.fillRect(X+10,Y+j,2,1);}}
+          else if(r<6){g.fillStyle='rgba(30,40,20,.28)';g.beginPath();g.arc(X+9,Y+11,6,0,7);g.fill();g.fillStyle='#6a4a2c';g.fillRect(X+7,Y+9,2,5);g.fillStyle='#3f7a34';g.beginPath();g.arc(X+8,Y+6,6,0,7);g.fill();g.fillStyle='#5f9a44';g.beginPath();g.arc(X+6,Y+4,3,0,7);g.fill();g.fillStyle='#86bb5c';g.fillRect(X+5,Y+3,2,1);}
+          else if(r===6){g.fillStyle='#6a6258';g.fillRect(X,Y+5,16,1);g.fillStyle='#f2efe6';g.fillRect(X+2,Y+6,5,6);g.fillStyle='#a8c0d8';g.fillRect(X+9,Y+6,4,5);}
+          else if(r===7){g.fillStyle='#55524a';g.fillRect(X+3,Y+5,10,8);g.fillStyle='#9a958a';g.fillRect(X+4,Y+6,8,6);g.fillStyle='#5f8fae';g.fillRect(X+5,Y+7,6,4);}
+          else if(r===8){[[4,6],[9,9],[6,12]].forEach(v=>{g.fillStyle='#f4f0e6';g.fillRect(X+v[0],Y+v[1],3,2);g.fillStyle='#c0392b';g.fillRect(X+v[0]+2,Y+v[1]-1,1,1);});}
+          else if(r===9){g.fillStyle='#5c4228';g.fillRect(X+3,Y+8,10,5);g.fillStyle='#8a6a44';for(let i=0;i<3;i++)g.fillRect(X+4+i*3,Y+9,2,3);}
+          /* cerca entre lotes e muro para a rua */
+          if(hi(x,91)%4===0&&eq(x-1,y)){g.fillStyle='#7a6648';g.fillRect(X,Y,2,16);g.fillStyle='#9a8460';g.fillRect(X,Y,1,16);}
+          if(rua(x,y-1)){g.fillStyle='#4a4038';g.fillRect(X,Y,16,7);g.fillStyle='#e6dcc4';g.fillRect(X,Y+1,16,5);g.fillStyle='#b9ad92';g.fillRect(X,Y+5,16,1);g.fillStyle='#a8543a';g.fillRect(X,Y,16,1);}
+          if(rua(x,y+1)){g.fillStyle='#4a4038';g.fillRect(X,Y+7,16,9);g.fillStyle='#e6dcc4';g.fillRect(X,Y+8,16,7);g.fillStyle='#b9ad92';g.fillRect(X,Y+14,16,1);g.fillStyle='#a8543a';g.fillRect(X,Y+7,16,2);if(hi(x,y*3)%5===0){g.fillStyle='#5e3a22';g.fillRect(X+5,Y+9,6,6);g.fillStyle='#3e2616';g.fillRect(X+8,Y+9,1,6);}}
+          if(rua(x-1,y)){g.fillStyle='#4a4038';g.fillRect(X,Y,4,16);g.fillStyle='#d8cdb2';g.fillRect(X+1,Y,2,16);}
+          if(rua(x+1,y)){g.fillStyle='#4a4038';g.fillRect(X+12,Y,4,16);g.fillStyle='#d8cdb2';g.fillRect(X+13,Y,2,16);}}}
       /* ===== v173 — CENTRO DE 1922: BARRANCOS DESENHADOS — o desnível do terreno deixa de ser uma faixa marrom riscada e vira barranco de terra com capim em cima e sombra embaixo (pedido do professor, 20/11/2026) ===== */
       try{const MM=window.__centro22.M,eC=(x,y)=>MM[y]&&MM[y][x]==='C';
         for(let y=0;y<MM.length;y++)for(let x=0;x<MM[y].length;x++){if(MM[y][x]!=='C')continue;const X=x*16,Y=y*16,up=eC(x,y-1),dn=eC(x,y+1),lf=eC(x-1,y),rt=eC(x+1,y);
           let n=0;for(let k=y;eC(x,k-1);k--)n++;let tot=n+1;for(let k=y;eC(x,k+1);k++)tot++;const f=tot>1?n/(tot-1):.5;
           const cs=['#a58558','#987a50','#8c6f48','#806440','#745a39'];
           for(let j=0;j<16;j+=4){const t=Math.min(4,Math.floor((f*(tot)+j/16)/tot*5));g.fillStyle=cs[t];g.fillRect(X,Y+j,16,4);g.fillStyle='rgba(50,30,15,.22)';g.fillRect(X,Y+j+3,16,1);}
-          for(let i=0;i<5;i++){const px=hsh(x*5+i,y)%15,py=hsh(x,y*7+i)%14;g.fillStyle=i%2?'rgba(60,40,20,.35)':'rgba(220,190,140,.30)';g.fillRect(X+px,Y+py,2,1);}
-          if(hsh(x*3,y*11)%4===0){const px=2+hsh(x,y*13)%10,py=3+hsh(x*17,y)%9;g.fillStyle='#4f7a34';g.fillRect(X+px,Y+py,3,2);g.fillStyle='#78a850';g.fillRect(X+px+1,Y+py-1,1,2);}
-          if(!up){g.fillStyle='#5f9440';g.fillRect(X,Y,16,3);g.fillStyle='#86bb5c';g.fillRect(X,Y,16,1);g.fillStyle='#4a7632';for(let i=1;i<16;i+=3)g.fillRect(X+i,Y+3,1,1+(hsh(x*9+i,y)%2));}
+          for(let i=0;i<5;i++){const px=hi(x*5+i,y)%15,py=hi(x,y*7+i)%14;g.fillStyle=i%2?'rgba(60,40,20,.35)':'rgba(220,190,140,.30)';g.fillRect(X+px,Y+py,2,1);}
+          if(hi(x*3,y*11)%4===0){const px=2+hi(x,y*13)%10,py=3+hi(x*17,y)%9;g.fillStyle='#4f7a34';g.fillRect(X+px,Y+py,3,2);g.fillStyle='#78a850';g.fillRect(X+px+1,Y+py-1,1,2);}
+          if(!up){g.fillStyle='#5f9440';g.fillRect(X,Y,16,3);g.fillStyle='#86bb5c';g.fillRect(X,Y,16,1);g.fillStyle='#4a7632';for(let i=1;i<16;i+=3)g.fillRect(X+i,Y+3,1,1+(hi(x*9+i,y)%2));}
           if(!dn){g.fillStyle='rgba(30,18,10,.45)';g.fillRect(X,Y+13,16,3);g.fillStyle='#3a2a1c';g.fillRect(X,Y+15,16,1);}
           if(!lf){g.fillStyle='rgba(30,18,10,.30)';g.fillRect(X,Y,1,16);}if(!rt){g.fillStyle='rgba(30,18,10,.30)';g.fillRect(X+15,Y,1,16);}}
         /* onde a rua desce o barranco: ladeira calçada com degraus de pedra, no lugar do riscado amarelo */
