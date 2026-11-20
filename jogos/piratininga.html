@@ -12804,6 +12804,88 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
   const c0=TILE_INFO.C;TILE_INFO.C=(x,y)=>cur==='sp88'?{name:'Barranco da colina',text:["Um barranco de terra e capim. O centro de São Paulo fica no alto de uma colina, entre o vale do Anhangabaú e a várzea do Tamanduateí.","Para subir ou descer, só pelas ladeiras: Ladeira do Carmo, Porto Geral, São João, do Piques..."]}:c0(x,y);
 }catch(e){console.warn('relevo 1888',e);}})();
 
+/* ===== v153 — RIOS DE 1888 COM CURVAS E VÁRZEA ALAGADIÇA (pedido do professor, 20/11/2026) ===== */
+/* Rodada 3 das correções de 1888. Antes da retificação (anos 1890 em diante), os rios corriam em curvas:
+   - Tamanduateí: faz curvas pela Várzea do Carmo, que fica mais larga dos dois lados e cheia de poças.
+   - Tietê: corre em meandros, com várzea dos dois lados.
+   - Anhangabaú: córrego estreito, em curvas, no fundo do vale.
+   As pontes, a ferrovia, a Ilha dos Amores e o que já estava em cada margem ficam no mesmo lugar:
+   nesses pontos o rio passa reto. O mapa não foi aumentado, para não mexer na posição de nada. */
+(function(){try{
+  if(!SCN.sp88)return;
+  const M=SCN.sp88.map,H=M.length,W=M[0].length,TG=SPTAG88;
+  const k=(x,y)=>x+','+y;
+  /* o que não pode virar rio */
+  const OCC=new Set();
+  for(const o of objects){if((o.scene||'pira')!=='sp88'||/^canoa88_/.test(o.id))continue;for(let y=o.y;y<o.y+(o.h||1);y++)for(let x=o.x;x<o.x+(o.w||1);x++)OCC.add(k(x,y));}
+  for(const n of npcs)if(n.scene==='sp88')OCC.add(k(n.x,n.y));
+  for(const w of walkers){if(w.scene!=='sp88'||!w.path)continue;const P=w.path;for(let i=0;i<P.length-1;i++){let [x,y]=P[i];const [x1,y1]=P[i+1];
+    while(true){OCC.add(k(x,y));if(x===x1&&y===y1)break;if(x!==x1)x+=Math.sign(x1-x);else y+=Math.sign(y1-y);}}}
+  if(typeof BONDE_RAIL!=='undefined')for(const q of BONDE_RAIL.keys())OCC.add(q);
+  if(window.__RAIL88)for(const q of window.__RAIL88.keys())OCC.add(q);
+  if(typeof PONTOS!=='undefined')for(const p of PONTOS)OCC.add(k(p.x,p.y));
+  OCC.add(k(player.x,player.y));
+  const livre=(x,y)=>M[y]&&M[y][x]!==undefined&&'V.,Tb'.includes(M[y][x])&&!OCC.has(k(x,y));
+  const agua=ch=>ch==='W'||ch==='B';
+  const mudados=[];
+  /* rio vertical: colunas x0 (margem) .. x1 (margem) */
+  const meandroV=(nome,x0,x1,ya,yb,amp,per,fase,trava)=>{
+    const off=new Array(H).fill(0),lock=new Array(H).fill(false);
+    for(let y=ya;y<=yb;y++){let ok=true;for(let x=x0;x<=x1;x++){if(!agua(M[y][x])||OCC.has(k(x,y)))ok=false;}
+      if(!ok||(trava&&trava(y)))for(let d=-2;d<=2;d++)if(y+d>=0&&y+d<H)lock[y+d]=true;}
+    for(let y=ya;y<=yb;y++)off[y]=lock[y]?0:Math.round(amp*Math.sin((y-ya)/per+fase));
+    const valido=(y,o)=>{for(let x=x0+o;x<=x1+o;x++){if(x>=x0&&x<=x1)continue;if(!livre(x,y))return false;}return true;};
+    for(let it=0;it<8;it++){
+      for(let y=ya;y<=yb;y++)while(off[y]!==0&&!valido(y,off[y]))off[y]-=Math.sign(off[y]);
+      for(let y=ya;y<=yb;y++){const m=Math.min(Math.abs(off[y]),y>ya?Math.abs(off[y-1])+1:9,y<yb?Math.abs(off[y+1])+1:9);
+        if((y>ya&&off[y-1]*off[y]<0)||(y<yb&&off[y+1]*off[y]<0))off[y]=0;else off[y]=Math.sign(off[y])*m;}}
+    for(let y=ya;y<=yb;y++){const o=off[y];if(!o)continue;
+      for(let x=x0;x<=x1;x++){M[y][x]='V';if(TG[y])TG[y][x]=nome==='Rio Tamanduateí'?'Várzea do Carmo':'Várzea';}
+      for(let x=x0+o;x<=x1+o;x++){M[y][x]=(x===x0+o||x===x1+o)?'B':'W';if(TG[y])TG[y][x]=nome;}
+      mudados.push([nome,y,o]);}
+    return off;};
+  /* rio horizontal: linhas y0 (margem) .. y1 (margem) */
+  const meandroH=(nome,y0,y1,xa,xb,amp,per,fase,trava)=>{
+    const off=new Array(W).fill(0),lock=new Array(W).fill(false);
+    for(let x=xa;x<=xb;x++){let ok=true;for(let y=y0;y<=y1;y++){if(!agua(M[y][x])||OCC.has(k(x,y)))ok=false;}
+      if(!ok||(trava&&trava(x)))for(let d=-3;d<=3;d++)if(x+d>=0&&x+d<W)lock[x+d]=true;}
+    for(let x=xa;x<=xb;x++)off[x]=lock[x]?0:Math.round(amp*Math.sin((x-xa)/per+fase));
+    const valido=(x,o)=>{for(let y=y0+o;y<=y1+o;y++){if(y>=y0&&y<=y1)continue;if(y<0||y>=H||!livre(x,y))return false;}return true;};
+    for(let it=0;it<8;it++){
+      for(let x=xa;x<=xb;x++)while(off[x]!==0&&!valido(x,off[x]))off[x]-=Math.sign(off[x]);
+      for(let x=xa;x<=xb;x++){const m=Math.min(Math.abs(off[x]),x>xa?Math.abs(off[x-1])+1:9,x<xb?Math.abs(off[x+1])+1:9);
+        if((x>xa&&off[x-1]*off[x]<0)||(x<xb&&off[x+1]*off[x]<0))off[x]=0;else off[x]=Math.sign(off[x])*m;}}
+    for(let x=xa;x<=xb;x++){const o=off[x];if(!o)continue;
+      for(let y=y0;y<=y1;y++){M[y][x]='V';if(TG[y])TG[y][x]='Várzea do Tietê';}
+      for(let y=y0+o;y<=y1+o;y++){M[y][x]=(y===y0+o||y===y1+o)?'B':'W';if(TG[y])TG[y][x]=nome;}
+      mudados.push([nome,x,o]);}
+    return off;};
+  /* acha as margens de cada rio */
+  const colsRio=(y,xa,xb)=>{let a=-1,b=-1;for(let x=xa;x<=xb;x++){if(M[y][x]==='B'&&M[y][x+1]==='W'&&a<0)a=x;if(a>=0&&M[y][x]==='B'&&M[y][x-1]==='W'){b=x;break;}}return [a,b];};
+  const [ta,tb]=colsRio(40,85,110);
+  const [aa,ab]=colsRio(80,40,60);
+  let tieA=-1,tieB=-1;for(let y=0;y<12;y++){if(M[y][20]==='B'&&M[y+1]&&M[y+1][20]==='W'&&tieA<0)tieA=y;else if(tieA>=0&&M[y][20]==='B'&&M[y-1][20]==='W'){tieB=y;break;}}
+  const res={};
+  if(ta>0&&tb>ta)res.tam=meandroV('Rio Tamanduateí',ta,tb,9,H-1,2.6,6.5,0.4);
+  if(aa>0&&ab>aa)res.anh=meandroV('Rio Anhangabaú',aa,ab,46,H-1,1.6,5,1.2);
+  if(tieA>=0&&tieB>tieA)res.tie=meandroH('Rio Tietê',tieA,tieB,0,W-1,2.2,7,0,x=>x>=ta-3&&x<=tb+3);
+  /* as canoas acompanham o Tamanduateí */
+  if(res.tam)for(const o of objects){if(!/^canoa88_/.test(o.id))continue;const d=res.tam[o.y]||0;if(d)o.x+=d;}
+  /* várzea mais larga: do lado de fora do Tamanduateí, o capim baixo vira várzea alagadiça */
+  if(res.tam)for(let y=24;y<=100;y++){const o=res.tam[y]||0;for(let x=tb+o+1;x<=tb+o+4;x++)if(M[y][x]==='.'&&!OCC.has(k(x,y))){M[y][x]='V';if(TG[y])TG[y][x]='Várzea do Carmo';}}
+  if(res.tie)for(let x=0;x<W;x++){for(let y=0;y<=tieB+3;y++)if(M[y]&&M[y][x]==='.'&&!OCC.has(k(x,y))&&y>=tieB+(res.tie[x]||0)+1&&y<=tieB+(res.tie[x]||0)+2){M[y][x]='V';if(TG[y])TG[y][x]='Várzea do Tietê';}}
+  window.__rios88={res,mudados:mudados.length,tam:[ta,tb],anh:[aa,ab],tie:[tieA,tieB]};
+  /* poças d'água na várzea: desenho por cima do chão */
+  const hsh=(x,y,s)=>{const v=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return v-Math.floor(v);};
+  const pocas=c=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(M[y][x]!=='V')continue;const h=hsh(x,y,51);if(h>.16)continue;
+      const X=x*T,Y=y*T,w=6+((hsh(x,y,52)*6)|0),hh=3+((hsh(x,y,53)*2)|0),px0=X+1+((hsh(x,y,54)*(14-w))|0),py0=Y+3+((hsh(x,y,55)*(12-hh))|0);
+      c.fillStyle='#2e6a4a';c.fillRect(px0-1,py0,w+2,hh);c.fillRect(px0,py0-1,w,hh+2);
+      c.fillStyle='#4e8aa8';c.fillRect(px0,py0,w,hh);c.fillStyle='#8ac0d8';c.fillRect(px0+1,py0,w-3,1);}};
+  const ro=railsOverlay88;railsOverlay88=function(c){pocas(c);ro(c);};
+  const v0=TILE_INFO.V;TILE_INFO.V=(x,y)=>cur==='sp88'?{name:(TG[y]&&/Várzea/.test(TG[y][x]||''))?TG[y][x]:'Várzea',text:["Terreno baixo e encharcado na beira do rio, cheio de capim e poças. Nas cheias, a água cobre tudo.","Os rios ainda correm em curvas. Só depois de 1890 a cidade começa a endireitar o Tamanduateí e, bem mais tarde, o Tietê."]}:(v0?v0(x,y):null);
+  try{if(cur==='sp88'){buildOcc();buildStatic();}}catch(_){}
+}catch(e){console.warn('rios 1888',e);}})();
+
 /* =========================================================
    IPIRANGA 1922 — setor monumental (Museu, jardim, Monumento, riacho),
    fábrica Jafet a leste, moradias e Casa do Grito.
