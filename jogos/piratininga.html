@@ -12705,6 +12705,48 @@ function desenhaLocobreque88(c,x,y){/* locobreque visto de lado, olhando para ba
   };
 }catch(e){console.warn('ferrovias 1888',e);}})();
 
+/* ===== v150 — NOMES DE 1888: RUAS, LARGOS E ILHA DOS AMORES (pedido do professor, 19/11/2026) ===== */
+/* Rodada 1 das correções históricas de 1888. Os nomes seguem a cidade de 1888 (antes da República):
+   Rua da Imperatriz (não XV de Novembro), Largo do Rosário (não Antônio Prado), Largo do Palácio
+   (não Pátio do Colégio), Largo 7 de Abril (o antigo Largo dos Curros; Praça da República só em 1889).
+   O Mercado dos Caipiras e o mercado da Rua 25 de Março são o mesmo mercado: um nome só, com os dois. */
+(function(){try{
+  if(!SCN.sp88)return;
+  const L=LABELS_88,tira=n=>{for(let i=L.length-1;i>=0;i--)if(L[i][0]===n)L.splice(i,1);};
+  /* rótulos que se atropelavam */
+  tira('Mercado dos Caipiras');tira('Rua 25 de Março');
+  const dedup=()=>{let v=0;for(let i=0;i<L.length;i++)if(L[i][0]==='Várzea do Carmo'){v++;if(v>1){L.splice(i,1);i--;}}};dedup();setTimeout(dedup,600);setTimeout(dedup,2500);
+  for(const l of L)if(l[0]==='Rio Tamanduateí'&&Math.abs(l[2]-30)<2)l[2]=34;
+  const RUA='#e3d6b0',LARGO='#f1c471';
+  L.push(['Mercado dos Caipiras',91,62.6],['Rua 25 de Março',95.5,67.4,RUA],
+    ['Rua Direita',60.5,71.4,RUA],['Rua de São Bento',61.5,66.2,RUA],['Rua da Imperatriz',77.5,58.6,RUA],
+    ['Largo do Rosário',84.5,53.4,LARGO],['Largo do Palácio',82,61.2,LARGO],['Largo de São Bento',66,51.2,LARGO],
+    ['Largo 7 de Abril',38,58.6,LARGO],['(antigo Largo dos Curros)',38,60.6,RUA],['Largo do Piques',41.5,76.4,LARGO],
+    ['Rua da Liberdade',72.5,92.4,RUA],['Rua da Glória',85,98.4,RUA],['Rua de Santo Amaro',41,96.4,RUA],
+    ['Rua de São Joaquim',60,106.4,RUA],['Rua do Gasômetro',110,46.4,RUA],['Ilha dos Amores',99,57.6,'#d8f0a0']);
+  /* um mercado só, com os dois nomes */
+  const mc=objects.find(o=>o.id==='mercCaipiras'&&(o.scene||'pira')==='sp88');
+  if(mc){mc.name='Mercado dos Caipiras (Rua 25 de Março)';
+    mc.text=["O Mercado dos Caipiras, na Rua 25 de Março, na beira da várzea: um prédio comprido, cheio de arcos.","Os sitiantes dos arredores chegam de carroça ou de canoa pelo Tamanduateí e vendem milho, feijão, farinha, frangos, ovos e verduras."];}
+  /* placas nas ruas e largos que ainda não tinham placa */
+  const tem=n=>objects.some(o=>(o.scene||'pira')==='sp88'&&o.text&&JSON.stringify(o.text).includes('“'+n));
+  const placa=(id,x,y,n,txt)=>{if(tem(n))return;const q=findFree('sp88',x,y,3);if(!q)return;if(window.__RAIL88&&window.__RAIL88.has(q[0]+','+q[1]))return;
+    objects.push({id,scene:'sp88',x:q[0],y:q[1],w:1,h:1,draw:drawSign,name:'Placa',text:['“'+n+'.” '+txt]});};
+  placa('placaN_sb',65,58,'Rua de São Bento',"Liga o Largo de São Bento à Rua Direita. É um dos três lados do Triângulo, o coração do comércio.");
+  placa('placaN_com',70,62,'Rua do Comércio',"Rua de lojas, escritórios de café e jornais. A redação de A Província de São Paulo fica aqui perto.");
+  placa('placaN_ros',79,55,'Largo do Rosário',"Aqui fica a Igreja de Nossa Senhora do Rosário dos Homens Pretos, da irmandade dos negros. Depois da República o largo vai virar Praça Antônio Prado.");
+  placa('placaN_pal',80,62,'Largo do Palácio',"O antigo Pátio do Colégio, onde a cidade nasceu em 1554. Hoje está aqui o Palácio do Governo da Província.");
+  placa('placaN_7a',36,57,'Largo 7 de Abril',"O antigo Largo dos Curros, onde havia touradas. O nome lembra 7 de abril de 1831, quando D. Pedro I deixou o trono. Em 1889, com a República, vai virar Praça da República.");
+  placa('placaN_lib',73,90,'Rua da Liberdade',"Desce do centro para a Liberdade. O nome do bairro vem do Largo da Forca, onde eram executados os condenados.");
+  placa('placaN_glo',86,96,'Rua da Glória',"Leva à Glória, onde a antiga chácara está sendo dividida em ruas e lotes desde 1886.");
+  placa('placaN_sa',42,95,'Rua de Santo Amaro',"O caminho velho para Santo Amaro, passando pelo Bexiga.");
+  placa('placaN_sj',59,103,'Rua de São Joaquim',"Rua nova, aberta em 1879. Aqui sai o tramway a vapor para a Vila Mariana e Santo Amaro.");
+  placa('placaN_gas',108,46,'Rua do Gasômetro',"Vai do Tamanduateí até a usina de gás do Brás, que acende os lampiões da cidade desde 1872.");
+  /* o condutor do bonde conta o tamanho da rede */
+  const cd=npcs.find(n=>n.id==='condutor'&&n.scene==='sp88');
+  if(cd&&Array.isArray(cd.lines)&&!cd.lines.some(s=>s.includes('319')))cd.lines.push("Em 1877 a cidade já tinha 7 linhas de bonde, 25 quilômetros de trilhos, 43 carros e 319 burros. É um milhão e meio de passageiros por ano!");
+}catch(e){console.warn('nomes 1888',e);}})();
+
 /* =========================================================
    IPIRANGA 1922 — setor monumental (Museu, jardim, Monumento, riacho),
    fábrica Jafet a leste, moradias e Casa do Grito.
