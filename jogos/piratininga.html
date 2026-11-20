@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=d9db775b","kb":788,"m":1},{"f":"pac_e1234.js?v=56ee25a1","kb":2140,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=9e50ae28","kb":1400,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=14f9cfed","kb":4150,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=d9db775b","kb":788,"m":1},{"f":"pac_e1234.js?v=56ee25a1","kb":2140,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=9e50ae28","kb":1400,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=ebb397c2","kb":4305,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -19432,7 +19432,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v191) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v192) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -20148,15 +20148,17 @@ window.__paulista82Ready=Promise.all(ready);
     try{const troca=(re,key,larg,fundo,porta,xx)=>{const o=objects.find(q=>q.scene===S&&q.enter&&re.test(q.name||''));if(!o||!A[key])return 0;const base=o.y+(o.h||1),cx=o.x+(o.w||1)/2,im=new Image();im.src=A[key];
         o.x=xx!=null?xx:Math.round(cx-larg/2);o.w=larg;o.h=fundo;o.y=base-fundo;o.door=porta;o.__canva=1;
         o.draw=function(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth/2,h=im.naturalHeight/2;c.drawImage(im,Math.round(X+larg*8-w/2),Math.round(Y+fundo*16-h),w,h);};return 1;};
-      rel.canva=[troca(/Santa Ifig/,'JM22_ig_santa_ifigenia',8,6,4,37)];}catch(e){console.warn('fachadas canva JM',e);}
+      rel.canva=[troca(/Santa Ifig/,'JM22_ig_santa_ifigenia',8,6,4,37)];
+      /* ===== v192 — CENTRO DE 1922: MOSTEIRO DE SÃO BENTO, CORREIOS E THEATRO MUNICIPAL COM FACHADAS NOVAS — conferidas com as fontes: igreja do mosteiro sozinha, com duas torres e relógio; Correios com relógio no alto e marquise de ferro e vidro; Municipal sem a cúpula da Ópera de Paris (pedido do professor, 20/11/2026) ===== */
+      rel.canva2=[troca(/Mosteiro de S/,'JM22_mosteiro_sao_bento',8,6,4,91),troca(/Pal[áa]cio dos Correios/,'JM22_correios',10,8,5,14),troca(/Theatro Municipal/,'JM22_theatro_municipal',9,7,4,31)];}catch(e){console.warn('fachadas canva JM',e);}
     /* ===== v191 — CENTRO DE 1922: LARGO DE SANTA IFIGÊNIA — igreja refeita conforme as fontes (pedra cinza, uma torre central alta e duas torrinhas), de frente para um largo calçado e arborizado ligado à cabeceira do viaduto; casas e sobrados no lugar do quintal solto e do gramado (pedido do professor, 20/11/2026) ===== */
     try{const ig=objects.find(q=>q.scene===S&&q.__canva&&/Santa Ifig/.test(q.name||''));if(ig&&M[22]&&M[22][45]!==undefined){
-      const den=(x,y)=>(x>=24&&x<=45&&y>=6&&y<=19)||(x>=35&&x<=45&&y>=20&&y<=21)||(y===22&&((x>=35&&x<=40)||x===45));
+      const den=(x,y)=>(x>=14&&x<=16&&y>=18&&y<=20)||(x>=24&&x<=45&&y>=6&&y<=19)||(x>=35&&x<=45&&y>=20&&y<=21)||(y===22&&((x>=35&&x<=40)||x===45));
       /* sai o quintal solto e o gramado em volta da igreja */
       for(const q of objects.slice()){if(q.scene!==S||q===ig||q.enter||!/^jm_q_|^jm_fx_|^jm_tapa_|^pt_/.test(q.id))continue;const w=q.w||1,h=q.h||1;if(h!==1){if(den(q.x,q.y)&&den(q.x+w-1,q.y+h-1))q.scene='__fora';continue;}
         let a=q.x,b=q.x+w-1;while(b>=a&&den(b,q.y))b--;while(a<=b&&den(a,q.y))a++;if(b<a)q.scene='__fora';else{q.x=a;q.w=b-a+1;}}
       if(rel.quintais)rel.quintais=rel.quintais.filter(q=>!den(q[0],q[1]));
-      for(let y=6;y<=22;y++)for(let x=24;x<=45;x++)if(den(x,y))M[y][x]='p';
+      for(let y=6;y<=22;y++)for(let x=24;x<=45;x++)if(den(x,y))M[y][x]='p';for(let y=18;y<=20;y++)for(let x=14;x<=16;x++)M[y][x]='p';/* calçada na frente toda do Palácio dos Correios */
       for(let x=24;x<=36;x++){M[12][x]='D';M[13][x]='D';}
       /* casas e sobrados: uma fileira de frente para a passagem do largo, outra de frente para a travessa de trás */
       const casa=(k,x,larg,base,sob)=>{if(!MAN[k]||!A['PC_'+k])return;const o={id:'jm_fx_si_'+x+'_'+base,scene:S,x,y:base-4,w:1,h:1,name:sob?'Sobrado':'Casa',text:sob?['Um sobrado: comércio embaixo, moradia ou escritório em cima.']:['Uma casa de moradia, parede com parede com as vizinhas.']};objects.push(o);
