@@ -1,13 +1,23 @@
 /* =====================================================================
    PIRATININGA – ESTILO VISUAL OFICIAL
-   Referência única: STARDEW VALLEY, em HD (tudo em dobro)
+   Referência única: STARDEW VALLEY, desenhado direto na grade de 32 px
    ---------------------------------------------------------------------
    Este arquivo é a "lei" do visual do jogo. Vale para todas as épocas
    (1554, 1830, 1888, 1922), para todas as conversas e para qualquer IA
    ou ferramenta (Claude, Canva, geradores/oficinas).
    Ele diz o mesmo que a skill "arte-piratininga-canva".
 
-   REGRA DE OURO: se não caberia dentro do Stardew Valley, não entra.
+   REGRA DE OURO: se não respeita o jeito de desenhar do Stardew Valley
+   E a realidade histórica de São Paulo, não entra em Piratininga.
+   O Stardew decide COMO se desenha. A documentação histórica decide
+   O QUE se desenha. Quando as duas brigam, a história ganha.
+
+   PRANCHAS DE REFERÊNCIA: todo tipo de peça nova (boneco, prédio, mata,
+   encosta...) tem primeiro uma prancha de teste aprovada pelo professor.
+   As peças seguintes são feitas a partir dela.
+
+   O conferidor no fim do arquivo só mede tamanho e preto puro. Passar
+   nele NÃO quer dizer que o desenho está aprovado.
 
    Zelda: A Link to the Past e Chrono Trigger servem só como CONSULTA
    para resolver um problema específico (encosta alta, quarteirão).
@@ -15,16 +25,23 @@
    ===================================================================== */
 
 const ESTILO = {
-  referencia: "Stardew Valley (em HD: tudo em dobro)",
+  referencia: "Stardew Valley, em pixel art nativa na grade de 32 px",
+  // "nativa": o desenho já nasce em 32 px, com detalhe de verdade.
+  // Nunca desenhar pequeno (16 px) e ampliar: isso não acrescenta detalhe.
   consultaSecundaria: ["Zelda: A Link to the Past", "Chrono Trigger"],
   descartados: ["Ninja Adventure", "pastel estilo Pokémon/GBA", "gráfico desenhado por código"],
 
-  /* ---------- TAMANHOS HD (em pixels, sem escala) ---------- */
+  /* ---------- TAMANHOS (em pixels, sem escala) ---------- */
   tile: 32,                                 // 1 quadradinho do jogo = 32 px
   boneco: { largura: 32, altura: 64 },      // quadro do boneco andando
   folhaBoneco: { largura: 512, altura: 64,  // 16 quadros em uma linha
                  ordem: "frente 0-3, costas 4-7, esquerda 8-11, direita 12-15" },
-  bonecoAltura: { min: 56, max: 64 },       // alturas variadas, ninguém gigante
+  // altura do corpo DENTRO do quadro de 32x64 (pés sempre na linha de baixo)
+  bonecoAltura: {
+    adulto:  { min: 56, max: 64 },          // alturas variadas, ninguém gigante
+    jovem:   { min: 48, max: 56 },
+    crianca: { min: 40, max: 48 }
+  },
   animal: { grande: { largura: 40, altura: 32 }, // cavalo, mula, burro
             pequeno: { largura: 16, altura: 16 } }, // pombo, galinha
   retratoFala: { largura: 85, altura: 78 }, // tamanho próprio, fora da grade
@@ -40,7 +57,8 @@ const ESTILO = {
 
   /* ---------- CORES ----------
      Cores quentes e médias. Nem pastel, nem neon.
-     Paleta-base (pode ser ajustada, mas tudo novo parte daqui). */
+     Paleta-base, comum às quatro épocas. Cada época soma a sua
+     paleta própria (paletaPorEpoca, logo abaixo). */
   paleta: {
     contornoGeral: "#2b1d16",
     terraEscura:   "#5c3a21",
@@ -62,6 +80,22 @@ const ESTILO = {
     pele1: "#5a3420", pele2: "#8a5636", pele3: "#c08a62", pele4: "#e6b896"
   },
 
+  /* ---------- CORES DE CADA ÉPOCA (somam à paleta-base) ---------- */
+  paletaPorEpoca: {
+    1554: { tema: "terra, Mata Atlântica, madeira e palha",
+            palha: "#c9a85a", palhaEscura: "#96783a", mataFunda: "#1f3a24",
+            mataClara: "#5f9440", barro: "#9a5f3c", troncoUmido: "#4a3324" },
+    1830: { tema: "taipa, cal, telha e rua de terra",
+            taipa: "#b08a62", calSuja: "#d6c8a8", telhaVelha: "#8f4a30",
+            ruaDeTerra: "#a57c52", madeiraPintada: "#3f6a5a", pedraDeCantaria: "#9c9488" },
+    1888: { tema: "tijolo, ferro, café e cidade crescendo",
+            tijolo: "#a04a34", tijoloClaro: "#c46a4a", ferro: "#3d4347",
+            cafe: "#5a2f22", folhaDeCafe: "#3d6b33", paralelepipedo: "#7d766d" },
+    1922: { tema: "arquitetura eclética, asfalto e fábrica",
+            reboco: "#d8cdb4", rebocoOcre: "#c9a868", asfalto: "#4a4a4e",
+            fuligem: "#5e554e", ferroPintado: "#2f4a44", tijoloDeFabrica: "#8f4534" }
+  },
+
   /* ---------- O QUE É PROIBIDO ---------- */
   proibido: [
     "arte esticada ou ampliada em tamanho quebrado (só por número inteiro)",
@@ -71,12 +105,20 @@ const ESTILO = {
     "piso de uma cor só com borda quadrada (transições irregulares)",
     "prédio pequeno demais perto do boneco (casinha de boneca)",
     "excesso de telhado marrom de cenário",
-    "lote vazio ou mato no centro de cidade",
-    "grama fora de parques nas cidades",
     "objeto fora da época",
     "letra de pixel pequena demais para ler no celular",
     "texto, moldura ou chão desenhado dentro da imagem"
   ],
+
+  /* ---------- PROIBIDO SÓ EM UMA ÉPOCA ----------
+     Em 1554 e 1830 a cidade TEM mato, quintal e terreno vazio:
+     a documentação histórica manda. */
+  proibidoPorEpoca: {
+    1922: [
+      "lote vazio ou mato no centro da cidade",
+      "grama fora dos parques no centro"
+    ]
+  },
 
   /* ---------- ARQUIVOS ---------- */
   arquivo: "PNG com fundo transparente, tamanho final reduzido (sem metadados)"
@@ -142,13 +184,14 @@ function prepararTela(ctx) {
    (trocar o ano pela época da peça: 1554, 1830, 1888 ou 1922)
    ===================================================================== */
 const PEDIDO_PADRAO = `
-Pixel art no estilo de Stardew Valley, em HD, vista de cima em três quartos,
-nunca isométrico. Grade de 32 px por quadradinho; personagens com quadros de
-32x64 px. Pixels nítidos, sem borrar. Contorno escuro da própria cor, nunca
-preto puro. Luz vindo de cima e da esquerda. Cores quentes e médias, nem
-pastel nem neon. PNG com fundo transparente, sem chão, moldura ou texto.
-São Paulo, [ANO]. Tudo da época, sem objetos modernos. Prédios grandes em
-proporção aos personagens.
+Pixel art no estilo de Stardew Valley, desenhada direto na grade de 32 px
+(não ampliar desenho pequeno), vista de cima em três quartos, nunca
+isométrico. Personagens em quadros de 32x64 px. Pixels nítidos, sem borrar.
+Contorno escuro da própria cor, nunca preto puro. Luz vindo de cima e da
+esquerda. Cores quentes e médias, nem pastel nem neon. PNG com fundo
+transparente, sem chão, moldura ou texto. São Paulo, [ANO]: tudo fiel à
+época (arquitetura, roupa, veículos, plantas brasileiras), sem objetos
+modernos. Prédios grandes em proporção aos personagens.
 `.trim();
 
 if (typeof module !== "undefined") module.exports = { ESTILO, conferirImagem, prepararTela, PEDIDO_PADRAO };
