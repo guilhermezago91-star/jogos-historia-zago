@@ -14027,6 +14027,66 @@ setTimeout(function(){try{
   window.__vida22log={lojas:LOJAS.filter(l=>ob(l[0])&&ob(l[0]).name===l[3]).length,araca:!!ob('cemAraca')};
 }catch(e){console.warn('[bairros22 vida]',e);}},0);
 /*__BAIRROS22_E_END__*/
+/*__BAIRROS22_F_START__*/
+/* ===== v181 — RUAS AO LADO DA LINHA (R. SÃO CAETANO E BARRA FUNDA): MUROS DE TIJOLO, POSTES E GENTE ESPERANDO NAS PORTEIRAS (pedido do professor, 20/11/2026) ===== */
+/* Roda por último e só usa lugar livre: nada muda de lugar. Só nos trechos da Inglesa no Brás/Mooca e na Barra Funda, longe do centro. */
+setTimeout(function(){try{
+  if(typeof RAILT22==='undefined'||!SCN.sp22||typeof A==='undefined')return;const S='sp22',M=SCN.sp22.map;
+  const Z=[[158,60,178,142],[0,44,52,58]],inZ=(x,y)=>Z.some(z=>x>=z[0]&&x<=z[2]&&y>=z[1]&&y<=z[3]);
+  const prot=(x,y)=>x>=50&&x<=140&&y>=56&&y<=124;
+  const occ=new Set();for(const q of objects)if(q.scene===S&&!q.walker&&q.x!=null)for(let y=q.y;y<q.y+(q.h||1);y++)for(let x=q.x;x<q.x+(q.w||1);x++)occ.add(x+','+y);
+  for(const n of npcs)if(n.scene===S)occ.add(n.x+','+n.y);for(const n of ITEMS)if(n.scene===S&&!n.got)occ.add(n.x+','+n.y);
+  const leito=(x,y)=>{const t=RAILT22.get(x+','+y);return t&&!t.cross&&!t.bridge;},trilho=(x,y)=>RAILT22.has(x+','+y);
+  const ch=(x,y)=>M[y]&&M[y][x];
+  const im=new Image();im.src=A.IND_mod_muro_tijolos||'';
+  const NOVOS=[];let nm=0,np=0;
+  /* 1) muro de tijolo onde o quintal ou o lote encosta no leito */
+  for(const [k,t] of RAILT22){if(t.cross||t.bridge)continue;const [x,y]=k.split(',').map(Number);if(!inZ(x,y))continue;
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=x+dx,Y=y+dy,key=X+','+Y;if(trilho(X,Y)||occ.has(key)||prot(X,Y)||!inZ(X,Y))continue;
+      if(!'pk,.'.includes(ch(X,Y)||'#'))continue;
+      const o={id:'muroLinha22_'+nm++,scene:S,x:X,y:Y,w:1,h:1,name:'Muro da linha do trem',
+        text:["Muro de tijolo entre os quintais e a linha do trem.","Mesmo assim a criançada pula o muro para ver a locomotiva passar de perto... e leva bronca do guarda da ferrovia."],
+        draw:function(c,PX,PY){if(im.complete&&im.naturalWidth){c.fillStyle='rgba(20,14,8,.2)';c.fillRect(PX,PY+14,16,3);c.drawImage(im,(X%4)*16,0,16,im.height,PX,PY+16-im.height,16,im.height);}}};
+      objects.push(o);NOVOS.push(o);occ.add(key);}}
+  /* 2) postes de luz na beira da rua colada na linha, de 9 em 9 quadradinhos, só onde a rua continua passável */
+  if(typeof spDraw==='function'){const on=spDraw('poste',1,1),off=spDraw('poste0',1,1);
+    for(const [k,t] of RAILT22){if(t.cross||t.bridge)continue;const [x,y]=k.split(',').map(Number);if(!inZ(x,y))continue;
+      for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=x+dx,Y=y+dy,key=X+','+Y;if(trilho(X,Y)||occ.has(key)||prot(X,Y))continue;
+        if(!'dDe'.includes(ch(X,Y)||'#'))continue;if(((dx?Y:X))%9!==0)continue;
+        const X2=X+dx,Y2=Y+dy;if(!'dDe'.includes(ch(X2,Y2)||'#')||occ.has(X2+','+Y2))continue;    // do lado de lá ainda dá para passar
+        const id='posteLinha22_'+np++;const o={id,scene:S,x:X,y:Y,w:1,h:1,lamp:true,name:'Poste de luz elétrica',
+          text:["Poste da Light na beira da linha. De noite, a luz elétrica ajuda o guarda da porteira a ver quem vem."],
+          draw:(c,PX,PY)=>((typeof lampLit==='function'&&lampLit(id))?on:off)(c,PX,PY)};
+        objects.push(o);NOVOS.push(o);occ.add(key);}}}
+  /* 3) gente esperando nas porteiras */
+  const grupos=[];const visto=new Set();
+  for(const [k,t] of RAILT22){if(!t.cross||visto.has(k))continue;const [x0,y0]=k.split(',').map(Number);if(!inZ(x0,y0))continue;
+    const g=[],f=[[x0,y0]];visto.add(k);while(f.length){const [x,y]=f.pop();g.push([x,y]);for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const kk=(x+dx)+','+(y+dy),tt=RAILT22.get(kk);if(tt&&tt.cross&&!visto.has(kk)){visto.add(kk);f.push([x+dx,y+dy]);}}}
+    grupos.push(g);}
+  const ponto=(g,dist)=>{const xs=g.map(p=>p[0]),ys=g.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),C=[];
+    for(let y=y0-dist-1;y<=y1+dist+1;y++)for(let x=x0-dist-1;x<=x1+dist+1;x++){if(trilho(x,y)||occ.has(x+','+y)||prot(x,y))continue;const c=ch(x,y);if(!c||!'dDe'.includes(c))continue;
+      const d=Math.max(x<x0?x0-x:x>x1?x-x1:0,y<y0?y0-y:y>y1?y-y1:0);if(d<1||d>dist)continue;C.push([x,y,(c==='e'?0:1)+d]);}
+    C.sort((a,b)=>a[2]-b[2]);return C;};
+  const BRAS=[['ferroviario','Guarda-cancela',["Quando o trem apita lá longe, eu toco o sino e baixo a cancela. Ninguém passa!","Já vi muito apressado querer atravessar na frente da locomotiva. A locomotiva sempre ganha."]],
+    ['carregador','Carroceiro impaciente',["Ô guarda, levanta essa cancela! Meu leite vai azedar antes de chegar na freguesia!","Todo dia é isso: um trem, depois outro, depois manobra... A Porteira do Brás é a minha penitência."]],
+    ['tecela','Moça com a marmita',["Levo a marmita do meu pai na fábrica do outro lado da linha. Se a porteira demora, a comida esfria e ele reclama comigo!"]],
+    ['caixeiro','Motorneiro do bonde',["O bonde da Light também para na porteira. Cada trem que passa são minutos de espera, e o povo do Brás reclama todo santo dia.","Dizem que um dia vão fazer um viaduto aqui. Quero ver!"]]];
+  const OUTRA=[['operario','Operário esperando o trem passar',["Lá vem trem! Melhor esperar a cancela subir. Quem atravessa correndo arrisca a vida."]],
+    ['dona','Moradora da beira da linha',["Moro colada na linha. De noite o trem de carga faz a casa inteira tremer, e a gente já nem acorda mais."]],
+    ['crianca','Menino contando vagões',["Eu conto os vagões de café que passam: hoje já foram cento e doze! Meu recorde é duzentos."]]];
+  let nn=0,no=0;const cy=g=>g.reduce((a,p)=>a+p[1],0)/g.length,cx=g=>g.reduce((a,p)=>a+p[0],0)/g.length;
+  const perto=[];  // uma porteira por cruzamento (as duas vias juntas), no máximo 6 além da do Brás
+  grupos.forEach((g,gi)=>{const ehBras=g.some(([x,y])=>x>=160&&x<=170&&y>=97&&y<=100);
+    if(!ehBras){if(no>=6||perto.some(p=>Math.abs(p[0]-cx(g))<6&&Math.abs(p[1]-cy(g))<6))return;no++;}perto.push([cx(g),cy(g)]);
+    const lista=ehBras?BRAS:[OUTRA[(no-1)%OUTRA.length]];
+    const C=ponto(g,ehBras?3:2);let used=0;
+    for(const [spr,name,lines] of lista){const p=C.find(c=>!occ.has(c[0]+','+c[1]));if(!p)break;
+      const sp=CHAR_ORDER.includes(spr)?spr:(CHAR_ORDER.includes('rt_'+spr)?'rt_'+spr:'colono');
+      addNPCs([{id:'porteira22_'+(nn++),spr:sp,x:p[0],y:p[1],dir:'up',name,lines,diary:name+', 1922: '+lines[0]}],S);occ.add(p[0]+','+p[1]);used++;}
+  });
+  window.__linha22log={muros:nm,postes:np,porteiras:grupos.length,gente:nn};
+}catch(e){console.warn('[bairros22 linha]',e);}},0);
+/*__BAIRROS22_F_END__*/
 
 /* =========================================================
    NOMES DAS RUAS NO CHÃO E NO MAPA (1922)
