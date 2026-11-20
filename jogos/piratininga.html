@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=82d06875","kb":777,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=f1c2bbcf","kb":781,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -9226,6 +9226,8 @@ setTimeout(function(){
   setTimeout(()=>{try{if(cur==='sv'){buildStatic();buildOcc();mmDirty=true;}}catch(_){}},0);
 }catch(e){console.warn('sv54',e);}})();
 
+/* ===== v167 — SÃO VICENTE: NAU NOVA FEITA NO CANVA (pedido do professor, 20/11/2026) =====
+   Desenho da nau (SV54_NAU em arte_1554.js) trocado pela versão do Canva e posta mais para dentro do mar (ajuste no bloco v164 logo abaixo). */
 /* ===== v164 — SÃO VICENTE: OBJETOS DA PRAIA E ENGENHO POR DENTRO NO ESTILO NOVO (pedido do professor, 20/11/2026) =====
    Canoa, toras de pau-brasil, caixas de açúcar, barris, cordas, sacas, barco e nau (velas com a cruz de Cristo)
    redesenhados; sala do engenho com moenda, caldeiras (fogo aceso), formas de açúcar, sacos e barril.
@@ -9239,7 +9241,7 @@ setTimeout(function(){
   pinta('torasSV','SV54_TORAS',-2,3); pinta('ob54_canoa_sv_nauSV','SV54_CANOA',-6,3);
   pinta('ob54_caixote_sv_nauSV','SV54_CAIXOTE',-1,2); pinta('ob54_barril_sv_nauSV','SV54_BARRIL',0,2);
   pinta('ob54_ancoraCorda_sv_nauSV','SV54_CORDA',-1,1); pinta('ob54_sacas_sv_mestre','SV54_SACAS',-2,2);
-  pinta('barco','SV54_BARCO',-2,2,true); pinta('nauSV','SV54_NAU',-4,14,true);
+  pinta('barco','SV54_BARCO',-2,2,true); pinta('nauSV','SV54_NAU',-4,34,true);
   /* engenho por dentro */
   const R='j_x1engenho',S=SCN[R];if(!S)return;
   for(const x of [6,7,8,11,12,13])if(S.map[3]&&S.map[3][x]==='.')S.map[3][x]='#';   /* atrás das caldeiras e das formas não se passa */
