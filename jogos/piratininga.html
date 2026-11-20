@@ -17259,6 +17259,20 @@ setTimeout(function(){try{
     const alvo=/com a tropa/.test(w.name)?14:7;while(w.mules.length<alvo){const m0=w.mules[w.mules.length-1];w.mules.push(Object.assign({},m0,{hidden:true,x:w.x,y:w.y,fx:w.x,fy:w.y,px:w.x*T,py:w.y*T}));}}
 }catch(e){console.warn('mulas 1830',e);}},2600);
 
+/* ===== v180 — 1830: TROPA EM FILA — as mulas andam uma atrás da outra, com um espaço entre elas (cada mula ocupa quase dois quadradinhos), e a primeira é a mula madrinha, com o sino no pescoço (pedido do professor, 20/11/2026) ===== */
+setTimeout(function(){try{
+  const ehTropa=w=>{let e=0;try{e=eraOf(w.scene);}catch(_){}return e===2&&w.mules&&w.mules.length>=3&&!w.mules[0].spr&&!w.mules[0].__vazio&&!w.__fila30;};
+  for(const w of walkers){if(!ehTropa(w))continue;const reais=w.mules.filter(m=>!m.__vazio);const nova=[];
+    reais.forEach((m,i)=>{if(i===0)m.__madrinha=1;nova.push(m);if(i<reais.length-1)nova.push(Object.assign({},m,{__vazio:1,__madrinha:0}));});
+    /* um espaço também entre o tropeiro e a madrinha */
+    nova.unshift(Object.assign({},reais[0],{__vazio:1,__madrinha:0}));
+    w.mules=nova;w.__fila30=1;}
+  const d0=drawMulaTropa;drawMulaTropa=function(m,MX,MY,w){if(m&&m.__vazio)return true;const r=d0.apply(this,arguments);
+    if(r&&m&&m.__madrinha){try{const sx=m.dir==='left'?MX+1:m.dir==='right'?MX+15:MX+8,sy=MY+(m.dir==='up'?5:8);ctx.fillStyle='#5a3a1c';ctx.fillRect(sx-1,sy-1,3,1);ctx.fillStyle='#d8b040';ctx.fillRect(sx-1,sy,3,2);ctx.fillStyle='#7a5a10';ctx.fillRect(sx,sy+2,1,1);}catch(_){}}
+    return r;};
+  window.__fila30=walkers.filter(w=>w.__fila30).map(w=>w.id+':'+w.mules.filter(m=>!m.__vazio).length);
+}catch(e){console.warn('tropa em fila 1830',e);}},4800);
+
 /* v124: tropa é muita mula junta. Pouso dos tropeiros com mulas descansando em volta do rancho. */
 setTimeout(function(){try{const S='sp';const r=objects.find(o=>o.scene===S&&/rancho|hospedaria/i.test(o.id+' '+(o.name||''))&&(o.w||1)>=3);if(!r||!window.__mula30)return;
   const M=SCN[S].map;const livre=(x,y)=>M[y]&&!'DdRWBCSXT'.includes(M[y][x])&&!objects.some(o=>(o.scene||'pira')===S&&x>=o.x-1&&x<o.x+(o.w||1)+1&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&Math.abs(n.x-x)<=1&&n.y===y)&&!ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
