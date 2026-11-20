@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=77e23c77","kb":786,"m":1},{"f":"pac_e1234.js?v=23a83b94","kb":2083,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=77e23c77","kb":786,"m":1},{"f":"pac_e1234.js?v=56ee25a1","kb":2140,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=1f4224f0","kb":980,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=10e4ff1a","kb":4113,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -19823,6 +19823,194 @@ window.__paulista82Ready=Promise.all(ready);
   try{const s0=setScene;setScene=function(to){const r=s0.apply(this,arguments);try{if(to===S&&!R30.avisoData){R30.avisoData=1;setTimeout(()=>{try{toast('São Paulo, outubro de 1830');}catch(_){}},900);
       if(!diary.some(d=>d.text&&d.text.startsWith('Você chegou a São Paulo em outubro de 1830')))addDiary('Lugar','Você chegou a São Paulo em outubro de 1830. É primavera e começam as chuvas.');}}catch(_){}return r;};}catch(_){}
 })();
+
+/* ===== v170 — VIAJANTE MAIS NATURAL: boneco HD com o chapéu de cada época, passo no ritmo do chão, balanço do corpo, sem tranquinho entre quadrados, arrancada suave, parado vivo, poeira só correndo, diagonal no toque, desvio de quem está no caminho, montaria HD com as pernas do lado do bicho, galope, animal vivo e saca à vista (pedido do professor, 20/11/2026) ===== */
+(function(){try{
+  const ANO={1:1554,2:1830,3:1888,4:1922};
+  const TOPO={1:12,2:8,3:12,4:13};            /* alto do chapéu na folha, em pixels da folha */
+  const BF={down:0,up:4,left:8,right:12};      /* ordem da folha do viajante */
+  const HROW={down:0,right:1,up:2,left:3};     /* ordem da folha do cavalo e da mula */
+  const okI=i=>i&&i.complete&&i.naturalWidth;
+  const eraNow=()=>{try{return eraOf(cur)||era;}catch(_){try{return era;}catch(__){return 1;}}};
+  const azul=()=>{try{return (window.HERO||'player')==='player';}catch(_){return true;}};
+  const hdOn=()=>{try{return !!(window.__hd&&window.__hd().ligado);}catch(_){return false;}};
+  const VJ={};function folha(e){const k='VIAJ_'+(ANO[e]||1554);if(!VJ[k]&&typeof A[k]==='string'){const i=new Image();i.src=A[k];VJ[k]=i;}return VJ[k];}
+  let IAN=null;function bichoImg(kind){try{if(!IAN)IAN=__lazyArt('A22_');return IAN[kind==='burro'?'mula_hd':'cavalo_selado'];}catch(_){return null;}}
+  const ST={dist:0,frame:0,idleT:0,settle:0,lpx:null,lpy:null,moveT:0,diag:false,montObj:null};
+  window.__andar=ST;
+  const COR_PO={1:'#c9a47a',2:'#cdb898',3:'#cfcac0',4:'#cfcac0'};
+
+  /* ---------- poeira só quando corre ---------- */
+  try{const d0=dust;dust=function(px,py){try{if(px===player.px&&py===player.py&&!running&&!player.vehicle)return;}catch(_){}return d0.apply(this,arguments);};}catch(_){}
+  function poeiraPe(n){try{const dx=player.tx-player.fx,dy=player.ty-player.fy;for(let i=0;i<n;i++)parts.push({x:player.px+8-dx*5+(Math.random()-.5)*6,y:player.py+15-dy*3,vx:-dx*8+(Math.random()-.5)*8,vy:-3-Math.random()*4,life:.3,max:.3,c:COR_PO[eraNow()]||'#cfcac0',s:1});}catch(_){}}
+
+  /* ---------- diagonal (toque na tela e duas setas juntas) ---------- */
+  const livre=(x,y)=>{try{return walkable(x,y);}catch(_){return false;}};
+  const especial=(x,y)=>{try{const ch=map[y]&&map[y][x];if(ch==='E'||ch==='x')return true;if(itemAt(x,y))return true;const pp=PORTALS[era];if(pp&&pp.scene===cur&&pp.x===x&&pp.y===y)return true;if(portal&&portal.scene===cur&&portal.x===x&&portal.y===y)return true;}catch(_){}return false;};
+  function podeDiag(dx,dy){const x=player.x,y=player.y;
+    return livre(x+dx,y+dy)&&livre(x+dx,y)&&livre(x,y+dy)&&!especial(x+dx,y)&&!especial(x,y+dy)&&!especial(x+dx,y+dy);}
+  function comecaDiag(dx,dy){player.dir=dx>0?'right':'left';player.moving=true;player.fx=player.x;player.fy=player.y;player.tx=player.x+dx;player.ty=player.y+dy;player.prog=0;ST.diag=true;}
+  function tentaDiagonal(){
+    if(player.moving)return;
+    try{if(dialog||hold||sceneFade||fading||isPaused()||!started)return;}catch(_){return;}
+    try{if(typeof ride!=='undefined'&&ride)return;}catch(_){}
+    /* caminho do toque: dois passos em L viram um passo na diagonal */
+    try{if(tapPath&&tapPath.length>=2){let P=tapPath;if(P[0][0]===player.x&&P[0][1]===player.y)P=P.slice(1);
+      if(P.length>=2){const a=P[0],b=P[1],dx=b[0]-player.x,dy=b[1]-player.y;
+        if(Math.abs(dx)===1&&Math.abs(dy)===1&&Math.abs(a[0]-player.x)+Math.abs(a[1]-player.y)===1&&podeDiag(dx,dy)){
+          const k=tapPath.indexOf(b);tapPath.splice(0,k);comecaDiag(dx,dy);return;}}}}catch(_){}
+    /* duas setas apertadas juntas */
+    try{if(!tapPath&&keyStack.length>=2){const D={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};const a=D[keyStack[keyStack.length-1]],b=D[keyStack[keyStack.length-2]];
+      if(a&&b&&((a[0]&&b[1])||(a[1]&&b[0]))){const dx=a[0]||b[0],dy=a[1]||b[1];if(podeDiag(dx,dy))comecaDiag(dx,dy);}}}catch(_){}
+  }
+
+  /* caminho do toque refeito em linha reta: em vez de "tudo na horizontal e depois tudo na vertical",
+     vira uma escadinha, que os passos em diagonal transformam numa reta */
+  function escadinha(gx,gy){
+    const W=MW,H=MH,sx=player.x,sy=player.y,N=W*H;if(N>400000)return null;
+    const dist=new Float32Array(N).fill(1e9),prev=new Int32Array(N).fill(-1),idx=(x,y)=>y*W+x;
+    const heap=[];const push=(d,i)=>{heap.push([d,i]);let k=heap.length-1;while(k>0){const p=(k-1)>>1;if(heap[p][0]<=heap[k][0])break;[heap[p],heap[k]]=[heap[k],heap[p]];k=p;}};
+    const pop=()=>{const top=heap[0],last=heap.pop();if(heap.length){heap[0]=last;let k=0;for(;;){const l=2*k+1,r=l+1;let m=k;if(l<heap.length&&heap[l][0]<heap[m][0])m=l;if(r<heap.length&&heap[r][0]<heap[m][0])m=r;if(m===k)break;[heap[m],heap[k]]=[heap[k],heap[m]];k=m;}}return top;};
+    dist[idx(sx,sy)]=0;push(0,idx(sx,sy));let n=0;const G=idx(gx,gy);
+    const D=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+    while(heap.length&&n<60000){const [d,i]=pop();if(d>dist[i])continue;n++;if(i===G)break;const x=i%W,y=(i/W)|0;
+      for(const [dx,dy] of D){const a=x+dx,b=y+dy;if(a<0||b<0||a>=W||b>=H)continue;const j=idx(a,b);
+        if(j!==G&&!livre(a,b))continue;if(j===G&&!livre(a,b))continue;
+        if(dx&&dy){if(!livre(x+dx,y)||!livre(x,y+dy)||especial(x+dx,y)||especial(x,y+dy))continue;}
+        const nd=d+(dx&&dy?1.414:1);if(nd<dist[j]){dist[j]=nd;prev[j]=i;push(nd,j);}}}
+    if(prev[G]<0)return null;
+    const cel=[];for(let k=G;k!==idx(sx,sy);k=prev[k])cel.push([k%W,(k/W)|0]);cel.reverse();
+    /* cada passo diagonal vira dois passos retos (a quina), como o jogo espera */
+    const out=[];let cx=sx,cy=sy;for(const [x,y] of cel){if(x!==cx&&y!==cy)out.push([x,cy]);out.push([x,y]);cx=x;cy=y;}
+    return out;}
+  try{const tg0=tapGo;tapGo=function(tx,ty,retry){const r=tg0.apply(this,arguments);
+    try{if(r&&tapPath&&tapPath.length>=3){const g=tapPath[tapPath.length-1],e=escadinha(g[0],g[1]);
+      if(e&&e.length&&e.length<=tapPath.length+1&&e[e.length-1][0]===g[0]&&e[e.length-1][1]===g[1])tapPath=e;}}catch(_){}
+    return r;};}catch(_){}
+
+  /* ---------- movimento: velocidade, sem tranquinho, ritmo do passo ---------- */
+  function velJogo(){let s=0;try{s=(running&&!(typeof comFome==='function'&&comFome())?9:5.5)*(player.vehicle?(player.vehicle==='carro'?2.2:1.7):1);}catch(_){s=5.5;}return s;}
+  function velMinha(){let s=velJogo();
+    if(!player.vehicle&&!running){s*=4.5/5.5;s*=0.55+0.45*Math.min(1,ST.moveT/0.2);}
+    if(ST.diag)s/=Math.SQRT2;return s;}
+  const u0=update;update=function(dt){
+    const a={moving:player.moving,prog:player.prog,fx:player.fx,fy:player.fy,tx:player.tx,ty:player.ty,v:velMinha()};
+    try{tentaDiagonal();}catch(_){}
+    if(!a.moving&&player.moving){a.moving=true;a.prog=0;a.fx=player.fx;a.fy=player.fy;a.tx=player.tx;a.ty=player.ty;a.v=velMinha();}
+    /* desvio: se alguém parou no próximo passo, procura outro caminho logo (antes esperava 1,5 s) */
+    try{if(tapPath&&tapPath.length&&!player.moving){const [nx,ny]=tapPath[0];if(!(nx===player.x&&ny===player.y)&&!livre(nx,ny)&&tapWait<84)tapWait=84;}}catch(_){}
+    const r=u0.apply(this,arguments);
+    try{
+      const mesmo=player.moving&&player.fx===a.fx&&player.fy===a.fy&&player.tx===a.tx&&player.ty===a.ty;
+      if(a.moving&&mesmo&&player.prog>a.prog){
+        /* o jogo andou com a velocidade dele; corrige para a nossa */
+        player.prog=Math.max(.001,Math.min(.999,a.prog+dt*a.v));
+        player.px=(player.fx+(player.tx-player.fx)*player.prog)*T;player.py=(player.fy+(player.ty-player.fy)*player.prog)*T;}
+      else if(a.moving&&!mesmo){
+        ST.diag=false;
+        if(player.moving&&player.prog===0&&player.fx===a.tx&&player.fy===a.ty){
+          /* passo seguinte começa com o que sobrou do anterior */
+          const sobra=Math.min(.6,Math.max(0,a.prog+dt*a.v-1));player.prog=sobra;
+          player.px=(player.fx+(player.tx-player.fx)*sobra)*T;player.py=(player.fy+(player.ty-player.fy)*sobra)*T;}
+        else if(!player.moving)ST.settle=.13;}
+      if(player.moving){ST.moveT+=dt;ST.idleT=0;}else{ST.idleT+=dt;if(ST.idleT>.05)ST.moveT=0;}
+      if(ST.settle>0)ST.settle-=dt;
+      /* quadro do passo pela distância andada */
+      const d=ST.lpx===null?0:Math.hypot(player.px-ST.lpx,player.py-ST.lpy);ST.lpx=player.px;ST.lpy=player.py;
+      if(player.moving&&d<12){ST.dist+=d;const passo=player.vehicle?(running?10:8):(running?8:6);const f=(Math.floor(ST.dist/passo)+1)%4;
+        if(f!==ST.frame&&(f===1||f===3)){if(player.vehicle&&player.vehicle!=='carro'){if(running)poeiraPe(4);else if(Math.random()<.4)poeiraPe(1);}else if(!player.vehicle&&running)poeiraPe(2);}
+        ST.frame=f;}
+      else if(!player.moving){ST.dist=0;ST.frame=0;}
+      /* qual animal da cidade a pessoa está montando (para ele sair do poste) */
+      if(player.vehicle&&player.vehicle!=='carro'){if(!ST.montObj||ST.montObj.scene!==cur){let best=null,bd=1e9;try{for(const o of MONT){if(o.scene!==cur||o.mont!==player.vehicle)continue;const dd=Math.abs(o.x-player.x)+Math.abs(o.y-player.y);if(dd<bd){bd=dd;best=o;}}}catch(_){}ST.montObj=best;}}
+      else ST.montObj=null;
+    }catch(e){}
+    return r;};
+
+  /* ---------- desenho ---------- */
+  const R=v=>hdOn()?Math.round(v*2)/2:Math.round(v);
+  function px(c,x,y,w,h){ctx.fillStyle=c;ctx.fillRect(R(x),R(y),Math.max(.5,R(w)),Math.max(.5,R(h)));}
+  function viajante(im,X,Y,dir,f,o){
+    const sx=(BF[dir]+(f%4))*32;ctx.imageSmoothingEnabled=false;o=o||{};
+    if(o.meia){ctx.drawImage(im,sx,0,32,46,X+(o.lean||0),Y+(o.bob||0),16,23);return;}
+    const des=o.bob||o.peito||0,lean=o.lean||0;
+    if(!des&&!lean){ctx.drawImage(im,sx,0,32,64,X,Y-17,16,32);return;}
+    const corte=o.peito&&!o.bob?18:23,sc=corte*2;
+    ctx.drawImage(im,sx,sc,32,64-sc,X,Y-17+corte,16,32-corte);
+    ctx.drawImage(im,sx,0,32,sc,X+lean,Y-17+des,16,corte);
+  }
+  function opcoesAPe(dir){const o={},U=.5,f=ST.frame;
+    if(player.moving&&(f===1||f===3))o.bob=running?2*U:U;
+    if(!player.moving&&ST.settle>0)o.bob=U;
+    if(player.moving&&running&&(dir==='left'||dir==='right'))o.lean=dir==='right'?U:-U;
+    if(!player.moving&&ST.idleT>.3){const fase=ST.idleT%2.4;if(fase>1.5&&fase<2.1)o.peito=U;
+      if(ST.idleT>3.5){const k=(ST.idleT-3.5)%5.5,lado=Math.floor((ST.idleT-3.5)/5.5)%2;if(k<1.1)o.dir=(dir==='left'||dir==='right')?'down':(lado?'left':'right');}}
+    return o;}
+  function desenhaAPe(im,X,Y,dir,e){
+    ctx.fillStyle='rgba(20,27,27,.28)';ctx.fillRect(X+3,Y+13,10,3);ctx.fillRect(X+4,Y+16,8,1);
+    const o=opcoesAPe(dir);viajante(im,X,Y,o.dir||dir,player.moving?ST.frame:0,o);
+    /* saca de café nas costas (embarque no porto de Santos, 1922) */
+    try{if(typeof sacaNaMao!=='undefined'&&sacaNaMao&&IMG.IT)ctx.drawImage(IMG.IT,11*16,0,16,16,X,Math.round(Y-17+(TOPO[e]||12)/2-13+(o.bob||0)),16,16);}catch(_){}
+  }
+  /* pernas do cavaleiro, do lado do bicho */
+  const CAL={o:'#2a1c18',e:'#4b3b31',m:'#60524a',c:'#776455'},BOT={o:'#2d1914',m:'#c66f3b',c:'#e1834a'};
+  function pernaLado(x0,y0,f,sw,yPe){const L=(x,w)=>f>0?x:2*x0-x-w;const kx=x0+f*3.5+sw,top=y0+1.5,bot=yPe-1.5;
+    px(CAL.o,L(x0-.5,5),y0-.5,5,3);px(CAL.m,L(x0,4),y0,4,2);px(CAL.c,L(x0,3.5),y0,3.5,.5);
+    px(CAL.o,L(kx-1.5,3),top,3,bot-top+.5);px(CAL.m,L(kx-1,2),top,2,bot-top);px(CAL.e,L(kx-1,.5),top+.5,.5,bot-top-.5);
+    px(BOT.o,L(kx-1.5,4.5),bot-.5,4.5,2.5);px(BOT.m,L(kx-1,3.5),bot,3.5,1.5);px(BOT.c,L(kx-1,2),bot,2,.5);px('#3a2a20',L(kx-1.5,4.5),bot+1.5,4.5,.5);}
+  function pernaFrente(x,y0,s,sw,yPe){const ox=x+s*1.5+sw*.5;
+    px(CAL.o,Math.min(x,ox)-.5,y0-.5,Math.abs(ox-x)+3,2.5);px(CAL.m,Math.min(x,ox),y0,Math.abs(ox-x)+2,1.5);
+    px(CAL.o,ox-.5,y0+1,3,yPe-y0-2);px(CAL.m,ox,y0+1,2,yPe-y0-2.5);px(CAL.c,ox+(s<0?0:1.5),y0+1.5,.5,yPe-y0-3.5);
+    px(BOT.o,ox-.5,yPe-1.5,3,2.5);px(BOT.m,ox,yPe-1,2,1.5);px(BOT.c,ox,yPe-1,1,.5);}
+  function pernas(X,cint,dir,sw,yPe){if(dir==='right')pernaLado(X+8,cint,1,sw,yPe);else if(dir==='left')pernaLado(X+8,cint,-1,sw,yPe);
+    else{const yp=yPe+1;pernaFrente(X+1.5,cint,-1,sw,yp);pernaFrente(X+12.5,cint,1,-sw,yp);}}
+  /* partes do bicho que se mexem sozinhas (cabeça, orelhas, rabo) */
+  const PARTES={right:[[0,0,9,19],[0,19,9,13,'r'],[9,0,15,32],[24,0,16,6,'o'],[24,6,16,8,'c'],[24,14,16,18]],
+    left:[[31,0,9,19],[31,19,9,13,'r'],[16,0,15,32],[0,0,16,6,'o'],[0,6,16,8,'c'],[0,14,16,18]],
+    down:[[0,0,40,6,'o'],[0,6,40,8,'c'],[0,14,40,18]],up:[[0,0,40,6,'o'],[0,6,40,26]]};
+  function bicho(i,X,Y,dir,fr,v,dy,soCabeca){const sx=(HROW[dir]*4+(fr%4))*40;dy=dy||0;ctx.imageSmoothingEnabled=false;
+    if(soCabeca){ctx.drawImage(i,sx+14,0,12,13,X+2,Y-16+dy,12,13);return;}
+    if(!v||(!v.cab&&!v.orelha&&!v.rabo)){ctx.drawImage(i,sx,0,40,32,X-12,Y-16+dy,40,32);return;}
+    for(const [x,y,w,h,q] of PARTES[dir]){let ox=0,oy=0;if(q==='c')oy=v.cab;if(q==='o'){oy=dir==='up'?0:v.cab;ox=v.orelha*(dir==='left'?1:dir==='right'?-1:1);}if(q==='r'){ox=v.rabo;}
+      ctx.drawImage(i,sx+x,y,w,h,X-12+x+ox,Y-16+y+oy+dy,w,h);}}
+  function vivo(seed,montado,dir){const s=seed||0;const pr=(t+s*2.1)%11;
+    const cab=montado||dir==='up'?0:(pr>6&&pr<6.25)||(pr>9.05&&pr<9.3)?1:(pr>=6.25&&pr<=9.05)?3:0;
+    const orelha=((t+s*3)%4.3)<.18?1:0,prb=(t+s*1.7)%3.1,rabo=prb<.6?(Math.floor(prb/.12)%2?1:-1):0;return{cab,orelha,rabo};}
+  function sombraBicho(X,Y,dir){ctx.fillStyle='rgba(20,27,27,.26)';if(dir==='left'||dir==='right'){ctx.fillRect(X-8,Y+13,32,3);ctx.fillRect(X-6,Y+16,28,1);}else ctx.fillRect(X+1,Y+12,14,4);}
+  function desenhaMontado(im,X,Y,dir){
+    const bi=bichoImg(player.vehicle);if(!okI(bi))return false;
+    const hf=player.moving?ST.frame:0,passo=player.moving&&(hf===1||hf===3),galopa=running&&player.moving;
+    let bob=passo?(galopa?2:1):0;if(!player.moving&&ST.settle>0)bob=1;
+    const ady=galopa&&passo?-1:0,v=player.moving?null:vivo(9,true,dir);
+    const lado=dir==='left'||dir==='right',mu=player.vehicle==='burro'?2:0;
+    const ry=(lado?Y-29:dir==='down'?Y-30:Y-27)+mu+ady;
+    const rider=()=>viajante(im,X,ry,dir,0,{meia:true,bob,lean:galopa&&lado?(dir==='right'?.5:-.5):0});
+    const sw=player.moving?(hf===1?.5:hf===3?-.5:0)*(galopa?2:1):0;
+    const legs=()=>pernas(X,ry+22+bob,dir,sw,Y+(lado?3:2)+mu*.5+ady);
+    sombraBicho(X,Y,dir);
+    if(dir==='up'){rider();bicho(bi,X,Y,dir,hf,v,ady);legs();}
+    else if(dir==='down'){bicho(bi,X,Y,dir,hf,v,ady);rider();legs();bicho(bi,X,Y,dir,hf,null,ady,true);}
+    else{bicho(bi,X,Y,dir,hf,v,ady);rider();legs();}
+    return true;}
+
+  /* animais amarrados no poste: desenho HD, vivos, e somem do poste enquanto alguém monta neles */
+  function animaisDoPoste(){try{for(const o of MONT){if(o.mont==='carro'||o.__v1)continue;o.__v1=true;const d0=o.draw;
+      o.draw=function(c,X,Y){if(ST.montObj===o&&player.vehicle===o.mont){c.fillStyle='#5e3428';c.fillRect(X+14,Y-6,2,20);return;}
+        const bi=bichoImg(o.mont);if(!okI(bi))return d0.apply(this,arguments);
+        c.fillStyle='#5e3428';c.fillRect(X+14,Y-6,2,20);c.fillStyle='#3e2618';c.fillRect(X+14,Y-6,2,1);
+        sombraBicho(X-4,Y,'right');bicho(bi,X-4,Y,'right',0,vivo(o.x*1.3+o.y,false,'right'));};}}catch(_){}}
+
+  function instala(){
+    if(window.__andarInstalado)return;window.__andarInstalado=true;
+    const dc=drawChar;drawChar=function(id,X,Y,dir,fr){
+      try{if(id==='player'&&azul()&&player.vehicle!=='carro'){const e=eraNow(),im=folha(e);
+        if(okI(im)){if(player.vehicle){if(desenhaMontado(im,X,Y,dir))return;}else{desenhaAPe(im,X,Y,dir,e);return;}}}}catch(_){}
+      return dc.apply(this,arguments);};
+    animaisDoPoste();setTimeout(animaisDoPoste,3000);
+  }
+  /* fica por fora das outras trocas de boneco, que entram até 1,5 s depois de abrir */
+  setTimeout(instala,2500);
+}catch(e){console.warn('andar natural',e);}})();
 
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /*ABERTURA_RAPIDA_FIM*/;(function(){
