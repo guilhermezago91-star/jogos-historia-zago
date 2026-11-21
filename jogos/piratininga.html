@@ -24047,6 +24047,30 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   const eb=enterBld;enterBld=function(o){const r=eb.apply(this,arguments);try{if(o&&o.__ret&&SCN[o.room])SCN[o.room].ret={x:o.__ret[0],y:o.__ret[1],dir:o.__ret[2]};}catch(_){}return r;};
   try{if(cur==='sv'&&typeof buildOcc==='function')buildOcc();}catch(_){}
 }catch(e){console.warn('v233 1554',e);}})();
+/* ===== v239 — CELULAR DEITADO: CAIXA DE FALA MENOR EM TODAS AS ÉPOCAS, TÍTULO "PARTE" E AVISOS SEM COBRIR A FALA (pedido do professor, 21/11/2026) =====
+   1. A caixa de fala de 1554, 1888 e 1922 fica igual à de 1830: entre o controle de setas e os botões A/B, letra de 19px, rosto menor.
+   2. O título "PARTE X" fica logo acima da caixa de fala, sem cobrir a primeira linha.
+   3. O aviso "Lugar descoberto…" fica com letra menor, logo abaixo da barra de cima, e cabe inteiro.
+   4. O aviso "✓ Jogo guardado neste aparelho" vai para o alto da tela, menor e por menos tempo: não cobre mais a fala nem os botões. */
+(function(){try{const st=document.createElement('style');st.textContent=
+  '@media (orientation:landscape) and (max-height:520px){'+
+    'body #dlg,body.e1830 #dlg{left:124px!important;right:64px!important;width:auto!important}'+
+    'body #dlgTxt,body.e1830 #dlgTxt{font-size:19px!important;line-height:1.3!important;min-height:3.9em!important}'+
+    'body #dlgFace{width:60px!important;height:60px!important}'+
+    'body #dlg .tab{font-size:14px!important;padding:2px 8px 1px!important}'+
+    'body #dlg .dbox{padding:6px 10px 8px 6px!important}'+
+    '#parteFaixa{top:auto!important;bottom:136px!important;padding:5px 12px!important;font-size:18px!important}'+
+    '#parteFaixa *{font-size:inherit}'+
+    '#toast{font-size:15px!important;top:46px!important;max-width:min(94%,560px)!important;line-height:1.25!important}'+
+  '}'+
+  '#avisoGuardado{top:max(6px,env(safe-area-inset-top,0px))!important;bottom:auto!important;font-size:13px!important;padding:5px 10px!important;width:max-content!important;max-width:min(88vw,380px)!important}';
+  document.head.appendChild(st);
+  /* o aviso de "jogo guardado" some em 5 s (antes 8 s) */
+  /* no computador ele fica no alto do mapa; em pé, um pouco mais abaixo (sem cobrir o aviso de lugar descoberto); deitado, por cima da barra de cima */
+  new MutationObserver(()=>{try{const a=document.getElementById('avisoGuardado');if(a&&!a.__v239){a.__v239=1;setTimeout(()=>{try{a.remove();}catch(_){}},5000);
+    const deitado=innerWidth>innerHeight&&innerHeight<=520,sc=document.querySelector('.screen');
+    if(!deitado&&sc){const t=Math.round(sc.getBoundingClientRect().top)+(innerHeight>innerWidth?100:8);if(t>0&&t<innerHeight/2)a.style.setProperty('top',t+'px','important');}}}catch(_){}}).observe(document.body,{childList:true});
+}catch(e){console.warn('v239 deitado',e);}})();
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
