@@ -23330,7 +23330,7 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   const uh=updHUD;
   updHUD=function(){const r=uh.apply(this,arguments);try{
     const t=talkedE(),ne=needE(),g=gotE(),need=needItemsE(),tot=itemsE().length;
-    $('cTalk').innerHTML=t>=ne?`Conversas <b>${t}/${ne} ✓</b>`:`Conversas <b>${t}/${ne}</b>`;
+    $('cTalk').innerHTML=t>=ne?`Conversas <b>${ne}/${ne} ✓</b>`:`Conversas <b>${t}/${ne}</b>`;
     $('cItem').innerHTML=g>=need?`Objetos <b>${g}/${tot} ✓</b>`:`Objetos <b>${g}/${need}</b>`;
     $('cItem').title=`Para o portal: ${need} objetos. No total, esta época tem ${tot}.`;
   }catch(_){}return r;};
@@ -23358,6 +23358,113 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
    Pedido do professor (21/11/2026). Melhora o bloco v213 ("ESTE LUGAR ESTÁ LIVRE?"): em vez de conferir as
    quase 1.000 pessoas a cada pergunta para saber se a lista mudou, a própria lista avisa quando alguém entra
    ou sai. A mudança está no bloco v213, nas linhas marcadas "v224". Mesma resposta de antes. */
+/* ===== v225 — CHECAGENS DE 1554 E 1830 SEM "A MAIS COMPRIDA É A CERTA" (pedido do professor, 21/11/2026) =====
+   Antes, em 76 de 81 checagens destas épocas a resposta certa era a alternativa mais comprida,
+   e as erradas eram absurdas (trem, torno elétrico, cinema). Dava para acertar sem ler.
+   Agora: as três alternativas têm tamanho parecido, e as erradas são confusões possíveis
+   com coisas que outros personagens da mesma época contam. A certa é sempre a primeira daqui
+   (o jogo embaralha a ordem na tela). */
+;(function(){try{
+ const N={
+  /* ---------- 1554 ---------- */
+  paiva:['O que é um jesuíta?',['Um padre da Companhia de Jesus, que veio converter os povos daqui','Um colono português que veio buscar terras e trabalhadores','Um marinheiro que leva o açúcar de São Vicente para Lisboa']],
+  irmaoj:['O que os jesuítas faziam no colégio, no alto do planalto?',['Dormiam, davam aula e cuidavam dos doentes, tudo numa casa só','Moíam a cana e faziam açúcar para mandar a Lisboa','Guardavam as armas e vigiavam a chegada dos tamoios']],
+  tibirica:['Onde nasceu São Paulo, em 1554?',['No alto de uma colina, entre dois rios','Na beira da praia, perto do porto de São Vicente','Num vale fundo, no meio da Serra do Mar']],
+  anchieta:['O que o irmão Anchieta estava aprendendo?',['O tupi, para escrever as regras e ensinar outros padres','O latim, para rezar a missa com os colonos','A fazer açúcar, para ajudar no engenho dos padres']],
+  colono:['O que o colono português queria no planalto?',['Terras boas e indígenas para trabalhar à força','Ouro e prata para mandar ao rei de Portugal','Um lugar para estudar no colégio dos jesuítas']],
+  curumim:['O que quer dizer Piratininga?',['Peixe secando','Rio dos tamanduás','Terra dos pinheiros']],
+  mulher:['Como a aldeia plantava a mandioca?',['Abria a mata, plantava e depois deixava a terra descansar','Plantava sempre no mesmo lugar, junto das ocas','Trocava as raízes com os portugueses por farinha pronta']],
+  avo:['O que é uma oca e o que é uma taba?',['Oca é a casa; taba é a aldeia','Oca é a aldeia; taba é a casa','Oca é a roça; taba é a casa']],
+  vigia54:['Para que servia a caiçara?',['Era a cerca de paus em volta da aldeia e do colégio','Era a torre de troncos de onde o vigia olhava o rio','Era a trombeta que avisava quando chegava inimigo']],
+  oleira:['Como se fazia um pote de barro na aldeia?',['Com rolinhos de barro, e depois o pote ia ao fogo','Com barro numa forma de madeira, secando só ao sol','Com barro do rio, moldado pelos homens da aldeia']],
+  guerreiro:['Quem eram os inimigos dos tupiniquins e dos portugueses?',['Os tupinambás do litoral, chamados de tamoios','Os homens de Tibiriçá, que moravam na colina','Os indígenas que trabalhavam no engenho']],
+  joaoRamalho:['Por que João Ramalho era importante para os portugueses?',['Era casado com Bartira, e os tupiniquins o aceitavam','Era o chefe dos jesuítas e mandou fundar o colégio','Foi o capitão que fundou a vila de São Vicente']],
+  karai54:['Por que o karaí desconfiava dos padres?',['Os padres queriam ficar no lugar dos pajés','Os padres proibiam a aldeia de plantar mandioca','Os padres queriam levar todos para São Vicente']],
+  guia:['Como os portugueses subiam a Serra do Mar em 1554?',['A pé, por trilhas indígenas, com guias da terra','A cavalo, por um caminho de pedra aberto pelo rei','De canoa, subindo os rios até o planalto']],
+  nobrega:['Por que os jesuítas subiram a serra até Piratininga?',['Para ficar longe dos colonos que escravizavam indígenas','Para procurar ouro e prata nos rios do sertão','Para fundar um engenho de açúcar longe da praia']],
+  vereador:['Quem decidia as regras na Câmara de São Vicente?',['Só os “homens bons”, os moradores mais ricos','Todos os homens livres da vila, ricos ou pobres','O governador-geral, mandado pelo rei']],
+  mestre:['Quem trabalhava no Engenho São Jorge dos Erasmos?',['Uns 130 escravizados, a maioria indígenas','Uns 130 escravizados, a maioria africanos','Uns 130 colonos pobres, que ganhavam salário']],
+  indigena:['Quem trabalhava à força no engenho de São Vicente, em 1554?',['Indígenas escravizados, capturados no sertão','Africanos escravizados, a maioria da Guiné','Colonos pobres, em troca de um pedaço de terra']],
+  marinheiro:['O que os navios levavam de São Vicente para Lisboa?',['Açúcar','Ferramentas','Vinho']],
+  reiJoao:['O que D. João III fez em 1549, depois que as capitanias não deram certo?',['Mandou um governador-geral, Tomé de Sousa, com os jesuítas','Dividiu o Brasil em capitanias, uma para cada capitão','Mandou Martim Afonso fundar a vila de São Vicente']],
+  /* ---------- 1830 ---------- */
+  mina30:['Quem cuidava do pequeno comércio de comida nas ruas?',['Muitas mulheres negras, africanas e nascidas aqui','Muitos caixeiros portugueses, empregados das lojas','Os estudantes da Academia, para pagar os estudos']],
+  carregMar30:['Por que a Glória ficava na entrada da cidade?',['Era a chegada do caminho de Santos','Era a chegada do caminho de Jundiaí','Era a chegada do caminho do Rio de Janeiro']],
+  irmaoRos30:['O que a Irmandade do Rosário dos Homens Pretos fazia?',['Festas, compra de alforrias e enterro dos irmãos','Aulas de ler e escrever para crianças livres','Venda de comida nas casinhas da Câmara']],
+  lavCarmo30:['Onde trabalhava a lavadeira da várzea do Carmo?',['Na beira do Tamanduateí','Na beira do Anhangabaú','Na beira do Tietê']],
+  velhoPiques30:['O que acontecia no Largo do Piques, além da parada dos tropeiros?',['Venda de pessoas escravizadas','Festa da coroação do rei do Congo','Exercícios dos soldados do quartel']],
+  acendedor:['O que queimava nos lampiões de São Paulo em 1830?',['Azeite de peixe, de mamona e de baleia','Gás feito numa usina perto da Luz','Velas de cera feitas pelos monges']],
+  estudante:['Por que há tantos estudantes de fora em São Paulo, em 1830?',['Porque em 1828 abriu aqui a Academia de Direito','Porque o colégio dos jesuítas voltou a dar aulas','Porque São Paulo tinha a única escola do Império']],
+  quitandeira:['O que é uma “escrava de ganho”, como a quitandeira?',['Escravizada que vende na rua e entrega parte ao senhor','Escravizada que já comprou a alforria e trabalha livre','Mulher livre que aluga uma banca da Câmara']],
+  aguadeiro:['Como a água chega às casas de São Paulo em 1830?',['Os aguadeiros enchem barris no chafariz e carregam','Por canos de barro que descem do Jardim Botânico','Cada casa tem um poço próprio no quintal']],
+  tropeiro:['O que os tropeiros levam para Santos e o que trazem?',['Levam açúcar; trazem sal, tecidos e ferramentas','Levam sal e tecidos; trazem açúcar dos engenhos','Levam café; trazem vinho, azeite e louça']],
+  lavadeira:['Como as lavadeiras do Anhangabaú trabalham?',['Batem a roupa nas pedras e secam no capim','Fervem a roupa em tachos dentro das casas','Lavam com sabão inglês no chafariz do largo']],
+  jardineiro:['O que é o Jardim Botânico de São Paulo em 1830?',['O primeiro jardim público da cidade, aberto em 1825','O quintal do Palácio, só para o presidente','Uma chácara onde se planta comida para vender']],
+  padre:['Onde os mortos são enterrados em São Paulo, em 1830?',['Dentro das igrejas','No Cemitério da Consolação','No campo, fora da cidade']],
+  lente:['Quem sai formado da Academia de Direito?',['Rapazes bacharéis: futuros juízes e deputados','Rapazes e moças, futuros professores de escola','Padres, que depois vão ser bispos']],
+  funcionario:['O que tinha sido, antes, o prédio do Palácio do Governo?',['O colégio dos jesuítas, expulsos em 1759','O convento dos franciscanos, hoje Academia','A Casa de Câmara e Cadeia da cidade']],
+  irmao:['Quem construiu a igreja do Rosário dos Homens Pretos?',['A irmandade de pessoas negras, escravizadas e libertas','O bispo de São Paulo, com o dinheiro da Sé','O governo da província de São Paulo, a mando do imperador']],
+  caixeiro:['Como chega a maior parte das mercadorias da loja?',['De navio até Santos e serra acima, no lombo das mulas','De barco pelo rio Tietê, descendo do interior','Feitas aqui mesmo, nas oficinas da cidade']],
+  tipografo:['O que é o Farol Paulistano?',['O primeiro jornal impresso de São Paulo, de 1827','O jornal de Líbero Badaró, criticando o imperador','O primeiro livro impresso em São Paulo, de 1827']],
+  dona:['Como é uma casa comum de São Paulo em 1830?',['Paredes de taipa, chão de terra e luz de vela','Paredes de tijolo, chão de tábua e luz de gás','Paredes de pedra, chão de ladrilho e lampião']],
+  atriz:['Quais são as grandes diversões da cidade em 1830?',['Teatro, festas religiosas e procissões','Corridas de cavalo, bailes e circo','Jogos de bola, banho de rio e regatas']],
+  vereador2:['O que funciona na Casa de Câmara e Cadeia?',['Em cima, a Câmara; embaixo, a cadeia','Em cima, a cadeia; embaixo, a Câmara','Em cima, o presidente; embaixo, o quartel']],
+  medico:['Como se trata a maioria das pessoas doentes em 1830?',['Com curandeiros, benzedeiras e boticários','Na Santa Casa, com os muitos médicos da cidade','Com os padres, que são também os médicos']],
+  boticario:['O que é uma botica?',['A farmácia, onde o boticário prepara os remédios','O hospital dos pobres, cuidado pela Santa Casa','A loja de ervas, temperos e sal do mercado']],
+  ferreiro:['Quem são os melhores fregueses do ferreiro?',['Os tropeiros','Os carpinteiros','Os soldados']],
+  padeiro:['Qual é o pão que o povo mais come em 1830?',['A broa de milho','O pão de trigo','O beiju de mandioca']],
+  taverneiro:['Para que serve a taverna?',['Para comer, beber, descansar e saber das novidades','Para dormir e guardar a carga e as selas das mulas','Para comprar sal, farinha, vinho e tecidos']],
+  professor:['Por que pouca gente frequenta a escola de primeiras letras?',['Muitas crianças trabalham, e as escravizadas não podem ir','Uma lei do Império proíbe as meninas de estudar','Só existe escola para os meninos que vão ser padres']],
+  fazendeiro:['De onde vem a riqueza do fazendeiro?',['Da fazenda de açúcar, com dezenas de escravizados','Da fazenda de café, com dezenas de imigrantes','Do comércio de tecidos ingleses na cidade']],
+  carteiro2:['Quanto tempo leva uma carta para a Europa em 1830?',['Meses, de navio','Alguns dias, de navio','Semanas, a cavalo']],
+  sargento:['Como muitos rapazes pobres viram soldados?',['São recrutados à força','São escolhidos pelos vereadores','Se alistam para ganhar terra']],
+  sapateiro:['O que o sapato mostra sobre uma pessoa, em 1830?',['Que ela é livre e tem algum dinheiro','Que ela veio de fora, de Portugal','Que ela trabalha com as tropas de mulas']],
+  alfaiate:['De onde vêm os tecidos finos, e o que o povo usa?',['Finos da Inglaterra e da França; o povo, algodão daqui','Finos daqui; o povo, algodão vindo da Inglaterra','Finos de Portugal; o povo, lã das ovelhas daqui']],
+  barbeiro:['Além de cortar cabelo e barba, o que o barbeiro faz?',['Arranca dentes e faz sangrias','Prepara xaropes e pomadas','Escreve cartas para quem não lê']],
+  carpinteiro:['Como o carpinteiro trabalha em 1830?',['À mão, com serra, plaina e formão','Com uma serra movida pela roda d’água','Com ferramentas que o ferreiro opera']],
+  acougueiro:['Por que a carne precisa ser vendida no mesmo dia?',['Porque não há gelo; o que sobra vira carne-seca','Porque a Câmara multa quem guarda carne','Porque o gado chega todo dia das fazendas']],
+  oleiro:['O que se faz na olaria, com o barro da várzea?',['Telhas, tijolos e potes','Taipa para as paredes das casas','Louça fina igual à inglesa']],
+  monge:['Como vivem os monges do Mosteiro de São Bento?',['Rezam, estudam e cuidam das terras do mosteiro','Rezam e dão aula na Academia de Direito','Rezam e cuidam dos doentes na Santa Casa']],
+  hospedeiro:['Quem usa o rancho e para quê?',['Os tropeiros, para descansar e dar pasto às mulas','Os estudantes, para morar perto da Academia','Os romeiros, na festa da Penha']],
+  liberta:['Como a mulher liberta conquistou a liberdade?',['Vendeu na rua por anos e comprou a alforria','Ganhou a liberdade quando o senhor morreu','Fugiu e foi protegida pela irmandade']],
+  chacareiro:['De onde vem boa parte da comida da cidade?',['Das chácaras e sítios em volta','Dos navios que chegam a Santos','Das fazendas de açúcar de Campinas']],
+  naturalista:['Por que os relatos de viajantes, como Saint-Hilaire, importam hoje?',['São fontes para saber como era a cidade','Foram as leis que organizaram a cidade','Foram os primeiros jornais da cidade']],
+  mSantana:['O que vai de Santana para a cidade, e por onde?',['Lenha, capim e comida, pela Ponte Grande','Açúcar e sal, pela Calçada do Lorena','Madeira e carvão, pela ponte de Pinheiros']],
+  mO:['Que caminho passa pela Freguesia do Ó?',['O de Jundiaí e do interior','O de Santos e do litoral','O do Rio de Janeiro e da Corte']],
+  mPinheiros:['Como começou Pinheiros?',['Como aldeia indígena organizada pelos jesuítas','Como colônia de alemães chamados pelo governo','Como fazenda dos jesuítas, depois do governo']],
+  mSantoAmaro:['Quem chegou a Santo Amaro em 1829?',['Colonos alemães, para cultivar a terra','Colonos italianos, para plantar café','Colonos portugueses, para abrir engenhos']],
+  mIpiranga:['O que aconteceu na beira do Ipiranga em 7 de setembro de 1822?',['D. Pedro proclamou a independência','D. Pedro foi coroado imperador','D. Pedro jurou a Constituição']],
+  mMooca:['Como é a Mooca em 1830?',['Terra de chácaras, com milho e galinhas','Terra de engenhos, com cana e moenda','Terra de olarias, com barro e fornos']],
+  mPenha:['O que é a Penha para quem viaja?',['A primeira parada no caminho do Rio','A primeira parada no caminho de Santos','A primeira parada no caminho de Jundiaí']],
+  badaro:['O que Líbero Badaró defende no jornal dele?',['A liberdade de imprensa, criticando D. Pedro I','O poder do imperador, contra os deputados','A volta de D. João VI ao trono do Brasil']],
+  reiCongo:['Como são escolhidos o rei e a rainha do Congo?',['Eleitos pela irmandade, entre os irmãos','Escolhidos pelo bispo, na Sé','Herdados de pai para filho, como na África']],
+  rainhaCongo:['Além da festa, o que a irmandade do Rosário faz?',['Ajuda os doentes e junta dinheiro para alforrias','Cuida da limpeza e dos chafarizes da cidade','Aluga as bancas das casinhas às quitandeiras']],
+  quit2:['De quem a quitandeira aluga a banca das casinhas?',['Da Câmara','Da Irmandade do Rosário','Do presidente da província']],
+  quit3:['O que “todo paulista come”, segundo a vendedora?',['Toucinho, feijão e farinha de milho','Arroz, feijão e carne-seca de boi','Pão de trigo, queijo e café com leite']],
+  estEntrudo:['O que as pessoas fazem no Entrudo?',['Jogam água, farinha e limões de cheiro','Saem em procissão com velas pelas ruas','Coroam um rei e uma rainha com tambores']],
+  presidente:['Quem escolhe o presidente da província de São Paulo?',['O imperador, no Rio de Janeiro','O Conselho Geral da Província','Os vereadores da Câmara']],
+  preso:['Como os presos conseguem comida na cadeia?',['Da família ou de esmolas','Da Câmara, três vezes por dia','Do trabalho na horta da cadeia']],
+  mae:['Como vive a família da casa simples?',['Numa sala só; a mãe lava roupa para fora','Num sobrado; o pai é caixeiro de loja','Numa chácara; a família planta e vende milho']],
+  liberta2:['Por que a carta de alforria fica tão bem guardada?',['Sem ela, podem dizer que a pessoa é escravizada','Ela serve para votar nas eleições da Câmara','Sem ela, ninguém aluga banca nas casinhas']],
+  ourives:['O que o ourives conta sobre os ofícios da cidade?',['Muitos artesãos são homens negros, livres ou libertos','Os artesãos são quase todos portugueses de Lisboa','Os artesãos aprendem o ofício com os monges']],
+  escrivao30:['O que a Constituição de 1824 criou?',['Imperador, Assembleia e o Poder Moderador','Imperador, Assembleia e voto para todos','Imperador e o fim do tráfico de africanos']],
+  viajante30:['Como se viaja de São Paulo ao Rio de Janeiro em 1830?',['De mula até Santos e de barco a vela','De mula até Santos e de barco a vapor','De carruagem, por uma estrada calçada']]
+ };
+ /* aplica agora e de novo depois, porque alguns blocos acrescentam checagens um pouco depois de abrir */
+ const aplica=()=>{for(const k in N)if(CHECK[k])CHECK[k]=[N[k][0],N[k][1].slice(),0];window.__chkNovas=Object.keys(N).filter(k=>CHECK[k]&&CHECK[k][0]===N[k][0]).length;};
+ aplica();setTimeout(aplica,0);setTimeout(aplica,2000);setTimeout(aplica,8000);
+}catch(e){console.warn('v225 checagens',e);}})();
+/* ===== v225 — UMA TELA DE CADA VEZ: checagem não abre por cima do capítulo (pedido do professor, 21/11/2026) ===== */
+;(function(){try{
+  const outraTela=()=>{const c=document.getElementById('ovCap');return !!(c&&!c.hidden);};
+  /* a checagem espera o capítulo fechar */
+  const ac=askCheck;askCheck=function(n,t){if(outraTela()){setTimeout(()=>askCheck(n,t),400);return;}return ac.apply(this,arguments);};
+  /* se o capítulo abrir com a checagem já aberta, a checagem some e volta quando o capítulo fechar */
+  let guardada=false;
+  setInterval(()=>{try{const q=document.getElementById('ovQuiz');if(!q)return;
+    if(outraTela()&&!q.hidden){q.hidden=true;guardada=true;}
+    else if(!outraTela()&&guardada){guardada=false;q.hidden=false;}}catch(_){}},150);
+}catch(e){console.warn('v225 uma tela',e);}})();
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
