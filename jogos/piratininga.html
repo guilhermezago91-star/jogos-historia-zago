@@ -23503,6 +23503,47 @@ window.__DOCS22={
   const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);aplica();return r;};
 }catch(e){console.warn('bonecos antigos',e);}})();
 
+/* ===== v234 — INTERIORES PRONTOS LIGADOS A PRÉDIOS SEM PORTA, COM GENTE DENTRO (pedido do professor, 21/11/2026) =====
+   A varredura achou salas prontas que nenhuma porta abria. Este bloco dá porta a prédios que não tinham interior e põe gente nas salas.
+   1922: Grandes Moinhos Gamba -> m_moinho; cortiços -> m_cortico; vilas operárias -> m_vila; oficinas mecânicas -> m_ferreiro;
+         Convento do Carmo e Igreja Ortodoxa (mapa dos bairros) -> m_ig_carmo e m_ig_ortodoxa (só a porta; não mexe em lugar, tamanho nem nome).
+   1888: Escola de primeiras letras do Bexiga -> k_escola; Solar Aguiar Vallim (Bananal) -> k_solar.
+   Roda por último (setTimeout) e só acrescenta porta onde não havia. */
+(function(){try{
+  const PORTAS=[
+   ['m_leste22','gamba22','m_moinho'],
+   ['m_leste22','cortBras1','m_cortico'],['m_leste22','lsCasa_233','m_cortico'],['m_leste22','lsCasa_343','m_cortico'],['m_leste22','cortBras2','m_cortico'],['m_leste22','mooca22_4','m_cortico'],['sp22','n1088','m_cortico'],
+   ['sp22','vilaop0','m_vila'],['m_leste22','vilaop2','m_vila'],['m_leste22','vilaop3','m_vila'],['m_leste22','vilaop4','m_vila'],['m_leste22','mooca22_3','m_vila'],['m_leste22','mooca22_8','m_vila'],['m_leste22','n1102','m_vila'],
+   ['m_leste22','mzOficina','m_ferreiro'],['m_oeste22','zo22_9','m_ferreiro'],
+   ['sp22','carmo','m_ig_carmo'],['sp22','igrejaOrtodoxa','m_ig_ortodoxa'],
+   ['sp88','escolaBexiga','k_escola'],['k_bananal','solarVallim88','k_solar']];
+  const TIT={m_moinho:'Dentro do moinho, 1922',m_cortico:'Dentro do cortiço, 1922',m_vila:'Casa de família operária, 1922',m_ferreiro:'Oficina mecânica, 1922',k_escola:'Escola de primeiras letras, 1888',k_solar:'Solar do fazendeiro de café, 1888'};
+  const GENTE=[
+   ['m_moinho','in22_moleiro','h22_n|carregadorS|2','Moleiro do Gamba',["O trigo chega de navio, muito dele da Argentina, pelo porto de Santos. Aqui vira farinha.","O moinho não para: as pedras e os cilindros giram dia e noite."],'Moinhos de trigo: São Paulo importava trigo e moía nos grandes moinhos da Mooca e do Brás.'],
+   ['m_moinho','in22_ensacadora','h22_n|mulherPovo22|5','Ensacadora de farinha',["Costuro os sacos de farinha o dia inteiro.","O pó branco entra no nariz e na garganta. No fim do dia a gente tosse e parece fantasma de tão branca."],null],
+   ['m_cortico','in22_concetta','h22_n|mulherPovo22|2','Dona Concetta, moradora do cortiço',["Aqui moram oito famílias. Uma latrina só e um tanque no pátio para todo mundo.","Meu marido trabalha na tecelagem. Eu lavo roupa para fora e cuido dos quatro filhos."],'Cortiço: muitas famílias operárias dividiam quartos pequenos, com banheiro e tanque coletivos.'],
+   ['m_cortico','in22_menino','h22_n|seg_crianca|2','Menino do cortiço',["Brinco no pátio porque o quarto é pequeno: a gente dorme em cinco aqui dentro.","Quando chove, a água entra pela porta. A mãe põe pano no chão."],null],
+   ['m_vila','in22_amelia','h22_n|operaria|1','Dona Amélia, mulher de operário',["Casa de vila é melhor que cortiço: cada família tem a sua cozinha e o seu quintalzinho.","Mas a casa é da fábrica. Se o meu marido perder o emprego, a gente perde a casa também."],'Vila operária: casas construídas por fábricas para seus operários; morar ali dependia de continuar no emprego.'],
+   ['m_vila','in22_folga','h22_n|pop_33|3','Operário de folga',["Domingo é o único dia de descanso. Hoje eu conserto a cadeira e durmo depois do almoço.","Amanhã o apito toca às seis de novo."],null],
+   ['m_ferreiro','in22_mecanico','h22_n|mestreFab|1','Mecânico da fábrica',["Conserto as máquinas. Quando uma correia arrebenta, a fábrica inteira para e o patrão fica nervoso.","Óleo, ferro e graxa: é disso que é feita a minha roupa."],'Mecânicos mantinham as máquinas das fábricas funcionando; um defeito podia parar a produção inteira.'],
+   ['m_ferreiro','in22_aprendiz','h22_n|pop_05|2','Aprendiz de 14 anos',["Sou aprendiz. Ganho pouco, mas estou aprendendo um ofício.","Varro o chão, passo as ferramentas e presto atenção em tudo."],null],
+   ['k_escola','in88_profa','h22_n|professora|3','Professora de primeiras letras',["Aqui ensino as primeiras letras: ler, escrever e contar.","Muitas crianças não vêm: começam a trabalhar desde pequenas, no comércio ou em casa."],'Escolas de primeiras letras ensinavam ler, escrever e contar; muitas crianças pobres não estudavam porque trabalhavam.'],
+   ['k_escola','in88_aluno','h22_n|seg_crianca|1','Aluno da escola',["Hoje copiei o alfabeto inteiro na lousa!","Meu irmão mais velho não vem: ele ajuda o pai na oficina."],null],
+   ['k_solar','in88_filha','h22_n|seg_mulher|1','Filha do fazendeiro',["Este solar foi construído com o dinheiro do café, quando o Vale do Paraíba era a região mais rica do Brasil.","Mas a terra daqui cansou. As fazendas novas estão no Oeste paulista."],'Vale do Paraíba: em 1888 suas fazendas de café estavam em decadência; o café avançava para o Oeste paulista.'],
+   ['k_solar','in88_liberta','h22_n|irma88|0','Mulher liberta que trabalha no solar',["A lei de 13 de maio libertou todos os escravizados do Brasil. Eu nasci escravizada aqui, nesta fazenda.","Fiquei trabalhando na casa, agora com salário. Mas sem terra, sem escola e sem nada guardado, para onde eu iria?"],'Depois da Abolição, muitos libertos continuaram trabalhando nas fazendas onde tinham sido escravizados, por falta de terra e de outras oportunidades.']];
+  const ligaPortas=()=>{let n=0;for(const [sc,id,room] of PORTAS){const o=objects.find(o=>o.scene===sc&&o.id===id);const R=SCN[room];if(!o||!R||o.enter||o.room)continue;
+      const w=o.w||1,m=Math.floor(w/2);const ord=[...Array(w).keys()].sort((a,b)=>Math.abs(a-m)-Math.abs(b-m));const d=ord.find(dx=>freeAt(sc,o.x+dx,o.y+o.h));if(d===undefined)continue;o.enter='ld_'+id;o.room=room;o.door=d;n++;}
+    for(const [k,t] of Object.entries(TIT)){if(SCN[k])SCN[k].title=t;}
+    try{if(typeof buildOcc==='function')buildOcc();}catch(_){}return n;};
+  const poeGente=()=>{for(const [sc,id,spr,nome,lines,diary] of GENTE){if(npcs.find(n=>n.id===id))continue;const S=SCN[sc];if(!S||!S.map)continue;
+      const M=S.map,H=M.length,W=M[0].length,cx=W>>1,cy=(H>>1)-1;const ok=(x,y)=>x>0&&y>0&&x<W-1&&y<H-2&&freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&Math.abs(n.x-x)+Math.abs(n.y-y)<2);
+      let p=null;for(let r=0;r<10&&!p;r++)for(let y=cy-r;y<=cy+r&&!p;y++)for(let x=cx-r;x<=cx+r&&!p;x++){if(Math.max(Math.abs(x-cx),Math.abs(y-cy))===r&&ok(x,y))p=[x,y];}
+      if(!p)continue;try{npcIn(sc,id,'colono',p[0],p[1],nome,lines,diary||undefined);}catch(e){continue;}const n=npcs.find(n=>n.id===id);if(n)n.spr=spr;}};
+  setTimeout(()=>{try{ligaPortas();poeGente();}catch(e){console.warn('interiores prontos',e);}},3500);
+  const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);try{ligaPortas();}catch(_){}return r;};
+  window.__interioresProntos={PORTAS,GENTE,ligaPortas};
+}catch(e){console.warn('interiores prontos',e);}})();
+
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /* ===== v203 — MENOS ESPAÇO PRETO EM TODOS OS FORMATOS E ABERTURA SEM 1554 NO FUNDO (pedido do professor, 21/11/2026) =====
    1) A abertura "máquina do tempo" cobre a tela inteira: o "1554" da barra de cima não aparece mais
