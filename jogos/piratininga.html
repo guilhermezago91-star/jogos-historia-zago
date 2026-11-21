@@ -19938,7 +19938,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v214) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v217) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -20803,10 +20803,10 @@ window.__paulista82Ready=Promise.all(ready);
     /* ===== v214 — CENTRO DE 1922: SAEM O THEATRO SÃO JOSÉ E A IGREJA DE SANTO ANTÔNIO — no lugar entram sobrados de comércio; o segundo Palacete Prates passa a se chamar "o gêmeo", porque eram mesmo dois (pedido do professor, 21/11/2026) ===== */
     try{const tira=(id,k,rot,nome,tx)=>{const o=objects.find(q=>q.scene===S&&q.id===id);if(!o||o.__tirado||!MAN[k]||!A['PC_'+k])return;const en=o.enter,dr=o.door,b=o.y+(o.h||1);
         grande(o,k,o.x,o.y,o.w||4,null,rot,['t',TELHA[(o.x+o.y)%4]],b);o.enter=en;if(dr!=null)o.door=dr;o.name=nome;o.text=tx;o.__tirado=1;};
-      tira('theatroSJ','g_loja_2x2_1','TECIDOS','Loja de tecidos',['Uma loja de tecidos da Rua Xavier de Toledo, com moradia no andar de cima.']);
       tira('pc_5_ig_santo_antonio','g_loja_2x2_2','LOJA','Loja',['Uma loja apertada entre os prédios novos do centro.']);
-      for(const o of objects)if(o.scene===S&&Array.isArray(o.text))o.text=o.text.map(t=>typeof t==='string'?t.replace(/,? ?cont[íi]guo ao Theatro S[ãa]o Jos[ée]/g,'').replace(/vizinho do Theatro S[ãa]o Jos[ée]/g,'na Rua Xavier de Toledo'):t);
       const p2=objects.find(q=>q.scene===S&&q.id==='prates2');if(p2)p2.name='Palacete Prates (o gêmeo)';
+      /* ===== v217 — CENTRO DE 1922: VOLTA O THEATRO SÃO JOSÉ — ele existia em 1922 (aberto em 1909, cerca de 3.000 lugares, junto ao Viaduto do Chá; fonte: Virgínia de Almeida Bessa, 2022); só a Igreja de Santo Antônio continua fora (pedido do professor, 21/11/2026) ===== */
+      {const sj=objects.find(q=>q.scene===S&&q.id==='theatroSJ');if(sj)rel.saoJose=[sj.x,sj.y];}
     }catch(e){console.warn('tira Sao Jose Santo Antonio JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
