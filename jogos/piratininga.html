@@ -21682,7 +21682,7 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
 (function(){try{
   const st=document.createElement('style');
   st.textContent='#ovIntro{position:fixed!important;inset:0!important;z-index:9500!important;padding:max(8px,env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))!important}'+
-    '#ovIntro canvas{max-width:min(900px,100%)!important;max-height:72vh!important;width:auto!important;height:auto!important;aspect-ratio:16/9}'+
+    '#ovIntro canvas{width:min(100%,900px,calc(56vh * 16 / 9))!important;max-width:100%!important;max-height:none!important;height:auto!important;aspect-ratio:16/9}'+
     'body.telaTablet .app{max-width:none!important}';
   document.head.appendChild(st);
   const scr=document.querySelector('.screen'),app=document.querySelector('.app'),hud=document.querySelector('.hud'),pad=document.querySelector('.pad');
