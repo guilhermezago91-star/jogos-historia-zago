@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=860e5dd1","kb":8543,"m":1},{"f":"pac_e1234.js?v=ca07eb09","kb":2177,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=0bf8ea21","kb":233,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=e3acbc3c","kb":1485,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=0c017fbf","kb":5114,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=ca07eb09","kb":2177,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=0bf8ea21","kb":233,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=e3acbc3c","kb":1485,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=0c017fbf","kb":5114,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -9433,6 +9433,170 @@ setTimeout(function(){
       diary:"Sambaqui quer dizer “monte de conchas” em tupi. Os povos sambaquieiros viveram no litoral milhares de anos antes dos tupis. Suas conchas viraram cal para as construções portuguesas."});
   }
 }catch(e){console.warn('peabiru54',e);}})();
+/* ===== v204 — 1554 MAIS LEVE: MAPAS DE LISBOA E ANTUÉRPIA SÓ NA HORA (pedido do professor, 20/11/2026) =====
+   Os quatro desenhos grandes do chão de Lisboa e de Antuérpia (7,5 MB) saíram do pacote de arte de 1554 e viraram
+   arquivos de imagem separados (jogos/arte/mapas1554/). O jogo só os baixa quando a nau parte para a cidade (a viagem
+   leva 12 s), quando a pessoa já está lá (jogo salvo) ou, para Antuérpia, uns segundos depois de chegar a Lisboa.
+   Assim a abertura de 1554 fica bem mais leve no celular. O visual não muda. */
+(function(){try{
+  const D='arte/mapas1554/';
+  window.CHAO54={lisboa54:{a:D+'lx54_mapa.webp',b:D+'lx54_mapa2x.webp'},antuerpia54:{a:D+'an54_mapa.webp',b:D+'an54_mapa2x.webp'}};
+  window.pedeChao54=function(sc){const m=CHAO54[sc];if(!m)return;
+    for(const k of ['a','b']){const im=m['i'+k];if(im&&!m['p'+k]){m['p'+k]=1;im.src=m[k];}}};
+  {const s0=setScene;setScene=function(to){const r=s0.apply(this,arguments);
+    try{pedeChao54(to);if(to==='lisboa54')setTimeout(()=>pedeChao54('antuerpia54'),15000);}catch(_){}return r;};}
+  {const n0=nauRide;nauRide=function(kind,dest){try{pedeChao54(dest);}catch(_){}return n0.apply(this,arguments);};}
+}catch(e){console.warn('mapas54',e);}})();
+/* ===== v205 — SÃO VICENTE NOVA EM 1554, NA ESCALA DO 1640 (pedido do professor, 20/11/2026) =====
+   A vila de São Vicente refeita com um desenho único do Canva, no estilo aprovado e com os prédios grandes perto
+   dos bonecos, como no teste de 1640. Mapa de 60 x 45, chão em 32 px de verdade (arte/mapas1554/sv54_mapa2x.webp,
+   baixado só quando precisa, como Lisboa e Antuérpia). No alto, a mata e a trilha que sobe para a Serra; no meio,
+   o largo com a igreja matriz, a Casa do Conselho (Câmara) e o pelourinho; em volta, casas de colono de taipa e
+   palha com quintais e roças; à direita, o riacho e a casa do engenho; embaixo, a praia, o cais, a nau, as canoas
+   e o sambaqui. */
+(function(){try{
+  if(typeof A==='undefined'||!window.CHAO54||!SCN.sv)return;
+  CHAO54.sv={a:'arte/mapas1554/sv54_mapa.webp',b:'arte/mapas1554/sv54_mapa2x.webp'};
+  const SC='sv',G=["CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCC..CCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC...CCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCC.................CCCCCC.............CCCCCCCCCCCCCCCCCCC", "CCC...................CCCCCC.............CCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCC....CCCCCC...................CCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCC....CCCCCC.....CCCCCCCCC.....CCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCC....CCCCCC.....CCCCCCCCC.....CCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCC....CCCCCC.....CCCCCCCCC.....CCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCC....CCCCCC.....CCCCCCCCC.....CCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCC....CCCCCC.....CCCCCCCCC.....CCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCC............C.CCCCCCCCC..........CCCCCCCC", "CCCCCCCCCCCCCCCCCCC............C.............CCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCC...........CCC............CCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCC...........CCC............CCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCC...........CCC............CCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCC..........................CCCCCCCCCCCCCCC", "CCCCCCCCC...........................CCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCC......................CCCC.CCCCCCCCCC......CCCCCC..", ".......................CCCCQQQQCCCC.CCCCCCCCCC......CCCCCC..", ".......................CCCCQQQQCCCC.CCCCCCCCCC....OOOOOCCC..", "..............CCCC.....QQQQQQQQQQQ..CCCCCCCCCCOOOOOOOOO.....", "..............CCCC.....QQQQQQQQQQQ..CCCCCCCCCCOOOOOOOOOOOOOO", "OOOOO.........CCCC.....QQQQQQQQQQQ.OCCCCCCCCCCOOOOOOOOOOOOOO", "OOOOOOOOOOO............OOOOQQQQOOOOOCCCCCCCCCCOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOQQQQOOOOOCCCCCCCCCCOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOQQQQOOOOOCCCCCCCCCCOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOQQQQOOOOOCCCCCCCCCCOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"],KR=[[0, 0, 29, 9, "mata"], [33, 0, 59, 9, "mata"], [0, 10, 4, 16, "mata"], [0, 17, 2, 23, "mata"], [47, 10, 59, 16, "mata"], [58, 17, 59, 30, "mata"], [45, 25, 51, 29, "mata"], [5, 10, 13, 15, "casa"], [14, 10, 23, 15, "casa"], [24, 9, 29, 15, "casa"], [33, 10, 40, 15, "casa"], [41, 11, 46, 17, "casa"], [3, 18, 11, 23, "casa"], [12, 18, 17, 23, "casa"], [9, 24, 18, 29, "casa"], [0, 24, 8, 31, "sambaqui"], [22, 15, 27, 23, "igreja"], [33, 19, 41, 24, "camara"], [30, 26, 32, 28, "pelourinho"], [31, 24, 31, 25, "pelourinho"], [47, 17, 54, 23, "engenho"], [43, 6, 47, 10, "riacho"], [47, 10, 51, 17, "riacho"], [54, 17, 57, 22, "riacho"], [52, 23, 57, 33, "riacho"], [46, 28, 51, 30, "barranco"], [14, 34, 17, 36, "canoa"], [23, 32, 26, 33, "carga"], [31, 31, 34, 33, "carga"], [36, 30, 45, 40, "nau"]],S=SCN[SC],MW_=G[0].length,MH_=G.length;
+  const K=(x,y)=>{let r=null;for(const q of KR)if(x>=q[0]&&x<=q[2]&&y>=q[1]&&y<=q[3])r=q[4];return r;};
+  S.map=G.map(r=>r.split(''));S.exp=new Uint8Array(MW_*MH_).fill(1);
+  for(let i=objects.length-1;i>=0;i--)if(objects[i].scene===SC&&objects[i].id==='barco')objects.splice(i,1);
+  const P=(id,x,y,w,h)=>{const o=objects.find(o=>o.id===id&&o.scene===SC);if(!o)return null;o.x=x;o.y=y;if(w){o.w=w;o.h=h;}return o;};
+  const vazio=()=>{};
+  const PREDIOS=['igreja','camara','engenho','casa1','casa2','nauSV','roda','forno','pelourinho','sambaquiSV','ob54_canoa_sv_nauSV','ob54_caixote_sv_nauSV','ob54_barril_sv_nauSV','ob54_ancoraCorda_sv_nauSV'];
+  const apaga=()=>{for(const id of PREDIOS){const o=objects.find(o=>o.id===id&&o.scene===SC);if(o)o.draw=vazio;}};
+  apaga();setTimeout(apaga,200);
+  P('igreja',22,15,6,9);P('camara',33,19,9,6);P('casa1',5,10,9,6);P('casa2',14,10,10,6);P('nauSV',36,30,10,11);
+  P('roda',47,18,2,3);P('forno',47,22,2,2);P('pelourinho',31,26,1,1);P('sambaquiSV',6,30,2,1);
+  {const e=P('engenho',49,17,6,7);if(e){e.door=2;}}
+  P('ob54_canoa_sv_nauSV',15,34,2,1);P('ob54_caixote_sv_nauSV',24,32,1,1);P('ob54_barril_sv_nauSV',31,32,1,1);P('ob54_ancoraCorda_sv_nauSV',33,32,1,1);
+  {const o=objects.find(o=>o.id==='igreja'&&o.scene===SC);if(o){o.name='Igreja matriz';o.text=['A igreja matriz da vila, de taipa caiada. Aqui os moradores vão à missa e se reúnem nas festas.','A primeira igreja foi levada pelo mar numa ressaca, por volta de 1542. Esta foi erguida de novo, mais para dentro.'];}}
+  {const o=objects.find(o=>o.id==='camara'&&o.scene===SC);if(o){o.name='Casa do Conselho (Câmara)';}}
+  {const o=objects.find(o=>o.id==='engenho'&&o.scene===SC);if(o&&o.text)o.text=o.text.map(t=>t.replace(/, coberta de palha/,''));}
+  const NP={nobrega:[25,25],vereador:[37,25],mestre:[45,21],indigena:[20,24],marinheiro:[33,35],mestreNau:[34,34],carregadorPau:[20,31]};
+  const OB={placaSV1:[30,7],placaSV2:[28,30],placaSV3:[45,23],painelEng:[44,23],placaRio_sv:[46,24],placaErasmos:[43,24],
+    mapa54:[29,30],torasSV:[19,32],ob54_sacas_sv_mestre:[46,20],pauBrasilSV:[38,7],cargaEuropa:[21,33]};
+  const poe=()=>{for(const n of npcs)if(n.scene===SC&&NP[n.id]){n.x=NP[n.id][0];n.y=NP[n.id][1];}
+    for(const o of objects)if(o.scene===SC&&OB[o.id]){o.x=OB[o.id][0];o.y=OB[o.id][1];}};
+  poe();
+  const ANDA=c=>c==='.'||c==='D'||c==='Q'||c==='A';
+  const pode=(x,y)=>G[y]&&ANDA(G[y][x]);
+  const CHEGA=[30,23],SERRA=[31,1],PORTO=[28,31];
+  const ocupa=(x,y,self)=>objects.some(o=>o!==self&&o.scene===SC&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))
+     ||npcs.some(n=>n!==self&&n.scene===SC&&n.x===x&&n.y===y)||(x===CHEGA[0]&&y===CHEGA[1])||(x===PORTO[0]&&y===PORTO[1])||(x>=30&&x<=32&&y<=2);
+  const cabe=(o,x,y)=>{for(let j=0;j<(o.h||1);j++)for(let i=0;i<(o.w||1);i++)if(!pode(x+i,y+j)||ocupa(x+i,y+j,o))return false;return true;};
+  const perto=(o,x,y)=>{for(let r=0;r<20;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;
+      const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<MW_&&Y<MH_&&cabe(o,X,Y))return [X,Y];}return [x,y];};
+  const FIXOS=new Set(PREDIOS);
+  const ROTAS=[[[20,25],[43,25]],[[10,32],[27,31]],[[30,16],[30,23]]];
+  const arruma=()=>{poe();
+    for(const o of objects){if(o.scene!==SC||FIXOS.has(o.id))continue;if(!cabe(o,o.x,o.y)){const p=perto(o,o.x,o.y);o.x=p[0];o.y=p[1];}}
+    for(const n of npcs){if(n.scene!==SC)continue;if(!pode(n.x,n.y)||ocupa(n.x,n.y,n)){const p=perto({w:1,h:1},n.x,n.y);n.x=p[0];n.y=p[1];}}
+    try{for(const it of ITEMS){if(it.scene!==SC)continue;if(!pode(it.x,it.y)||ocupa(it.x,it.y,null)){const p=perto({w:1,h:1},it.x,it.y);it.x=p[0];it.y=p[1];}}}catch(_){}
+    try{let i=0;for(const w of walkers){if(w.scene!==SC)continue;const r=ROTAS[i++%ROTAS.length];
+      if(w.path)w.path=r.map(q=>q.slice());const p=r[0];if(!pode(w.x,w.y)||!w.__sv2){w.__sv2=1;w.x=w.fx=p[0];w.y=w.fy=p[1];w.px=p[0]*T;w.py=p[1]*T;}}}catch(_){}};
+  arruma();setTimeout(arruma,0);setTimeout(arruma,1500);
+  /* chegadas: pela trilha da Serra, de navio e de jogo salvo */
+  {const g0=goScene;goScene=function(to,x,y,dir,after){if(to===SC){if(y===0){x=SERRA[0];y=SERRA[1];}else if(!(G[y]&&ANDA(G[y][x]))){x=CHEGA[0];y=CHEGA[1];}}return g0.call(this,to,x,y,dir,after);};}
+  {const ru=rideUpdate;rideUpdate=function(dt){const r=ride;const res=ru(dt);
+    if(r&&!ride&&/^mar54/.test(r.kind)&&r.dest===SC){player.x=PORTO[0];player.y=PORTO[1];player.px=player.x*T;player.py=player.y*T;reveal(player.x,player.y);}return res;};}
+  {const s1=setScene;setScene=function(to){const r=s1.apply(this,arguments);if(to===SC)setTimeout(()=>{try{if(cur===SC&&!(G[player.y]&&ANDA(G[player.y][player.x]))){player.x=CHEGA[0];player.y=CHEGA[1];player.px=player.x*T;player.py=player.y*T;player.moving=false;reveal(player.x,player.y);checkZone();}}catch(_){}},0);
+    try{if(era===1&&!CHAO54.sv.pa)setTimeout(()=>pedeChao54(SC),to===SC?0:3000);}catch(_){}return r;};}
+  /* saída: a trilha no alto do mapa sobe para a Serra */
+  {const c0=checkZone;checkZone=function(){const r=c0.apply(this,arguments);
+    try{if(cur===SC&&player.y===0&&player.x>=30&&player.x<=32&&!sceneFade)goScene('serra',player.x===30?18:19,SCN.serra.map.length-1,'up');}catch(_){}return r;};}
+  {const z0=zoneAt;zoneAt=function(x,y){if(cur!==SC)return z0.apply(this,arguments);
+    return y<=9?'Trilha da Serra':y>=30?'Praia e porto':x>=42&&y>=17?'Engenho':'Vila de São Vicente';};}
+  setTimeout(()=>{try{LABELS_XS.sv=[['Igreja matriz',24.8,13.4],['Casa do Conselho',37.4,17.4],['Pelourinho',31.4,29.2],['Engenho',51.8,15.4],
+    ['Sambaqui',4.4,22.6],['Cais',28.4,37.4],['Trilha para a Serra',31.4,0.4],['Baía de São Vicente',12,41]];}catch(_){}},0);
+  {const c0=TILE_INFO.C;TILE_INFO.C=(x,y)=>{if(cur===SC){const k=K(x,y);
+     const T_={mata:['Mata Atlântica','A mata fechada chega até a beira da vila. Dela saem madeira, caça, frutas e o pau-brasil.'],
+       casa:['Casa de colono','Casa de taipa (barro socado) coberta de palha, com quintal cercado, horta e roça de mandioca.'],
+       sambaqui:['Sambaqui','Um morro de conchas, ossos e restos de comida, feito pelos povos do litoral muito antes dos tupis e dos portugueses: alguns têm milhares de anos.'],
+       igreja:['Igreja matriz','A igreja da vila, de taipa caiada.'],
+       camara:['Casa do Conselho','Aqui se reúnem os vereadores da Câmara de São Vicente, a primeira das Américas portuguesas, criada em 1532.'],
+       pelourinho:['Pelourinho','A coluna que mostra que São Vicente é uma vila, com Câmara e justiça. Ali também se castigavam pessoas em público.'],
+       engenho:['Casa do engenho','A casa onde a cana é moída e o caldo vira açúcar.'],
+       riacho:['Riacho','Um riacho desce do morro até o mar. A água corre forte e pode mover a roda de um engenho.'],
+       barranco:['Barranco','O terreno cai em barranco até a praia.'],
+       canoa:['Canoa','Canoa usada para levar gente e carga até a nau.'],
+       carga:['Carga do cais','Caixas de açúcar e fardos esperando para embarcar.'],
+       nau:['Nau','Uma nau portuguesa, com a cruz da Ordem de Cristo na vela.']}[k];
+     if(T_)return {name:T_[0],text:[T_[1]]};}return c0(x,y);};}
+  const IM=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur===SC){buildStatic();buildOcc&&buildOcc();}}catch(_){}};CHAO54.sv.ia=IM;
+  const bs=buildStatic;buildStatic=function(){bs();try{if(cur===SC&&ok){sc.imageSmoothingEnabled=false;sc.drawImage(IM,0,0);}}catch(_){}};
+  const I2=new Image();CHAO54.sv.ib=I2;if(cur===SC)pedeChao54(SC);
+  {const di=ctx.drawImage;ctx.drawImage=function(src){
+     if(src===stat&&cur===SC&&arguments.length===9&&I2.complete&&I2.naturalWidth){const a=arguments;di.apply(this,a);
+       return di.call(this,I2,a[1]*2,a[2]*2,a[3]*2,a[4]*2,a[5],a[6],a[7],a[8]);}
+     return di.apply(this,arguments);};}
+  setTimeout(()=>{try{if(cur===SC){buildStatic();buildOcc();mmDirty=true;}}catch(_){}},0);
+}catch(e){console.warn('sv54',e);}})();
+/* ===== v206 — OBJETOS DE 1554 REDESENHADOS NO CANVA (pedido do professor, 21/11/2026) =====
+   Placas, mesa com a carta náutica, toras de pau-brasil, sacas, caixas, barris, cestos, pote, âncora,
+   tendas de feira, carroça, carrinho, chafariz, banco e pelourinho de São Vicente, Lisboa e Antuérpia
+   trocados pelos desenhos novos do Canva (32 px, família colonial). As placas ficam altas e bem visíveis.
+   Imagem: arte/objetos1554/obj54n.webp, baixada só quando a pessoa chega a uma dessas cidades. */
+(function(){try{
+  const M={"toras": [0, 0, 100, 82], "sacas": [102, 0, 52, 45], "caixa": [156, 0, 40, 39], "barril": [198, 0, 30, 40], "cestoPeixe": [230, 0, 42, 33], "cestoFruta": [274, 0, 42, 33], "pote": [318, 0, 30, 43], "ancora": [350, 0, 50, 48], "bau": [402, 0, 44, 46], "mesaCarta": [448, 0, 60, 56], "placa": [0, 84, 40, 72], "tendaVerd": [42, 84, 80, 103], "tendaPao": [124, 84, 72, 101], "tendaTec": [198, 84, 78, 95], "chafariz": [278, 84, 72, 95], "pelourinho": [352, 84, 44, 94], "carroca": [398, 84, 76, 70], "carrinho": [0, 189, 60, 64], "banco": [62, 189, 54, 38]};
+  const CENAS={sv:1,lisboa54:1,antuerpia54:1};
+  let I=null;const img=()=>{if(!I){I=new Image();I.src='arte/objetos1554/obj54n.webp';}return I;};
+  const QUAL=[[/^(placa|painel|gravura)/,['placa']],[/^mapa54/,['mesaCarta']],[/^toras/,['toras']],
+    [/^tendaLx1$/,['tendaVerd','tendaPao']],[/^tendaLx2$/,['tendaTec','tendaVerd']],[/^caixasLx$/,['caixa','barril']],
+    [/^barrisAnt$/,['barril','barril']],[/^pelourinhoLx$/,['pelourinho']],[/tenda_pao/,['tendaPao']],[/tenda_tecidos/,['tendaTec']],
+    [/carrinho/,['carrinho']],[/chafariz/,['chafariz']],[/carroca/,['carroca']],[/banco_pedra/,['banco']],
+    [/_caixote_/,['caixa']],[/_barril_/,['barril']],[/sacas/,['sacas']],[/ancoraCorda/,['ancora']],
+    [/cestoPeixe/,['cestoPeixe']],[/cestoFruta/,['cestoFruta']],[/_pote_/,['pote']]];
+  const DESL={placa:3,toras:4,sacas:2,caixa:2,barril:2,pote:2,ancora:2,mesaCarta:4,tendaVerd:3,tendaPao:3,tendaTec:3,chafariz:4,pelourinho:2,carroca:3,carrinho:3,banco:3,cestoPeixe:2,cestoFruta:2,bau:2};
+  function veste(sc){if(!CENAS[sc])return;for(const o of objects){if(o.scene!==sc||o.__n54)continue;
+    if(o.draw&&o.draw.name==='vazio')continue;
+    const q=QUAL.find(([re])=>re.test(o.id));if(!q)continue;const L=q[1];o.__n54=1;
+    o.draw=(c,X,Y)=>{const im=img();if(!im.complete||!im.naturalWidth)return;const W=(o.w||1)*T,n=L.length;
+      L.forEach((k,j)=>{const r=M[k];if(!r)return;const w=r[2]/2,h=r[3]/2,cx=X+W*(j+.5)/n;
+        const dx=Math.round(cx-w/2),dy=Math.round(Y+(o.h||1)*T-h+(DESL[k]||2));c.drawImage(im,r[0],r[1],r[2],r[3],dx,dy,w,h);
+        if(k==='placa'){const tt=performance.now()/1000+(o.x*.37+o.y*.21);if(tt%2.4<.45){const sx=dx+w-3,sy=dy+11,a=tt%2.4<.22?3:2;
+          c.fillStyle='#fff3c4';c.fillRect(sx-a,sy,a*2+1,1);c.fillRect(sx,sy-a,1,a*2+1);c.fillStyle='#f1c471';c.fillRect(sx,sy,1,1);}}});};}}
+  window.veste54=veste;
+  {const s0=setScene;setScene=function(to){const r=s0.apply(this,arguments);try{veste(to);if(CENAS[to])img();}catch(_){}return r;};}
+  setTimeout(()=>{try{if(typeof cur!=='undefined')veste(cur);}catch(_){}},0);
+}catch(e){console.warn('obj54n',e);}})();
+
+/* ===== v207 — BAÚS PARA ABRIR EM 1554 (pedido do professor, 21/11/2026) =====
+   Seis baús de madeira (dois em São Vicente, dois em Lisboa, dois em Antuérpia). A pessoa fica de frente
+   e aperta A: a tampa abre devagar, sai uma luz dourada e ela acha um objeto que entra na coleção de 1554.
+   Depois o baú fica aberto e vazio (também no jogo salvo). Os baús fechados piscam um brilho para chamar
+   a atenção. Desenho: arte/objetos1554/bau54.webp (4 quadros da animação, Canva). */
+(function(){try{
+  const QW=54,QH=61;let I=null;const img=()=>{if(!I){I=new Image();I.src='arte/objetos1554/bau54.webp';}return I;};
+  const BAUS=[
+    ['bauSV1','sv',22,29,'i54_bau_machados',4,'Machados para o escambo',"Machados e facas de ferro guardados para o escambo. Os portugueses trocam essas ferramentas com os tupis por pau-brasil, comida e trabalho. Para quem só tinha machado de pedra, uma lâmina de ferro valia muito."],
+    ['bauSV2','sv',41,26,'i54_bau_ordenacoes',21,'Ordenações Manuelinas',"As Ordenações Manuelinas: o livro das leis do reino de Portugal, publicado em 1521. Os homens da Câmara de São Vicente usam essas leis para julgar e dar ordens na vila."],
+    ['bauLx1','lisboa54',20,39,'i54_bau_pimenta',11,'Saco de pimenta',"Pimenta-do-reino vinda da Índia. Ela chega a Lisboa nas naus e passa pela Casa da Índia, que controla esse comércio para o rei. Vale tanto que fica guardada em baú com fechadura."],
+    ['bauLx2','lisboa54',45,33,'i54_bau_tostao',10,'Tostão de prata',"Um tostão, moeda de prata de Portugal. Nas lojas da Rua Nova dos Mercadores e no cais, tudo se compra e se vende com moedas assim: pimenta, tecidos, açúcar e também o trabalho dos carregadores."],
+    ['bauAn1','antuerpia54',48,28,'i54_bau_letra',57,'Letra de câmbio',"Uma letra de câmbio: um papel que vale dinheiro. Na Bolsa de Antuérpia, aberta em 1531, os mercadores trocam papéis assim em vez de carregar sacos de moedas pela Europa."],
+    ['bauAn2','antuerpia54',63,31,'i54_bau_acucar',15,'Açúcar refinado',"Açúcar branco, refinado aqui em Antuérpia. Ele chega escuro da Madeira, de São Tomé e também do Brasil, e as refinarias da cidade o deixam branco para vender por toda a Europa."]];
+  for(const b of BAUS){if(!ITEMS.some(i=>i.id===b[4]))ITEMS.push({id:b[4],i:b[5],scene:'bau54',x:-99,y:-99,name:b[6],text:b[7],got:false});}
+  const itemDe=o=>ITEMS.find(i=>i.id===o.bauItem);
+  function poe(sc){for(const b of BAUS){if(b[1]!==sc||objects.some(o=>o.id===b[0]))continue;
+    const p=(typeof findFree==='function'&&findFree(sc,b[2],b[3],6))||[b[2],b[3]];
+    const o={id:b[0],scene:sc,x:p[0],y:p[1],w:1,h:1,bau54:1,bauItem:b[4],name:'Baú de madeira',text:['Um baú de madeira com ferragens de ferro.'],
+      draw(c,X,Y){const im=img();if(!im.complete||!im.naturalWidth)return;const it=itemDe(o);
+        let f=0;if(it&&it.got)f=3;else if(o.anim)f=Math.min(3,Math.floor((performance.now()-o.anim)/190));
+        const w=QW/2,h=QH/2,dx=Math.round(X+T/2-w/2),dy=Math.round(Y+T-h+3);
+        c.drawImage(im,f*QW,0,QW,QH,dx,dy,w,h);
+        if(f===0){const tt=performance.now()/1000+o.x*.31;if(tt%2<.4){const sx=dx+w-4,sy=dy+5,a=tt%2<.2?3:2;
+          c.fillStyle='#fff3c4';c.fillRect(sx-a,sy,a*2+1,1);c.fillRect(sx,sy-a,1,a*2+1);c.fillStyle='#f1c471';c.fillRect(sx,sy,1,1);}}}};
+    objects.push(o);}}
+  function abre(o){const it=itemDe(o);if(!it)return;
+    if(it.got){say('Baú de madeira',['O baú está aberto e vazio. Você já pegou o que havia dentro: '+it.name+'.']);return;}
+    if(o.anim)return;o.anim=performance.now();player.moving=false;player.dir='down';try{sfx('door');}catch(_){}
+    setTimeout(()=>{try{if(!it.got)collect(it);}catch(e){console.warn('bau',e);}},820);}
+  {const i0=interact;interact=function(fx,fy){try{const o=objects.find(o=>o.bau54&&o.scene===cur&&o.x===fx&&o.y===fy);if(o){abre(o);return;}}catch(_){}return i0.apply(this,arguments);};}
+  {const s0=setScene;setScene=function(to){const r=s0.apply(this,arguments);try{poe(to);if(['sv','lisboa54','antuerpia54'].includes(to))img();}catch(_){}return r;};}
+  setTimeout(()=>{try{if(typeof cur!=='undefined')poe(cur);}catch(_){}},0);
+  window.__baus54=BAUS.map(b=>b[0]);
+}catch(e){console.warn('baus54',e);}})();
+
 /* ===== v196 — LISBOA NOVA EM 1554 (pedido do professor, 20/11/2026) =====
    Lisboa refeita com arte do Canva no estilo aprovado em Antuérpia, com chão em 32 px de verdade (LX54_MAPA2X;
    LX54_MAPA é a cópia em 16 px para o mapa pequeno). Mapa de 72 x 54. No alto, o Castelo de São Jorge e as casas
@@ -9441,7 +9605,7 @@ setTimeout(function(){
    no jogo, a Torre de Belém (1514-1520) dentro do rio. A coluna com estátua que o Canva pôs no Terreiro foi apagada
    (não existia em 1554). */
 (function(){try{
-  if(typeof A==='undefined'||!A.LX54_MAPA||!SCN.lisboa54)return;
+  if(typeof A==='undefined'||!window.CHAO54||!SCN.lisboa54)return;
   const SC='lisboa54',G=["CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCC...........................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCC...........................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCC..........CCCCCCCCCCCC................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCC...CCC....CCCCCCCCCCCC................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "OOOOOOO.CCC....CCCCCCCCCCCC................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "OOOOOOO.CCCCCCCCCCCCCCCCCCC...............................OOOOOOOOOOOOOO", "OOOOOOO.CCCCCCCCCCCCCCCCCCC...............................OOOOOOOOOOOOOO", "OOOOOOO....CCCCCCCCCCCCCCCC...............................OOOOOOOOOOOOOO", "OOOOOOOOOOOCCCCCCCCCCCCCCCC...............................OOOOOOOOOOOOOO", "OOOOOOOOOOOCCCCCCCCCCCCCCCC..............CCCC.CCCC.CCC....OOOOOOOOOOOOOO", "OOOOOOOOOOOCCCCCCCCCCCCCCCC..............CCCC.CCCC.CCC....OOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCCCCCCCCCCC....CCCCCCC..................OOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCC..............CCCCCCC..................OOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOO...............................OOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"],KR=[[0,0,71,13,"casa"],[14,0,58,8,"castelo"],[0,14,4,29,"casa"],[5,14,15,17,"casa"],[5,18,15,27,"se"],[16,14,41,25,"ruanova"],[42,14,71,18,"casa"],[43,19,67,30,"paco"],[68,19,71,30,"casa"],[15,28,26,37,"india"],[11,31,14,36,"alf"],[8,29,10,32,"arvore"],[41,35,44,36,"carga"],[46,35,49,36,"carga"],[51,35,53,36,"carga"],[31,37,37,38,"carga"],[2,37,16,50,"torre"]],S=SCN[SC],MW_=G[0].length,MH_=G.length;
   const K=(x,y)=>{let r=null;for(const q of KR)if(x>=q[0]&&x<=q[2]&&y>=q[1]&&y<=q[3])r=q[4];return r;};
   S.map=G.map(r=>r.split(''));S.exp=new Uint8Array(MW_*MH_).fill(1);
@@ -9484,6 +9648,7 @@ setTimeout(function(){
       if(w.path)w.path=r.map(q=>q.slice());const p=r[0];if(!pode(w.x,w.y)||!w.__lx2){w.__lx2=1;w.x=w.fx=p[0];w.y=w.fy=p[1];w.px=p[0]*T;w.py=p[1]*T;}}}catch(_){}};
   arruma();setTimeout(arruma,0);setTimeout(arruma,1500);
   {const g0=goScene;goScene=function(to,x,y,dir,after){if(to===SC&&!(G[y]&&ANDA(G[y][x]))){x=CHEGA[0];y=CHEGA[1];}return g0.call(this,to,x,y,dir,after);};}
+  {const s1=setScene;setScene=function(to){const r=s1.apply(this,arguments);if(to===SC)setTimeout(()=>{try{if(cur===SC&&!(G[player.y]&&ANDA(G[player.y][player.x]))){player.x=CHEGA[0];player.y=CHEGA[1];player.px=player.x*T;player.py=player.y*T;player.moving=false;reveal(player.x,player.y);checkZone();save();}}catch(_){}},0);return r;};}
   setTimeout(()=>{try{LABELS_XS.lisboa54=[['Castelo de São Jorge',36,0.4],['Sé',10,16.6],['Rua Nova dos Mercadores',29,13.6],['Paço da Ribeira',55,17.6],
     ['Casa da Índia',20.5,26.6],['Alfândega',12.5,29.6],['Terreiro do Paço',40,29.4],['Cais da Ribeira',45,34.2],['Torre de Belém',9,35.6],['Rio Tejo',30,48]];}catch(_){}},0);
   {const o0=TILE_INFO.O;TILE_INFO.O=(x,y)=>cur===SC?{name:'Rio Tejo',text:['O rio Tejo, largo como um mar, chega ao oceano logo depois de Belém. Por ele entram e saem as naus da Índia, da África e do Brasil.']}:o0(x,y);}
@@ -9499,9 +9664,9 @@ setTimeout(function(){
        arvore:['Árvore','Uma árvore perto do rio.'],
        torre:['Torre de Belém','A torre que vigia a entrada do porto, construída dentro do rio. Na verdade fica uns 6 km rio abaixo.']}[k];
      if(T_)return {name:T_[0],text:[T_[1]]};}return c0(x,y);};}
-  const IM=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur===SC){buildStatic();buildOcc&&buildOcc();}}catch(_){}};IM.src=A.LX54_MAPA;
+  const IM=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur===SC){buildStatic();buildOcc&&buildOcc();}}catch(_){}};CHAO54.lisboa54.ia=IM;
   const bs=buildStatic;buildStatic=function(){bs();try{if(cur===SC&&ok){sc.imageSmoothingEnabled=false;sc.drawImage(IM,0,0);}}catch(_){}};
-  const I2=new Image();I2.src=A.LX54_MAPA2X||'';
+  const I2=new Image();CHAO54.lisboa54.ib=I2;if(cur===SC)pedeChao54(SC);
   {const di=ctx.drawImage;ctx.drawImage=function(src){
      if(src===stat&&cur===SC&&arguments.length===9&&I2.complete&&I2.naturalWidth){const a=arguments;di.apply(this,a);
        return di.call(this,I2,a[1]*2,a[2]*2,a[3]*2,a[4]*2,a[5],a[6],a[7],a[8]);}
@@ -9514,7 +9679,7 @@ setTimeout(function(){
    No mapa: casas de tijolo com empena em degraus, a Catedral de Nossa Senhora (torre de 1521), a Bolsa (1531),
    a refinaria de açúcar, o Steen na beira do Escalda, o cais com o guindaste de roda e a nau. Mapa de 72 x 54. */
 (function(){try{
-  if(typeof A==='undefined'||!A.AN54_MAPA||!SCN.antuerpia54)return;
+  if(typeof A==='undefined'||!window.CHAO54||!SCN.antuerpia54)return;
   const SC='antuerpia54',G=["CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "..................CCCCC.................................................", "..................CCCCC.................................................", "..................CCCCC.................................................", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "..........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "..........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "........CC........CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "........CC........CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "........CC........CCCCCCCCCCCCCCCCCCCCCC................CCCCCCCCCCCCCCCC", "........CC........CCCCCCCCCCCCCCCCCCCCCC......CC........CCCCCCCCCCCCCCCC", "..................CCCCCCCCCCCCCCCCCCCCCC......CC........CCCCCCCCCCCCCCCC", "..................CCCCCCCCCCCCCCCCCCCCCC......CC........CCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC......CC........................", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC................................", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC................................", "CCCCCCCCCCCCCCCCCCCCCCCC...................CCCCCCCCC....................", "CCCCCCCCCCCCCCCCCCCCCCCC...................CCCCCCCCC....................", "CCCCCCCCCCCCCCCCCCCCCCCC.................CCCCCCCCCCC..CC................", "CCCCCCCCCCCCCCCCCCCCCCCC.................CCCCCCCCCCC..CCCCCCCC..CCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCC..............CCCCCCCCCCCCCC..CCCCCCCC..CCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCC..............CCC..CCCCCCCCC..CC........CCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCC.....CCCCCCCCCCCC..CCCCCCCCC..CC........CCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCC.....CCCCCCCCCCCC..CCCCCCCCC.....OOOOOOOOOOOOOOO", "CCCCCCCCCCCCCCCCCCCCCCCC.....CCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "CCCCCCCCCCCCCCCCCCCCCCCC.....CCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "CCCCCCCCCCCCCCCCCCCCCCCC.....CCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "CCCCCCCCCCCCCCCCCCCCCCCCOOOOOCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "CCCCCCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"],KR=[[0,0,71,10,"casa"],[10,14,16,23,"casa"],[0,14,1,21,"casa"],[8,24,9,27,"arvore"],[18,0,22,32,"catedral"],[23,14,39,32,"catedral"],[42,14,55,25,"bolsa"],[46,27,47,30,"fonte"],[56,14,71,29,"refin"],[0,30,23,45,"steen"],[43,33,51,40,"kraan"],[56,36,61,37,"carga"],[54,35,55,39,"carga"],[64,36,71,39,"cais"],[38,37,40,41,"cais"],[41,35,42,37,"carga"],[29,39,40,44,"nau"]],K=new Proxy({},{get:(_,p)=>{const [x,y]=String(p).split(",").map(Number);let r=null;for(const q of KR)if(x>=q[0]&&x<=q[2]&&y>=q[1]&&y<=q[3])r=q[4];return r;}}),S=SCN[SC],MW_=G[0].length,MH_=G.length;
   S.map=G.map(r=>r.split(''));S.exp=new Uint8Array(MW_*MH_).fill(1);
   const tira=new Set(['nauAnt2','nauAnt3','barcoAnt']);
@@ -9553,6 +9718,7 @@ setTimeout(function(){
   arruma();setTimeout(arruma,0);setTimeout(arruma,1500);
   /* quem chega de navio ou volta do banquete cai em lugar certo */
   {const g0=goScene;goScene=function(to,x,y,dir,after){if(to===SC&&!(G[y]&&ANDA(G[y][x]))){x=CHEGA[0];y=CHEGA[1];}return g0.call(this,to,x,y,dir,after);};}
+  {const s1=setScene;setScene=function(to){const r=s1.apply(this,arguments);if(to===SC)setTimeout(()=>{try{if(cur===SC&&!(G[player.y]&&ANDA(G[player.y][player.x]))){player.x=CHEGA[0];player.y=CHEGA[1];player.px=player.x*T;player.py=player.y*T;player.moving=false;reveal(player.x,player.y);checkZone();save();}}catch(_){}},0);return r;};}
   setTimeout(()=>{try{LABELS_XS.antuerpia54=[['Catedral de Nossa Senhora',30,12.6],['Casa do mercador',12,5.6],['Bolsa (1531)',49,12.6],['Refinaria de açúcar',63.5,12.6],
     ['Tinturaria',64,5.6],['Steen',12,28.6],['Guindaste',47,31.6],['Cais do Escalda',62,34.6],['Rio Escalda',52,49]];}catch(_){}},0);
   {const o0=TILE_INFO.O;TILE_INFO.O=(x,y)=>cur===SC?{name:'Rio Escalda',text:['O rio Escalda leva ao mar do Norte. Por ele chegam navios de Lisboa, da Inglaterra, da Alemanha e da Itália: Antuérpia é o maior porto da Europa.']}:o0(x,y);}
@@ -9565,9 +9731,9 @@ setTimeout(function(){
        cais:['Cais do Escalda','O cais de pedra onde os navios descarregam.'],nau:['Nau no cais','A nau que leva o viajante de volta. As velas estão recolhidas enquanto carregam a carga.'],fonte:['Fonte da praça','Água para quem trabalha na praça e no cais.'],arvore:['Árvore','Uma árvore da praça.']}[k];
      if(T_)return {name:T_[0],text:[T_[1]]};}return c0(x,y);};}
   /* chão: em 16 px no mapa interno (AN54_MAPA) e em 32 px de verdade na tela (AN54_MAPA2X) */
-  const IM=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur===SC){buildStatic();buildOcc&&buildOcc();}}catch(_){}};IM.src=A.AN54_MAPA;
+  const IM=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur===SC){buildStatic();buildOcc&&buildOcc();}}catch(_){}};CHAO54.antuerpia54.ia=IM;
   const bs=buildStatic;buildStatic=function(){bs();try{if(cur===SC&&ok){sc.imageSmoothingEnabled=false;sc.drawImage(IM,0,0);}}catch(_){}};
-  const I2=new Image();I2.src=A.AN54_MAPA2X||'';
+  const I2=new Image();CHAO54.antuerpia54.ib=I2;if(cur===SC)pedeChao54(SC);
   {const di=ctx.drawImage;ctx.drawImage=function(src){
      if(src===stat&&cur===SC&&arguments.length===9&&I2.complete&&I2.naturalWidth){const a=arguments;di.apply(this,a);
        return di.call(this,I2,a[1]*2,a[2]*2,a[3]*2,a[4]*2,a[5],a[6],a[7],a[8]);}
