@@ -373,7 +373,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=fc8eb325","kb":282,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=f4ea5e07","kb":1592,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=e8f49438","kb":6929,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=fc8eb325","kb":282,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=f4ea5e07","kb":1592,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=fbde469e","kb":6985,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -23406,6 +23406,49 @@ window.__DOCS22={
         'O jornal da nossa gente: depois de 1888, a comunidade negra paulistana criou jornais, clubes e bailes para se informar, se encontrar e lutar contra o racismo.')};}
     return h0(n);};
 }catch(e){console.warn('São Paulo negra 1922',e);}})();
+
+/* ===== v230 — MULHERES DE 1922: MARIA LACERDA DE MOURA, TERESA DO CRESPI, ODILA NORMALISTA E ESTER DO BOLETIM + MISSÃO "AS VOZES DAS MULHERES" (pedido do professor, 21/11/2026) =====
+   Maria Lacerda de Moura é real: professora e escritora, mudou-se para São Paulo em 1921 e achava que o voto sozinho era pouco para libertar as mulheres.
+   Teresa (tecelã do Cotonifício Crespi, onde começou a Greve Geral de 1917) e Odila (normalista) são ficção baseada na história.
+   A "Moça do boletim feminista" que já existia passa a se chamar Ester. Boneco novo: N88_mariaLacerda22. Retratos novos no arte_1922.js.
+   Só põe gente (1 quadradinho) em lugar livre, por último; não mexe em chão nem em prédio. */
+(function(){try{
+  const P=[
+   ['mu22_maria','m_centro22',[28,59],'mariaLacerda22|0','Maria Lacerda de Moura',
+    ["Sou Maria Lacerda de Moura. Cheguei de Minas Gerais no ano passado.","Sou professora e escrevo nos jornais sobre a vida das mulheres e dos trabalhadores."],
+    'Maria Lacerda de Moura: professora e escritora; em São Paulo, a partir de 1921, defendeu a educação e a liberdade das mulheres e dos trabalhadores.'],
+   ['mu22_teresa','m_leste22',[50,175],'tecelaFab|1','Teresa, tecelã do Crespi',
+    ["Trabalho nos teares do Cotonifício Crespi desde os 12 anos.","Entro antes do sol nascer e saio com o céu escuro."],
+    'Teresa: tecelã do Cotonifício Crespi, na Mooca, onde começou a Greve Geral de 1917.'],
+   ['mu22_odila','m_centro22',[31,60],'normalista|1','Odila, normalista',
+    ["Estudo na Escola Normal, aqui na Praça da República. Vou ser professora primária!","Minha mãe não estudou. Eu vou estudar e ainda vou ensinar outras meninas."],
+    'Odila: normalista; ser professora primária era uma das poucas profissões abertas às moças em 1922.']];
+  const poe=()=>{for(const [id,sc,[x0,y0],spr,nome,lines,diary] of P){if(npcs.find(n=>n.id===id))continue;const S=SCN[sc];if(!S||!S.map)continue;
+      const M=S.map,H=M.length,W=M[0].length;const ok=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y);
+      let p=null;for(let r=0;r<8&&!p;r++)for(let y=y0-r;y<=y0+r&&!p;y++)for(let x=x0-r;x<=x0+r&&!p;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))===r&&ok(x,y))p=[x,y];}
+      if(!p)continue;try{npcIn(sc,id,'colono',p[0],p[1],nome,lines,diary);}catch(e){continue;}const n=npcs.find(n=>n.id===id);if(n)n.spr='h22_n|'+spr;}
+    const f=npcs.find(n=>n.id==='feminista');if(f&&!/^Ester/.test(f.name))f.name='Ester, do boletim feminista';};
+  let tent=0;const tenta=()=>{try{poe();}catch(e){console.warn('mulheres 1922',e);}if(P.some(p=>!npcs.find(n=>n.id===p[0]))&&++tent<40)setTimeout(tenta,500);};
+  setTimeout(tenta,0);
+
+  const K='vozesMulheres22';
+  Q[K]={era:4,title:'As vozes das mulheres',where:'Fale com Maria Lacerda de Moura, perto da Escola Normal, no centro de 1922.',
+    steps:['Pergunte a Teresa, tecelã do Cotonifício Crespi, na Mooca, o que ela quer','Pergunte a Odila, normalista, perto da Escola Normal','Pergunte a Ester, que distribui o boletim feminista no centro','Volte e conte tudo a Maria Lacerda de Moura'],step:null,count:0,done:false};
+  if(!QE4.includes(K))QE4.push(K);(GIVER.mu22_maria=GIVER.mu22_maria||[]).push(K);
+  setTimeout(()=>{try{QT[K]={giver:'n:mu22_maria',steps:['n:mu22_teresa','n:mu22_odila','n:feminista','n:mu22_maria']};}catch(_){}},0);
+  const h0=questHook;questHook=function(n){const q=Q[K];if(q&&!q.done){
+    if(n.id==='mu22_maria'&&q.step===null)return{pages:["Quero saber o que as mulheres desta cidade querem. Cada uma tem a sua vida, e cada vida tem a sua luta.","Você me ajuda a perguntar? Fale com Teresa, tecelã do Cotonifício Crespi, na Mooca; com Odila, normalista aqui da Escola Normal; e com Ester, que distribui o boletim feminista no centro."],after:()=>qStart(K)};
+    if(n.id==='mu22_maria'&&q.step<3)return{only:true,pages:["Ainda faltam vozes. Siga a ordem: Teresa, Odila e Ester."]};
+    if(n.id==='mu22_teresa'&&q.step===0)return{only:true,pages:["O que eu quero? Escuta bem.","A Greve Geral de 1917 começou aqui, no Crespi. Muitas de nós, tecelãs, estávamos na frente.","A gente faz o mesmo trabalho que os homens e ganha menos. E tem contramestre que não respeita as moças.","Quero salário justo, oito horas de trabalho e as meninas pequenas fora das máquinas, na escola."],after:()=>qNext(K)};
+    if(n.id==='mu22_odila'&&q.step===1)return{only:true,pages:["O que eu quero? Estudar!","Ser professora é uma das poucas profissões que as famílias deixam a moça seguir. Por isso a Escola Normal está cheia de meninas.","Quero ensinar as crianças do Brás a ler. Educação muda a vida, principalmente a das meninas."],after:()=>qNext(K)};
+    if(n.id==='feminista'&&q.step===2)return{only:true,pages:["Pegue um boletim! O que nós queremos? O direito de votar!","Em 1922 as mulheres não votam. Quem faz as leis são só os homens, até as leis sobre a nossa vida.","Lá no Rio, Bertha Lutz acabou de fundar uma federação pelo progresso feminino. A luta está crescendo!"],after:()=>qNext(K)};
+    if(n.id==='mu22_maria'&&q.step===3)return{only:true,pages:["Viu? A tecelã quer salário e oito horas. A normalista quer estudar e trabalhar. A moça do boletim quer votar.","Eu acho que o voto sozinho é pouco. As mulheres precisam de educação, de trabalho digno e de liberdade para decidir a própria vida.","(O voto feminino só chegou ao Brasil em 1932, dez anos depois.)"],
+      after:()=>finishMission(K,'As vozes das mulheres','O que as mulheres de São Paulo reivindicavam em 1922?',
+        ['Coisas diferentes, conforme a vida de cada uma: salário e jornada menor nas fábricas, estudo e profissão, e o direito de votar','Nada: estavam satisfeitas com a vida que tinham','Só o voto, e todas pelas mesmas razões'],0,
+        'As mulheres não eram um grupo só. As operárias lutavam por salário e oito horas, como na greve de 1917; as moças buscavam estudo e profissão; as feministas pediam o voto, que só veio em 1932.',
+        'As vozes das mulheres: em 1922 operárias, normalistas e feministas lutavam por coisas diferentes; o voto feminino só veio em 1932.')};}
+    return h0(n);};
+}catch(e){console.warn('mulheres 1922',e);}})();
 
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /* ===== v203 — MENOS ESPAÇO PRETO EM TODOS OS FORMATOS E ABERTURA SEM 1554 NO FUNDO (pedido do professor, 21/11/2026) =====
