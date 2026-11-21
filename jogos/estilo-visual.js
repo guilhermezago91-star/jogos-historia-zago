@@ -19,7 +19,9 @@
    UM MODELO SÓ (decisão do professor, 21/11/2026): o jogo inteiro, de 1554 a
    1922, usa o mapa montado por quadradinhos, como 1830. Mapa pintado inteiro
    é proibido (um estudante mostrou que ficava poluído e não dava para ver onde
-   se anda). Única exceção: a Serra do Mar de 1554. Ver "modelo" logo abaixo.
+   se anda). Exceções: a Serra do Mar de 1554 e toda a época de 1640 (os bandeirantes), que
+   continua com mapa pintado inteiro (decisão do professor, 21/11/2026, à
+   tarde). Ver "modelo" logo abaixo.
 
    O conferidor no fim do arquivo só mede tamanho e preto puro. Passar
    nele NÃO quer dizer que o desenho está aprovado.
@@ -38,10 +40,11 @@ const ESTILO = {
 
   /* ---------- UM MODELO SÓ ---------- */
   modelo: {
-    epocas: [1554, 1640, 1830, 1888, 1922],
+    epocas: [1554, 1830, 1888, 1922],
     chao: "mapa montado por quadradinhos (tiles) de 32 px que se repetem; cada prédio, veículo, placa e objeto é um PNG separado",
-    proibido: "mapa pintado inteiro (um desenho único com chão e prédios dentro), em qualquer época",
-    excecao: "Serra do Mar de 1554 (SERRA54_MAPA), que fica como está",
+    proibido: "mapa pintado inteiro (um desenho único com chão e prédios dentro), em qualquer época, menos 1640",
+    excecao: ["Serra do Mar de 1554 (SERRA54_MAPA), que fica como está",
+              "toda a época de 1640 (A vila dos bandeirantes, que será a Parte 2 quando entrar no jogo): continua com mapa pintado inteiro (14 mapas na escala 1,5x, prédios do Canva com a porta na altura do boneco); não converter para quadradinhos sem o professor pedir; valem as mesmas lições de leitura"],
     leitura: [
       "leitura antes de beleza: caminho, parede, água e porta têm de se ver de relance",
       "o que não se atravessa tem de parecer que não se atravessa",
