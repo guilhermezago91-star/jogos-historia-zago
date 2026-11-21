@@ -19885,7 +19885,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v202) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v208) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -20726,6 +20726,24 @@ window.__paulista82Ready=Promise.all(ready);
       for(const n of npcs){if(n.scene!==S)continue;const in1=n.x>=128&&n.x<=141&&n.y>=47&&n.y<=63,in2=n.x>=130&&n.x<=137&&n.y>=0&&n.y<=8;if(!in1&&!in2)continue;if(!ocp(n.x,n.y)&&/[pDde.,fV]/.test(M[n.y][n.x]))continue;
         let ok=0;for(let r=1;r<9&&!ok;r++)for(let dy=-r;dy<=r&&!ok;dy++)for(let dx=-r;dx<=r&&!ok;dx++){const x=n.x+dx,y=n.y+dy;if(M[y]&&/[pd.]/.test(M[y][x]||'')&&!ocp(x,y)&&!npcs.some(q=>q!==n&&q.scene===S&&q.x===x&&q.y===y)){n.x=x;n.y=y;n.px=x*16;n.py=y*16;ok=1;}}}
       rel.mercadoVelho=1;}}catch(e){console.warn('Mercado Velho JM',e);}
+    /* ===== v208 — CENTRO DE 1922: LADEIRA PORTO GERAL — a escada curta vira ladeira de verdade: rua calçada estreita que desce em diagonal do alto da colina até a Rua 25 de Março, lojas em degraus de um lado, muro de arrimo e quintal com bananeiras do outro, conforme as fotografias de 1911 e 1916 (pedido do professor, 21/11/2026) ===== */
+    try{if(M[33]&&M[33][141]!==undefined){
+      const yt=x=>26+Math.floor((x-128)*5/13),L=rel.ladPG={x0:128,x1:141,yt:{}};for(let x=128;x<=141;x++)L.yt[x]=yt(x);
+      const ocp=(x,y,me)=>objects.some(o=>o!==me&&o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+      /* lojas do lado de cima descem em degraus, acompanhando a ladeira */
+      const desce=(re,d)=>{const o=objects.find(q=>q.scene===S&&q.enter&&re.test(q.id+' '+(q.name||'')));if(!o||o.__pg)return;for(let y=o.y;y<o.y+d;y++)for(let x=o.x;x<o.x+(o.w||1);x++)M[y][x]='.';o.y+=d;o.__pg=1;};
+      desce(/^br_loja56 /,2);desce(/Assad Abdalla|Elias Had/,3);
+      for(const o of objects)if(o.scene===S&&!o.enter&&/^jm_q_|^jm_fx_/.test(o.id)&&o.x>=130&&o.x+(o.w||1)-1<=141&&o.y>=26&&o.y<=33)o.scene='__fora';
+      if(rel.quintais)rel.quintais=rel.quintais.filter(q=>!(q[0]>=130&&q[0]<=141&&q[1]>=26&&q[1]<=33));
+      L.muro=[];L.quintal=[];
+      for(let x=128;x<=141;x++){const t=yt(x);for(let y=26;y<=33;y++){if(ocp(x,y)&&objects.some(o=>o.scene===S&&o.enter&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1)))continue;
+        if(y<t)M[y][x]='p';else if(y<=t+2)M[y][x]='D';else if(x<130)M[y][x]='C';else if(y===t+3){M[y][x]='p';L.muro.push([x,y]);}else{M[y][x]='p';L.quintal.push([x,y]);}}}
+      for(const q of L.muro.concat(L.quintal))if(!ocp(q[0],q[1]))objects.push({id:'jm_pg_'+q[0]+'_'+q[1],scene:S,x:q[0],y:q[1],w:1,h:1,name:L.muro.includes(q)?'Muro de arrimo':'Quintal com bananeiras',text:L.muro.includes(q)?['Um muro de pedra segura a ladeira do lado de baixo.']:['Um quintal antigo, com bananeiras, atrás do muro da ladeira. Aparece nas fotografias de 1911 e 1916.'],__jm:1,draw(){}});
+      if(typeof drawSign==='function'&&!objects.some(o=>o.id==='jm_pgPlaca')&&!ocp(130,26))objects.push({id:'jm_pgPlaca',scene:S,x:130,y:26,w:1,h:1,draw:drawSign,name:'Placa',text:['Ladeira Porto Geral. Desce forte do alto da colina até a Rua 25 de Março. Lá embaixo, antes de o rio ser levado para o canal, ficava o porto das canoas do Tamanduateí: daí o nome.','Nas fotografias de 1911 e 1916 a ladeira aparece calçada de pedra, com sobrados de comércio de um lado e, do outro, um muro de quintal com bananeiras. Em 1916 o bonde já passava lá embaixo.'],__jm:1});
+      try{if(!C.P.some(q=>q&&/PORTO GERAL/.test(q.t||'')))C.P.push({t:'LAD. PORTO GERAL',x:135*16,y:29*16+12,w:104});}catch(_){}
+      for(const n of npcs){if(n.scene!==S||n.x<128||n.x>141||n.y<22||n.y>33)continue;const livre=(x,y)=>M[y]&&/[pD.]/.test(M[y][x]||'')&&!ocp(x,y);if(livre(n.x,n.y))continue;
+        let ok=0;for(let r=1;r<9&&!ok;r++)for(let dy=-r;dy<=r&&!ok;dy++)for(let dx=-r;dx<=r&&!ok;dx++){const x=n.x+dx,y=n.y+dy;if(livre(x,y)&&M[y][x]!=='.'&&!npcs.some(q=>q!==n&&q.scene===S&&q.x===x&&q.y===y)){n.x=x;n.y=y;n.px=x*16;n.py=y*16;ok=1;}}}
+    }}catch(e){console.warn('Ladeira Porto Geral JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
@@ -20854,7 +20872,7 @@ window.__paulista82Ready=Promise.all(ready);
         const fl=(px,py)=>{const q=h4(px>>1,py>>1)%10;return q<3?'#e58a8a':q<5?'#f2efe2':q<7?'#e8d36a':q<8?'#d9582f':'#5f9a3a';};
         const Z=[{y0:14,y1:19,an:[[57,16.9,5.6,2.1]],ct:[[57,16.9,1.5,.8]]},{y0:24,y1:25,an:[],ct:[]},
           {y0:30,y1:41,sin:1,an:[[52.4,33.2,1.8,2.3],[61.2,38.6,1.8,2.3]],ct:[[61.3,32.4,1.25,.95],[52.4,38.9,1.25,.95]]},{y0:46,y1:63,so:1,an:[],ct:[]}];
-        for(const z of Z)for(let py=z.y0*16;py<(z.y1+1)*16;py++)for(let px=50*16;px<64*16;px++){const tx=px>>4,ty=py>>4,ch=MP[ty][tx];if(!/[.,fd]/.test(ch))continue;
+        for(const z of Z)for(let py=z.y0*16;py<(z.y1+1)*16;py++)for(let px=(z.so?44:50)*16;px<64*16;px++){const tx=px>>4,ty=py>>4,ch=MP[ty][tx];if(!/[.,fd]/.test(ch))continue;
           const x=px/16+1/32,y=py/16+1/32;let c=gr(px,py),m=9;
           if(z.so&&ch==='d'){const i=px&15,j=py&15,nd=(a,b)=>!MP[ty+b]||MP[ty+b][tx+a]!=='d';c=((i<1&&nd(-1,0))||(i>14&&nd(1,0))||(j<1&&nd(0,-1))||(j>14&&nd(0,1)))?'#b39f6c':sb(px,py);}
           for(const e of z.ct){const d=el(e,x,y);if(d<1)c=d>.82?'#4f7a36':fl(px,py);}
@@ -20873,6 +20891,21 @@ window.__paulista82Ready=Promise.all(ready);
           for(let j=0;j<16;j++)for(let i=0;i<16;i++){const q=h3(X+i,Y+j)%100,q2=h3((X+i)>>2,(Y+j)>>2)%10;g.fillStyle=q<6?'#9c8254':q<12?'#c9b07c':q2<2?'#8fa35a':'#b79b68';g.fillRect(X+i,Y+j,1,1);}
           if(h3(x*3,y*7)%4===0){g.fillStyle='#6b4a2a';g.fillRect(X+8,Y+4,1,9);g.fillStyle='#5f9a3a';g.fillRect(X+6,Y+3,5,3);g.fillStyle='#86bd52';g.fillRect(X+7,Y+2,2,2);}}
       }catch(e){console.warn('paredao e trecho sem jardim JM',e);}
+      try{const L=rel.ladPG;if(L){const h5=(a,b)=>{let n=(a*374761393+b*668265263)|0;n=(n^(n>>>13))*1274126177|0;return (n^(n>>>16))>>>0;};
+        const mix=(c,f)=>'rgb('+c.map(v=>Math.max(0,Math.min(255,Math.round(v*f)))).join(',')+')';
+        for(let x=L.x0;x<=L.x1;x++){const t=L.yt[x],f=1.10-.26*(x-L.x0)/(L.x1-L.x0);
+          for(let py=t*16;py<(t+3)*16;py++)for(let i=0;i<16;i++){const px=x*16+i,row=(py/5)|0,bi=(px+(row%2?4:0))%8,bj=py%5;
+            let c=[150,143,130];const q=h5(px>>1,row)%9;if(q===0)c=[166,158,143];else if(q===1)c=[134,128,117];
+            if(bj===0||bi===0)c=[108,102,93];if((px+py*2)%40<2)c=[96,91,83];
+            const top=py-t*16,bot=(t+3)*16-1-py,stepUp=L.yt[x-1]!==undefined&&L.yt[x-1]<t&&i<2,stepDn=L.yt[x+1]!==undefined&&L.yt[x+1]>t&&i>13;
+            if(top<2&&!(stepUp&&0))c=top<1?[214,207,190]:[176,169,154];if(bot<2)c=bot<1?[70,66,60]:[190,183,167];
+            g.fillStyle=mix(c,f);g.fillRect(px,py,1,1);}}
+        for(const q of L.muro){const X=q[0]*16,Y=q[1]*16;for(let j=0;j<16;j++)for(let i=0;i<16;i++){const bj=j%5,bi=(i+((j/5|0)%2?5:0))%10;let c=(bj===0||bi===0)?'#5f5a52':(h5(X+i>>1,Y+j>>1)%6===0?'#9a9488':'#857f73');if(j<2)c=j<1?'#cfc8b6':'#a8a192';if(j>12)c='#4f4b44';g.fillStyle=c;g.fillRect(X+i,Y+j,1,1);}}
+        for(const q of L.quintal){const X=q[0]*16,Y=q[1]*16;for(let j=0;j<16;j++)for(let i=0;i<16;i++){const k=h5(X+i,Y+j)%100,k2=h5(X+i>>2,Y+j>>2)%10;g.fillStyle=k<6?'#8a7448':k<12?'#b9a06c':k2<4?'#7f9a4e':'#a58c5c';g.fillRect(X+i,Y+j,1,1);}}
+        const ban=(X,Y)=>{g.fillStyle='rgba(30,40,20,.3)';g.fillRect(X+3,Y+13,10,2);g.fillStyle='#7a8a3a';g.fillRect(X+7,Y+2,2,12);g.fillStyle='#96a84a';g.fillRect(X+7,Y+2,1,12);
+          const fo=(a,b,w,h,c)=>{g.fillStyle=c;g.fillRect(X+a,Y+b,w,h);};fo(1,-2,6,3,'#3f8a36');fo(0,0,4,2,'#2f6f2a');fo(9,-3,6,3,'#4a9a3e');fo(12,-1,4,2,'#2f6f2a');fo(4,-6,3,6,'#55a848');fo(9,-7,3,6,'#3f8a36');fo(2,3,5,2,'#4a9a3e');fo(9,2,6,2,'#3f8a36');fo(5,-5,1,5,'#8fd070');fo(10,-6,1,5,'#8fd070');};
+        L.quintal.forEach((q,i)=>{if(h5(q[0]*7,q[1]*3)%2===0||i%5===0)ban(q[0]*16,q[1]*16);});}
+      }catch(e){console.warn('Ladeira Porto Geral pintura JM',e);}
     }catch(e){console.warn('calcada JM',e);}};}
   let n=0;const tenta=()=>{try{if(roda()||++n>20)return;}catch(e){console.warn('quadra de teste JM',e);return;}setTimeout(tenta,700);};
   setTimeout(tenta,3600);
