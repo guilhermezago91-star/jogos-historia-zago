@@ -20488,7 +20488,8 @@ $('btn1922').addEventListener('click',()=>{
 $('btnStart').addEventListener('click',()=>{
   try{localStorage.removeItem(SKEY);}catch(_){}
   ovStart.hidden=true;started=true;reveal(player.x,player.y);checkZone();
-  say('Piratininga, 1554',["25 de janeiro de 1554. Você abriu o livro de História... e caiu dentro dele! Agora você é um viajante do tempo.","Você está no alto de uma colina, entre dois rios, cercada de mata. Este lugar se chama Piratininga.","Para voltar: converse com pelo menos 11 pessoas, aqui e na vila de São Vicente, no litoral. Aí um portal vai se abrir. Algumas pessoas têm missões para você: elas mostram um ponto de exclamação amarelo.","A trilha para São Vicente começa no sul da colina, descendo o barranco. Pelo caminho há 12 objetos da época para colecionar. Ande por cima deles para pegar. O botão Mapa mostra por onde você já passou, e o botão Dicionário explica as palavras difíceis, como taipa, oca e curumim."],null,'player');
+  say('Piratininga, 1554',["25 de janeiro de 1554. Você abriu o livro de História... e caiu dentro dele! Agora você é um viajante do tempo.","Você está no alto de uma colina, entre dois rios, cercada de mata. Este lugar se chama Piratininga.",/* ===== v221 — OBJETIVO ÚNICO DO PORTAL: fala de abertura de 1554 (pedido do professor, 21/11/2026) ===== */
+`Para voltar, um portal precisa se abrir. Você precisa de duas coisas: conversar com ${(()=>{try{return needE();}catch(_){return 11;}})()} pessoas e encontrar ${(()=>{try{return needItemsE();}catch(_){return 8;}})()} objetos desta época. Tem gente e objetos aqui e na vila de São Vicente, no litoral.`,"Os objetos brilham no chão: ande por cima deles para pegar. Lá em cima, os contadores Conversas e Objetos mostram quanto falta.","Quem tem uma missão para você mostra um ponto de exclamação amarelo (!). A trilha para São Vicente começa no sul da colina, descendo o barranco.","O botão Mapa mostra por onde você já passou. No botão Diário tem um dicionário com as palavras difíceis, como taipa, oca e curumim."],null,'player');
 });
 
 /* ---------- LOOP ---------- */
@@ -23312,6 +23313,31 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   if(document.readyState==='complete')setTimeout(reg,1500);else window.addEventListener('load',()=>setTimeout(reg,1500));
   window.__guardado={aviso};
 }catch(e){console.warn('v216 guardar',e);}})();
+/* ===== v221 — OBJETIVO ÚNICO DO PORTAL: contadores, faixa e cenas engraçadas (pedido do professor, 21/11/2026) ===== */
+;(function(){try{
+  /* 1. Contadores de cima: mostram a meta do portal (antes "Itens 0/26" e a fala dizia 12) */
+  const uh=updHUD;
+  updHUD=function(){const r=uh.apply(this,arguments);try{
+    const t=talkedE(),ne=needE(),g=gotE(),need=needItemsE(),tot=itemsE().length;
+    $('cTalk').innerHTML=t>=ne?`Conversas <b>${t}/${ne} ✓</b>`:`Conversas <b>${t}/${ne}</b>`;
+    $('cItem').innerHTML=g>=need?`Objetos <b>${g}/${tot} ✓</b>`:`Objetos <b>${g}/${need}</b>`;
+    $('cItem').title=`Para o portal: ${need} objetos. No total, esta época tem ${tot}.`;
+  }catch(_){}return r;};
+  /* 2. Faixa do objetivo: a mesma meta, curta, sem ser cortada */
+  for(const e of [1,2,3,4])if(Q['portal'+e])Q['portal'+e].title='Para abrir o portal';
+  const qt=qText;
+  qText=function(k){if(/^portal[1-4]$/.test(k)&&Q[k].step===0){try{return `${talkedE()}/${needE()} conversas e ${gotE()}/${needItemsE()} objetos`;}catch(_){}}return qt(k);};
+  const st=document.createElement('style');
+  st.textContent='#quest{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;height:auto!important;line-height:1.25!important}';
+  document.head.appendChild(st);
+  /* 3. Cena engraçada não conta como conversa: avisar uma vez por época, para ninguém achar que é defeito */
+  const avisado={};const tt=talkTo;
+  talkTo=function(n){const r=tt.apply(this,arguments);try{
+    if(n&&n.piada&&!avisado[era]){avisado[era]=1;
+      const esp=()=>{if(dialog){setTimeout(esp,500);return;}toast('Essa foi só para rir: não conta como conversa.');};setTimeout(esp,500);}
+  }catch(_){}return r;};
+  setTimeout(()=>{try{updHUD();updQuest();}catch(_){}},800);
+}catch(e){console.warn('v221 objetivo único',e);}})();
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
