@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=860e5dd1","kb":8543,"m":1},{"f":"pac_e1234.js?v=ca07eb09","kb":2177,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=0bf8ea21","kb":233,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=e3acbc3c","kb":1485,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=596e77bd","kb":5057,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=860e5dd1","kb":8543,"m":1},{"f":"pac_e1234.js?v=ca07eb09","kb":2177,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=0bf8ea21","kb":233,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=e3acbc3c","kb":1485,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=d9cd7a53","kb":5065,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -19719,7 +19719,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v198) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v200) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -20490,6 +20490,29 @@ window.__paulista82Ready=Promise.all(ready);
       /* Mosteiro de São Bento: palmeiras nos dois vãos ao lado da igreja */
       pp('jm_enPalA','ANH_palmeira',90,18,PA[0],PA[1]);pp('jm_enPalB','ANH_palmeira',99,18,PA[0],PA[1]);
       rel.entorno=1;}}catch(e){console.warn('entorno Municipal Correios Mosteiro JM',e);}
+    /* ===== v200 — CENTRO DE 1922: PARQUE DOM PEDRO II — a antiga várzea do Carmo vira parque de verdade: gramado, caminhos curvos de saibro, ruas internas, lago com ilha e coreto, árvores ainda novas, conforme as fotografias da década de 1920 e a Folha da Noite de 27/07/1922 (pedido do professor, 21/11/2026) ===== */
+    try{if(M[21]&&M[21][145]!==undefined){
+      const PQ=rel.parqueDP={x0:130,x1:145,y0:0,y1:21,lago:[134,16.5,3.3,2.6],ilha:[134,16.3,1.5,1.15],
+        el:[[134,4.5,3.2,3.2],[142.4,4.5,2.5,3.4],[134,16.5,4.3,3.6],[142.5,16.5,2.5,3.6]],seg:[[137.2,4.5,138,4.5],[139.9,4.5,140.2,4.5]]};
+      const dentro=(e,x,y)=>{const a=(x-e[0])/e[2],b=(y-e[1])/e[3];return a*a+b*b;};
+      for(const o of objects)if(o.scene===S&&!o.enter&&o.x>=130&&o.x<=145&&o.y>=0&&o.y<=21&&/^jm_|^pt_/.test(o.id))o.scene='__fora';
+      for(let y=0;y<=21;y++)for(let x=130;x<=145;x++){if(!/[.,fdV]/.test(M[y][x]))continue;
+        const cx=x+.5,cy=y+.5;M[y][x]=(x===138||x===139||y===10||y===11)?'d':(dentro(PQ.lago,cx,cy)<1&&dentro(PQ.ilha,cx,cy)>1)?'W':'.';}
+      const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+      const pp=(id,k,x,y,nm,tx)=>{if(!A[k]||ocp(x,y)||M[y][x]==='W'||objects.some(o=>o.id===id))return;const im=new Image();im.src=A[k];
+        objects.push({id,scene:S,x,y,w:1,h:1,name:nm,text:tx,__jm:1,draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth,h=im.naturalHeight;c.fillStyle='rgba(20,16,24,.22)';c.fillRect(Math.round(X+8-w*.3),Y+13,Math.round(w*.6),3);c.drawImage(im,Math.round(X+8-w/2),Y+16-h);}});};
+      const AR=['Árvore nova do parque',['As árvores do parque ainda são novas: foram plantadas nas obras que acabaram neste ano.']],PA=['Palmeira',['Uma fileira de palmeiras acompanha a rua interna do parque.']],BA=['Banco do parque',['Um banco de frente para o lago.']],PO=['Poste de luz elétrica',['Luz elétrica nas ruas internas do parque.']],CA=['Canteiro de flores',['Um canteiro de flores no meio do gramado.']];
+      [[133,3],[135,6],[142,3],[143,6],[142,15],[143,18],[130,9],[145,12],[131,21],[144,1]].forEach((q,i)=>pp('jm_dpArv'+i,i%3===1?'ANH_arvore_florida':'ANH_arvore_verde',q[0],q[1],AR[0],AR[1]));
+      [1,5,14,18].forEach(y=>{pp('jm_dpPalA'+y,'ANH_palmeira',137,y,PA[0],PA[1]);pp('jm_dpPalB'+y,'ANH_palmeira',140,y,PA[0],PA[1]);});
+      pp('jm_dpCan1','ANH_canteiro_florido',134,4,CA[0],CA[1]);pp('jm_dpCan2','ANH_canteiro_florido',142,17,CA[0],CA[1]);
+      pp('jm_dpBan1','ANH_banco_A',132,21,BA[0],BA[1]);pp('jm_dpBan2','ANH_banco_A',136,21,BA[0],BA[1]);pp('jm_dpBan3','ANH_banco_A',131,13,BA[0],BA[1]);
+      pp('jm_dpPos1','ANH_poste_dois_globos_A',137,9,PO[0],PO[1]);pp('jm_dpPos2','ANH_poste_dois_globos_A',140,12,PO[0],PO[1]);
+      /* coreto na ilha do lago */
+      if(A.JM22_coreto&&!objects.some(o=>o.id==='jm_dpCoreto')){const im=new Image();im.src=A.JM22_coreto;objects.push({id:'jm_dpCoreto',scene:S,x:133,y:16,w:2,h:1,name:'Coreto da ilha',text:['O coreto fica numa ilha, no meio do lago do parque. Aos domingos, bandas tocam nos coretos da cidade.','[O lago, a ilha e o coreto aparecem em fotografias da década de 1920; a data exata em que ficaram prontos está por conferir.]'],__jm:1,
+        draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth/2,h=im.naturalHeight/2;c.drawImage(im,Math.round(X+16-w/2),Math.round(Y+16-h),w,h);}});}
+      if(typeof drawSign==='function'&&!ocp(137,12)&&!objects.some(o=>o.id==='jm_dpPlaca'))objects.push({id:'jm_dpPlaca',scene:S,x:137,y:12,w:1,h:1,draw:drawSign,name:'Placa',text:['Parque Dom Pedro II. Aqui era a várzea do Carmo, que o Tamanduateí alagava. O rio foi posto num canal reto e a várzea, aterrada, virou parque, entregue em 1922, no Centenário da Independência.','Folha da Noite, 27 de julho de 1922: o prefeito Firmiano Pinto determinou que nas ruas internas do parque só circulem veículos de condução pessoal com rodas de borracha, numa só direção. Carga, só pelas ruas de fora. É proibido estacionar.'],__jm:1});
+      try{if(!C.P.some(q=>q&&/D\. PEDRO/.test(q.t||'')))C.P.push({t:'PARQUE D. PEDRO II',x:142*16+8,y:10*16+12,w:110,largo:1});}catch(_){}
+    }}catch(e){console.warn('parque Dom Pedro JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
@@ -20591,6 +20614,25 @@ window.__paulista82Ready=Promise.all(ready);
           for(let j=0;j<16;j+=4){g.fillStyle='#b4aea2';g.fillRect(X,Y+j,16,2);g.fillStyle='#9a958a';g.fillRect(X,Y+j+2,16,1);g.fillStyle='#5e5a52';g.fillRect(X,Y+j+3,16,1);for(let i=(j%8?3:7);i<16;i+=8){g.fillStyle='#7d786e';g.fillRect(X+i,Y+j,1,3);}}
           if(MM[y][x-1]!=='S'){g.fillStyle='#55524a';g.fillRect(X,Y,2,16);g.fillStyle='#c9c3b6';g.fillRect(X+2,Y,1,16);}if(MM[y][x+1]!=='S'){g.fillStyle='#55524a';g.fillRect(X+14,Y,2,16);g.fillStyle='#c9c3b6';g.fillRect(X+13,Y,1,16);}}
       }catch(e){console.warn('barranco JM',e);}
+      /* Parque Dom Pedro II e demais gramados do lado leste: gramado com textura, caminhos curvos de saibro, lago */
+      try{const PQ=rel.parqueDP,MP=window.__centro22.M,h2=(a,b)=>{let n=(a*374761393+b*668265263)|0;n=(n^(n>>>13))*1274126177|0;return (n^(n>>>16))>>>0;};
+        const grama=(px,py)=>{const q=h2(px,py)%100,q2=h2(px>>2,py>>1)%100;return q<5?'#86ab58':q<10?'#5c8440':q2<18?'#6a9347':'#74a04e';};
+        for(let y=0;y<MP.length;y++)for(let x=130;x<=145;x++){const ch=MP[y][x];if(ch!=='.'&&ch!==','&&ch!=='f')continue;const X=x*16,Y=y*16;
+          for(let j=0;j<16;j++)for(let i=0;i<16;i++){g.fillStyle=grama(X+i,Y+j);g.fillRect(X+i,Y+j,1,1);}
+          if(ch==='f'&&!(PQ&&y<=PQ.y1)){for(let k=0;k<5;k++){const q=h2(x*7+k,y*13+k);g.fillStyle=['#e8d36a','#e58a8a','#f2efe2'][q%3];g.fillRect(X+2+q%12,Y+2+(q>>4)%12,2,2);}}}
+        if(PQ){const d2=(e,x,y)=>{const a=(x-e[0])/e[2],b=(y-e[1])/e[3];return Math.sqrt(a*a+b*b);};
+          const seg=(s,x,y)=>{const vx=s[2]-s[0],vy=s[3]-s[1],t=Math.max(0,Math.min(1,((x-s[0])*vx+(y-s[1])*vy)/(vx*vx+vy*vy||1)));return Math.hypot(x-s[0]-t*vx,y-s[1]-t*vy);};
+          const saibro=(px,py)=>{const q=h2(px,py)%100;return q<8?'#c9b27a':q<16?'#e6d6a4':'#d9c690';};
+          for(let py=PQ.y0*16;py<(PQ.y1+1)*16;py++)for(let px=PQ.x0*16;px<(PQ.x1+1)*16;px++){const x=px/16+1/32,y=py/16+1/32,tx=px>>4,ty=py>>4,ch=MP[ty][tx];if(!/[.,fdW]/.test(ch))continue;
+            const dl=d2(PQ.lago,x,y),di=d2(PQ.ilha,x,y);let c=null;
+            if(dl<1&&di>1){c=(h2(px>>1,py)%23===0)?'#8fb7cf':(h2(px>>2,py>>1)%9===0?'#5a8aa8':'#6a9bb8');if(dl>.9||di<1.12)c='#4f7f9c';}
+            else if(dl<1.09&&di>1){c='#5b6f3c';}
+            else if(di<=1){c=di>.86?'#5b7f3d':grama(px,py);}
+            else if(ch==='d'){const b=(tx===138||tx===139)?Math.min(x-138,140-x):Math.min(y-10,12-y);c=b<.09?'#b39f6c':saibro(px,py);}
+            else{let m=9;for(const e of PQ.el){const d=Math.abs(d2(e,x,y)-1)*Math.min(e[2],e[3]);if(d<m)m=d;}for(const s of PQ.seg){const d=seg(s,x,y);if(d<m)m=d;}
+              if(m<.26)c=m>.2?'#b39f6c':saibro(px,py);else if(ch==='W')c=grama(px,py);}
+            if(c){g.fillStyle=c;g.fillRect(px,py,1,1);}}}
+      }catch(e){console.warn('parque Dom Pedro pintura JM',e);}
     }catch(e){console.warn('calcada JM',e);}};}
   let n=0;const tenta=()=>{try{if(roda()||++n>20)return;}catch(e){console.warn('quadra de teste JM',e);return;}setTimeout(tenta,700);};
   setTimeout(tenta,3600);
