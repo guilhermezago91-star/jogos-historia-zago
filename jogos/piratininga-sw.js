@@ -1,4 +1,4 @@
-/* Piratininga — guarda o jogo no aparelho (v216, 21/11/2026, pedido do professor)
+/* Piratininga — guarda o jogo no aparelho (v216, 21/11/2026, pedido do professor; v224: confere versão nova no máximo a cada 5 min)
    Da segunda vez em diante o jogo abre do que ficou guardado, sem esperar a internet,
    e funciona até sem internet. Quando há versão nova no GitHub, ela é baixada por trás
    e só passa a valer quando está inteira (página + todos os desenhos), na vez seguinte.
@@ -25,7 +25,8 @@ self.addEventListener('fetch', e => {
 async function pagina(e) {
   const c = await caches.open(CACHE);
   const velha = await c.match(HTML);
-  e.waitUntil(atualiza(!velha).catch(() => {}));
+  /* v224: confere versão nova no máximo a cada 5 minutos (não a cada troca de época, que recarrega a página) */
+  if (!velha || await faz5min(c)) e.waitUntil(atualiza(!velha).catch(() => {}));
   if (velha) return velha;
   return fetch(e.request); /* primeira vez: da internet; a página só é guardada quando todos os desenhos estiverem guardados */
 }
@@ -40,6 +41,8 @@ async function guardado(r, imutavel) {
   return n;
 }
 
+const META = new URL('piratininga-sw-meta', self.registration.scope).href;
+async function faz5min(c) { try { const m = await c.match(META); if (!m) return true; const t = +(await m.text()); return !(t > 0) || Date.now() - t > 5 * 60 * 1000; } catch (_) { return true; } }
 const html = t => new Response(t, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
 /* a lista de pacotes fica escrita na página pela ferramenta abertura_rapida.py: {"f":"pac_e1.js?v=5c00e677",...} */
 const pacotes = t => [...new Set([...t.matchAll(/"f":"(pac_[a-z0-9_]+\.js\?v=[0-9a-f]+)"/g)].map(m => m[1]))].map(p => new URL('arte/' + p, HTML).href);
@@ -50,6 +53,7 @@ async function atualiza1(primeira) {
   const c = await caches.open(CACHE);
   const r = await fetch(HTML, { cache: 'no-cache' });
   if (!r.ok) return;
+  await c.put(META, new Response(String(Date.now())));
   const t = await r.text();
   const velha = await c.match(HTML);
   const tv = velha ? await velha.text() : null;

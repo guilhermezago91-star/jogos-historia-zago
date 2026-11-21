@@ -6844,7 +6844,10 @@ function findFreeRect(sc,cx,cy,w,h,R){for(let r=0;r<=(R||20);r++)for(let y=cy-r;
       Object.defineProperty(n,k,{get(){return val;},set(v){if(v!==val){val=v;V.v++;}},enumerable:true,configurable:true});}
     Object.defineProperty(n,MARCA,{value:true});return true;};
   const I={refs:[],m:null,v:-1,ok:false};
-  const valido=()=>{if(I.v!==V.v||I.refs.length!==npcs.length)return false;for(let i=0;i<npcs.length;i++)if(npcs[i]!==I.refs[i])return false;return true;};
+  /* v224: a lista de pessoas avisa quando muda (push, splice, pop...), então não precisa conferir pessoa por pessoa a cada pergunta */
+  let vigiaLista=false;try{for(const m of ['push','pop','shift','unshift','splice','sort','reverse','fill','copyWithin']){const f=Array.prototype[m];
+    Object.defineProperty(npcs,m,{value:function(){V.v++;return f.apply(this,arguments);},configurable:true,writable:true,enumerable:false});}vigiaLista=true;}catch(_){}
+  const valido=()=>{if(I.v!==V.v||I.refs.length!==npcs.length)return false;if(vigiaLista)return true;for(let i=0;i<npcs.length;i++)if(npcs[i]!==I.refs[i])return false;return true;};
   const monta=()=>{I.ok=true;const m=new Map();
     for(const n of npcs){if(!vigia(n)){I.ok=false;break;}const sc=n.scene||'pira';let g=m.get(sc);if(!g){g=new Map();m.set(sc,g);}
       const yy=g.get(n.y);if(yy)yy.add(n.x);else g.set(n.y,new Set([n.x]));}
@@ -23309,11 +23312,13 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
       a.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:9900;max-width:min(92vw,420px);background:#20301e;color:#e8f6d8;border:2px solid #7fbf6a;border-radius:8px;padding:8px 12px;font:600 14px/1.35 system-ui,sans-serif;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.4);cursor:pointer';
       a.onclick=()=>a.remove();document.body.appendChild(a);}
     a.textContent=txt;clearTimeout(a.__t);a.__t=setTimeout(()=>{try{a.remove();}catch(_){}},ms||7000);}catch(_){}};
+  /* v224: o aviso "jogo guardado" também aparece ao abrir de novo, se a primeira mensagem se perdeu (a página recarrega ao trocar de época) */
+  const guardadoOk=()=>{let ja=false;try{ja=localStorage.getItem('pira_guardado_aviso')==='1';}catch(_){}
+    if(!ja){aviso('✓ Jogo guardado neste aparelho. Da próxima vez ele abre rápido, até sem internet.',8000);setTimeout(()=>{try{localStorage.setItem('pira_guardado_aviso','1');}catch(_){}},4000);}};
+  setTimeout(()=>{try{if(!navigator.serviceWorker.controller||!window.caches)return;caches.open('piratininga-1').then(c=>c.match(new URL('piratininga.html',location.href).href)).then(r=>{if(r)guardadoOk();}).catch(()=>{});}catch(_){}},3000);
   navigator.serviceWorker.addEventListener('message',ev=>{const d=ev.data||{};if(d.pira!=='guardado')return;
     if(d.nova)aviso('Há uma versão nova do jogo. Ela já foi baixada e aparece na próxima vez que você abrir.',9000);
-    else{let ja=false;try{ja=localStorage.getItem('pira_guardado_aviso')==='1';}catch(_){}
-      /* o aviso aparece uma vez só por aparelho; só conta como visto depois de 4 s na tela (a página pode recarregar ao trocar de época bem na hora) */
-      if(!ja){aviso('✓ Jogo guardado neste aparelho. Da próxima vez ele abre rápido, até sem internet.',8000);setTimeout(()=>{try{localStorage.setItem('pira_guardado_aviso','1');}catch(_){}},4000);}}});
+    else guardadoOk();});
   try{navigator.serviceWorker.startMessages();}catch(_){}
   const reg=()=>navigator.serviceWorker.register('piratininga-sw.js').catch(e=>console.warn('guardar no aparelho',e));
   if(document.readyState==='complete')setTimeout(reg,1500);else window.addEventListener('load',()=>setTimeout(reg,1500));
@@ -23349,6 +23354,10 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
    do centro novo) era chamado também antes de as missões existirem e deixava o aviso "liga missoes" no console.
    Agora, nessas vezes, ele só espera: a linha dele ganhou uma conferência marcada "v223". As chamadas de depois
    (1,5 s e 5 s) continuam fazendo o trabalho, como antes. Nenhum outro comportamento mudou. */
+/* ===== v224 — ABERTURA MAIS RÁPIDA EM 1922: LISTA DE PESSOAS QUE AVISA QUANDO MUDA =====
+   Pedido do professor (21/11/2026). Melhora o bloco v213 ("ESTE LUGAR ESTÁ LIVRE?"): em vez de conferir as
+   quase 1.000 pessoas a cada pergunta para saber se a lista mudou, a própria lista avisa quando alguém entra
+   ou sai. A mudança está no bloco v213, nas linhas marcadas "v224". Mesma resposta de antes. */
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
