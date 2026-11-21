@@ -373,7 +373,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=fc8eb325","kb":282,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=4e4411ca","kb":1528,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=0275149a","kb":6777,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=fc8eb325","kb":282,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=f4ea5e07","kb":1592,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=0275149a","kb":6777,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -19718,6 +19718,117 @@ setTimeout(function(){
     'E guardo peixes vivos numa canoa que virou viveiro!'],
     'O General Couto de Magalhães, sertanista e autor de "O Selvagem", morava numa chácara na Ponte Grande, à beira do Tietê.');
 }catch(e){console.warn('v109 nobres',e);}})();
+/* ===== v227 — PROCURE NA FOTO: RUA DE SÃO PAULO POR VOLTA DE 1890 (pedido do professor, 21/11/2026) ===== */
+/* Joguinho de "procure na foto" com uma fotografia de verdade enviada pelo professor: a fachada da Casa do
+   Brigadeiro Tobias, por volta de 1890 (FOTO_TOBIAS88 no arte_1888.js). Um fotógrafo ambulante, ao lado do
+   Barão de Piracicaba (Rua Alegre, hoje Brigadeiro Tobias), mostra a foto. O aluno toca em seis coisas da cidade
+   do café: lampião, trilhos do bonde de burro, postes com fios, veículo de tração animal, grade de ferro e rua
+   calçada de pedra. Cada acerto marca o lugar na foto e explica. No fim, a pergunta da missão.
+   Fontes: descrição do acervo enviada pelo professor; iluminação a gás em SP desde 1872; bondes de tração animal
+   da Companhia Carris de Ferro desde 1872; bonde elétrico da Light em 1900. */
+(function(){try{
+  if(typeof SKEY==='undefined'||SKEY!=='piratininga1554_v2'||!SCN.sp88)return;
+  const CREDITO='Casa do Brigadeiro Tobias, São Paulo, por volta de 1890. Fotografia em papel, 16,5 × 22,5 cm.';
+  const barao=npcs.find(n=>n.id==='piracicaba88');
+  const p=barao?findFree('sp88',barao.x+2,barao.y,5):findFree('sp88',33,14,8);
+  if(!p)return;
+  addNPCs([{id:'fotoRua88',spr:'caixeiro',x:p[0],y:p[1],dir:'down',name:'Fotógrafo ambulante',
+    lines:["Fotografia é coisa nova e cara. Quem tem dinheiro do café quer ver a própria casa no papel!","[Personagem inventado para o jogo. A foto é de verdade.]"],
+    diary:"Fotografias antigas são fontes: mostram como eram as ruas, as casas e os transportes."}],'sp88');
+  Object.assign(Q,{fotoRua88:{era:3,title:'Procure na foto',where:'Fale com o fotógrafo ambulante, ao lado do Barão de Piracicaba (Rua Alegre).',steps:['Ache as 6 coisas na fotografia'],step:null,count:0,done:false}});
+  QE3.push('fotoRua88');Object.assign(GIVER,{fotoRua88:['fotoRua88']});
+
+  /* as seis coisas, em coordenadas da foto (476 × 364) */
+  const dSeg=(x,y,a,b,c2,d)=>{const vx=c2-a,vy=d-b,t=Math.max(0,Math.min(1,((x-a)*vx+(y-b)*vy)/(vx*vx+vy*vy)));return Math.hypot(x-(a+t*vx),y-(b+t*vy));};
+  const dentro=(x,y,P)=>{let s=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const [xi,yi]=P[i],[xj,yj]=P[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)s=!s;}return s;};
+  const caixa=(x,y,b)=>x>=b[0]&&x<=b[2]&&y>=b[1]&&y<=b[3];
+  const RUA=[[12,268],[300,214],[412,210],[412,356],[12,356]];
+  const COISAS=[
+    {k:'lampiao',n:'Lampião',m:[419,110,22],
+     ok:(x,y)=>caixa(x,y,[398,80,440,292]),
+     t:'Lampião! Desde 1872, São Paulo tem iluminação a gás nas ruas principais. No fim da tarde, o acendedor passa acendendo um por um.'},
+    {k:'trilhos',n:'Trilhos do bonde',m:[215,290,40],
+     ok:(x,y)=>dSeg(x,y,30,350,400,226)<13||dSeg(x,y,200,356,415,240)<13,
+     t:'Trilhos de bonde! Desde 1872, bondes puxados por burros andam sobre trilhos de ferro. O bonde elétrico só chega em 1900.'},
+    {k:'postes',n:'Postes com fios',m:[352,165,26],
+     ok:(x,y)=>caixa(x,y,[338,120,372,212])||(y<62&&x>220&&x<472),
+     t:'Postes com fios! Telégrafo, telefone e, pouco depois, luz elétrica: nos anos 1880 e 1890 a cidade começa a ser cruzada por fios.'},
+    {k:'carroca',n:'Veículo puxado por animal',m:[306,205,20],
+     ok:(x,y)=>caixa(x,y,[284,186,332,224])||caixa(x,y,[386,188,414,206]),
+     t:'Um veículo puxado por animal! Carroças, carros e tílburis ainda levam gente e mercadoria pelas ruas.'},
+    {k:'grade',n:'Grade de ferro',m:[130,176,40],
+     ok:(x,y)=>caixa(x,y,[14,148,258,202]),
+     t:'Grade de ferro! Com o dinheiro do café, os casarões ganham grades e portões de ferro, muitas vezes trazidos da Europa pela ferrovia.'},
+    {k:'pedra',n:'Rua calçada de pedra',m:[110,320,30],
+     ok:(x,y)=>dentro(x,y,RUA),
+     t:'Rua calçada com pedras! Na São Paulo de 1830, quase todas as ruas eram de terra, com poeira no sol e lama na chuva.'}];
+
+  /* ---- a tela ---- */
+  const FONT="system-ui,-apple-system,Roboto,Arial,sans-serif";
+  const css=document.createElement('style');
+  css.textContent=
+   '#ovFoto{position:absolute;inset:0;z-index:40;background:#0c0a14;display:flex;flex-direction:column;align-items:center;justify-content:safe center;gap:8px;padding:8px 10px;overflow:auto}'+
+   '#ovFoto h2{color:#f1c471;font:700 clamp(16px,4.4vw,20px)/1.2 '+FONT+';margin:0;flex:none;text-align:center}'+
+   '#ovFoto canvas{flex:none;display:block;width:auto;height:auto;max-width:min(100%,720px);max-height:52vh;border:2px solid #c9a24a;border-radius:6px;background:#000;cursor:crosshair;touch-action:manipulation}'+
+   '#ovFoto .cr{width:100%;max-width:720px;margin:0;font:italic 12px/1.3 '+FONT+';color:#bdb4cc;flex:none}'+
+   '#ovFoto .lst{width:100%;max-width:720px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;flex:none;margin:0;padding:0;list-style:none}'+
+   '#ovFoto .lst li{font:600 14px/1.2 '+FONT+';padding:5px 9px;border-radius:14px;background:#26344e;color:#f6f0f4;border:2px solid #4a5a7a}'+
+   '#ovFoto .lst li.ok{background:#2f5a34;border-color:#7ac47a;text-decoration:line-through}'+
+   '#ovFoto .msg{width:100%;max-width:720px;background:#141a2c;border:2px solid #c9a24a;border-radius:8px;padding:8px 10px;flex:none;margin:0;font:400 clamp(15px,4.2vw,18px)/1.45 '+FONT+';color:#f6f0f4;min-height:3em}'+
+   '#ovFoto .row{flex:none;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}'+
+   '#ovFoto .btn{font:600 17px/1.2 '+FONT+';padding:8px 14px}'+
+   '@media (orientation:portrait) and (max-width:700px){#ovFoto{position:fixed;z-index:1000;justify-content:flex-start;padding-top:14px}#ovFoto canvas{max-height:none;width:100%}}'+
+   '@media (orientation:landscape) and (max-height:520px){#ovFoto .lst li{font-size:12px;padding:3px 7px}#ovFoto h2{font-size:15px}#ovFoto .cr{font-size:11px}#ovFoto .btn{font-size:15px;padding:6px 12px}#ovFoto{position:fixed;z-index:1000;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-auto-rows:min-content;align-content:center;column-gap:12px;row-gap:6px}#ovFoto>*{grid-column:2}#ovFoto canvas{grid-column:1;grid-row:1 / span 5;align-self:center;justify-self:center;max-height:88vh}#ovFoto .msg{font-size:15px}}';
+  document.head.appendChild(css);
+  const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+  const ov=el('div');ov.id='ovFoto';ov.hidden=true;
+  const tit=el('h2',null,'Procure na foto: São Paulo, por volta de 1890');
+  const cv=el('canvas');cv.width=952;cv.height=728;cv.setAttribute('role','img');cv.setAttribute('aria-label','Fotografia antiga: rua de paralelepípedo com trilhos de bonde, um casarão atrás de uma grade de ferro, árvores, postes com fios, um lampião em primeiro plano e um veículo puxado por animal ao fundo.');
+  const cr=el('p','cr',CREDITO);
+  const lst=el('ul','lst');const LI={};for(const o of COISAS){LI[o.k]=el('li',null,o.n);lst.append(LI[o.k]);}
+  const msg=el('p','msg');
+  const row=el('div','row');const bD=el('button','btn alt','Dica'),bF=el('button','btn','Fechar');[bD,bF].forEach(b=>b.type='button');row.append(bD,bF);
+  ov.append(tit,cv,cr,lst,msg,row);
+  (typeof ovQuiz!=='undefined'&&ovQuiz.parentElement?ovQuiz.parentElement:document.body).appendChild(ov);
+  const _ip=isPaused;isPaused=function(){return _ip()||!ov.hidden;};
+  const c=cv.getContext('2d');let foto=null;
+  const pega=()=>{if(!foto&&A.FOTO_TOBIAS88){foto=new Image();foto.src=A.FOTO_TOBIAS88;}return foto;};
+  const S=cv.width/476;
+  let achou=new Set(),erro=null,dica=null,run=false,onEnd=null,t0=0;
+  function frame(now){if(!run)return;const t=(now-t0)/1000;
+    try{c.setTransform(1,0,0,1,0,0);c.fillStyle='#0c0a14';c.fillRect(0,0,cv.width,cv.height);
+      const im=pega();if(im&&im.complete&&im.naturalWidth){c.imageSmoothingEnabled=true;c.drawImage(im,0,0,cv.width,cv.height);}
+      c.setTransform(S,0,0,S,0,0);
+      for(const o of COISAS)if(achou.has(o.k)){const [x,y,r]=o.m;c.lineWidth=3;c.strokeStyle='rgba(20,27,27,.7)';c.beginPath();c.arc(x+1,y+1,r,0,7);c.stroke();c.strokeStyle='#7ae07a';c.beginPath();c.arc(x,y,r,0,7);c.stroke();}
+      if(erro&&now-erro.t<700){const a=1-(now-erro.t)/700;c.strokeStyle='rgba(230,90,70,'+a.toFixed(2)+')';c.lineWidth=3;c.beginPath();c.moveTo(erro.x-7,erro.y-7);c.lineTo(erro.x+7,erro.y+7);c.moveTo(erro.x+7,erro.y-7);c.lineTo(erro.x-7,erro.y+7);c.stroke();}
+      if(dica&&now-dica.t<2600){const o=dica.o,[x,y,r]=o.m,a=.5+.5*Math.sin(t*8);c.strokeStyle='rgba(241,196,113,'+a.toFixed(2)+')';c.lineWidth=2;c.setLineDash([5,4]);c.beginPath();c.arc(x,y,r*1.9,0,7);c.stroke();c.setLineDash([]);}
+      c.setTransform(1,0,0,1,0,0);}catch(_){}
+    requestAnimationFrame(frame);}
+  const conta=()=>{const q=Q.fotoRua88;if(q&&q.step===0){q.count=achou.size;try{updQuest();}catch(_){}}};
+  cv.addEventListener('pointerdown',ev=>{ev.preventDefault();const r=cv.getBoundingClientRect();const x=(ev.clientX-r.left)/r.width*476,y=(ev.clientY-r.top)/r.height*364;
+    const o=COISAS.find(o=>!achou.has(o.k)&&o.ok(x,y));
+    if(o){achou.add(o.k);LI[o.k].classList.add('ok');dica=null;
+      msg.textContent=o.t+(achou.size<COISAS.length?'  ('+achou.size+' de '+COISAS.length+')':'');conta();
+      if(achou.size===COISAS.length){msg.textContent=o.t+'  Você achou as '+COISAS.length+'! Toque em "Terminar".';bF.textContent='Terminar ✓';bD.hidden=true;}}
+    else{erro={x,y,t:performance.now()};const ja=COISAS.find(o=>achou.has(o.k)&&o.ok(x,y));msg.textContent=ja?'Essa você já achou: '+ja.n.toLowerCase()+'. Procure outra coisa da lista.':'Aí não tem nada da lista. Olhe com calma: a lista está embaixo da foto.';}});
+  bD.onclick=()=>{const o=COISAS.find(o=>!achou.has(o.k));if(!o)return;dica={o,t:performance.now()};msg.textContent='Dica: procure '+o.n.toLowerCase()+' perto do círculo amarelo.';};
+  function abrir(fim){onEnd=fim;achou=new Set();for(const k in LI)LI[k].classList.remove('ok');bD.hidden=false;bF.textContent='Fechar';
+    msg.textContent='Esta é uma fotografia de verdade. Toque na foto onde você vê cada coisa da lista.';
+    pega();ov.hidden=false;run=true;t0=performance.now();requestAnimationFrame(frame);}
+  bF.onclick=()=>{run=false;ov.hidden=true;const tudo=achou.size===COISAS.length,f=onEnd;onEnd=null;if(f)f(tudo);};
+  window.__fotoRua88={abrir,COISAS,achados:()=>[...achou]};
+
+  {const h0=questHookX;questHookX=function(n){
+    if(n.id==='fotoRua88'){const q=Q.fotoRua88;if(!q)return h0(n);
+      const fim=tudo=>{if(!tudo){say('Fotógrafo ambulante',['Quando quiser, volte e olhe a foto de novo. Faltou achar alguma coisa!'],null);return;}
+        finishMission('fotoRua88','Procure na foto',"Nesta foto de por volta de 1890, o que mostra que São Paulo estava mudando com o dinheiro do café?",
+          ["Trilhos de bonde, lampião e postes com fios na rua calçada","Ruas de terra e lamparinas de azeite nas esquinas","Bondes elétricos da Light e automóveis na rua"],0,
+          "A foto mostra novidades da cidade do café: bonde de burro sobre trilhos, iluminação a gás, fios de telégrafo e telefone e rua calçada de pedra. Ruas de terra e azeite eram de 1830; bonde elétrico e automóvel só depois de 1900.",
+          "Procure na foto (c. 1890): trilhos do bonde de burro, lampião a gás, postes com fios, grade de ferro e rua calçada mostram a cidade crescendo com o café.");};
+      if(q.done)return{pages:["Gostou? Fotografia é uma fonte: guarda um instante da cidade que não volta mais. Quer ver de novo?"],after:()=>abrir(()=>{})};
+      return{pages:["Psiu! Quer ver uma fotografia? Esta rua aqui, num papel!","Na foto tem seis coisas da cidade nova do café. Veja se você acha todas."],after:()=>{if(q.step===null)qStart('fotoRua88');abrir(fim);}};}
+    return h0(n);};}
+}catch(e){console.warn('procure na foto 1888',e);}})();
 
 
 /* =========================================================
