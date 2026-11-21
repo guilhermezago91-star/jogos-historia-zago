@@ -27,3 +27,7 @@ git add -A jogos
 
 Um desenho novo de 1922 usado numa cena de 1830, por exemplo, precisa estar nos dois pacotes.
 Abra `uso_arte.json`, ache a imagem e acrescente a época (`"e2"`). Rode a ferramenta de novo.
+
+## Imagens em WebP sem perda (v209)
+
+`python3 jogos/ferramentas/png_para_webp.py` troca as imagens PNG embutidas por WebP sem perda (desenho pixel por pixel igual, arquivo menor). Confere cada imagem; se mudaria um pixel ou ficaria maior, deixa como estava. Depois rode `abertura_rapida.py`.
