@@ -19719,7 +19719,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v192) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v198) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -20467,6 +20467,29 @@ window.__paulista82Ready=Promise.all(ready);
       if(typeof drawSign==='function'&&!ocp(36,20))objects.push({id:'jm_siPlaca',scene:S,x:36,y:20,w:1,h:1,draw:drawSign,name:'Placa',text:['Largo de Santa Ifigênia. A igreja nova, de pedra cinza, foi desenhada pelo arquiteto austríaco Johann Lorenz Madein e levantada no lugar da capela antiga. Tem uma torre central alta e duas torrinhas.','A obra começou em 1904 e a igreja abriu ainda inacabada em 1910. A data do fim da obra muda conforme a fonte: 1913 ou 1922.','O viaduto de ferro, aqui ao lado, liga o largo ao Largo de São Bento desde 1913.','[A travessa atrás da igreja e a passagem até os Correios foram postas para o jogo.]'],__jm:1});
       try{if(!C.P.some(q=>q&&/IFIG/.test(q.t||'')))C.P.push({t:'LARGO DE STA. IFIGÊNIA',x:40*16+8,y:18*16+10,w:124,largo:1});}catch(_){}
       rel.largoSI=1;}}catch(e){console.warn('largo Santa Ifigenia JM',e);}
+    /* ===== v198 — CENTRO DE 1922: ENTORNO DO THEATRO MUNICIPAL, DOS CORREIOS E DO MOSTEIRO — casas e sobrados no lugar do quintal com horta, larguinho calçado ao lado do teatro, calçada na frente dos Correios e palmeiras ao lado da igreja de São Bento (pedido do professor, 20/11/2026) ===== */
+    try{if(M[38]&&M[38][46]!==undefined){
+      const R=[[21,30,25,37],[28,30,28,37],[40,30,45,37],[0,18,16,20],[0,10,13,13]];
+      const den=(x,y)=>R.some(r=>x>=r[0]&&x<=r[2]&&y>=r[1]&&y<=r[3]);
+      for(const q of objects.slice()){if(q.scene!==S||q.enter&&!/^pc_124_/.test(q.id)||!/^jm_q_|^jm_fx_|^jm_tapa_|^pt_|^pc_124_/.test(q.id))continue;const w=q.w||1,h=q.h||1;if(h!==1){if(den(q.x,q.y)&&den(q.x+w-1,q.y+h-1))q.scene='__fora';continue;}
+        let a=q.x,b=q.x+w-1;while(b>=a&&den(b,q.y))b--;while(a<=b&&den(a,q.y))a++;if(b<a)q.scene='__fora';else{q.x=a;q.w=b-a+1;}}
+      if(rel.quintais)rel.quintais=rel.quintais.filter(q=>!den(q[0],q[1]));
+      for(const r of R)for(let y=r[1];y<=r[3];y++)for(let x=r[0];x<=r[2];x++)if(M[y]&&M[y][x]!==undefined)M[y][x]='p';
+      const casa=(k,x,larg,base,sob)=>{if(!MAN[k]||!A['PC_'+k])return;const o={id:'jm_fx_en_'+x+'_'+base,scene:S,x,y:base-4,w:1,h:1,name:sob?'Sobrado':'Casa',text:sob?['Um sobrado: comércio embaixo, moradia ou escritório em cima.']:['Uma casa de moradia, parede com parede com as vizinhas.']};objects.push(o);
+        grande(o,k,x,base-4,larg,null,null,[(x+base)%3?'t':'p',TELHA[(x+base)%4]],base);o.__gen=1;};
+      const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+      const pp=(id,k,x,y,nm,tx)=>{if(!A[k]||ocp(x,y)||objects.some(o=>o.id===id))return;const im=new Image();im.src=A[k];
+        objects.push({id,scene:S,x,y,w:1,h:1,name:nm,text:tx,__jm:1,draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth,h=im.naturalHeight;c.fillStyle='rgba(20,16,24,.22)';c.fillRect(Math.round(X+8-w*.3),Y+13,Math.round(w*.6),3);c.drawImage(im,Math.round(X+8-w/2),Y+16-h);}});};
+      const AR=['Árvore da calçada',['Uma árvore plantada pela Prefeitura.']],PA=['Palmeira',['Uma palmeira ao lado da igreja.']],BA=['Banco de praça',['Um banco de madeira e ferro.']];
+      /* Theatro Municipal: quadra da esquerda, calçada entre as duas ruas e larguinho da direita */
+      casa('g_residencia_2x2_2',21,4,34,0);casa('g_residencia_2x2_1',21,4,38,0);
+      casa('g_sobrado_3x2_2',40,6,34,1);
+      pp('jm_enArvD','ANH_arvore_florida',42,36,AR[0],AR[1]);pp('jm_enBan','ANH_banco_A',43,36,BA[0],BA[1]);pp('jm_enArvE','ANH_arvore_florida',45,36,AR[0],AR[1]);
+      /* Correios: casas de frente para a rua que termina no palácio */
+      casa('g_residencia_2x2_1',2,4,14,0);casa('g_colonial_2x1_1',6,4,14,0);casa('g_residencia_2x2_2',10,4,14,0);
+      /* Mosteiro de São Bento: palmeiras nos dois vãos ao lado da igreja */
+      pp('jm_enPalA','ANH_palmeira',90,18,PA[0],PA[1]);pp('jm_enPalB','ANH_palmeira',99,18,PA[0],PA[1]);
+      rel.entorno=1;}}catch(e){console.warn('entorno Municipal Correios Mosteiro JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
