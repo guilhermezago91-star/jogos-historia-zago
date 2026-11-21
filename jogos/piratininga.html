@@ -23575,6 +23575,109 @@ window.__DOCS22={
   window.__interioresProntos={PORTAS,GENTE,ligaPortas};
 }catch(e){console.warn('interiores prontos',e);}})();
 
+/* ===== v238 — BICICLETA EM 1922: O VIAJANTE PEDALA (pedido do professor, 21/11/2026) =====
+   Bicicletas paradas ao lado do Mecânico de bicicletas (centro) e do Ciclista do Bosque da Saúde. Aperte A perto delas para pedalar.
+   Só em 1922 (em 1888 quase ninguém tinha bicicleta em São Paulo). Anda mais rápido que a pé, pedala em todas as ruas e bairros de 1922;
+   ao entrar num prédio ou trocar de época, a bicicleta fica estacionada na porta. Botão "Descer da bicicleta" para descer onde quiser.
+   Desenho feito no próprio jogo (rodas que giram, pedal que roda, pernas pedalando) em cima do boneco HD do viajante.
+   Objetos de 1 quadradinho, postos por último em lugar livre: não mexe em chão nem em prédio. */
+(function(){try{
+  const ANDA=()=>window.__andar||{};
+  const hd=()=>{try{return !!(window.__hd&&window.__hd().ligado);}catch(_){return false;}};
+  const R=v=>hd()?Math.round(v*2)/2:Math.round(v);
+  let MX=null;/* espelho para a bicicleta virada para a esquerda */
+  const px=(c,x,y,w,h)=>{w=Math.max(.5,w);h=Math.max(.5,h);if(MX!==null)x=2*MX-x-w;ctx.fillStyle=c;ctx.fillRect(R(x),R(y),Math.max(.5,R(w)),Math.max(.5,R(h)));};
+  const seg=(c,x0,y0,x1,y1,w)=>{const n=Math.max(1,Math.ceil(Math.hypot(x1-x0,y1-y0)*2));for(let i=0;i<=n;i++){const k=i/n;px(c,x0+(x1-x0)*k-w/2,y0+(y1-y0)*k-w/2,w,w);}};
+  const C={pneu:'#2a2422',aro:'#c8ccd4',raio:'#8d939b',quadro:'#34404c',qEsc:'#1a2026',qClaro:'#6a7e92',couro:'#6a3a26',couroC:'#9a5a36',metal:'#c8ccd4',metEsc:'#6c727a',
+    braco:'#6ec4c4',bracoO:'#164048',pele:'#e0a06c',calO:'#2a1c18',calM:'#60524a',calE:'#4b3b31',botO:'#2d1914',botM:'#c66f3b',sombra:'rgba(20,27,27,.26)'};
+  const roda=(cx,cy,r,ang)=>{for(let k=0;k<3;k++){const a=ang+k*Math.PI/3,dx=Math.cos(a)*(r-1.2),dy=Math.sin(a)*(r-1.2);seg(C.raio,cx-dx,cy-dy,cx+dx,cy+dy,.5);}
+    for(let i=0;i<40;i++){const a=i/40*Math.PI*2;px(C.pneu,cx+Math.cos(a)*r-.75,cy+Math.sin(a)*r-.75,1.5,1.5);}
+    for(let i=0;i<32;i++){const a=i/32*Math.PI*2;px(C.aro,cx+Math.cos(a)*(r-1.2)-.25,cy+Math.sin(a)*(r-1.2)-.25,.5,.5);}
+    px(C.metEsc,cx-.5,cy-.5,1,1);};
+  /* perna em dois pedaços (coxa e canela) do quadril até o pedal, joelho para a frente */
+  const perna=(hx,hy,pxx,pyy,frente,escura)=>{const L1=5.2,L2=5.6;let dx=pxx-hx,dy=pyy-hy,d=Math.hypot(dx,dy);if(d>L1+L2-.1){const s=(L1+L2-.1)/d;dx*=s;dy*=s;d=L1+L2-.1;}
+    const a=(L1*L1-L2*L2+d*d)/(2*d),h=Math.sqrt(Math.max(0,L1*L1-a*a)),mx=hx+a*dx/d,my=hy+a*dy/d;let kx=mx-h*dy/d,ky=my+h*dx/d;
+    if((kx-hx)*frente<(mx+h*dy/d-hx)*frente){kx=mx+h*dy/d;ky=my-h*dx/d;}
+    const o=escura?C.calO:C.calO,m=escura?C.calE:C.calM;seg(o,hx,hy,kx,ky,2.6);seg(o,kx,ky,hx+dx,hy+dy,2.4);seg(m,hx,hy,kx,ky,1.8);seg(m,kx,ky,hx+dx,hy+dy,1.6);
+    px(C.botO,hx+dx-1.5,hy+dy-1,3.5,2);px(escura?'#8a4a26':C.botM,hx+dx-1,hy+dy-.5,2.5,1);};
+  const folha=()=>{const k='VIAJ_1922';if(!folha.i&&typeof A!=='undefined'&&typeof A[k]==='string'){folha.i=new Image();folha.i.src=A[k];}return folha.i;};
+  const BF={down:0,up:4,left:8,right:12};
+  const meia=(X,Y,dir,dx,bob)=>{const im=folha();if(!im||!im.complete||!im.naturalWidth)return false;ctx.imageSmoothingEnabled=false;ctx.drawImage(im,BF[dir]*32,0,32,46,R(X+dx),R(Y+bob),16,23);return true;};
+  /* bicicleta de lado (virada para a direita; para a esquerda, espelhada) */
+  const bikeLado=(X,Y,ang,th,cav)=>{const rA=[X+2.5,Y+10.5],rF=[X+14,Y+10.5],BB=[X+8,Y+11],S=[X+6,Y+3.6],H=[X+12.4,Y+3.2];
+    const ped=s=>[BB[0]+Math.cos(th+s)*2.4,BB[1]+Math.sin(th+s)*2.4];
+    return{rA,rF,BB,S,H,ped,
+      fundo:()=>{px(C.sombra,X-2.5,Y+14.5,21,2);roda(rA[0],rA[1],4.6,ang);roda(rF[0],rF[1],4.6,ang);},
+      quadro:()=>{const q=(a,b,w)=>{seg(C.qEsc,a[0],a[1],b[0],b[1],w+.6);};const qq=(a,b,w)=>seg(C.quadro,a[0],a[1],b[0],b[1],w);
+        q(rA,BB,1);q(rA,S,1);q(BB,S,1.2);q(S,H,1.2);q(BB,H,1.2);q(H,rF,1);qq(rA,BB,1);qq(rA,S,.8);qq(BB,S,1);qq(S,H,1);qq(BB,H,1);qq(H,rF,.8);
+        seg(C.qClaro,S[0]+.5,S[1],H[0]-.5,H[1],.5);
+        for(let i=0;i<16;i++){const a=i/16*Math.PI*2;px(C.metEsc,BB[0]+Math.cos(a)*1.6-.25,BB[1]+Math.sin(a)*1.6-.25,.5,.5);}
+        seg(C.metEsc,rA[0],rA[1]-.8,BB[0],BB[1]-1.6,.5);
+        if(cav){seg(C.metEsc,BB[0]-1,BB[1],BB[0]-3,Y+15,.6);}
+        seg(C.metal,H[0],H[1],H[0]+.3,Y+1.4,.8);seg(C.metal,H[0]+.3,Y+1.4,H[0]-1.6,Y+1.6,.8);px(C.couro,H[0]-2.6,Y+1,1.5,1.5);
+        px(C.qEsc,S[0]-2,S[1]-1.4,4.2,1.6);px(C.couro,S[0]-1.8,S[1]-1.2,3.8,1);px(C.couroC,S[0]-1.2,S[1]-1.2,1.6,.5);},
+      pedal:(s,esc)=>{const p=ped(s);seg(esc?C.metEsc:C.metal,BB[0],BB[1],p[0],p[1],.7);px(C.pneu,p[0]-1,p[1]-.4,2,.9);}};};
+  /* desenho do viajante pedalando */
+  function desenha(X,Y,dir){if(!folha()||!folha().complete)return false;
+    const st=ANDA(),dist=st.dist||0,mov=player.moving,ang=dist/4.6,th=mov?dist*.42:Math.PI*.5,bob=mov&&(Math.floor(dist/6)%2)?.5:0;
+    if(dir==='left'||dir==='right'){MX=dir==='left'?X+8:null;const b=bikeLado(X,Y,ang,th,false);const hip=[b.S[0]+.4,b.S[1]-1];
+      const pF=b.ped(Math.PI),pN=b.ped(0);
+      perna(hip[0],hip[1]+bob,pF[0],pF[1],1,true);b.pedal(Math.PI,true);b.fundo();b.quadro();
+      const mx=MX;MX=null;const ok=meia(X,Y-21.2,dir,dir==='right'?-1.5:1.5,bob);MX=mx;
+      perna(hip[0],hip[1]+bob,pN[0],pN[1],1,false);b.pedal(0,false);
+      seg(C.bracoO,X+7.6,Y-4.5+bob,X+10.6,Y+1.4,2.2);seg(C.braco,X+7.6,Y-4.5+bob,X+10,Y+.4,1.3);px(C.bracoO,X+10.2,Y+.6,2,1.8);px(C.pele,X+10.5,Y+.9,1.4,1.2);MX=null;return ok;}
+    /* de frente e de costas */
+    const cx=X+8,s1=Math.sin(th),pL=[cx-3.2,Y+10.6+s1*2.2],pR=[cx+3.2,Y+10.6-s1*2.2];
+    px(C.sombra,cx-3,Y+13.5,6,2.5);
+    const rodaFrente=()=>{seg(C.pneu,cx,Y+5.5,cx,Y+15,1.8);seg(C.aro,cx,Y+6.5,cx,Y+14,.5);px(C.metEsc,cx-.5,Y+9.8,1,1);};
+    const guidao=()=>{seg(C.metal,cx-6.2,Y+2.6,cx+6.2,Y+2.6,.8);px(C.couro,cx-7.4,Y+2,1.6,1.4);px(C.couro,cx+5.8,Y+2,1.6,1.4);seg(C.qEsc,cx,Y+2.6,cx,Y+5.5,1.2);seg(C.quadro,cx,Y+2.8,cx,Y+5.5,.7);};
+    const pernas=()=>{for(const [h,p] of [[[cx-2.6,Y+2],pL],[[cx+2.6,Y+2],pR]]){const kx=h[0]+(h[0]<cx?-1.4:1.4),ky=(h[1]+p[1])/2-.6;
+      seg(C.calO,h[0],h[1]+bob,kx,ky,2.6);seg(C.calO,kx,ky,p[0],p[1],2.4);seg(C.calM,h[0],h[1]+bob,kx,ky,1.8);seg(C.calM,kx,ky,p[0],p[1],1.6);
+      px(C.botO,p[0]-1.3,p[1]-.6,2.6,2);px(C.botM,p[0]-.8,p[1]-.2,1.6,.9);}};
+    if(dir==='down'){const ok=meia(X,Y-21.2,'down',0,bob);pernas();rodaFrente();guidao();return ok;}
+    guidao();const ok=meia(X,Y-21.2,'up',0,bob);pernas();rodaFrente();px(C.qEsc,cx-1.6,Y+3,3.2,1.2);px('#a8281e',cx-.6,Y+6,1.2,.8);return ok;}
+  window.__bikeDesenha=desenha;
+
+  /* bicicletas paradas */
+  const BIKES=[];const ESC='Bicicleta';
+  const TXT=["Uma bicicleta de passeio. Em 1922 ela é o transporte barato do trabalhador: entregador, carteiro, aprendiz, mensageiro.","Automóvel é para rico; bicicleta não come capim nem gasta gasolina. Aperte A para pedalar."];
+  const drawParada=(c,X,Y)=>{const b=bikeLado(X,Y,0,Math.PI*.5,true);MX=null;b.fundo();b.quadro();b.pedal(Math.PI*.5,false);};
+  const livre=(sc,x,y)=>{const M=SCN[sc]&&SCN[sc].map;if(!M||y<1||x<1||y>=M.length-2||x>=M[0].length-1)return false;
+    return freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y)&&!objects.some(o=>o.scene===sc&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))&&!(player&&cur===sc&&player.x===x&&player.y===y);};
+  const perto=(sc,x0,y0,rm,ok2)=>{for(let r=1;r<=(rm||6);r++)for(let y=y0-r;y<=y0+r;y++)for(let x=x0-r;x<=x0+r;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))!==r)continue;
+      if(livre(sc,x,y)&&(!ok2||ok2(x,y)))return [x,y];}return null;};
+  const novaBike=(id,sc,x,y)=>{const o={id,scene:sc,x,y,w:1,h:1,name:ESC,text:TXT,bici:true,draw:drawParada};objects.push(o);BIKES.push(o);return o;};
+  const poe=()=>{const pares=[['bici_mecanico','xBicicletas'],['bici_saude','ciclistaSau']];let falta=0;
+    for(const [id,nid] of pares){if(BIKES.find(b=>b.id===id))continue;const n=npcs.find(n=>n.id===nid);if(!n){falta++;continue;}
+      const p=perto(n.scene,n.x,n.y,6);if(p)novaBike(id,n.scene,p[0],p[1]);}
+    return falta;};
+  let tent=0;const tenta=()=>{let f=1;try{f=poe();}catch(e){console.warn('bicicleta',e);}if(f&&++tent<30)setTimeout(tenta,600);};
+  setTimeout(tenta,4200);
+  /* o mecânico avisa */
+  setTimeout(()=>{try{const n=npcs.find(n=>n.id==='xBicicletas');if(n&&Array.isArray(n.lines)&&!n.lines.some(l=>/aí do lado/.test(l)))n.lines.push('Quer experimentar? Pegue a bicicleta aí do lado e dê uma volta pela cidade!');}catch(_){}},4500);
+
+  /* subir e descer */
+  let minha=null;
+  const btn=()=>{const b=document.getElementById('btnDescer');if(!b)return;if(player.vehicle==='bike'){b.hidden=false;b.textContent='Descer da bicicleta';}};
+  const estaciona=(sc,x,y)=>{if(!minha)return;const p=livre(sc,x,y+1)?[x,y+1]:livre(sc,x+1,y)?[x+1,y]:livre(sc,x-1,y)?[x-1,y]:perto(sc,x,y,5);
+    if(p){minha.scene=sc;minha.x=p[0];minha.y=p[1];}else{const d=BIKES.find(b=>b===minha);if(d){d.scene=d.cena0;d.x=d.x0;d.y=d.y0;}}minha=null;};
+  const desce=msg=>{const sc=cur,x=player.x,y=player.y;player.vehicle=null;estaciona(sc,x,y);try{window.__montUpd&&window.__montUpd();}catch(_){}if(msg)toast(msg);};
+  const a1=questActionX;questActionX=function(tg){const o=tg&&tg.type==='obj'?tg.o:null;
+    if(o&&o.bici){if(player.vehicle){toast(player.vehicle==='bike'?'Você já está de bicicleta.':'Desça primeiro para pegar a bicicleta.');return true;}
+      askChoice(ESC,'Subir na bicicleta e pedalar pela cidade?',['Pedalar','Agora não'],i=>{if(i!==0)return;if(o.cena0===undefined){o.cena0=o.scene;o.x0=o.x;o.y0=o.y;}
+        minha=o;o.scene='__bici';player.vehicle='bike';btn();try{sfx('blip');}catch(_){}toast('Trim-trim! Você está de bicicleta. Para descer, use o botão “Descer da bicicleta”.');});return true;}
+    return a1(tg);};
+  document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('#btnDescer');if(!b||player.vehicle!=='bike')return;e.stopImmediatePropagation();e.preventDefault();desce('Você desceu e deixou a bicicleta encostada aqui.');},true);
+  const ss=setScene;setScene=function(to){const v=player.vehicle,de=cur,x0=player.x,y0=player.y;const r=ss.apply(this,arguments);
+    try{if(v==='bike'&&to!==de){const S=SCN[to];if(S&&!S.room&&eraOf(to)===4){player.vehicle='bike';btn();}
+      else{player.vehicle=null;estaciona(de,x0,y0);try{window.__montUpd&&window.__montUpd();}catch(_){}toast('A bicicleta ficou estacionada lá fora.');}}}catch(e){console.warn('bicicleta',e);}
+    return r;};
+
+  /* desenho: entra por fora da troca do viajante HD (que liga 2,5 s depois de abrir) */
+  setTimeout(()=>{try{const dc=drawChar;drawChar=function(id,X,Y,dir,fr){if(id==='player'&&player.vehicle==='bike'){try{if(desenha(X,Y,dir))return;}catch(e){}}return dc.apply(this,arguments);};}catch(e){console.warn('bicicleta',e);}},3200);
+  window.__bici={BIKES,desenha,desce};
+}catch(e){console.warn('bicicleta',e);}})();
+
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /* ===== v203 — MENOS ESPAÇO PRETO EM TODOS OS FORMATOS E ABERTURA SEM 1554 NO FUNDO (pedido do professor, 21/11/2026) =====
    1) A abertura "máquina do tempo" cobre a tela inteira: o "1554" da barra de cima não aparece mais
