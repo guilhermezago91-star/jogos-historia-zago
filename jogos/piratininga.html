@@ -6819,6 +6819,19 @@ function __objEm(sc,x,y){const N=objects.length,now=performance.now();
   if(N<__OI.n||now-__OI.t>10||(__OI.n&&objects[__OI.n-1]!==__OI.u)){__OI.g={};for(const o of objects)__objPoe(o);__OI.n=N;__OI.t=now;__OI.u=objects[N-1];}
   else if(N>__OI.n){for(let i=__OI.n;i<N;i++)__objPoe(objects[i]);__OI.n=N;__OI.u=objects[N-1];}
   const m=__OI.g[sc];return !!m&&m.has(y*4096+x);}
+/* ===== v243 — 1922 ABRE RÁPIDO TAMBÉM NO CELULAR SIMPLES: A LISTA DE OBJETOS NÃO É MAIS REFEITA SEM PARAR (pedido do professor, 21/11/2026) =====
+   A lista "onde há objeto" (mais de 7 mil objetos) é refeita inteira de 10 em 10 milésimos de segundo. Num computador rápido,
+   refazer leva uns 2 milésimos e está tudo bem. Num celular lento, refazer leva mais de 10 milésimos: aí ela era refeita a CADA
+   pergunta "este lugar está livre?", e 1922 levava minutos para abrir.
+   Agora o intervalo é de 10 milésimos OU 4 vezes o tempo que a última arrumação levou, o que for maior. No computador rápido
+   nada muda (continua 10); no celular lento, arrumar a lista passa a gastar no máximo 1/5 do tempo. */
+;(function(){try{
+  let custo=0;
+  __objEm=function(sc,x,y){const N=objects.length,now=performance.now();
+    if(N<__OI.n||now-__OI.t>Math.max(10,4*custo)||(__OI.n&&objects[__OI.n-1]!==__OI.u)){__OI.g={};for(const o of objects)__objPoe(o);__OI.n=N;__OI.t=now;__OI.u=objects[N-1];custo=performance.now()-now;}
+    else if(N>__OI.n){for(let i=__OI.n;i<N;i++)__objPoe(objects[i]);__OI.n=N;__OI.u=objects[N-1];}
+    const m=__OI.g[sc];return !!m&&m.has(y*4096+x);};
+}catch(e){console.warn('v243 lista de objetos',e);}})();
 function freeAt(sc,x,y){const M=SCN[sc]&&SCN[sc].map;if(!M||!M[y]||M[y][x]===undefined)return false;if(SOLIDX.includes(M[y][x]))return false;
   if(__objEm(sc,x,y))return false;
   if(npcs.some(n=>(n.scene||'pira')===sc&&n.x===x&&n.y===y))return false;
