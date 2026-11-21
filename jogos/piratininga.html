@@ -20705,7 +20705,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v222) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v226) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -21588,6 +21588,23 @@ window.__paulista82Ready=Promise.all(ready);
       /* ===== v217 — CENTRO DE 1922: VOLTA O THEATRO SÃO JOSÉ — ele existia em 1922 (aberto em 1909, cerca de 3.000 lugares, junto ao Viaduto do Chá; fonte: Virgínia de Almeida Bessa, 2022); só a Igreja de Santo Antônio continua fora (pedido do professor, 21/11/2026) ===== */
       {const sj=objects.find(q=>q.scene===S&&q.id==='theatroSJ');if(sj)rel.saoJose=[sj.x,sj.y];}
     }catch(e){console.warn('tira Sao Jose Santo Antonio JM',e);}
+    /* ===== v226 — CENTRO DE 1922: SANTA IFIGÊNIA NO EIXO DO VIADUTO — a igreja desce para ficar bem na ponta do Viaduto de Santa Ifigênia, como na fotografia do Largo de São Bento (c. 1920), em que o viaduto aponta direto para ela; o largo passa para a frente da porta (pedido do professor, 21/11/2026) ===== */
+    try{const ig=objects.find(q=>q.scene===S&&q.__canva&&/Santa Ifig/.test(q.name||''));if(ig&&!ig.__eixo&&M[25]&&M[25][45]!==undefined){ig.__eixo=1;
+      const ocupa=(x,y,me)=>objects.some(o=>o!==me&&o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+      const tav=objects.find(q=>q.scene===S&&q.id==='taverna'),ofi=objects.find(q=>q.scene===S&&q.enter&&/Oficina de autom/.test(q.name||'')&&q.x>=33&&q.x<=37);
+      for(let y=12;y<=25;y++)for(let x=37;x<=44;x++)M[y][x]='p';for(let y=12;y<=25;y++)M[y][45]='p';for(let y=22;y<=25;y++)for(let x=35;x<=36;x++)M[y][x]='p';
+      ig.y=18;
+      if(tav){tav.x=37;tav.y=12;}
+      if(ofi){ofi.x=41;ofi.y=13;ofi.w=4;}
+      for(let y=16;y<=17;y++)for(let x=37;x<=45;x++)M[y][x]='p';
+      /* o largo vai para a frente da porta */
+      const mv=(id,x,y)=>{const o=objects.find(q=>q.scene===S&&q.id===id);if(o){o.x=x;o.y=y;}};
+      mv('jm_siArv1',37,24);mv('jm_siArv2',44,24);mv('jm_siBan1',38,25);mv('jm_siBan2',43,25);mv('jm_siPos1',36,25);mv('jm_siPos2',45,24);mv('jm_siPlaca',36,24);
+      try{const q=C.P.find(q=>q&&/IFIG/.test(q.t||''));if(q){q.x=40*16+8;q.y=25*16+10;}}catch(_){}
+      for(const n of npcs){if(n.scene!==S||n.x<35||n.x>45||n.y<12||n.y>25)continue;const livre=(x,y)=>M[y]&&/[pD]/.test(M[y][x]||'')&&!ocupa(x,y);if(livre(n.x,n.y))continue;
+        let ok=0;for(let r=1;r<9&&!ok;r++)for(let dy=-r;dy<=r&&!ok;dy++)for(let dx=-r;dx<=r&&!ok;dx++){const x=n.x+dx,y=n.y+dy;if(livre(x,y)&&!npcs.some(q=>q!==n&&q.scene===S&&q.x===x&&q.y===y)){n.x=x;n.y=y;n.px=x*16;n.py=y*16;ok=1;}}}
+      rel.eixoSI=[ig.x,ig.y,tav?[tav.x,tav.y]:0,ofi?[ofi.x,ofi.y]:0];}
+    }catch(e){console.warn('Santa Ifigenia no eixo JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
