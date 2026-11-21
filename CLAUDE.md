@@ -35,6 +35,17 @@ Seguir a skill `publicar-piratininga-v2`. O essencial:
 6. Testar com o navegador de verdade (Playwright): computador, celular em pé e deitado; as 4 épocas abrem sem erro.
 7. Teste obrigatório do centro de 1922: abrir com `#teste`, ir para `m_centro22`, esperar ~7 s e conferir que `Object.keys(window.__jmTeste).filter(k=>/^r\d/.test(k))` traz todas as rodadas (r13, r14, r15a, r15b, r16a, r16b, r16c, r17, r18, r19, r20, r21, r22, r23…). Se faltar alguma, não subir.
 
+## Gastar pouco (a conta é da Nova Escola)
+
+O professor usa o plano da Nova Escola e não quer gerar custo à toa. Seguir a skill `escolher-modelo`. Na prática:
+
+- **Modelo certo para cada parte do trabalho.** Decidir, planejar, escrever falas e mexer no código do jogo: Opus (o padrão). Tarefas auxiliares e mecânicas — rodar testes, conferir se algo sumiu, buscar no código, listar cenários, fazer prints — passar para um agente auxiliar com modelo mais leve: Sonnet, ou Haiku para busca e leitura simples. Se o resultado do modelo leve vier fraco, primeiro dar um jeito de ele conferir o próprio trabalho; só depois subir de modelo.
+- **Esforço padrão.** Subir o nível de esforço só quando o resultado não estiver bom.
+- **Uma coisa de cada vez.** Pedido claro e pequeno. Não revisar o jogo inteiro sem ele pedir.
+- **Teste completo (as 4 épocas, três telas, centro de 1922) só antes de subir.** Durante o trabalho, testar só a parte mexida.
+- **Não abrir o jogo várias vezes à toa** nem repetir o mesmo teste sem ter mudado nada.
+- **Uma conversa por parte do jogo.** Evitar duas conversas fazendo o mesmo trabalho.
+
 ## O centro de 1922 é frágil
 
 O centro (`m_centro22`) é montado a partir de um retângulo do mapa dos bairros (`sp22`, colunas 58 a 132, linhas 64 a 116). Mudar chão, prédio grande ou nome de prédio ali dentro embaralha o centro inteiro, sem erro no console. Não mexer nesse retângulo sem avisar o professor.
