@@ -24071,6 +24071,42 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
     const deitado=innerWidth>innerHeight&&innerHeight<=520,sc=document.querySelector('.screen');
     if(!deitado&&sc){const t=Math.round(sc.getBoundingClientRect().top)+(innerHeight>innerWidth?100:8);if(t>0&&t<innerHeight/2)a.style.setProperty('top',t+'px','important');}}}catch(_){}}).observe(document.body,{childList:true});
 }catch(e){console.warn('v239 deitado',e);}})();
+/* ===== v240 — 1554: GENTE DENTRO DOS PRÉDIOS E ESPALHADA PELOS OUTROS LUGARES, PARA DESAFOGAR O ALTO DA COLINA (pedido do professor, 21/11/2026) =====
+   O alto da colina estava cheio. Sete das figuras de humor saem de lá e vão para dentro da casa de colono, da igreja e do colégio
+   e para a vila de São Vicente. Cada sala por dentro ganha morador. Lisboa e Antuérpia ganham um menino de recados. */
+(function(){try{
+  const SALA=(sk,pref,evita)=>{const S=SCN[sk];if(!S)return null;const M=S.map,H=M.length,W=M[0].length;
+    const ocupa=(x,y)=>objects.some(o=>o.scene===sk&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===sk&&Math.abs(n.x-x)+Math.abs(n.y-y)<2);
+    const ok=(x,y)=>M[y]&&M[y][x]==='.'&&y>=3&&y<=H-3&&!(y>=H-3&&x>=W/2-3&&x<=W/2+2)&&!ocupa(x,y)&&[[1,0],[-1,0],[0,1],[0,-1]].filter(([a,b])=>M[y+b]&&M[y+b][x+a]==='.'&&!ocupa(x+a,y+b)).length>=3;
+    for(let r=0;r<=8;r++)for(let y=pref[1]-r;y<=pref[1]+r;y++)for(let x=pref[0]-r;x<=pref[0]+r;x++){if(Math.max(Math.abs(x-pref[0]),Math.abs(y-pref[1]))!==r)continue;if(ok(x,y))return [x,y];}
+    return null;};
+  const FORA=(sc,pref)=>{const M=SCN[sc]&&SCN[sc].map;if(!M)return null;
+    const ok=(x,y)=>{try{return freeAt(sc,x,y)&&!ITEMS.some(i=>(i.scene||'pira')===sc&&Math.abs(i.x-x)+Math.abs(i.y-y)<2)&&!npcs.some(n=>(n.scene||'pira')===sc&&Math.abs(n.x-x)+Math.abs(n.y-y)<3)&&!objects.some(o=>o.scene===sc&&x>=o.x-1&&x<=o.x+(o.w||1)&&y>=o.y-1&&y<=o.y+(o.h||1))&&[[1,0],[-1,0],[0,1],[0,-1]].every(([a,b])=>freeAt(sc,x+a,y+b));}catch(_){return false;}};
+    for(let r=0;r<=10;r++)for(let y=pref[1]-r;y<=pref[1]+r;y++)for(let x=pref[0]-r;x<=pref[0]+r;x++){if(Math.max(Math.abs(x-pref[0]),Math.abs(y-pref[1]))!==r)continue;if(ok(x,y))return [x,y];}
+    return null;};
+  const poe=(n,sc,pos)=>{if(!pos)return false;n.scene=sc;n.x=pos[0];n.y=pos[1];if('px' in n||true){n.px=n.x*T;n.py=n.y*T;}n.__v236=1;return true;};
+  /* 1. figuras de humor que saem do alto da colina */
+  const MOVE=[['piada2','j_x1casaSV1',[10,6]],['piada5','j_x1igrejaSV',[3,4]],['piada7','j_x1igrejaSV',[10,4]],['piada11','j_x1colegio',[5,6]],
+    ['piada9','sv',[12,9]],['piada10','sv',[26,22]],['piada3','sv',[8,25]]];
+  const tira=()=>{for(const [id,sc,pref] of MOVE){const n=npcs.find(q=>q.id===id);if(!n||n.__v236)continue;
+      poe(n,sc,/^j_/.test(sc)?SALA(sc,pref):FORA(sc,pref));}};
+  /* 2. moradores novos: cada sala por dentro com alguém, e um menino em Lisboa e outro em Antuérpia */
+  const GENTE=[
+   ['moradoraMam54','mulher','j_x1casaSV2',[7,6],'Dona da casa','down',["Meu marido é português e eu sou tupiniquim. Nossos filhos falam tupi em casa e português na rua.","Chamam os meus filhos de mamelucos. Eles entendem as duas gentes."],'Mamelucos eram os filhos de pai português e mãe indígena. Falavam tupi em casa e português na rua.'],
+   ['ferreiro54','colono','j_x1casaSV3',[6,6],'Ferreiro','down',["Todo ferro que eu bato veio de Portugal. Aqui quase não se acha ferro.","Um machado meu vale muito: os indígenas trocam comida e trabalho por ferramenta de ferro."],'Ferramenta de ferro era rara e valiosa na vila. Os indígenas trocavam comida e trabalho por machados.'],
+   ['pescador54','colono','j_x1casaSV4',[7,6],'Pescador','down',["Saio de madrugada na canoa e volto com o balaio cheio.","O sal que vem de Portugal faz o peixe durar dias. E o covo, essa armadilha de taquara, quem me ensinou foi um tupiniquim."],'O covo, armadilha de taquara para pegar peixe, é invenção indígena.'],
+   ['degredado54','colono','j_x1casaSV5',[8,6],'Degredado','down',["Fui condenado em Portugal e mandado para cá como castigo. Quem veio assim se chama degredado.","Escrevo à minha família, mas a carta leva meses para chegar. Se chegar."],'Degredado era quem a justiça de Portugal mandava para o Brasil como castigo. Muitos dos primeiros colonos chegaram assim.'],
+   ['farinheira54','mulher','j_x1casaSV6',[7,6],'Mulher da casa de farinha','down',["Rala, espreme no tipiti, torra no tacho. A farinha de mandioca é o pão daqui.","Quem me ensinou foram as mulheres tupiniquins, que fazem isso desde sempre."],'A farinha de mandioca era o "pão da terra": comida da vila e comida de viagem dos navios.'],
+   ['vigario54','padre','j_x1igrejaSV',[7,5],'Vigário','down',["Esta é a igreja matriz de São Vicente. A vila foi fundada em 1532, uma das primeiras do Brasil.","Aqui eu batizo filhos de portugueses, de indígenas e de escravizados."],'São Vicente, fundada em 1532, foi a primeira vila do Brasil.'],
+   ['escrivao54','nobrega','j_x1camaraSV',[7,5],'Escrivão da Câmara','down',["Eu anoto tudo neste livro: preço da farinha, conserto do caminho, multas.","Quem manda na Câmara são os homens bons, moradores com terras. O resto da vila só obedece."],'A Câmara era governada pelos "homens bons": moradores com terras. Indígenas, escravizados e pobres ficavam de fora.'],
+   ['meninoLx54','crianca','lisboa54',[18,22],'Menino de recados','down',["Chegou navio do Brasil com pau-brasil e, dizem, com açúcar também. A Ribeira anda cheia!","Eu levo recado de um mercador a outro. Pago em pão."],'Em Lisboa chegavam os navios do Brasil com pau-brasil e, aos poucos, com açúcar.'],
+   ['meninoAnt54','crianca','antuerpia54',[20,16],'Menino de recados','down',["Aqui em Antuérpia quem manda é o dinheiro. A Bolsa fica logo ali: compra-se e vende-se de tudo.","Até o açúcar que ainda está no mar já tem comprador."],'Antuérpia, com sua Bolsa de comércio, era um dos maiores centros de negócios da Europa no século XVI.']];
+  const gente=()=>{for(const [id,spr,sc,pref,nome,dir,lines,diary] of GENTE){if(npcs.some(q=>q.id===id)||!SCN[sc])continue;
+      const pos=/^j_/.test(sc)?SALA(sc,pref):FORA(sc,pref);if(!pos)continue;
+      npcs.push({id,spr,scene:sc,x:pos[0],y:pos[1],px:pos[0]*T,py:pos[1]*T,dir,name:nome,lines,diary,talked:true,nextTurn:9e9,__v236:1});}};
+  const roda=()=>{try{tira();gente();}catch(e){console.warn('v236',e);}};
+  roda();for(const t of [300,1500,3500,6500])setTimeout(roda,t);
+}catch(e){console.warn('v236 1554',e);}})();
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
