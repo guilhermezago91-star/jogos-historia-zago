@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=3456cda0","kb":8535,"m":1},{"f":"pac_e1234.js?v=ca07eb09","kb":2177,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=9e50ae28","kb":1400,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=ebb397c2","kb":4305,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=860e5dd1","kb":8543,"m":1},{"f":"pac_e1234.js?v=ca07eb09","kb":2177,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=0bf8ea21","kb":233,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=e3acbc3c","kb":1485,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=596e77bd","kb":5057,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -21377,6 +21377,183 @@ window.__paulista82Ready=Promise.all(ready);
   /* fica por fora das outras trocas de boneco, que entram até 1,5 s depois de abrir */
   setTimeout(instala,2500);
 }catch(e){console.warn('andar natural',e);}})();
+
+/* ===== v199 — GENTE NOVA NO CENTRO DE 1922 (pedido do professor, 20/11/2026) =====
+   48 pessoas novas andando e falando no centro ampliado de 1922 (cena m_centro22): Sé, Triângulo, Viaduto do Chá,
+   Theatro Municipal, São Bento, Antônio Prado, 25 de Março, Largo de São Francisco, Paissandu e Escola Normal.
+   Só gente: não põe nem tira prédio, objeto ou chão (o centro não se embaralha). Roda depois de o centro estar montado
+   e só usa calçada e rua da rede de caminhos (C.naRede). Cada um anda de um lugar a outro, num caminho achado na hora. */
+(function(){try{
+  const S='m_centro22';
+  const P={se:[103,67],sf:[73,62],via:[55,41],mun:[36,38],mappin:[80,43],sb:[95,21],ap:[118,28],xv:[112,48],pat:[118,45],r25:[128,38],ros:[8,42],normal:[30,59],guinle:[93,65],corr:[103,51],correios:[20,19],cine:[56,21],anh:[58,52],boaMorte:[121,65]};
+  const G=[
+   ['gn22_01','h22_x|cartunista|0','Caricaturista de revista','mun','via',['Eu estava no Theatro Municipal em fevereiro, na Semana de Arte Moderna. Desenhei a plateia vaiando os artistas!','Uns diziam que era arte nova, do Brasil de agora. Outros juravam que era brincadeira de moço rico. Eu desenhei os dois lados.']],
+   ['gn22_02','h22_x|maestro|0','Músico de orquestra','mun','mappin',['Na Semana de Arte Moderna tocaram músicas de Villa-Lobos. Teve quem aplaudisse e teve quem latisse feito cachorro na plateia!','No Municipal a elite gosta mesmo é de ópera italiana. Música nova assusta.']],
+   ['gn22_03','h22_x|escultor|0','Aprendiz de escultor','mun','anh',['Meu mestre admira o Brecheret, que mostrou esculturas na Semana de Arte Moderna.','Estátua de bronze, mármore, gesso: a cidade nova quer monumento em toda praça.']],
+   ['gn22_04','h22_x|violonista_de_choro|0','Chorão do violão','sf','se',['Toco choro nas festas do Bexiga e da Barra Funda. Música de rua, feita por gente simples.','No Municipal ninguém me chama. Mas no botequim todo mundo canta junto.']],
+   ['gn22_05','h22_x|militante_sufragista|0','Moça que quer votar','xv','se',['No Brasil, mulher não vota. Nem eu, nem minha mãe, nem a professora da Escola Normal.','Em agosto, no Rio, fundaram uma federação para lutar pelo voto das mulheres. Um dia a gente chega lá.']],
+   ['gn22_06','h22_x|instalador_de_telefones|0','Instalador de telefones','ap','xv',['Cada telefone tem um fio que vai até a central. Lá, a telefonista liga as pessoas com a mão, enfiando um pino no buraco certo.','Telefone em casa ainda é coisa de rico. O povo usa o da farmácia ou do botequim.']],
+   ['gn22_07','h22_x|reparador_de_maquinas_de_escrever|0','Consertador de máquinas de escrever','xv','corr',['Os escritórios do centro estão cheios de moças datilógrafas. A máquina de escrever abriu emprego para as mulheres.','Hoje consertei três máquinas. Uma estava com a tecla do A gasta de tanto escrever "café".']],
+   ['gn22_08','h22_x|vendedor_de_automoveis|0','Vendedor de automóveis','mappin','ap',['O Ford é montado aqui mesmo em São Paulo! Peças vêm dos Estados Unidos, os operários daqui juntam tudo.','Daqui a pouco tem mais automóvel do que carroça nesta cidade. Pode escrever!']],
+   ['gn22_09','h22_x|instrutor_de_direcao|0','Instrutor de direção','via','mun',['Hoje meu aluno apertou a buzina em vez do freio. A buzina funcionou muito bem. O freio, nem foi tentado.','Ainda bem que no Viaduto do Chá tem pouca curva.']],
+   ['gn22_10','h22_x|vendedor_de_castanhas|0','Vendedor de castanhas','se','guinle',['Castanha assada, quentinha! Em junho, com esta garoa, sai feito água.','São Paulo é a terra da garoa. De manhã a gente nem enxerga o fim da rua.']],
+   ['gn22_11','h22_x|vendedor_de_charutos|0','Vendedor de charutos','corr','xv',['Quando o preço do café sobe, os corretores compram charuto para comemorar. Quando cai, compram para esquecer.','Na Rua XV e na Praça Antônio Prado se fala de café o dia inteiro.']],
+   ['gn22_12','h22_x|floricultor|0','Florista','mappin','via',['Flores para o chá do Mappin! As senhoras gostam de chegar com um raminho.','As rosas vêm das chácaras em volta da cidade, de carroça, de madrugada.']],
+   ['gn22_13','h22_x|confeiteiro|0','Confeiteiro','xv','pat',['Estou fazendo um bolo de três andares para a festa do Centenário da Independência, em setembro.','Verde e amarelo, com a data 1822-1922 em açúcar. Só não pode chover no dia!']],
+   ['gn22_14','h22_x|projecionista|0','Projecionista de cinema','cine','correios',['O cinema é mudo: o filme não tem som. Um pianista toca na sala conforme a cena.','Quando o filme é triste, o pianista toca triste. Quando é perseguição, ele toca rapidinho e sua!']],
+   ['gn22_15','h22_x|bibliotecario|0','Bibliotecário','sf','mun',['Mais da metade dos brasileiros não sabe ler. É muito livro esperando leitor.','Os estudantes de Direito vêm aqui só em véspera de prova. Aí não cabe ninguém!']],
+   ['gn22_16','h22_x|dentista|0','Dentista','guinle','se',['Arranco dente quase sem dor. O quase é por conta do paciente.','O consultório fica no Edifício Guinle, o prédio mais alto do centro. Tem elevador! Muita gente sobe só para passear nele.']],
+   ['gn22_17','h22_x|entregador_de_farmacia|0','Entregador de farmácia','xv','r25',['Levo remédio de bicicleta para as casas. Desde a gripe de 1918, todo mundo corre para a farmácia na primeira febre.']],
+   ['gn22_18','h22_x|enfermeira_da_santa_casa|0','Enfermeira da Santa Casa','se','ros',['Em 1918, a gripe espanhola matou milhares de pessoas em São Paulo. Fecharam escolas, teatros e igrejas.','Os hospitais não davam conta. Eu nunca trabalhei tanto na vida.']],
+   ['gn22_19','h22_x|dirigente_sindical|0','Tipógrafo do sindicato','r25','se',['Em 1917 a greve geral parou a cidade: fábricas, bondes, tudo. Os operários pediam salário e jornada menor.','Depois veio a polícia: líderes presos, estrangeiros mandados embora do país. Mas a gente continua se organizando.']],
+   ['gn22_20','h22_x|aluna_de_grupo_escolar|0','Aluna do grupo escolar','normal','mun',['Estamos ensaiando o hino para a festa do Centenário da Independência!','A professora disse que em 1822 São Paulo era uma cidadezinha. Agora olha o tamanho!']],
+   ['gn22_21','h22_x|inspetor_escolar|0','Inspetor escolar','normal','via',['Fiscalizo os grupos escolares. Escola pública, de graça, para menino e menina.','Mas muita criança não vai: trabalha na fábrica ou engraxa sapato aqui no centro.']],
+   ['gn22_22','h22_x|reparador_de_trilhos|0','Consertador de trilhos','se','sb',['Cuido dos trilhos do bonde da Light. Bonde elétrico, desde 1900.','Se o trilho entorta, o bonde salta e a cidade inteira atrasa.']],
+   ['gn22_23','h22_x|vendedor_de_artigos_de_costura|0','Mascate libanês','r25','ap',['Vim do Líbano com uma mala nas costas. Vendia linha e agulha de porta em porta, até no interior.','Agora tenho uma lojinha na Rua 25 de Março. Meu primo chega no mês que vem.']],
+   ['gn22_24','h22_x|chapeleira|0','Chapeleira','mappin','xv',['A moda agora é chapéu pequeno, bem justo na cabeça. Os grandões, cheios de pena, ficaram para trás.','Homem também não sai sem chapéu. Cabeça descoberta no centro é falta de educação!']],
+   ['gn22_25','h22_x|cantora_lirica|0','Cantora de ópera','mun','mappin',['Canto ópera italiana no Municipal. A plateia de casaca e vestido longo, os camarotes cheios.','Lá em cima, nas galerias baratas, ficam os italianos do Brás. Esses sabem as músicas de cor!']],
+   ['gn22_26','h22_x|ator_de_teatro|0','Ator de comédia','cine','via',['Faço comédia no teatro. O público ri das coisas da cidade: o bonde lotado, o preço da carne, o político que promete tudo.']],
+   ['gn22_27','h22_x|investigador|0','Investigador de polícia','se','xv',['Procuro um batedor de carteiras de chapéu-coco e bigode.','O problema é que no centro todo homem usa chapéu-coco e bigode. Até eu!']],
+   ['gn22_28','h22_x|mecanico_de_bicicletas|0','Mecânico de bicicletas','r25','pat',['Bicicleta é o automóvel do pobre. O entregador, o carteiro, o aprendiz: todo mundo pedala.','Só não dá para subir a ladeira do Carmo pedalando. Ali é empurrando.']],
+   ['gn22_29','h22_x|soldado_da_forca_publica|1','Soldado com notícias do Rio','se','pat',['Em julho, no Rio de Janeiro, tenentes do Forte de Copacabana se revoltaram contra o governo.','Saíram pela praia, poucos contra muitos. Os jornais chamam de "Os 18 do Forte". O país anda nervoso.']],
+   ['gn22_30','h22_x|vendedor_de_salgados|1','Vendedor de pastel','sb','cine',['Pastel, empadinha, coxinha de galinha! Tudo feito hoje.','Quem trabalha no centro come em pé, depressa, e volta para o escritório.']],
+   ['gn22_31','h22_n|normalista|1','Normalista','normal','mun',['Estudo na Escola Normal, na Praça da República. Vou ser professora de grupo escolar.','Ser professora é uma das poucas profissões abertas para as moças.']],
+   ['gn22_32','h22_n|telefonista|2','Telefonista','xv','ap',['"Número, por favor!" Falo isso umas quinhentas vezes por dia.','As telefonistas são quase todas moças. Ouvimos cada conversa... mas não contamos nada!']],
+   ['gn22_33','h22_n|imigrante|0','Imigrante perdido','via','se',['Desci do trem e me disseram: "o Brás é ali". Ali onde? Já andei a cidade inteira!','Na minha terra a cidade toda cabia nesta praça.']],
+   ['gn22_34','h22_n|corretor|0','Corretor de café','corr','ap',['O café é a maior riqueza do Brasil. Mais da metade do que o país vende para fora é café.','O dinheiro do café paga estes prédios, os bancos, os teatros. Se o preço cai, a cidade inteira sente.']],
+   ['gn22_35','h22_n|fotografoRua|0','Fotógrafo lambe-lambe','se','guinle',['Retrato na hora! Fique bem paradinho... não pisque... pronto!','Os imigrantes tiram retrato para mandar para a família na Europa: "Olha como estou bem!"']],
+   ['gn22_36','h22_n|condutor|1','Condutor do bonde','sb','se',['De folga hoje. Mas até sonhando eu grito: "Passagem, faz favor!"','Bonde cheio, gente pendurada no estribo. O povo chama de "pinga-pinga" porque para em todo canto.']],
+   ['gn22_37','h22_n|cocheiro|0','Cocheiro de tílburi','ap','corr',['Antes todo mundo andava de tílburi. Agora o freguês prefere o automóvel de praça.','Meu cavalo é mais confiável que motor. Ele nunca fica sem gasolina!']],
+   ['gn22_38','h22_n|mestreObras|0','Pedreiro da catedral','se','boaMorte',['Trabalho na catedral nova da Sé. A antiga foi derrubada em 1911 e esta começou em 1913.','Do jeito que vai, meus netos é que vão ver pronta.']],
+   ['gn22_39','h22_n|freira|0','Irmã de caridade','boaMorte','se',['Cuidamos de doentes, órfãos e velhos. A cidade cresceu tão rápido que falta lugar para todos.']],
+   ['gn22_40','h22_n|carregadorS|0','Carregador','r25','ap',['Carrego fardo de tecido e saco de farinha nas lojas da 25 de Março. Paga pouco, mas paga no dia.','Muita gente negra de São Paulo ganha a vida assim: carregando, engraxando, lavando. Os empregos melhores vão para outros.']],
+   ['gn22_41','h22_n|italianaB|2','Verdureira italiana','r25','se',['Verdura fresquinha, da chácara! Couve, alface, tomate!','Meu marido planta, eu vendo. Os filhos? Dois na fábrica, um no grupo escolar.']],
+   ['gn22_42','h22_n|livreiro|0','Livreiro','sf','mappin',['Vendo livro francês, livro português, revista nova. Os moços da Semana de Arte Moderna querem escrever do jeito que o brasileiro fala.']],
+   ['gn22_43','h22_n|redator|1','Repórter do Fanfulla','xv','r25',['Trabalho no Fanfulla, o jornal em italiano de São Paulo. Tem tanto italiano aqui que um jornal só para eles vende muito!']],
+   ['gn22_44','h22_n|quintino|2','Irmão do Rosário','ros','ap',['A nossa igreja, a do Rosário dos Homens Pretos, ficava onde hoje é a Praça Antônio Prado.','No começo do século derrubaram tudo para alargar o centro. A irmandade mudou para o Largo do Paissandu.']],
+   ['gn22_45','h22_n|seg_liberto|0','Velho que viu a abolição','ros','via',['Eu nasci escravizado. Em 1888 veio a liberdade, mas não veio terra, nem escola, nem trabalho direito.','Os moços de hoje leem jornais feitos pela gente negra. Isso eu não pensei que fosse ver.']],
+   ['gn22_46','h22_n|professora|3','Moça do interior','via','mappin',['Vim de Ribeirão Preto passear. Que barulho! Bonde, buzina, jornaleiro gritando...','Na minha cidade o mais alto é a torre da igreja. Aqui tem prédio de sete andares!']],
+   ['gn22_47','h22_n|operaria|1','Operária no domingo','se','mappin',['Hoje é domingo, dia de passear no centro com o vestido bom.','Durante a semana são dez horas na tecelagem. Domingo é o único dia que vejo a luz do sol.']],
+   ['gn22_48','h22_n|seg_homem|2','Homem correndo atrás do chapéu','via','anh',['Meu chapéu! O vento levou meu chapéu lá para baixo, no Anhangabaú!','Chapéu novo, comprado ontem na Rua Direita. Se alguém achar, eu pago um café!']],
+  ];
+  const go=()=>{try{
+    if(walkers.some(w=>w.id==='gn22_01'))return true;
+    const C=window.__centro22||{};const M=(SCN[S]&&SCN[S].map);if(!M||!C.naRede||!(window.__jmTeste&&window.__jmTeste.r13))return false;
+    const W=M[0].length,H=M.length;
+    const livre=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&freeAt(S,x,y)&&'pDdeS,.RVf'.includes(M[y][x]);
+    const perto=([x0,y0])=>{for(let r=0;r<10;r++)for(let y=y0-r;y<=y0+r;y++)for(let x=x0-r;x<=x0+r;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))!==r)continue;if(livre(x,y))return [x,y];}return null;};
+    /* caminho de A até B; se B fica em outro pedaço da rede, vai até o ponto mais perto de B que dá para alcançar */
+    const bfs=(a,b)=>{const prev=new Int32Array(W*H).fill(-1),q=[a[0]+a[1]*W];prev[q[0]]=q[0];let h=0,best=q[0],bd=1e9;
+      while(h<q.length){const c=q[h++],x=c%W,y=(c/W)|0;const d=Math.abs(x-b[0])+Math.abs(y-b[1]);if(d<bd){bd=d;best=c;}if(!d)break;
+        for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(!livre(nx,ny))continue;const k=nx+ny*W;if(prev[k]>=0)continue;prev[k]=c;q.push(k);}}
+      const L=[];for(let k=best;;k=prev[k]){L.push([k%W,(k/W)|0]);if(k===prev[k])break;}return L.reverse();};
+    /* caminho só com os cantos (como os outros andantes), ida e volta */
+    const cantos=L=>{const o=[L[0]];for(let i=1;i<L.length-1;i++){const [a,b]=L[i-1],[c,d]=L[i],[e,f]=L[i+1];if((c-a)!==(e-c)||(d-b)!==(f-d))o.push(L[i]);}o.push(L[L.length-1]);return o;};
+    const rel=window.__gente22={postos:0,fora:[]};const lista=[];
+    for(const [id,spr,name,a,b,lines] of G){const A=perto(P[a]),B=perto(P[b]);let L=A&&B&&bfs(A,B);
+      if(!L||L.length<6){rel.fora.push(id);continue;}
+      if(L.length>90)L=L.slice(0,90);
+      const c=cantos(L);const path=c.concat(c.slice(1,-1).reverse());
+      lista.push({id,spr,name,lines,path,speed:1.1+((id.charCodeAt(6)+id.charCodeAt(5))%5)/10});rel.postos++;}
+    addWalkers(S,lista);return true;}catch(e){console.warn('gente22',e);return true;}};
+  let n=0;const t=setInterval(()=>{if(go()||++n>120)clearInterval(t);},500);
+}catch(e){console.warn('gente22',e);}})();
+
+/* ===== v199 — RETRATOS PRÓPRIOS POR PERSONAGEM (fábrica de rostos) (pedido do professor, 20/11/2026) =====
+   Cada personagem que não tinha retrato grande ganha um retrato só dele, tirado do próprio boneco (pele, cabelo, roupa, chapéu).
+   As imagens ficam nos arquivos de arte da época com o nome R_P<época>_<id do personagem> (época: 1=1554, 2=1830, 3=1888, 4=1922).
+   Quem já tem retrato (próprio, por tipo ou de figurino x22) continua com o dele. */
+(function(){try{
+  const IM={};const img=k=>{if(IM[k])return IM[k];if(typeof A==='undefined'||typeof A[k]!=='string')return null;const i=new Image();i.src=A[k];return IM[k]=i;};
+  const chave=n=>{try{if(!n||!n.id)return null;const s=String(n.spr||'');
+      if(s.indexOf('h22_x|')===0){const k='X22R_'+s.split('|')[1];return (n.__walker&&typeof A[k]==='string')?k:null;}
+      if(s.indexOf('x22_')===0)return null;
+      if(!n.__walker&&typeof PORK==='function'&&PORK(n.spr||n.id))return null;
+      const k='R_P'+eraOf(n.scene||'pira')+'_'+n.id;return (typeof A!=='undefined'&&typeof A[k]==='string')?k:null;}catch(_){return null;}};
+  const poe=i=>{try{if(!dialog)return;dlgFace.width=85;dlgFace.height=78;fctx.imageSmoothingEnabled=false;fctx.clearRect(0,0,85,78);fctx.drawImage(i,0,0);dlgFace.hidden=false;}catch(_){}};
+  const mostra=n=>{try{const k=chave(n),i=k&&img(k);if(i){const vai=()=>{poe(i);setTimeout(()=>poe(i),0);};if(i.complete&&i.naturalWidth)vai();else i.onload=vai;}}catch(_){}};
+  /* personagem parado: passa por talkTo */
+  const tt=talkTo;talkTo=function(n){const r=tt.apply(this,arguments);mostra(n);return r;};
+  /* gente andando: o jogo chama say direto e só depois marca dialog.walker */
+  const s0=say;say=function(){const r=s0.apply(this,arguments);setTimeout(()=>{try{const w=dialog&&dialog.walker;if(w){w.__walker=1;mostra(w);}}catch(_){}},0);return r;};
+  window.__retrP={chave,conta:()=>{let c=0;for(const n of npcs)if(chave(n))c++;for(const w of walkers)if(chave(w))c++;return c;}};
+}catch(e){console.warn('retratos P',e);}})();
+
+/* ===== v199 — BONECOS TROCADOS POR BONECOS HD QUE JÁ EXISTEM (pedido do professor, 20/11/2026) =====
+   Corrige personagens com boneco errado (homem em personagem mulher e o contrário), troca os últimos cabeçudos de 1888
+   e o figurino de industriais, desembargador e diretor. Não desenha nada novo: só aponta cada personagem para um boneco HD
+   que já está no jogo. Alguns são provisórios até chegarem os bonecos novos do Canva (Antônio Bento, ama de leite,
+   Couto de Magalhães, Marquesa de Santos). Repete por 2 minutos e a cada troca de cena, porque há personagens que
+   outros blocos criam depois que o jogo abre. */
+(function(){try{
+  const T={
+   /* 1922: gênero errado */
+   kairalla22:'seg_mulher|1',bianchi22:'italianaB|1',bilheteira:'telefonista|1',colhedores2:'colona|2',imiCalabria22:'colona|3',
+   moocaS22n_7:'operaria|2',mulherAS:'seg_mulher|2',feirante:'portugues|1',sitianteCobra:'viajante88|1',clientelchik22:'peixeiro|1',
+   /* 1922: figurino errado para o papel */
+   industrial:'republicano|1',gen22_39:'republicano|2',gen22_85:'estudantesSJ|1',scarpa22:'republicano|3',desembargador22:'banqueiro|0',diretor22:'banqueiro|1',
+   /* 1888: últimos cabeçudos */
+   estAbol88:'estudante88|1',estPoeta88:'seg_estudante|1',estRepub88:'estudante88|2',bucha88:'seg_estudante|2',wenceslau88:'estudante88|0',
+   lenteArc88:'lente88|0',bedel88:'caixeiroFin|0',telegrafista88:'caixeiroFin|1',bilheteSJ88:'caixeiroFin|2',
+   gl88lav:'beneditaRes|1',africana88:'irma88|1',lavSarac88:'beneditaRes|2',gl88car:'carregadorS|0',caifazRem88:'liberto|1',gl88men:'molequeRes|0',
+   quitCom88:'fugida|1',quitMerc88:'irma88|2',aguadeira88:'fugida|2',cozinheira88:'espanhola|1',devotaAfl88:'irma88|3',
+   rufina88:'beneditaRes|3',moradorAfl88:'quintino|1',atibaiana88:'colona|1',casalIlha:'dona88|1',piada36:'n88_casa|1',piada31:'dona88|2',
+   piada30:'condutor|0',piada33:'pop_01|1',piada35:'carregaArm1|1',piada37:'n88_botica|0',irmaoRos88:'quintino|2',encanador88:'operarioGas|1',
+   int88_k_estacao_0:'imigrante|0',int88_k_estacao_1:'dona88|0',int88_k_estnorte_1:'dona88|1',int88_k_opera_1:'dona88|2',
+   int88_k_convento_0:'salesiano|0',int88_k_cervejaria_0:'operarioGas|2',d13festa3:'seg_homem|1',d13festa4:'irma88|1',
+   d13povo0:'seg_homem|2',d13povo1:'seg_crianca|1',d13povo4:'pop_01|2',festa:'quintino|3',
+   /* provisórios até chegar o boneco novo */
+   bento88:'caifaz|0',ama88:'beneditaRes|0',coutoMagalhaes88:'baraoBan|0',marquesa30:'n88_casa|2'
+  };
+  const aplica=()=>{let n=0;try{for(const L of [npcs,walkers])for(const p of L){const t=T[p.id];if(!t)continue;const s='h22_n|'+t;if(p.spr!==s){p.spr=s;n++;}}}catch(_){}return n;};
+  window.__trocaBonecos={T,aplica};
+  aplica();let k=0;const it=setInterval(()=>{aplica();if(++k>120)clearInterval(it);},1000);
+  const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);try{aplica();}catch(_){}return r;};
+}catch(e){console.warn('troca bonecos',e);}})();
+
+/* ===== v199 — BONECOS NOVOS DO CANVA EM 1922: MULHER DO POVO, SENHORA RICA, JAPONESES E MENINAS (pedido do professor, 21/11/2026) =====
+   Seis bonecos novos desenhados no Canva com as proporções dos bonecos do jogo (folhas N88_mulherPovo22, N88_senhoraRica22,
+   N88_japonesTrab22, N88_japonesCom22, N88_meninaPobre22, N88_meninaRica22, no arte_1922.js).
+   Entram no lugar dos bonecos emprestados: mulheres do povo que usavam a sufragista ou a enfermeira, senhoras ricas,
+   japoneses que usavam boneco de europeu e meninas que usavam boneco de mulher adulta.
+   A sufragista, a moça que quer votar e a enfermeira de verdade continuam com o boneco delas.
+   Repete por 2 minutos e a cada troca de cena, como o bloco dos bonecos trocados. */
+(function(){try{
+  const MP='mulherPovo22',SR='senhoraRica22',JT='japonesTrab22',JC='japonesCom22',MPB='meninaPobre22',MR='meninaRica22';
+  const T={
+   /* mulheres do povo */
+   donaVila:MP+'|0',lavadeiraC:MP+'|1',moradoraLapa:MP+'|2',bairro22_7:MP+'|3',bairro22_17:MP+'|0',bairro22_23:MP+'|4',
+   lavadeiraBix:MP+'|1',zo22n_141:MP+'|2',br_maeCarta:MP+'|3',br_fregA:MP+'|5',br_fregB:MP+'|1',compradoraMerc22:MP+'|2',
+   devotaSG22:MP+'|4',lotes22_3:MP+'|0',lotes22_7:MP+'|4',porteira22_1:MP+'|1',porteira22_4:MP+'|3',porteira22_12:MP+'|2',
+   moocaS22n_4:MP+'|5',empregadaRica22:MP+'|0',donaHorta22:MP+'|3',mooca22n_3:MP+'|1',passanteS2:MP+'|1',nonna:MP+'|4',
+   /* senhoras ricas */
+   senhoraP:SR+'|0',madameMappin:SR+'|0',mocaMappin:SR+'|2',familiaMaronita:SR+'|1',br_admaJafet:SR+'|0',br_senMaluf:SR+'|1',
+   br_senMattar:SR+'|2',br_senSalem:SR+'|3',br_senGebara:SR+'|5',br_senhoraQuibe:SR+'|1',freguesaTec22:SR+'|2',
+   damaIsrael22:SR+'|3',maeRica22:SR+'|0',senhoraTrianon:SR+'|1',pass22_15:SR+'|2',pass22_18:SR+'|3',
+   /* japoneses */
+   jardineiroJP:JT+'|0',colonoJP:JT+'|0',imiOkinawa22:JT+'|1',fila3:JT+'|2',
+   japones:JC+'|0',profJP:JC+'|1',japonesLib:JC+'|0',
+   /* meninas */
+   aguadeira:MPB+'|0',meninaRP:MPB+'|1',meninaAS:MPB+'|2',bairro22_14:MPB+'|0',vida22_2:MPB+'|3',fiandeira22:MPB+'|0',
+   imiMenina22:MPB+'|1',rio22_3:MPB+'|2',mooca22n_9:MPB+'|3',moocaS22n_8:MPB+'|5',
+   meninaRica22:MR+'|0',filhaLoja22:MR+'|1'
+  };
+  const V=[0,1,2,3,5];
+  const h=s=>{let x=0;for(const c of String(s))x=(x*31+c.charCodeAt(0))|0;return Math.abs(x);};
+  /* quem anda pela cidade e é sorteado: reconhece pelo nome */
+  const porNome=p=>{const n=String(p.name||''),s=String(p.spr||'');
+    if(/^Comerciante japon/i.test(n))return JC+'|'+[0,1,2][h(p.id)%3];
+    if(/japon/i.test(n))return JT+'|'+[0,1,2][h(p.id)%3];
+    if(/^Senhora (da Paulista|de chapéu|elegante|de Santa Cecília)/.test(n))return SR+'|'+V[h(p.id)%V.length];
+    if(/^Menina/.test(n))return MPB+'|'+V[h(p.id)%V.length];
+    if(/^h22_x\|(militante_sufragista|enfermeira_da_santa_casa)\|/.test(s)&&!/sufrag|votar|feminist|enfermeir|freira|irmã/i.test(n))return MP+'|'+V[h(p.id)%V.length];
+    return null;};
+  const aplica=()=>{let n=0;try{for(const L of [npcs,walkers])for(const p of L){let e=4;try{e=eraOf(p.scene||cur);}catch(_){}if(e!==4)continue;
+      const t=T[p.id]||porNome(p);if(!t)continue;const s='h22_n|'+t;if(p.spr!==s){p.spr=s;n++;}}}catch(_){}return n;};
+  window.__bonecosCanva22={T,aplica,porNome};
+  aplica();let k=0;const it=setInterval(()=>{aplica();if(++k>120)clearInterval(it);},1000);
+  const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);try{aplica();}catch(_){}return r;};
+}catch(e){console.warn('bonecos canva 22',e);}})();
 
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /*ABERTURA_RAPIDA_FIM*/;(function(){
