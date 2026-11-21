@@ -20816,7 +20816,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v226) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v232) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -21716,6 +21716,40 @@ window.__paulista82Ready=Promise.all(ready);
         let ok=0;for(let r=1;r<9&&!ok;r++)for(let dy=-r;dy<=r&&!ok;dy++)for(let dx=-r;dx<=r&&!ok;dx++){const x=n.x+dx,y=n.y+dy;if(livre(x,y)&&!npcs.some(q=>q!==n&&q.scene===S&&q.x===x&&q.y===y)){n.x=x;n.y=y;n.px=x*16;n.py=y*16;ok=1;}}}
       rel.eixoSI=[ig.x,ig.y,tav?[tav.x,tav.y]:0,ofi?[ofi.x,ofi.y]:0];}
     }catch(e){console.warn('Santa Ifigenia no eixo JM',e);}
+    /* ===== v232 — CENTRO DE 1922: FAIXA SUL FECHADA — embaixo da Senador Feijó entra uma rua de terra com casas e sobrados; na beira de baixo, depois da encosta, uma fileira de fachadas subindo para a Liberdade (a loja de Santo Antônio vira uma delas); o canto sudeste vira a ponta sul do Parque D. Pedro II, com caminhos curvos e árvores novas (pedido do professor, 21/11/2026) ===== */
+    try{if(M[97]&&M[97][145]!==undefined&&!rel.faixaSul){
+      const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+      const limpa=(x0,y0,x1,y1)=>{for(const o of objects){if(o.scene!==S)continue;const w=o.w||1,h=o.h||1;if(!/^jm_q_|^jm_fx_|^pt_|^jm_tapa_|^pc_5_ig_santo_antonio/.test(o.id))continue;
+          if(o.x>=x0&&o.x+w-1<=x1&&o.y>=y0&&o.y+h-1<=y1){o.scene='__fora';continue;}
+          if(h===1&&o.y>=y0&&o.y<=y1&&/^jm_q_/.test(o.id)){let a=o.x,b=o.x+w-1;while(b>=a&&b>=x0&&b<=x1)b--;while(a<=b&&a>=x0&&a<=x1)a++;if(b<a)o.scene='__fora';else{o.x=a;o.w=b-a+1;}}}
+        if(rel.quintais)rel.quintais=rel.quintais.filter(q=>!(q[0]>=x0&&q[0]<=x1&&q[1]>=y0&&q[1]<=y1));};
+      const KS=[['g_residencia_2x2_1',4,0],['g_sobrado_3x2_1',6,1],['g_colonial_2x1_1',4,0],['g_residencia_2x2_2',4,0],['g_sobrado_3x2_2',6,1],['g_colonial_2x1_2',4,0],['g_loja_2x2_1',4,0]];
+      const fila=(x0,x1,base,pref)=>{let x=x0,i=(x0+base)%KS.length;while(x<=x1){let k=KS[i%KS.length];if(x+k[1]-1>x1){k=KS.find(q=>q[1]<=x1-x+1);if(!k)break;}
+          if(MAN[k[0]]&&A['PC_'+k[0]]){const o={id:pref+x+'_'+base,scene:S,x,y:base-4,w:1,h:1,name:k[2]?'Sobrado':'Casa',text:k[2]?['Um sobrado: comércio embaixo, moradia em cima.']:['Uma casa de moradia, parede com parede com as vizinhas.']};objects.push(o);grande(o,k[0],x,base-4,k[1],null,null,[(x+base)%3?'t':'p',TELHA[(x+base)%4]],base);o.__gen=1;}
+          x+=k[1];i++;}};
+      /* 1. embaixo da Senador Feijó: rua de terra e fileira de casas */
+      limpa(66,84,95,89);for(let y=84;y<=87;y++)for(let x=66;x<=95;x++)M[y][x]='p';for(let y=88;y<=89;y++)for(let x=66;x<=95;x++)M[y][x]='d';
+      const fz=objects.find(o=>o.scene===S&&o.id==='fazenda');if(fz){fz.y=85;}
+      fila(66,91,88,'jm_fs_');
+      /* 2. no lugar da encosta: mais uma fileira de casas, de frente para uma segunda rua de terra; a rua da Liberdade continua aberta */
+      limpa(62,90,95,97);limpa(100,90,129,97);
+      for(let y=90;y<=97;y++)for(let x=62;x<=129;x++){if(x>=96&&x<=99)continue;M[y][x]=y<=93?'p':y<=95?'d':'p';}
+      fila(64,95,94,'jm_fb_');fila(100,129,94,'jm_fb_');
+      rel.ruasSul=[[62,129,88,89],[62,129,94,95]];
+      /* 3. canto sudeste: ponta sul do Parque D. Pedro II */
+      for(const o of objects)if(o.scene===S&&o.id==='pc_68_g_loja_2x2_1')o.scene='__fora';
+      for(let y=72;y<=97;y++)for(let x=128;x<=145;x++){if(y>=80&&y<=81)continue;if(/[d,f]/.test(M[y][x]))M[y][x]='.';if(y>=82&&y<=87&&x>=134&&x<=141&&M[y][x]==='p')M[y][x]='.';}
+      rel.parqueSul={el:[[136.5,76,5.6,2.9],[137,89.5,6.2,5.6]],seg:[[136.5,79,136.5,82],[137,84,137,80],[137,95.1,137,97.9],[128,76,130.9,76],[143.2,89.5,145.9,89.5]]};
+      const pp=(id,k,x,y,nm,tx,sc)=>{if(!A[k]||ocp(x,y)||!M[y]||M[y][x]!=='.'||objects.some(o=>o.id===id))return;const im=new Image();im.src=A[k];sc=sc||1;
+        objects.push({id,scene:S,x,y,w:1,h:1,name:nm,text:tx,__jm:1,draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=Math.round(im.naturalWidth*sc),h=Math.round(im.naturalHeight*sc);c.fillStyle='rgba(20,16,24,.22)';c.fillRect(Math.round(X+8-w*.3),Y+13,Math.round(w*.6),3);c.drawImage(im,Math.round(X+8-w/2),Y+16-h,w,h);}});};
+      const AR=['Árvore nova do parque',['As árvores da ponta sul do parque acabaram de ser plantadas.']],BA=['Banco do parque',['Um banco novo, de frente para o gramado.']],CA=['Canteiro de flores',['Um canteiro de flores no gramado novo.']];
+      [[136,76],[131,73],[143,78],[137,89],[131,85],[143,85],[130,94],[144,95],[133,91],[141,92]].forEach((q,i)=>pp('jm_psArv'+i,i%3===1?'ANH_arvore_florida':'ANH_arvore_verde',q[0],q[1],AR[0],AR[1],.6));
+      pp('jm_psCan1','ANH_canteiro_florido',137,92,CA[0],CA[1]);pp('jm_psBan1','ANH_banco_A',134,79,BA[0],BA[1]);pp('jm_psBan2','ANH_banco_A',140,84,BA[0],BA[1]);
+      /* gente que ficou dentro de casa nova vai para a rua mais perto */
+      for(const n of npcs){if(n.scene!==S||n.y<82||n.x<62)continue;const livre=(x,y)=>M[y]&&/[pDd.]/.test(M[y][x]||'')&&!ocp(x,y);if(livre(n.x,n.y))continue;
+        let ok=0;for(let r=1;r<10&&!ok;r++)for(let dy=-r;dy<=r&&!ok;dy++)for(let dx=-r;dx<=r&&!ok;dx++){const x=n.x+dx,y=n.y+dy;if(livre(x,y)&&!npcs.some(q=>q!==n&&q.scene===S&&q.x===x&&q.y===y)){n.x=x;n.y=y;n.px=x*16;n.py=y*16;ok=1;}}}
+      rel.faixaSul=1;}
+    }catch(e){console.warn('faixa sul JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
@@ -21836,6 +21870,16 @@ window.__paulista82Ready=Promise.all(ready);
               if(m<.26)c=m>.2?'#b39f6c':saibro(px,py);else if(ch==='W')c=grama(px,py);}
             if(c){g.fillStyle=c;g.fillRect(px,py,1,1);}}}
       }catch(e){console.warn('parque Dom Pedro pintura JM',e);}
+      try{const PS=rel.parqueSul;if(PS){const MP=window.__centro22.M,h6=(a,b)=>{let n=(a*374761393+b*668265263)|0;n=(n^(n>>>13))*1274126177|0;return (n^(n>>>16))>>>0;};
+        const sb=(px,py)=>{const q=h6(px,py)%100;return q<8?'#c9b27a':q<16?'#e6d6a4':'#d9c690';};
+        const el=(e,x,y)=>{const a=(x-e[0])/e[2],b=(y-e[1])/e[3];return Math.sqrt(a*a+b*b);};
+        const sg=(s,x,y)=>{const vx=s[2]-s[0],vy=s[3]-s[1],t=Math.max(0,Math.min(1,((x-s[0])*vx+(y-s[1])*vy)/(vx*vx+vy*vy||1)));return Math.hypot(x-s[0]-t*vx,y-s[1]-t*vy);};
+        for(let py=72*16;py<98*16;py++)for(let px=128*16;px<146*16;px++){const ch=MP[py>>4][px>>4];if(ch!=='.')continue;const x=px/16+1/32,y=py/16+1/32;let m=9;
+          for(const e of PS.el){const d=Math.abs(el(e,x,y)-1)*Math.min(e[2],e[3]);if(d<m)m=d;}for(const s of PS.seg){const d=sg(s,x,y);if(d<m)m=d;}
+          if(m<.26){g.fillStyle=m>.2?'#b39f6c':sb(px,py);g.fillRect(px,py,1,1);}}}
+        {const MP=window.__centro22.M,h7=(a,b)=>{let n=(a*374761393+b*668265263)|0;n=(n^(n>>>13))*1274126177|0;return (n^(n>>>16))>>>0;},sb=(px,py)=>{const q=h7(px,py)%100;return q<8?'#c9b27a':q<16?'#e6d6a4':'#d9c690';};
+        for(const r of (rel.ruasSul||[]))for(let py=r[2]*16;py<(r[3]+1)*16;py++)for(let px=r[0]*16;px<(r[1]+1)*16;px++){if(MP[py>>4][px>>4]!=='d')continue;const e=py-r[2]*16,f=(r[3]+1)*16-1-py;g.fillStyle=e<2||f<2?(e<1||f<1?'#9c8a5e':'#b8a474'):sb(px,py);g.fillRect(px,py,1,1);}}
+      }catch(e){console.warn('parque sul pintura JM',e);}
       /* ===== v202 — CENTRO DE 1922: PARQUE DO ANHANGABAÚ — gramado com textura, alameda sinuosa de saibro, caminhos curvos e canteiros de flores no lugar do verde liso e das faixas retas (pedido do professor, 21/11/2026) ===== */
       try{const MP=window.__centro22.M,h4=(a,b)=>{let n=(a*374761393+b*668265263)|0;n=(n^(n>>>13))*1274126177|0;return (n^(n>>>16))>>>0;};
         const gr=(px,py)=>{const q=h4(px,py)%100,q2=h4(px>>2,py>>1)%100;return q<5?'#86ab58':q<10?'#5c8440':q2<18?'#6a9347':'#74a04e';};
