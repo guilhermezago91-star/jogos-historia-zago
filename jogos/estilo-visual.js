@@ -16,12 +16,10 @@
    encosta...) tem primeiro uma prancha de teste aprovada pelo professor.
    As peças seguintes são feitas a partir dela.
 
-   DUAS FAMÍLIAS DE VISUAL (fixado em 21/11/2026): o jogo tem dois jeitos
-   de montar o cenário. Não misturar. Ver "familias" logo abaixo.
-     Família COLONIAL: 1554 (e 1640, quando entrar) – mapa pintado inteiro.
-     Família CIDADE: 1830, 1888 e 1922 – mapa montado por quadradinhos.
-   O que vale para as duas: Stardew, 32 px, três quartos, sem preto puro,
-   o mesmo boneco do jogador e a história acima do estilo.
+   UM MODELO SÓ (decisão do professor, 21/11/2026): o jogo inteiro, de 1554 a
+   1922, usa o mapa montado por quadradinhos, como 1830. Mapa pintado inteiro
+   é proibido (um estudante mostrou que ficava poluído e não dava para ver onde
+   se anda). Única exceção: a Serra do Mar de 1554. Ver "modelo" logo abaixo.
 
    O conferidor no fim do arquivo só mede tamanho e preto puro. Passar
    nele NÃO quer dizer que o desenho está aprovado.
@@ -38,30 +36,20 @@ const ESTILO = {
   consultaSecundaria: ["Zelda: A Link to the Past", "Chrono Trigger"],
   descartados: ["Ninja Adventure", "pastel estilo Pokémon/GBA", "gráfico desenhado por código"],
 
-  /* ---------- DUAS FAMÍLIAS DE VISUAL ---------- */
-  familias: {
-    colonial: {
-      epocas: [1554, 1640],
-      chao: "cada lugar é UM desenho inteiro do Canva (mapa pintado), com chão, mata, rio, prédios e cais já dentro dele",
-      arquivos: "2 tamanhos (normal e 2x, webp) em jogos/arte/mapas1554/; o jogo só baixa quando a pessoa vai para o lugar; nunca dentro do pacote arte_1554.js",
-      grade: "por cima do desenho, uma grade invisível diz onde se anda e onde se bate; o prédio do mapa não tem desenho próprio, só porta, texto e nome",
-      escala: "a do teste de 1640: casa de colono com quintal ~9-10 quadradinhos de largura, igreja ~6x9, Casa do Conselho ~9x6; mapa de vila ~60x45",
-      objetos: "placa, baú, barril, tenda, toras etc. refeitos no mesmo estilo do mapa (Canva, 32 px); peça antiga em 16 px que aparecer é resto a refazer",
-      referencias: "prancha de São Vicente (Canva MAHbgYle5kw) e mapa de Lisboa (Canva MAHbfy0B6wM): toda imagem nova desta família é gerada com elas como referência"
-    },
-    cidade: {
-      epocas: [1830, 1888, 1922],
-      chao: "mapa montado por quadradinhos (tiles) de 32 px; cada prédio, veículo e objeto é um PNG separado",
-      arquivos: "dentro dos pacotes arte_1830.js, arte_1888.js, arte_1922.js e arte_comum.js",
-      cuidado: "o centro de 1922 é sorteado a partir do mapa dos bairros (colunas 58-132, linhas 64-116 de sp22): não mexer sem avisar"
-    },
-    naoMisturar: [
-      "nunca fazer mapa pintado inteiro em 1830, 1888 ou 1922",
-      "nunca usar quadradinho ou prédio das épocas da cidade num mapa colonial",
-      "a regra 'sem chão desenhado na imagem' vale para peças soltas; na família colonial o mapa pintado É o chão",
-      "o boneco do jogador e as pessoas seguem as mesmas medidas nas duas famílias",
-      "na dúvida sobre a família de uma peça nova, perguntar ao professor antes de desenhar"
-    ]
+  /* ---------- UM MODELO SÓ ---------- */
+  modelo: {
+    epocas: [1554, 1640, 1830, 1888, 1922],
+    chao: "mapa montado por quadradinhos (tiles) de 32 px que se repetem; cada prédio, veículo, placa e objeto é um PNG separado",
+    proibido: "mapa pintado inteiro (um desenho único com chão e prédios dentro), em qualquer época",
+    excecao: "Serra do Mar de 1554 (SERRA54_MAPA), que fica como está",
+    leitura: [
+      "leitura antes de beleza: caminho, parede, água e porta têm de se ver de relance",
+      "o que não se atravessa tem de parecer que não se atravessa",
+      "pouca gente e poucos objetos por lugar; sem enfeite que não ensina nada",
+      "antes de trocar o visual de um lugar inteiro, mostrar ao professor antes e depois, lado a lado"
+    ],
+    chave1554: "no piratininga.html, window.CENARIO54_ANTIGO=true desliga os mapas pintados de 1554 (v161, v194, v196, v197, v205); não religar",
+    cuidado: "o centro de 1922 é sorteado a partir do mapa dos bairros (colunas 58-132, linhas 64-116 de sp22): não mexer sem avisar"
   },
 
   /* ---------- TAMANHOS (em pixels, sem escala) ---------- */
@@ -140,7 +128,8 @@ const ESTILO = {
     "excesso de telhado marrom de cenário",
     "objeto fora da época",
     "letra de pixel pequena demais para ler no celular",
-    "texto, moldura ou chão desenhado dentro da imagem (exceto o mapa pintado da família colonial)"
+    "texto, moldura ou chão desenhado dentro da imagem",
+    "mapa pintado inteiro (só a Serra do Mar de 1554 fica como está)"
   ],
 
   /* ---------- PROIBIDO SÓ EM UMA ÉPOCA ----------
