@@ -6830,6 +6830,35 @@ function findFree(sc,cx,cy,R){for(let r=0;r<=(R||20);r++)for(let y=cy-r;y<=cy+r;
 function findFreeRect(sc,cx,cy,w,h,R){for(let r=0;r<=(R||20);r++)for(let y=cy-r;y<=cy+r;y++)for(let x=cx-r;x<=cx+r;x++){if(Math.max(Math.abs(x-cx),Math.abs(y-cy))!==r)continue;
   let ok=true;for(let yy=y-1;yy<=y+h&&ok;yy++)for(let xx=x-1;xx<=x+w&&ok;xx++)if(!freeAt(sc,xx,yy))ok=false;if(ok)return [x,y];}return null;}
 
+/* ===== v213 — ABERTURA MAIS RÁPIDA: "ESTE LUGAR ESTÁ LIVRE?" SEM PROCURAR NAS 900 PESSOAS =====
+   Pedido do professor (21/11/2026). Na montagem da cidade o jogo pergunta milhares de vezes
+   "tem alguém neste quadradinho?" e, a cada pergunta, olhava as quase 1.000 pessoas uma por uma.
+   Agora o jogo guarda uma lista de onde está cada pessoa e só consulta a lista.
+   A resposta é a mesma de antes: a lista é refeita sozinha sempre que alguém muda de lugar,
+   entra ou sai. Se algo estranho acontecer, volta ao jeito antigo (olhar um por um). */
+(function(){try{
+  const V={v:0};const MARCA=Symbol('vigiado');
+  const vigia=n=>{if(!n||typeof n!=='object')return false;if(n[MARCA])return true;
+    for(const k of ['x','y','scene']){const d=Object.getOwnPropertyDescriptor(n,k);if(d&&(d.get||d.set||!d.configurable||!d.writable))return false;}
+    for(const k of ['x','y','scene']){let val=n[k];
+      Object.defineProperty(n,k,{get(){return val;},set(v){if(v!==val){val=v;V.v++;}},enumerable:true,configurable:true});}
+    Object.defineProperty(n,MARCA,{value:true});return true;};
+  const I={refs:[],m:null,v:-1,ok:false};
+  const valido=()=>{if(I.v!==V.v||I.refs.length!==npcs.length)return false;for(let i=0;i<npcs.length;i++)if(npcs[i]!==I.refs[i])return false;return true;};
+  const monta=()=>{I.ok=true;const m=new Map();
+    for(const n of npcs){if(!vigia(n)){I.ok=false;break;}const sc=n.scene||'pira';let g=m.get(sc);if(!g){g=new Map();m.set(sc,g);}
+      const yy=g.get(n.y);if(yy)yy.add(n.x);else g.set(n.y,new Set([n.x]));}
+    I.m=m;I.refs=npcs.slice();I.v=V.v;};
+  const alguemEm=(sc,x,y)=>{if(!valido())monta();
+    if(!I.ok)return npcs.some(n=>(n.scene||'pira')===sc&&n.x===x&&n.y===y);
+    const g=I.m.get(sc);if(!g)return false;const yy=g.get(y);return !!yy&&yy.has(x);};
+  freeAt=function(sc,x,y){const M=SCN[sc]&&SCN[sc].map;if(!M||!M[y]||M[y][x]===undefined)return false;if(SOLIDX.includes(M[y][x]))return false;
+    if(__objEm(sc,x,y))return false;
+    if(alguemEm(sc,x,y))return false;
+    if(ITEMS.some(i=>(i.scene||'pira')===sc&&i.x===x&&i.y===y))return false;return true;};
+  window.__v213={I,V,alguemEm};
+}catch(e){console.warn('v213 lugar livre',e);}})();
+
 /* ---------- 1) no Mapa: onde estão os objetos e as pessoas ---------- */
 {const mm=mapMarks;mapMarks=function(c,k,oy){mm(c,k,oy);
   const DS=k==='sp88'?2.2:k==='sp22'?3:1;
