@@ -373,7 +373,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=fc8eb325","kb":282,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=4e4411ca","kb":1528,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=8433de42","kb":6672,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=fc8eb325","kb":282,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=4e4411ca","kb":1528,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=0275149a","kb":6777,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -20702,7 +20702,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v220) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v222) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -21427,6 +21427,12 @@ window.__paulista82Ready=Promise.all(ready);
       {const sj=objects.find(q=>q.scene===S&&q.id==='theatroSJ');if(sj&&!sj.__txt){sj.__txt=1;sj.name='Antigo Theatro São José';sj.text=['Antigo Theatro São José. Projeto do arquiteto Carlos Ekman, aberto em 1909, com lugar para cerca de 3.000 pessoas: mais do que o Municipal.','Perdeu o público para o Municipal e parou de funcionar como teatro em 1919. Em 1920 a Light comprou o prédio. Hoje, em 1922, as salas estão alugadas para lojas, ateliês e oficinas.','Em 1924 ele vai ser demolido. No lugar, a Light ergue a sua sede, o Edifício Alexandre Mackenzie (1929), onde hoje funciona o Shopping Light, de frente para o Theatro Municipal.','[Fontes: São Paulo Antiga; Galatica; Wikipédia. A fachada segue o cartão-postal da época, simplificada.]'];}}
       {const tb=objects.find(q=>q.scene===S&&q.enter&&/^Tabacaria$/.test(q.name||'')&&q.x>=116&&q.x<=124&&q.y>=18&&q.y<=24);if(tb&&A.JM22_teatro_boa_vista&&!tb.__boa){tb.__boa=1;tb.name='Teatro Boa Vista';tb.text=['Teatro Boa Vista, na Rua Boa Vista, esquina com a Ladeira Porto Geral. É pequeno: cerca de 734 lugares.','Em 1922 a cidade tem muitas casas de espetáculo além do Municipal: teatros, cinemas, cassinos. Companhias de opereta, revista e teatro estrangeiro se apresentam aqui.','[Fonte: Virgínia de Almeida Bessa, 2022. A fachada é imaginada: não achamos fotografia dela.]'];
         const im=new Image();im.src=A.JM22_teatro_boa_vista;const L=tb.w||4,F=tb.h||5;tb.__canva=1;tb.draw=function(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth/2,h=im.naturalHeight/2;c.drawImage(im,Math.round(X+L*8-w/2),Math.round(Y+F*16-h),w,h);};}}
+      /* ===== v222 — CENTRO DE 1922: FOTO DE HOJE DO SHOPPING LIGHT — ao lado do Antigo Theatro São José, uma fonte com a fotografia do prédio que ocupa o terreno hoje (pedido do professor, 21/11/2026) ===== */
+      try{if(typeof FONTES!=='undefined'&&A.F22LHJ&&!FONTES.fotoLightHj){const sj=objects.find(q=>q.scene===S&&q.id==='theatroSJ');
+        FONTES.fotoLightHj={sc:S,kick:'Fonte: fotografia de hoje',title:'O Shopping Light hoje',img:'F22LHJ',cap:'No terreno do antigo Theatro São José, a Light construiu a sua sede, o Edifício Alexandre Mackenzie, inaugurado em 1929. Hoje o prédio abriga o Shopping Light, de frente para o Theatro Municipal. O teatro de 1909 não existe mais.',cred:'Fotografia enviada pelo professor (Veja São Paulo).',diary:'Fotografia de hoje: o Shopping Light, no lugar do antigo Theatro São José.'};
+        let p=null;if(sj){const porta=(x,y)=>objects.some(o=>o.scene===S&&o.enter&&Math.abs(x-(o.x+(o.door!=null?o.door:((o.w||1)>>1))))<=1&&y>=o.y+(o.h||1)&&y<=o.y+(o.h||1)+1);for(const c of [[sj.x+4,sj.y+4],[sj.x+4,sj.y+3],[sj.x+5,sj.y+4],[sj.x+3,sj.y+5],[sj.x,sj.y+5]]){const x=c[0],y=c[1];if(M[y]&&/[pD]/.test(M[y][x]||'')&&!porta(x,y)&&!objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))){p=c;break;}}
+          if(!p)try{p=findFree(S,sj.x+2,sj.y+5,4);}catch(_){}}
+        if(p){FONTES.fotoLightHj.xy=p;objects.push({id:'fotoLightHj',scene:S,x:p[0],y:p[1],w:1,h:1,draw:drawSign,name:'Fonte histórica',text:['Uma fonte histórica. Aperte A para ver.']});rel.fotoLight=p;}}}catch(e){console.warn('foto Shopping Light JM',e);}
       }catch(e){console.warn('fachadas canva JM',e);}
     /* ===== v191 — CENTRO DE 1922: LARGO DE SANTA IFIGÊNIA — igreja refeita conforme as fontes (pedra cinza, uma torre central alta e duas torrinhas), de frente para um largo calçado e arborizado ligado à cabeceira do viaduto; casas e sobrados no lugar do quintal solto e do gramado (pedido do professor, 20/11/2026) ===== */
     try{const ig=objects.find(q=>q.scene===S&&q.__canva&&/Santa Ifig/.test(q.name||''));if(ig&&M[22]&&M[22][45]!==undefined){
