@@ -19719,7 +19719,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v201) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v202) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -20680,6 +20680,23 @@ window.__paulista82Ready=Promise.all(ready);
               if(m<.26)c=m>.2?'#b39f6c':saibro(px,py);else if(ch==='W')c=grama(px,py);}
             if(c){g.fillStyle=c;g.fillRect(px,py,1,1);}}}
       }catch(e){console.warn('parque Dom Pedro pintura JM',e);}
+      /* ===== v202 — CENTRO DE 1922: PARQUE DO ANHANGABAÚ — gramado com textura, alameda sinuosa de saibro, caminhos curvos e canteiros de flores no lugar do verde liso e das faixas retas (pedido do professor, 21/11/2026) ===== */
+      try{const MP=window.__centro22.M,h4=(a,b)=>{let n=(a*374761393+b*668265263)|0;n=(n^(n>>>13))*1274126177|0;return (n^(n>>>16))>>>0;};
+        const gr=(px,py)=>{const q=h4(px,py)%100,q2=h4(px>>2,py>>1)%100;return q<5?'#86ab58':q<10?'#5c8440':q2<18?'#6a9347':'#74a04e';};
+        const sb=(px,py)=>{const q=h4(px,py)%100;return q<8?'#c9b27a':q<16?'#e6d6a4':'#d9c690';};
+        const el=(e,x,y)=>{const a=(x-e[0])/e[2],b=(y-e[1])/e[3];return Math.sqrt(a*a+b*b);};
+        const fl=(px,py)=>{const q=h4(px>>1,py>>1)%10;return q<3?'#e58a8a':q<5?'#f2efe2':q<7?'#e8d36a':q<8?'#d9582f':'#5f9a3a';};
+        const Z=[{y0:14,y1:19,an:[[57,16.9,5.6,2.1]],ct:[[57,16.9,1.5,.8]]},{y0:24,y1:25,an:[],ct:[]},
+          {y0:30,y1:41,sin:1,an:[[52.4,33.2,1.8,2.3],[61.2,38.6,1.8,2.3]],ct:[[61.3,32.4,1.25,.95],[52.4,38.9,1.25,.95]]},{y0:46,y1:63,so:1,an:[],ct:[]}];
+        for(const z of Z)for(let py=z.y0*16;py<(z.y1+1)*16;py++)for(let px=50*16;px<64*16;px++){const tx=px>>4,ty=py>>4,ch=MP[ty][tx];if(!/[.,fd]/.test(ch))continue;
+          const x=px/16+1/32,y=py/16+1/32;let c=gr(px,py),m=9;
+          if(z.so&&ch==='d'){const i=px&15,j=py&15,nd=(a,b)=>!MP[ty+b]||MP[ty+b][tx+a]!=='d';c=((i<1&&nd(-1,0))||(i>14&&nd(1,0))||(j<1&&nd(0,-1))||(j>14&&nd(0,1)))?'#b39f6c':sb(px,py);}
+          for(const e of z.ct){const d=el(e,x,y);if(d<1)c=d>.82?'#4f7a36':fl(px,py);}
+          for(const e of z.an){const d=Math.abs(el(e,x,y)-1)*Math.min(e[2],e[3]);if(d<m)m=d;}
+          if(m<.26)c=m>.2?'#b39f6c':sb(px,py);
+          if(z.sin){const d=Math.abs(x-(57+2.3*Math.sin((y-30)*Math.PI/6)));if(d<.8)c=d>.72?'#b39f6c':sb(px,py);}
+          g.fillStyle=c;g.fillRect(px,py,1,1);}
+      }catch(e){console.warn('Anhangabau pintura JM',e);}
       try{const MP=window.__centro22.M,h3=(a,b)=>{let n=(a*374761393+b*668265263)|0;n=(n^(n>>>13))*1274126177|0;return (n^(n>>>16))>>>0;};
         const W=rel.paredao;if(W)for(let y=W.y0;y<=W.y1;y++){if(MP[y][128]!=='C'||MP[y][129]!=='C')continue;const Y=y*16,X=128*16;
           for(let j=0;j<16;j++)for(let i=0;i<32;i++){let c;if(i<9){const q=h3(X+i,Y+j)%100;c=q<6?'#86ab58':q<12?'#5c8440':'#74a04e';}
