@@ -19909,7 +19909,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v210) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v212) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -20764,10 +20764,13 @@ window.__paulista82Ready=Promise.all(ready);
         if(y<t)M[y][x]='p';else if(y<=t+2)M[y][x]='D';else if(x<130)M[y][x]='C';else if(y===t+3){M[y][x]='p';L.muro.push([x,y]);}else{M[y][x]='p';L.quintal.push([x,y]);}}}
       for(const q of L.muro.concat(L.quintal))if(!ocp(q[0],q[1]))objects.push({id:'jm_pg_'+q[0]+'_'+q[1],scene:S,x:q[0],y:q[1],w:1,h:1,name:L.muro.includes(q)?'Muro de arrimo':'Quintal com bananeiras',text:L.muro.includes(q)?['Um muro de pedra segura a ladeira do lado de baixo.']:['Um quintal antigo, com bananeiras, atrás do muro da ladeira. Aparece nas fotografias de 1911 e 1916.'],__jm:1,draw(){}});
       if(typeof drawSign==='function'&&!objects.some(o=>o.id==='jm_pgPlaca')&&!ocp(130,26))objects.push({id:'jm_pgPlaca',scene:S,x:130,y:26,w:1,h:1,draw:drawSign,name:'Placa',text:['Ladeira Porto Geral. Desce forte do alto da colina até a Rua 25 de Março. Lá embaixo, antes de o rio ser levado para o canal, ficava o porto das canoas do Tamanduateí: daí o nome.','Nas fotografias de 1911 e 1916 a ladeira aparece calçada de pedra, com sobrados de comércio de um lado e, do outro, um muro de quintal com bananeiras. Em 1916 o bonde já passava lá embaixo.'],__jm:1});
-      try{if(!C.P.some(q=>q&&/PORTO GERAL/.test(q.t||'')))C.P.push({t:'LAD. PORTO GERAL',x:132*16,y:27*16+12,w:100});}catch(_){}
+      try{if(!C.P.some(q=>q&&/PORTO GERAL/.test(q.t||'')))C.P.push({t:'LAD. PORTO GERAL',x:137*16+8,y:31*16+2,w:100});}catch(_){}
       for(const n of npcs){if(n.scene!==S||n.x<128||n.x>141||n.y<22||n.y>33)continue;const livre=(x,y)=>M[y]&&/[pD.]/.test(M[y][x]||'')&&!ocp(x,y);if(livre(n.x,n.y))continue;
         let ok=0;for(let r=1;r<9&&!ok;r++)for(let dy=-r;dy<=r&&!ok;dy++)for(let dx=-r;dx<=r&&!ok;dx++){const x=n.x+dx,y=n.y+dy;if(livre(x,y)&&M[y][x]!=='.'&&!npcs.some(q=>q!==n&&q.scene===S&&q.x===x&&q.y===y)){n.x=x;n.y=y;n.px=x*16;n.py=y*16;ok=1;}}}
     }}catch(e){console.warn('Ladeira Porto Geral JM',e);}
+    /* ===== v212 — CENTRO DE 1922: LADEIRA PORTO GERAL, ACABAMENTO — calçamento mais claro, no tom das outras ruas; degraus de soleira na porta de cada loja, marcando a altura; casa térrea de telha no meio da ladeira, como nas fotografias; nome da rua no leito da ladeira (pedido do professor, 21/11/2026) ===== */
+    try{const d=objects.find(q=>q.scene===S&&q.id==='br_loja56');if(d&&!d.__terrea&&MAN['g_colonial_2x1_1']&&A['PC_g_colonial_2x1_1']){const en=d.enter,dr=d.door;grande(d,'g_colonial_2x1_1',d.x,d.y,4,null,'DOCES',['t',TELHA[1]],d.y+d.h);d.enter=en;if(dr!=null)d.door=dr;d.__terrea=1;}
+    }catch(e){console.warn('Porto Geral acabamento JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
@@ -20931,8 +20934,8 @@ window.__paulista82Ready=Promise.all(ready);
             if(v<-9)continue;
             else if(v<0){/* calçada estreita de lajes do lado das lojas */const lj=((px+((py>>3)%2?5:0))%11===0)||(Math.round(v)%8===0);c=lj?[150,144,130]:(h5(px>>1,py>>1)%7===0?[206,199,182]:[192,185,168]);}
             else if(v<3&&!fim){/* meio-fio com falhas */if(h5(px>>3,11)%7===0)c=[120,114,102];else c=v<1?[222,215,198]:[170,163,148];}
-            else if(v<W+wob){const u=Math.round(v),m=pedra(px,u);const n=.9+.22*ruido(px,py),f=(1.05-.18*t)*n;
-              if(m===null){c=[base[0]*.62,base[1]*.62,base[2]*.6];if((v<9||v>W-9)&&h5(px,py)%4===0)c=[96,128,62];}
+            else if(v<W+wob){const u=Math.round(v),m=pedra(px,u);const n=.9+.22*ruido(px,py),f=(1.1-.1*t)*n;
+              if(m===null){c=[base[0]*.8,base[1]*.8,base[2]*.78];if((v<9||v>W-9)&&h5(px,py)%4===0)c=[96,128,62];}
               else{c=[base[0]*f*m,base[1]*f*m,base[2]*f*m*.97];const r1=Math.abs(v-W*.33),r2=Math.abs(v-W*.7);if(r1<2.2||r2<2.2)c=[c[0]*.86,c[1]*.86,c[2]*.86];}}
             else if(v<W+wob+4+(h5(px>>2,9)%3)){/* terra batida encostada no muro */if(tx<130)continue;c=h5(px,py)%5===0?[150,128,90]:[176,152,108];if(h5(px>>1,py)%13===0)c=[110,140,68];}
             else if(v<W+9+hm){if(tx<130)continue;const u=Math.round(v-W-6),desc=h5((px)>>3,(py-Math.round(top))>>3)%10<3;
@@ -20948,6 +20951,10 @@ window.__paulista82Ready=Promise.all(ready);
           for(const d of [-1,1]){for(let k=0;k<=10;k++){const x=7+d*k*1.05,y=2-5*Math.sin(k/10*Math.PI*.9)+(k>6?(k-6)*1.3:0);P(x,y,k%3?'#3f8a36':'#2f6f2a');P(x,y+1,'#2f6f2a');Q(x+(d>0?0:1),y,'#7fca5a');}
             for(let k=0;k<=7;k++){const x=7+d*k*.55,y=1-k*1.5;P(x,y,k%2?'#4a9a3e':'#3f8a36');Q(x+(d>0?1:0),y,'#8fd070');}}
           for(let k=0;k<=6;k++){P(7,-k*1.6,'#55a848');Q(7,-k*1.6,'#9fdc7a');}};
+        /* degraus de soleira: da porta de cada loja até o leito da ladeira */
+        for(const o of objects){if(o.scene!=='m_centro22'||!o.enter||o.x<130||o.x>141)continue;const bs=o.y+(o.h||1);if(bs<26||bs>30)continue;const cx=Math.round((o.x+(o.w||1)/2)*16),y0=bs*16,y1=Math.round(L.cv(cx/16)*16)+2;
+          g.fillStyle='rgb(150,144,130)';g.fillRect(o.x*16,y0,(o.w||1)*16,1);
+          for(let py=y0;py<y1;py++){const k=(py-y0)%4,wd=9+Math.floor((py-y0)/4);g.fillStyle=k===3?'rgb(118,112,101)':k===0?'rgb(232,225,208)':'rgb(206,199,182)';g.fillRect(cx-wd,py,wd*2,1);g.fillStyle='rgb(140,134,121)';g.fillRect(cx-wd,py,1,1);g.fillRect(cx+wd-1,py,1,1);}}
         bans.sort((a,b)=>a[1]-b[1]).forEach(q=>ban(q[0],q[1]));}
       }catch(e){console.warn('Ladeira Porto Geral pintura JM',e);}
     }catch(e){console.warn('calcada JM',e);}};}
