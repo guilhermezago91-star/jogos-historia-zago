@@ -3914,7 +3914,7 @@ const quiz3=[
   {q:"Como eram os bondes de São Paulo em 1888?",o:["Andavam sobre trilhos, puxados por burros","Eram elétricos","Eram ônibus a diesel"],a:0,e:"Os bondes a burro começaram em 1872. Os elétricos só vieram em 1900."},
   {q:"Onde moravam muitos imigrantes pobres e libertos?",o:["Em cortiços","Em palacetes nos Campos Elíseos","Em mosteiros"],a:0,e:"Os cortiços eram quartos apertados que várias famílias dividiam, enquanto os barões do café moravam em palacetes."},
 ];
-function INTRO3(first){const n=npcs.filter(n=>eraOf(n.scene||'pira')===3).length;return [first,"Hoje é domingo, 13 de maio de 1888. No Rio de Janeiro, a princesa Isabel vai assinar a lei que acaba com a escravidão. A notícia chega pelo telégrafo.","É a mesma colina de 1554 e de 1830, mas a cidade cresceu com o café: ferrovia, imigrantes italianos, bondes puxados por burros e lampiões a gás.","Você está no Largo da Sé. Procure as missões (ponto de exclamação amarelo) e entre nos prédios: Estação da Luz, Hospedaria dos Imigrantes, jornal, palacete, cortiço...","A cidade ficou enorme: Bom Retiro, Campos Elíseos, Santa Cecília, Brás, Pari, Liberdade, Bexiga... Use o bonde (placas verdes com a letra B) e o Mapa, que também mostra a planta de verdade de 1890. E repare: tem café por todo lado!",`Converse com pelo menos ${Math.min(10,n)} dos ${n} moradores. Aí o portal do Largo do Palácio se abre.`];}
+function INTRO3(first){const n=npcs.filter(n=>eraOf(n.scene||'pira')===3).length;return [first,"Hoje é domingo, 13 de maio de 1888. No Rio de Janeiro, a princesa Isabel vai assinar a lei que acaba com a escravidão. A notícia chega pelo telégrafo.","É a mesma colina de 1554 e de 1830, mas a cidade cresceu com o café: ferrovia, imigrantes italianos, bondes puxados por burros e lampiões a gás.","Você está no Largo da Sé. Procure as missões (ponto de exclamação amarelo) e entre nos prédios: Estação da Luz, Hospedaria dos Imigrantes, jornal, palacete, cortiço...","A cidade ficou enorme: Bom Retiro, Campos Elíseos, Santa Cecília, Brás, Pari, Liberdade, Bexiga... Use o bonde (placas verdes com a letra B) e o Mapa, que também mostra a planta de verdade de 1890. E repare: tem café por todo lado!",/* v229 — META DO PORTAL NA ABERTURA DE 1888 */`Para o portal do Largo do Palácio abrir: converse com ${Math.min(10,n)} pessoas e encontre ${(()=>{try{return needItemsE();}catch(_){return 8;}})()} objetos desta época. Os contadores lá em cima mostram quanto falta.`];}
 function startEra3(){
   ovQuiz.hidden=true;portal=null;reis=Math.max(reis,0);gmin=9*60;gday=0;
   goScene('sp88',41+O88[0],45+O88[1],'up',()=>{say('São Paulo, 1888',INTRO3("O portal levou você 58 anos para a frente: São Paulo, 1888!"),()=>recall(3),'player');});
@@ -20490,7 +20490,7 @@ let qi=0,score=0,QZ=quiz,wrongs=[];const quizScores={};
 function quizDoneOf(e){return e===1?quizDone:e===2?quizDone2:e===4?quizDone4:quizDone3;}
 function openQuiz(){if(era===1){if(quizDone)return;quizDone=true;}else if(era===2){if(quizDone2)return;quizDone2=true;}else if(era===4){if(quizDone4)return;quizDone4=true;}else{if(quizDone3)return;quizDone3=true;}QZ=era===1?quiz:era===2?quiz2:era===4?quiz4:quiz3;save();qi=0;score=0;wrongs=[];ovQuiz.hidden=false;renderQ();}
 function needE2(){return Math.min(12,npcs.filter(n=>eraOf(n.scene||'pira')===2).length);}
-function INTRO2(first){const n=npcs.filter(n=>eraOf(n.scene||'pira')===2).length;return [first,"É a mesma colina de Piratininga, entre os rios Anhangabaú e Tamanduateí. A aldeia de 1554 virou uma cidade.","Você está no Largo da Sé, no centro. O centro é o Triângulo: três ruas ligando os conventos de São Bento, São Francisco e Carmo.","Você pode entrar em muitos prédios: igrejas, Academia, Palácio, Câmara, Santa Casa, lojas e oficinas. Fique de frente para a porta e aperte A. As tabuletas mostram o que é cada loja.","Quem tem uma missão para você mostra um ponto de exclamação amarelo. O relógio corre: de manhã tem neblina, ao anoitecer os sinos tocam e os lampiões acendem.",`Converse com pelo menos ${needE2()} dos ${n} moradores. Aí o portal do Largo do Palácio se abre. O Mapa mostra quem falta.`];}
+function INTRO2(first){const n=npcs.filter(n=>eraOf(n.scene||'pira')===2).length;return [first,"É a mesma colina de Piratininga, entre os rios Anhangabaú e Tamanduateí. A aldeia de 1554 virou uma cidade.","Você está no Largo da Sé, no centro. O centro é o Triângulo: três ruas ligando os conventos de São Bento, São Francisco e Carmo.","Você pode entrar em muitos prédios: igrejas, Academia, Palácio, Câmara, Santa Casa, lojas e oficinas. Fique de frente para a porta e aperte A. As tabuletas mostram o que é cada loja.","Quem tem uma missão para você mostra um ponto de exclamação amarelo. O relógio corre: de manhã tem neblina, ao anoitecer os sinos tocam e os lampiões acendem.",/* v229 — META DO PORTAL NA ABERTURA DE 1830 */`Para o portal do Largo do Palácio abrir: converse com ${needE2()} pessoas e encontre ${(()=>{try{return needItemsE();}catch(_){return 8;}})()} objetos desta época. Os contadores lá em cima mostram quanto falta.`];}
 function startEra2(){
   ovQuiz.hidden=true;portal=null;
   goScene('sp',41,45,'up',()=>{say('São Paulo, 1830',INTRO2("O portal levou você 276 anos para a frente: São Paulo, 1830!"),()=>recall(2),'player');});
@@ -23650,6 +23650,31 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
     if(outraTela()&&!q.hidden){q.hidden=true;guardada=true;}
     else if(!outraTela()&&guardada){guardada=false;q.hidden=false;}}catch(_){}},150);
 }catch(e){console.warn('v225 uma tela',e);}})();
+/* ===== v229 — CHECAGENS DE 1888 SEM "A MAIS COMPRIDA É A CERTA" (pedido do professor, 21/11/2026) =====
+   Mesma regra de 1554 e 1830: três alternativas de tamanho parecido, erradas que são confusões
+   possíveis com o que outros personagens de 1888 contam. A certa é a primeira daqui. */
+;(function(){try{
+ const N={
+  bento88:['O que aconteceu em 1883 na frente da Igreja dos Remédios?',['45 pessoas receberam suas cartas de alforria','Luiz Gama fez seu último discurso na cidade','Foi assinada ali a lei que acabou com a escravidão']],
+  rufina88:['O que as irmandades negras faziam, segundo Rufina?',['Rezavam, faziam festa, emprestavam dinheiro e compravam alforrias','Escondiam fugitivos e os levavam a pé até o quilombo do Jabaquara','Davam aula de leitura e defendiam escravizados na Justiça']],
+  cozinheira88:['O que a lei de 1886 obrigava os trabalhadores domésticos a fazer?',['Inscrever-se na polícia e andar com uma caderneta','Ter a carta de alforria registrada na Câmara','Trabalhar só para famílias que pagassem salário']],
+  lavSarac88:['O que era o Saracura, no Bexiga?',['Um vale com córrego, onde houve um quilombo na cidade','Um cortiço onde moravam sete famílias de imigrantes','O bairro dos palacetes dos barões do café']],
+  ama88:['Por que as amas de leite negras perdiam trabalho?',['As famílias passaram a pedir amas brancas, imigrantes','Uma lei proibiu que mulheres negras fossem amas','As famílias ricas mudaram para o Rio de Janeiro']],
+  africana88:['O que a senhora africana respondeu à patroa?',['“Não sou sua escrava.”','“Hoje a princesa assina a lei.”','“Vou trabalhar na fábrica.”']],
+  liberto:['O que a Lei Áurea NÃO deu às pessoas libertadas?',['Terra, dinheiro e escola','O fim da escravidão no país','O direito de ir à festa do Rosário']],
+  caifaz:['O que os caifazes faziam?',['Ajudavam escravizados a fugir para o quilombo do Jabaquara','Libertavam escravizados na Justiça, como advogados','Compravam alforrias com o dinheiro das irmandades']],
+  fotografo:['Por que as fotos do Militão são tão importantes?',['Mostram os mesmos lugares em 1862 e em 1887','Foram as primeiras fotos coloridas da cidade','Mostram a cidade antes da chegada dos jesuítas']],
+  ferroviario:['Como os trens dos ingleses venciam a Serra do Mar?',['Puxados por cabos de aço, em planos inclinados','Por um túnel comprido, cavado debaixo da serra','Com duas locomotivas, uma puxando e outra empurrando']],
+  imigrante:['Quem pagou a passagem da família italiana até o Brasil?',['O governo da província de São Paulo','O barão do café que contratou a família','A própria família, vendendo a terra na Itália']],
+  barao:['Quem passou a colher o café do barão depois da abolição?',['Imigrantes italianos contratados','Os mesmos libertos, agora com salário','Colonos alemães de Santo Amaro']],
+  italiana2:['Como se vivia num cortiço?',['Várias famílias, cada uma num quarto, com tanque comum','Uma família por casa, em fileiras de casinhas iguais','Operários solteiros, num dormitório da fábrica']],
+  operaria:['Como era o trabalho na fábrica de tecidos em 1888?',['Doze horas por dia, com meninas de doze anos','Oito horas por dia, por causa de uma lei nova','Doze horas por dia, mas só para adultos']],
+  quintino:['Quem vivia no Quilombo do Jabaquara?',['Gente que fugiu das fazendas e desceu a serra','Libertos que ganharam terra do governo','Imigrantes que não quiseram ir para as fazendas']],
+  ouvinte:['Quem podia votar em 1888?',['Só homens com renda','Todos os homens livres','Homens e mulheres com renda']]
+ };
+ const aplica=()=>{for(const k in N)if(CHECK[k])CHECK[k]=[N[k][0],N[k][1].slice(),0];};
+ aplica();setTimeout(aplica,0);setTimeout(aplica,2000);setTimeout(aplica,8000);
+}catch(e){console.warn('v229 checagens 1888',e);}})();
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
