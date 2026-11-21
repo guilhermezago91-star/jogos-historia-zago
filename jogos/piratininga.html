@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=d9db775b","kb":788,"m":1},{"f":"pac_e1234.js?v=56ee25a1","kb":2140,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=9e50ae28","kb":1400,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=ebb397c2","kb":4305,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=3456cda0","kb":8535,"m":1},{"f":"pac_e1234.js?v=ca07eb09","kb":2177,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=813fa8cd","kb":82,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=9e50ae28","kb":1400,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=ebb397c2","kb":4305,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -9287,6 +9287,293 @@ setTimeout(function(){
 }catch(e){console.warn('sv54b',e);}})();
 
 
+/* ===== v193 — SÃO VICENTE: ENGENHO SÃO JORGE DOS ERASMOS (pedido do professor, 20/11/2026) =====
+   Fonte: catálogo "Ruínas quinhentistas em território milenar" (RESJE, PRCEU-USP, 2024) e a carta de 1548 (trad. Eddy Stols, 1968).
+   Nome do engenho, placa com o lugar real (alto da Caneleira, fortaleza, capela de São Jorge, pedra e cal de conchas),
+   pilares de pedra por fora e por dentro (SV54_MAPA, ENG54_SALA), a carta de 1548 como documento (ENG54_CARTA)
+   e os trabalhadores como a carta descreve: maioria indígena escravizada, poucos africanos com ofício. */
+(function(){try{
+  if(typeof A==='undefined'||!A.ENG54_CARTA||!SCN.sv)return;
+  const R='j_x1engenho';
+  /* nomes */
+  const nomeia=()=>{try{if(XSCN[R]){XSCN[R].label='Engenho São Jorge dos Erasmos';XSCN[R].title='Dentro do Engenho São Jorge dos Erasmos';}}catch(_){}};nomeia();setTimeout(nomeia,0);
+  setTimeout(()=>{try{for(const L of LABELS_SV)if(L[0]==='Engenho')L[0]='Engenho dos Erasmos';}catch(_){}},0);
+  {const o=objects.find(o=>o.id==='engenho');if(o){o.name='Engenho São Jorge dos Erasmos';
+    o.text=["O Engenho São Jorge dos Erasmos, da família Schetz, de Antuérpia. Pilares e paredes de pedra, assentados com cal feita de conchas."];}}
+  /* livre no mapa da cena */
+  const livre=(sc,x,y)=>{const M=SCN[sc]&&SCN[sc].map;if(!M)return [x,y];for(let r=0;r<6;r++)for(let yy=y-r;yy<=y+r;yy++)for(let xx=x-r;xx<=x+r;xx++){
+      const c=M[yy]&&M[yy][xx];if(c&&'.DA'.includes(c)&&!objects.some(o=>o.scene===sc&&xx>=o.x&&xx<o.x+(o.w||1)&&yy>=o.y&&yy<o.y+(o.h||1))&&!npcs.some(n=>n.scene===sc&&n.x===xx&&n.y===yy))return [xx,yy];}
+    return [x,y];};
+  /* placa: onde ficava o engenho de verdade */
+  {const p=livre('sv',30,11);objects.push({id:'placaErasmos',scene:'sv',x:p[0],y:p[1],w:1,h:1,draw:drawPlaca,name:'Onde ficava o engenho?',text:[
+    "Este é o Engenho São Jorge dos Erasmos. Foi erguido em 1534, por iniciativa de Martim Afonso de Sousa, e comprado em 1543 por Erasmo Schetz, um mercador e banqueiro que morava em Antuérpia.",
+    "No jogo, ele está perto da vila. Na verdade, ficava no interior da ilha, num alto ao pé do morro da Caneleira, no caminho entre São Vicente e Santos.",
+    "Era quase uma fortaleza: casa grande, senzala com ferraria, muros com baluartes e uma capelinha de São Jorge. As paredes eram de pedra assentada com cal feita das conchas dos sambaquis.",
+    "As ruínas existem até hoje, em Santos. Estão entre as construções mais antigas da colonização portuguesa no Brasil e são a marca mais antiga que sobrou da produção de açúcar."]});}
+  /* trabalhadores, como a carta de 1548 descreve */
+  {const n=npcs.find(n=>n.id==='mestre'&&n.scene==='sv');if(n){n.name='Feitor do engenho';
+    n.lines=["Este é o Engenho São Jorge dos Erasmos. Eu cuido dele para a família Schetz, que mora em Antuérpia e nunca pôs os pés aqui.",
+      "Aqui vivem uns 130 escravizados. A maioria é gente da terra: indígenas escravizados. Metade não trabalha, porque são crianças e velhos.",
+      "Da Guiné, na África, vieram só sete ou oito. Todos têm ofício: um é o mestre de açúcar, outro é o purgador. Muitos da terra também têm ofício, como os tacheiros das caldeiras.",
+      "O açúcar vai de navio para Lisboa e de lá para Antuérpia, onde vale muito dinheiro."];
+    n.diary="O Engenho São Jorge dos Erasmos era da família Schetz, de Antuérpia. Em 1548 tinha cerca de 130 escravizados: a maioria indígenas e 7 ou 8 africanos com ofício.";}}
+  {const n=npcs.find(n=>n.id==='caldeireiro');if(n){n.name='Tacheiro escravizado';
+    n.lines=["Eu sou gente da terra, tupiniquim. Fui escravizado e trazido para cá. Aqui sou tacheiro: cuido dos tachos das caldeiras.",
+      "Sei quanto fogo o caldo precisa e a hora de tirar a espuma. Se eu errar, o açúcar estraga.",
+      "Meu saber dá lucro para os donos do engenho. Para mim, não dá liberdade."];
+    n.diary="A carta de 1548 conta que muitos indígenas escravizados tinham ofício no engenho, como os tacheiros das caldeiras.";}}
+  const novo=(o)=>{if(npcs.some(n=>n.id===o.id))return;const p=livre(R,o.x,o.y);o.x=p[0];o.y=p[1];npcs.push(o);};
+  novo({id:'mestreAcucar',spr:'z54_h4',scene:R,x:12,y:6,dir:'down',name:'Mestre de açúcar',
+    lines:["Eu sou o mestre de açúcar. Vim da Guiné, na África, escravizado, num navio.",
+      "Olho a cor do caldo, sinto o ponto e digo a hora certa. Desde que cheguei, o açúcar daqui ficou melhor.",
+      "O dono economiza o salário de um mestre pago. Quem ganha com o meu saber são eles."],
+    diary:"Em 1548, o mestre de açúcar do engenho era um africano escravizado. A carta diz que ele fazia açúcar melhor que o anterior."});
+  novo({id:'purgador',spr:'z54_caldeireiro',scene:R,x:14,y:5,dir:'down',name:'Purgador',
+    lines:["Eu sou o purgador. Vim da Guiné, como o mestre de açúcar.",
+      "Aqui nas formas o açúcar escorre o mel e vai ficando branco. Isso é purgar. Leva semanas.",
+      "O açúcar branco vale mais lá na Europa. O trabalho é nosso; o lucro vai para Antuérpia."],
+    diary:"O purgador cuidava das formas onde o açúcar ficava branco. Em 1548, era um dos 7 ou 8 africanos escravizados do engenho."});
+  novo({id:'indigenaMoenda',spr:'z54_w_indigena',scene:R,x:4,y:5,dir:'down',name:'Mulher indígena escravizada',
+    lines:["Eu trago a cana do canavial e ponho na moenda. É perigoso: a mão não pode chegar perto dos rolos.",
+      "A maior parte de quem trabalha aqui é gente da terra, como eu. Muitos foram capturados em guerras, longe daqui.",
+      "Os velhos e as crianças também vivem aqui. Quando dá, alguns fogem para a mata."],
+    diary:"A maioria dos escravizados do engenho era indígena, inclusive mulheres, crianças e velhos."});
+  /* a carta de 1548: documento que abre sozinho na primeira visita */
+  {const p=livre(R,1,4);FONTES.carta1548={sc:R,xy:p,kick:'Fonte: carta de 1548',title:'Carta ao dono do engenho, 1548',img:'ENG54_CARTA',
+    cap:"Esta carta foi escrita em 1548 pelo administrador do engenho para a família Schetz, em Antuérpia. Repare: ele conta as pessoas escravizadas como “peças”, como se fossem coisas. A carta mostra que a maioria era indígena, muitos com ofício, e que havia só 7 ou 8 africanos, todos com ofício. Por que será que o administrador elogia tanto o mestre de açúcar africano?",
+    cred:"Carta de 1548 (trechos), tradução de Eddy Stols, Revista de História (USP), 1968; citada no catálogo “Ruínas quinhentistas em território milenar”, Monumento Nacional Ruínas Engenho São Jorge dos Erasmos (PRCEU-USP), 2024.",
+    diary:"Carta de 1548: cerca de 130 escravizados no engenho, a maioria indígena; 7 ou 8 africanos com ofício, entre eles o mestre de açúcar."};
+    objects.push({id:'carta1548',scene:R,x:p[0],y:p[1],w:1,h:1,draw:drawSign,name:'Fonte histórica',text:["A carta de 1548 sobre este engenho. Aperte A para ler."]});}
+}catch(e){console.warn('erasmos',e);}})();
+
+/* ===== v194 — PLANALTO DE PIRATININGA NOVO EM 1554 (pedido do professor, 20/11/2026) =====
+   Colina redesenhada no estilo de São Vicente e da serra, seguindo a ficha do terreno (skill de geografia):
+   espigão estreito que sobe para o sul (sem paredão), encosta íngreme a leste até a várzea do Carmo, com o Tamanduateí
+   em curvas e o porto das canoas; Anhangabaú fininho num vale estreito a oeste, com mata do outro lado; descida suave
+   para o norte, rumo ao Tietê. Colégio de taipa e palha, aldeia de Tibiriçá com ocas e caiçara, roça de mandioca.
+   Colégio e oca por dentro redesenhados no mesmo estilo.
+   Arte em arte_1554.js: PIRA54_MAPA, COL54_SALA, OCA54_SALA. */
+(function(){try{
+  if(typeof A==='undefined'||!A.PIRA54_MAPA||!SCN.pira)return;
+  const G=["CCCCCC......DD...........C......C...CCCC", "CCCCCC......DD.........CCC....C.....CCCC", "CCCCCCCC...CCD.........CCC....CC...CCCCC", "CCCCCC.CC..C.DD........CCCC...CC...CCCCC", "CCCCCC.CC....DD.........CCCCC.C....CCCCC", "CCCCCC........D...........CC.C....CCCCCC", "CCCCCCCC.CC...DD..........CC........CCCC", "CCCCCCCC.CC...DD..........CC...C....CCCC", "CCCCCC..CCCC...D.CCCCC.....CC......CCCCC", "CCCCCC..CCCC...DDCCCCC.....CC.......CCCC", "CCCCC..........DDCCCCC......CC.CC...CCCC", "CCCCC..........DDDDDDDD.....CC..C..CCCCC", "CCCCC..........DDDDDDDD.....CC....CCCCCC", "CCCCC.........DDDDDDDDD.....CC...CCCCCCC", "CCDDDDDDDDDDDDDD..DD.DDD....CCC.CCCCCCCC", "CCDDCCC.DDDDD.....DD...DDDD..CC.CCCCCCCC", "CCCCCCC...CCCCCCCCDD....DDDD.CC.CCCCCCCC", "CCCCCCCCCCC.CCC..CDD......DDDDC.CCCCCCCC", "CCCCCCCCC...CCC...DC........DDDDCCCCCCCC", "CCCCCCCCC..DCCCDD.DCC........CDDDCCCCCCC", "CCCCCCCC..DDDDDDDDD.C.CCCCCC.CC...CCCCCC", "CCCCCCCC..DDCCCDDDD.C.CCCCCC.CCCC..CCCCC", "CCCCCCCC..DDCCCDDDD.C.CCCCCCCCCCCCCCCCCC", "CCCCCCCCC..DCCCCCCDCC.CCCCCCCCCCCCCCCCCC", "CCCCCCCCCC..DDCCCCDC..CCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCC..CCCCD...CCCCCCCCCCCCCCCCCC", "CCCCCCCCC..CC.....DD......CCCCCCCCCCCCCC", "CCCCCCCCC.........DD....CCCCCCCCCCCCCCCC", "CCCCCCCCCC........DD....CCCCCCCCCCCCCCCC", "CCCCCCCCC.........DD.....CCCCCCCCCCCCCCC"],SETS={"MATA": ["0,0", "1,0", "2,0", "3,0", "4,0", "5,0", "0,1", "1,1", "2,1", "3,1", "4,1", "5,1", "23,1", "24,1", "25,1", "0,2", "1,2", "2,2", "3,2", "4,2", "5,2", "6,2", "7,2", "23,2", "24,2", "25,2", "31,2", "0,3", "1,3", "2,3", "3,3", "4,3", "5,3", "7,3", "8,3", "23,3", "24,3", "25,3", "26,3", "31,3", "0,4", "1,4", "2,4", "3,4", "4,4", "7,4", "8,4", "24,4", "25,4", "26,4", "0,5", "1,5", "2,5", "3,5", "4,5", "34,5", "35,5", "0,6", "1,6", "2,6", "3,6", "4,6", "6,6", "7,6", "37,6", "0,7", "1,7", "2,7", "3,7", "4,7", "6,7", "7,7", "9,7", "10,7", "37,7", "0,8", "1,8", "2,8", "3,8", "4,8", "8,8", "9,8", "10,8", "11,8", "0,9", "1,9", "2,9", "3,9", "4,9", "8,9", "9,9", "10,9", "11,9", "0,10", "1,10", "2,10", "3,10", "4,10", "32,10", "39,10", "0,11", "1,11", "2,11", "3,11", "0,12", "1,12", "2,12", "3,12", "28,12", "29,12", "38,12", "39,12", "0,13", "1,13", "2,13", "3,13", "0,14", "1,14", "0,15", "1,15", "4,15", "5,15", "6,15", "0,16", "1,16", "2,16", "3,16", "4,16", "6,16", "0,17", "1,17", "2,17", "3,17", "4,17", "6,17", "7,17", "0,18", "1,18", "2,18", "3,18", "4,18", "0,19", "1,19", "2,19", "3,19", "4,19", "6,19", "37,19", "0,20", "1,20", "2,20", "3,20", "4,20", "6,20", "0,21", "1,21", "2,21", "3,21", "4,21", "31,21", "32,21", "36,21", "0,22", "1,22", "2,22", "3,22", "4,22", "5,22", "30,22", "31,22", "32,22", "33,22", "34,22", "0,23", "1,23", "2,23", "3,23", "4,23", "5,23", "30,23", "32,23", "33,23", "0,24", "1,24", "2,24", "3,24", "4,24", "5,24", "7,24", "0,25", "1,25", "2,25", "3,25", "4,25", "5,25", "6,25", "7,25", "32,25", "33,25", "0,26", "1,26", "2,26", "3,26", "4,26", "6,26", "7,26", "26,26", "27,26", "32,26", "33,26", "0,27", "1,27", "2,27", "3,27", "4,27", "7,27", "8,27", "24,27", "25,27", "26,27", "27,27", "32,27", "33,27", "0,28", "1,28", "2,28", "3,28", "4,28", "5,28", "6,28", "7,28", "8,28", "9,28", "24,28", "25,28", "26,28", "27,28", "38,28", "0,29", "1,29", "2,29", "3,29", "4,29", "5,29", "6,29", "7,29", "8,29", "25,29", "26,29", "27,29", "33,29", "34,29", "38,29"], "RIO": ["36,0", "36,1", "35,2", "35,3", "5,4", "35,4", "5,5", "36,5", "5,6", "36,6", "5,7", "36,7", "5,8", "35,8", "36,8", "5,9", "36,9", "36,10", "4,11", "35,11", "36,11", "4,12", "34,12", "4,13", "33,13", "32,14", "33,14", "32,15", "5,16", "32,16", "5,17", "32,17", "5,18", "32,18", "5,19", "33,19", "5,20", "34,20", "5,21", "35,21", "35,22", "34,23", "35,23", "34,24", "35,24", "35,25", "5,26", "35,26", "5,27", "35,27", "34,28", "35,29"], "ENC": ["25,0", "11,2", "12,2", "11,3", "26,5", "27,5", "9,6", "10,6", "26,6", "27,6", "26,7", "27,7", "27,8", "28,8", "27,9", "28,9", "28,10", "29,10", "28,11", "29,11", "28,13", "29,13", "28,14", "29,14", "30,14", "29,15", "30,15", "29,16", "30,16", "30,17", "8,19", "29,19", "29,20", "30,20", "6,21", "29,21", "30,21", "28,22", "29,22", "6,23", "28,23", "29,23", "6,24", "28,24", "29,24", "28,25", "29,25", "8,26", "28,26", "29,26", "28,27", "29,27", "28,28", "29,28", "28,29", "29,29", "30,29", "6,18", "6,22", "8,25", "6,27"], "ROCA": ["22,20", "23,20", "24,20", "25,20", "26,20", "27,20", "22,21", "23,21", "24,21", "25,21", "26,21", "27,21", "22,22", "23,22", "24,22", "25,22", "26,22", "27,22", "22,23", "23,23", "24,23", "25,23", "26,23", "27,23", "22,24", "23,24", "24,24", "25,24", "26,24", "27,24", "22,25", "23,25", "24,25", "25,25", "26,25", "27,25"], "CASA": ["17,8", "18,8", "19,8", "20,8", "21,8", "17,9", "18,9", "19,9", "20,9", "21,9", "17,10", "18,10", "19,10", "20,10", "21,10", "12,17", "13,17", "14,17", "12,18", "13,18", "14,18", "12,19", "13,19", "14,19", "12,21", "13,21", "14,21", "12,22", "13,22", "14,22", "12,23", "13,23", "14,23", "15,23", "16,23", "17,23", "14,24", "15,24", "16,24", "17,24", "14,25", "15,25", "16,25", "17,25"], "PALI": ["10,16", "11,16", "12,16", "13,16", "14,16", "15,16", "16,16", "17,16", "8,17", "9,17", "10,17", "17,17", "7,18", "8,18", "19,18", "7,19", "19,19", "20,19", "7,20", "20,20", "7,21", "20,21", "7,22", "20,22", "7,23", "8,23", "19,23", "20,23", "8,24", "9,24", "19,24", "9,25", "10,25", "11,25", "11,26", "12,26"], "POCA": ["32,0", "37,0", "30,1", "30,2", "30,3", "37,3", "27,4", "28,4", "30,4", "29,5", "31,7", "31,10", "32,11", "39,15", "34,16", "35,16", "36,17", "38,17", "38,21", "37,23", "32,24", "39,25", "37,26", "38,27", "37,28", "39,28"], "VARZ": ["38,0", "39,0", "37,1", "38,1", "39,1", "36,2", "37,2", "38,2", "39,2", "36,3", "38,3", "39,3", "36,4", "37,4", "38,4", "39,4", "37,5", "38,5", "39,5", "38,6", "39,6", "38,7", "39,7", "37,8", "38,8", "39,8", "37,9", "38,9", "39,9", "37,10", "38,10", "37,11", "38,11", "39,11", "35,12", "36,12", "37,12", "34,13", "35,13", "36,13", "37,13", "38,13", "39,13", "34,14", "35,14", "36,14", "37,14", "38,14", "39,14", "33,15", "34,15", "35,15", "36,15", "37,15", "38,15", "33,16", "36,16", "37,16", "38,16", "39,16", "33,17", "34,17", "35,17", "37,17", "39,17", "33,18", "34,18", "35,18", "36,18", "37,18", "38,18", "39,18", "34,19", "35,19", "36,19", "38,19", "39,19", "35,20", "36,20", "37,20", "38,20", "39,20", "37,21", "39,21", "36,22", "37,22", "38,22", "39,22", "31,23", "36,23", "38,23", "39,23", "30,24", "31,24", "33,24", "36,24", "37,24", "38,24", "39,24", "30,25", "31,25", "34,25", "36,25", "37,25", "38,25", "30,26", "31,26", "34,26", "36,26", "38,26", "39,26", "30,27", "31,27", "34,27", "36,27", "37,27", "39,27", "30,28", "31,28", "32,28", "33,28", "35,28", "36,28", "31,29", "32,29", "36,29", "37,29", "39,29"]},S=SCN.pira,K={};
+  for(const k in SETS)for(const p of SETS[k])K[p]=k;
+  for(let y=0;y<S.map.length;y++)for(let x=0;x<S.map[y].length;x++)S.map[y][x]=G[y][x];
+  /* os desenhos antigos param: a imagem nova já mostra colégio, ocas e caiçara */
+  for(const o of objects)if((o.scene||'pira')==='pira'&&['colegio','oca1','oca2','forte54'].includes(o.id))o.draw=()=>{};
+  const P=(id,x,y,w,h)=>{const o=objects.find(o=>o.id===id&&(o.scene||'pira')==='pira');if(o){o.x=x;o.y=y;if(w){o.w=w;o.h=h;}}};
+  P('colegio',17,8,5,3);P('oca1',12,18,3,2);P('oca2',12,21,3,2);P('forte54',13,16,1,1);
+  {const n=npcs.find(n=>n.id==='vigia54');if(n){n.x=13;n.y=17;}}
+  const pode=(x,y)=>G[y]&&(G[y][x]==='.'||G[y][x]==='D');
+  const ocupa=(x,y,self)=>objects.some(o=>o!==self&&(o.scene||'pira')==='pira'&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))
+     ||npcs.some(n=>n!==self&&(n.scene||'pira')==='pira'&&n.x===x&&n.y===y)
+     ||(typeof ITEMS!=='undefined'&&ITEMS.some(i=>i!==self&&(i.scene||'pira')==='pira'&&i.x===x&&i.y===y))
+     ||(x===19&&y===13);                                         /* lugar do portal */
+  const perto=(x,y,self,ok)=>{for(let r=0;r<12;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;
+      const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<40&&Y<30&&(ok?ok(X,Y):pode(X,Y))&&!ocupa(X,Y,self))return [X,Y];}return [x,y];};
+  const VIZ=(x,y)=>[[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>pode(x+a,y+b));
+  /* placas e objetos pequenos: no chão livre (ou na beira, para quem só se olha de perto) */
+  for(const o of objects){if((o.scene||'pira')!=='pira'||(o.w||1)>1||(o.h||1)>1||o.id==='forte54')continue;
+    if(!pode(o.x,o.y)||ocupa(o.x,o.y,o)){const p=perto(o.x,o.y,o);o.x=p[0];o.y=p[1];}}
+  for(const n of npcs){if((n.scene||'pira')!=='pira')continue;if(!pode(n.x,n.y)||ocupa(n.x,n.y,n)){const p=perto(n.x,n.y,n);n.x=p[0];n.y=p[1];}}
+  const arrumaItens=()=>{if(typeof ITEMS!=='undefined')for(const i of ITEMS){if((i.scene||'pira')!=='pira'||i.got)continue;if(!pode(i.x,i.y)||ocupa(i.x,i.y,i)){const p=perto(i.x,i.y,i);i.x=p[0];i.y=p[1];}}};
+  arrumaItens();setTimeout(arrumaItens,0);setTimeout(arrumaItens,1500);
+  try{for(const a of animals){if((a.scene||'pira')!=='pira')continue;if(!pode(a.x,a.y)){const p=perto(a.x,a.y,a);a.x=p[0];a.y=p[1];if('fx' in a){a.fx=a.x;a.fy=a.y;a.px=a.x*T;a.py=a.y*T;}}}}catch(_){}
+  try{for(const w of walkers){if(w.scene!=='pira')continue;
+    if(w.path)w.path=w.path.map(q=>pode(q[0],q[1])?q:perto(q[0],q[1],w));
+    if(!pode(w.x,w.y)){const p=perto(w.x,w.y,w);w.x=w.fx=p[0];w.y=w.fy=p[1];w.px=p[0]*T;w.py=p[1]*T;}}}catch(_){}
+  /* nomes no mapa */
+  setTimeout(()=>{try{const L=LABELS,mv=(a,b)=>{const l=L.find(l=>l[0]===a);if(l){l[1]=b[0];l[2]=b[1];if(b[2])l[0]=b[2];}};
+    mv('Rio Anhangabaú',[2.2,16.4]);mv('Rio Tamanduateí',[35.2,5.2]);mv('Várzea',[34.6,26.4,'Várzea do Carmo']);
+    mv('Barranco',[27.2,15.6,'Ladeira']);mv('Aldeia de Tibiriçá',[13.6,26.6]);mv('Roça',[24.4,19.6,'Roça de mandioca']);
+    const i=L.findIndex(l=>l[0]==='Mata Atlântica'&&l[1]>30);if(i>=0)L.splice(i,1);}catch(_){}},0);
+  /* o que se diz ao tocar no que não se atravessa */
+  {const c0=TILE_INFO.C;TILE_INFO.C=(x,y)=>{if(cur==='pira'){const k=K[x+','+y];
+     const T_={MATA:['Mata Atlântica','Do outro lado do Anhangabaú o terreno sobe de novo, coberto de mata fechada.'],
+       RIO:['Rio','O Anhangabaú é um riacho fininho num vale estreito. O Tamanduateí é maior e faz curvas na várzea; era por ele que chegavam as canoas.'],
+       ENC:['Encosta','A colina cai de repente para a várzea do Carmo. Para descer, só pela ladeira.'],
+       ROCA:['Roça de mandioca','A mandioca vira farinha, a comida de todo dia na terra.'],
+       CASA:['Casa','Paredes de taipa e teto de palha.'],PALI:['Caiçara','Cerca de estacas pontudas que protege a aldeia.'],
+       POCA:['Poça','Água parada da várzea. Nas cheias, a colina parecia uma ilha.'],
+       VARZ:['Várzea do Carmo','Planície baixa e alagada, com capim alto e taboa.']}[k];
+     if(T_)return {name:T_[0],text:[T_[1]]};}return c0(x,y);};}
+  const IM=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur==='pira'){buildStatic();buildOcc&&buildOcc();}}catch(_){}};IM.src=A.PIRA54_MAPA;
+  const bs=buildStatic;buildStatic=function(){bs();try{if(cur==='pira'&&ok){sc.imageSmoothingEnabled=false;sc.drawImage(IM,0,0);}}catch(_){}};
+  setTimeout(()=>{try{if(cur==='pira'){buildStatic();buildOcc();mmDirty=true;}}catch(_){}},0);
+  /* colégio e oca por dentro, no mesmo estilo (COL54_SALA, OCA54_SALA) */
+  const sala=(R,key,ids)=>{if(!A[key]||!SCN[R])return;for(const o of objects)if(o.scene===R&&ids.includes(o.id))o.draw=()=>{};
+    const I=new Image();let ok2=false;I.onload=()=>{ok2=true;try{if(cur===R){buildStatic();buildOcc&&buildOcc();}}catch(_){}};I.src=A[key];
+    const b2=buildStatic;buildStatic=function(){b2();try{if(cur===R&&ok2){sc.imageSmoothingEnabled=false;sc.drawImage(I,0,0);}}catch(_){}};};
+  sala('j_x1colegio','COL54_SALA',['altar_j','rede_j','saco_j','pote_j','banco_j','banco_j2','cama_j','mesa_j']);
+  sala('j_x1oca','OCA54_SALA',['rede_o1','rede_o2','arcos_o','pote_o','cesto_o','esteira_o']);
+  /* fogo aceso por cima das fogueiras desenhadas; o catre já está no desenho */
+  const chama=(c,X,Y)=>{if(typeof OPT!=='undefined'&&OPT.calm){c.fillStyle='#e8a64a';c.fillRect(X+6,Y+6,4,5);return;}const f=Math.floor(performance.now()/160)%3;
+    const P=[['#d9784a',5,7,6,5],['#e8a64a',6,5,4,6],['#f4d070',7,4+f%2,2,4]];for(const [cor,x,y,w,h] of P){c.fillStyle=cor;c.fillRect(X+x+(f===1?1:0)-(f===2?1:0)*(cor==='#f4d070'?1:0),Y+y-(f===0?1:0),w,h);}};
+  setTimeout(()=>{for(const o of objects){if(o.id==='fogo_j'||o.id==='fogo_o')o.draw=chama;if(o.id==='cama_j')o.draw=()=>{};}},300);
+}catch(e){console.warn('pira54',e);}})();
+/* ===== v195 — 1554: PEABIRU NO PLANALTO E SAMBAQUI EM SÃO VICENTE (pedido do professor, 20/11/2026) =====
+   Do catálogo "Ruínas quinhentistas em território milenar" (RESJE, PRCEU-USP, 2024): placa do Peabiru no fim da trilha
+   do Anhangabaú, com Nóbrega e Antônio Rodrigues (1553); sambaqui na praia de São Vicente (SV54_SAMBAQUI), com a cal de conchas. */
+(function(){try{
+  if(typeof A==='undefined'||!SCN.pira||!SCN.sv)return;
+  if(!objects.some(o=>o.id==='placaPeabiru'))objects.push({id:'placaPeabiru',scene:'pira',x:2,y:14,w:1,h:1,draw:drawPlaca,name:'Peabiru, o grande caminho',text:[
+    "Esta trilha faz parte do Peabiru, a maior rede de caminhos indígenas da América do Sul. Ela ligava o litoral ao Paraguai e chegava aos caminhos dos incas, nos Andes. A trilha da serra que sobe de São Vicente também é um pedaço dele.",
+    "Em 1553, o padre Manuel da Nóbrega escreveu ao rei que São Vicente “é a porta e o caminho mais certo e seguro para entrar nas gerações do sertão”.",
+    "No mesmo ano, o governador Tomé de Sousa fechou o caminho para portugueses e espanhóis. Ele tinha medo de que os espanhóis do Paraguai, que procuravam minas de prata, chegassem por aqui (carta do irmão Antônio Rodrigues, 1553).",
+    "Mais tarde, os bandeirantes usaram esses mesmos caminhos para entrar no sertão."]});
+  if(A.SV54_SAMBAQUI&&!objects.some(o=>o.id==='sambaquiSV')){
+    const I=new Image();I.src=A.SV54_SAMBAQUI;
+    const ok=(x,y)=>{const M=SCN.sv.map;return M[y]&&'.AD'.includes(M[y][x])&&M[y]&&'.AD'.includes(M[y][x+1])&&!objects.some(o=>o.scene==='sv'&&x+1>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene==='sv'&&n.y===y&&(n.x===x||n.x===x+1));};
+    let p=null;for(const [x,y] of [[1,19],[0,19],[2,19],[1,18],[2,20],[4,19]])if(ok(x,y)){p=[x,y];break;}
+    if(p)objects.push({id:'sambaquiSV',scene:'sv',x:p[0],y:p[1],w:2,h:1,name:'Sambaqui',
+      draw:(c,X,Y)=>{if(!I.complete||!I.naturalWidth)return;const w=I.naturalWidth/2,h=I.naturalHeight/2;c.drawImage(I,Math.round(X+16-w/2),Math.round(Y+T+1-h),w,h);},
+      text:["Este monte é um sambaqui: em tupi, “monte de conchas”. Foi feito por povos que viveram neste litoral muito antes dos tupis, alguns há cerca de 8 mil anos.",
+        "Eles pescavam, comiam ostras e mariscos e enterravam seus mortos nesses montes. Eram ótimos canoeiros.",
+        "Os portugueses queimam as conchas dos sambaquis para fazer cal. É com essa cal que se assentam as pedras do Engenho dos Erasmos.",
+        "Hoje os sambaquis são protegidos por lei (desde 1961). Destruir um sambaqui é crime."],
+      diary:"Sambaqui quer dizer “monte de conchas” em tupi. Os povos sambaquieiros viveram no litoral milhares de anos antes dos tupis. Suas conchas viraram cal para as construções portuguesas."});
+  }
+}catch(e){console.warn('peabiru54',e);}})();
+/* ===== v196 — LISBOA NOVA EM 1554 (pedido do professor, 20/11/2026) =====
+   Lisboa refeita com arte do Canva no estilo aprovado em Antuérpia, com chão em 32 px de verdade (LX54_MAPA2X;
+   LX54_MAPA é a cópia em 16 px para o mapa pequeno). Mapa de 72 x 54. No alto, o Castelo de São Jorge e as casas
+   subindo o morro; a Sé com as duas torres; a Rua Nova dos Mercadores com as arcadas; o Terreiro do Paço; o Paço da
+   Ribeira na beira do rio; a Casa da Índia; o cais da Ribeira com a carga; as naus no Tejo e, aproximada para caber
+   no jogo, a Torre de Belém (1514-1520) dentro do rio. A coluna com estátua que o Canva pôs no Terreiro foi apagada
+   (não existia em 1554). */
+(function(){try{
+  if(typeof A==='undefined'||!A.LX54_MAPA||!SCN.lisboa54)return;
+  const SC='lisboa54',G=["CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCC...........................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCC...........................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCC..........CCCCCCCCCCCC................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCC...CCC....CCCCCCCCCCCC................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "OOOOOOO.CCC....CCCCCCCCCCCC................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "OOOOOOO.CCCCCCCCCCCCCCCCCCC...............................OOOOOOOOOOOOOO", "OOOOOOO.CCCCCCCCCCCCCCCCCCC...............................OOOOOOOOOOOOOO", "OOOOOOO....CCCCCCCCCCCCCCCC...............................OOOOOOOOOOOOOO", "OOOOOOOOOOOCCCCCCCCCCCCCCCC...............................OOOOOOOOOOOOOO", "OOOOOOOOOOOCCCCCCCCCCCCCCCC..............CCCC.CCCC.CCC....OOOOOOOOOOOOOO", "OOOOOOOOOOOCCCCCCCCCCCCCCCC..............CCCC.CCCC.CCC....OOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCCCCCCCCCCC....CCCCCCC..................OOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCC..............CCCCCCC..................OOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOO...............................OOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"],KR=[[0,0,71,13,"casa"],[14,0,58,8,"castelo"],[0,14,4,29,"casa"],[5,14,15,17,"casa"],[5,18,15,27,"se"],[16,14,41,25,"ruanova"],[42,14,71,18,"casa"],[43,19,67,30,"paco"],[68,19,71,30,"casa"],[15,28,26,37,"india"],[11,31,14,36,"alf"],[8,29,10,32,"arvore"],[41,35,44,36,"carga"],[46,35,49,36,"carga"],[51,35,53,36,"carga"],[31,37,37,38,"carga"],[2,37,16,50,"torre"]],S=SCN[SC],MW_=G[0].length,MH_=G.length;
+  const K=(x,y)=>{let r=null;for(const q of KR)if(x>=q[0]&&x<=q[2]&&y>=q[1]&&y<=q[3])r=q[4];return r;};
+  S.map=G.map(r=>r.split(''));S.exp=new Uint8Array(MW_*MH_).fill(1);
+  const tira=new Set(['nauLx2','nauLx3','barcoLx1']);
+  for(let i=objects.length-1;i>=0;i--)if(objects[i].scene===SC&&(/^casarioLx/.test(objects[i].id)||tira.has(objects[i].id)))objects.splice(i,1);
+  const P=(id,x,y,w,h)=>{const o=objects.find(o=>o.id===id&&o.scene===SC);if(!o)return null;o.x=x;o.y=y;if(w){o.w=w;o.h=h;}return o;};
+  const vazio=()=>{};
+  const PREDIOS=['casteloLx','seLx','pacoRibeira','casaIndia','alfLx','nauLx'];
+  const apaga=()=>{for(const id of PREDIOS){const o=objects.find(o=>o.id===id&&o.scene===SC);if(o)o.draw=vazio;}};
+  apaga();setTimeout(apaga,200);
+  P('casteloLx',14,0,45,9);P('seLx',5,18,11,10);P('pacoRibeira',43,19,25,12);P('casaIndia',15,28,12,10);P('alfLx',11,31,4,6);P('nauLx',35,40,13,4);
+  {const o=objects.find(o=>o.id==='alfLx'&&o.scene===SC);if(o)o.name='Alfândega';}
+  if(!objects.some(o=>o.id==='placaRuaNova'))objects.push({id:'placaRuaNova',scene:SC,x:30,y:26,w:1,h:1,draw:drawPlaca,name:'Rua Nova dos Mercadores',text:["Esta é a Rua Nova dos Mercadores, a rua mais rica de Lisboa. Aqui se vende de tudo o que chega pelo mar: pimenta, canela, porcelana da China, tecidos da Índia, marfim da África e açúcar do Brasil.",
+    "Mercadores de toda a Europa moram e fazem negócios nesta rua."]});
+  if(!objects.some(o=>o.id==='placaTorreBelem'))objects.push({id:'placaTorreBelem',scene:SC,x:7,y:29,w:1,h:1,draw:drawPlaca,name:'Torre de Belém',text:["Esta é a Torre de Belém, construída entre 1514 e 1520 para vigiar a entrada do porto de Lisboa. Ela fica dentro do rio.",
+    "No jogo ela está pertinho. Na verdade, fica uns 6 quilômetros rio abaixo, em Belém, onde também estão construindo o grande Mosteiro dos Jerónimos.",
+    "Foi da praia de Belém que partiram Vasco da Gama para a Índia, em 1497, e Pedro Álvares Cabral, em 1500."]});
+  const NP={reiJoao:[50,32],oficialAlf:[16,38],mercadorLx:[30,27],aguadeiraLx:[42,28],marujoLx:[44,38],varinaLx:[26,39]};
+  const OB={pelourinhoLx:[40,31],c54_lisboa_chafariz_17_18:[47,32],tendaLx1:[27,30],tendaLx2:[33,30],caixasLx:[39,36],torasLx:[52,33],
+    placaTerreiro:[37,29],gravuraLx:[38,29],mapa54_lisboa54:[36,39],placaRuaNova:[30,26],placaTorreBelem:[7,29],
+    ob54_caixote_lisboa54_nauLx:[33,39],ob54_barril_lisboa54_nauLx:[48,39],ob54_sacas_lisboa54_nauLx:[50,39],
+    c54_lisboa_carroca_30_15:[54,33],c54_lisboa_banco_pedra_14_21:[20,38],c54_barril_12_18:[45,37],c54_cestoPeixe_20_15:[28,39],c54_cestoFruta_24_20:[35,27],c54_pote_32_19:[24,27]};
+  const poe=()=>{for(const n of npcs)if(n.scene===SC&&NP[n.id]){n.x=NP[n.id][0];n.y=NP[n.id][1];if(n.id==='reiJoao')n.dir='down';}
+    for(const o of objects)if(o.scene===SC&&OB[o.id]){o.x=OB[o.id][0];o.y=OB[o.id][1];}};
+  poe();
+  const ANDA=c=>c==='.'||c==='D'||c==='Q'||c==='A';
+  const pode=(x,y)=>G[y]&&ANDA(G[y][x]);
+  const CHEGA=[41,39];
+  const ocupa=(x,y,self)=>objects.some(o=>o!==self&&o.scene===SC&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))
+     ||npcs.some(n=>n!==self&&n.scene===SC&&n.x===x&&n.y===y)||(x===CHEGA[0]&&y===CHEGA[1]);
+  const cabe=(o,x,y)=>{for(let j=0;j<(o.h||1);j++)for(let i=0;i<(o.w||1);i++)if(!pode(x+i,y+j)||ocupa(x+i,y+j,o))return false;return true;};
+  const perto=(o,x,y)=>{for(let r=0;r<20;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;
+      const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<MW_&&Y<MH_&&cabe(o,X,Y))return [X,Y];}return [x,y];};
+  const FIXOS=new Set(PREDIOS);
+  const ROTAS=[[[17,26],[41,26]],[[28,33],[56,33]],[[30,39],[55,39]],[[5,28],[14,28]],[[42,19],[42,34]]];
+  const arruma=()=>{poe();
+    for(const o of objects){if(o.scene!==SC||FIXOS.has(o.id))continue;if(!cabe(o,o.x,o.y)){const p=perto(o,o.x,o.y);o.x=p[0];o.y=p[1];}}
+    for(const n of npcs){if(n.scene!==SC)continue;if(!pode(n.x,n.y)||ocupa(n.x,n.y,n)){const p=perto({w:1,h:1},n.x,n.y);n.x=p[0];n.y=p[1];}}
+    try{let i=0;for(const w of walkers){if(w.scene!==SC)continue;const r=ROTAS[i++%ROTAS.length];
+      if(w.path)w.path=r.map(q=>q.slice());const p=r[0];if(!pode(w.x,w.y)||!w.__lx2){w.__lx2=1;w.x=w.fx=p[0];w.y=w.fy=p[1];w.px=p[0]*T;w.py=p[1]*T;}}}catch(_){}};
+  arruma();setTimeout(arruma,0);setTimeout(arruma,1500);
+  {const g0=goScene;goScene=function(to,x,y,dir,after){if(to===SC&&!(G[y]&&ANDA(G[y][x]))){x=CHEGA[0];y=CHEGA[1];}return g0.call(this,to,x,y,dir,after);};}
+  setTimeout(()=>{try{LABELS_XS.lisboa54=[['Castelo de São Jorge',36,0.4],['Sé',10,16.6],['Rua Nova dos Mercadores',29,13.6],['Paço da Ribeira',55,17.6],
+    ['Casa da Índia',20.5,26.6],['Alfândega',12.5,29.6],['Terreiro do Paço',40,29.4],['Cais da Ribeira',45,34.2],['Torre de Belém',9,35.6],['Rio Tejo',30,48]];}catch(_){}},0);
+  {const o0=TILE_INFO.O;TILE_INFO.O=(x,y)=>cur===SC?{name:'Rio Tejo',text:['O rio Tejo, largo como um mar, chega ao oceano logo depois de Belém. Por ele entram e saem as naus da Índia, da África e do Brasil.']}:o0(x,y);}
+  {const c0=TILE_INFO.C;TILE_INFO.C=(x,y)=>{if(cur===SC){const k=K(x,y);
+     const T_={casa:['Casas de Lisboa','Casas de cal, coladas umas nas outras, subindo o morro até o castelo.'],
+       se:['Sé de Lisboa','A catedral, com duas torres de pedra, começou a ser construída logo depois de 1147.'],
+       castelo:['Castelo de São Jorge','O castelo no alto do morro. De lá se vê o Tejo inteiro.'],
+       ruanova:['Rua Nova dos Mercadores','A rua mais rica de Lisboa, com lojas debaixo das arcadas.'],
+       paco:['Paço da Ribeira','O palácio do rei, na beira do rio. Do andar de cima, o rei vê as naus chegando.'],
+       india:['Casa da Índia','Aqui se registram e guardam as mercadorias de além-mar.'],
+       alf:['Alfândega','Toda mercadoria que chega pelo mar paga imposto ao rei aqui.'],
+       carga:['Carga da Ribeira','Caixas de açúcar, sacos de pimenta e barris esperando para embarcar ou entrar na cidade.'],
+       arvore:['Árvore','Uma árvore perto do rio.'],
+       torre:['Torre de Belém','A torre que vigia a entrada do porto, construída dentro do rio. Na verdade fica uns 6 km rio abaixo.']}[k];
+     if(T_)return {name:T_[0],text:[T_[1]]};}return c0(x,y);};}
+  const IM=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur===SC){buildStatic();buildOcc&&buildOcc();}}catch(_){}};IM.src=A.LX54_MAPA;
+  const bs=buildStatic;buildStatic=function(){bs();try{if(cur===SC&&ok){sc.imageSmoothingEnabled=false;sc.drawImage(IM,0,0);}}catch(_){}};
+  const I2=new Image();I2.src=A.LX54_MAPA2X||'';
+  {const di=ctx.drawImage;ctx.drawImage=function(src){
+     if(src===stat&&cur===SC&&arguments.length===9&&I2.complete&&I2.naturalWidth){const a=arguments;di.apply(this,a);
+       return di.call(this,I2,a[1]*2,a[2]*2,a[3]*2,a[4]*2,a[5],a[6],a[7],a[8]);}
+     return di.apply(this,arguments);};}
+  setTimeout(()=>{try{if(cur===SC){buildStatic();buildOcc();mmDirty=true;}}catch(_){}},0);
+}catch(e){console.warn('lx54',e);}})();
+/* ===== v197 — ANTUÉRPIA NOVA EM 1554 (pedido do professor, 20/11/2026) =====
+   Antuérpia refeita com arte do Canva no estilo Stardew aprovado pelo professor, desenhada em 32 px por quadradinho
+   (primeiro mapa do jogo com chão em 32 px de verdade: AN54_MAPA2X; AN54_MAPA é a cópia em 16 px para o mapa pequeno).
+   No mapa: casas de tijolo com empena em degraus, a Catedral de Nossa Senhora (torre de 1521), a Bolsa (1531),
+   a refinaria de açúcar, o Steen na beira do Escalda, o cais com o guindaste de roda e a nau. Mapa de 72 x 54. */
+(function(){try{
+  if(typeof A==='undefined'||!A.AN54_MAPA||!SCN.antuerpia54)return;
+  const SC='antuerpia54',G=["CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "..................CCCCC.................................................", "..................CCCCC.................................................", "..................CCCCC.................................................", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "CC........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "..........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "..........CCCCCCC.CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "........CC........CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "........CC........CCCCCCCCCCCCCCCCCCCCCC..CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "........CC........CCCCCCCCCCCCCCCCCCCCCC................CCCCCCCCCCCCCCCC", "........CC........CCCCCCCCCCCCCCCCCCCCCC......CC........CCCCCCCCCCCCCCCC", "..................CCCCCCCCCCCCCCCCCCCCCC......CC........CCCCCCCCCCCCCCCC", "..................CCCCCCCCCCCCCCCCCCCCCC......CC........CCCCCCCCCCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC......CC........................", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC................................", "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC................................", "CCCCCCCCCCCCCCCCCCCCCCCC...................CCCCCCCCC....................", "CCCCCCCCCCCCCCCCCCCCCCCC...................CCCCCCCCC....................", "CCCCCCCCCCCCCCCCCCCCCCCC.................CCCCCCCCCCC..CC................", "CCCCCCCCCCCCCCCCCCCCCCCC.................CCCCCCCCCCC..CCCCCCCC..CCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCC..............CCCCCCCCCCCCCC..CCCCCCCC..CCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCC..............CCC..CCCCCCCCC..CC........CCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCC.....CCCCCCCCCCCC..CCCCCCCCC..CC........CCCCCCCC", "CCCCCCCCCCCCCCCCCCCCCCCC.....CCCCCCCCCCCC..CCCCCCCCC.....OOOOOOOOOOOOOOO", "CCCCCCCCCCCCCCCCCCCCCCCC.....CCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "CCCCCCCCCCCCCCCCCCCCCCCC.....CCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "CCCCCCCCCCCCCCCCCCCCCCCC.....CCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "CCCCCCCCCCCCCCCCCCCCCCCCOOOOOCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "CCCCCCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"],KR=[[0,0,71,10,"casa"],[10,14,16,23,"casa"],[0,14,1,21,"casa"],[8,24,9,27,"arvore"],[18,0,22,32,"catedral"],[23,14,39,32,"catedral"],[42,14,55,25,"bolsa"],[46,27,47,30,"fonte"],[56,14,71,29,"refin"],[0,30,23,45,"steen"],[43,33,51,40,"kraan"],[56,36,61,37,"carga"],[54,35,55,39,"carga"],[64,36,71,39,"cais"],[38,37,40,41,"cais"],[41,35,42,37,"carga"],[29,39,40,44,"nau"]],K=new Proxy({},{get:(_,p)=>{const [x,y]=String(p).split(",").map(Number);let r=null;for(const q of KR)if(x>=q[0]&&x<=q[2]&&y>=q[1]&&y<=q[3])r=q[4];return r;}}),S=SCN[SC],MW_=G[0].length,MH_=G.length;
+  S.map=G.map(r=>r.split(''));S.exp=new Uint8Array(MW_*MH_).fill(1);
+  const tira=new Set(['nauAnt2','nauAnt3','barcoAnt']);
+  for(let i=objects.length-1;i>=0;i--)if(objects[i].scene===SC&&(/^flam/.test(objects[i].id)||tira.has(objects[i].id)))objects.splice(i,1);
+  const P=(id,x,y,w,h)=>{const o=objects.find(o=>o.id===id&&o.scene===SC);if(!o)return null;o.x=x;o.y=y;if(w){o.w=w;o.h=h;}return o;};
+  const vazio=()=>{};
+  const PREDIOS=['catAnt','casaMerc','refinAnt','bolsaAnt','steenAnt','kraanAnt','tinturaria','nauAnt'];
+  const apaga=()=>{for(const id of PREDIOS){const o=objects.find(o=>o.id===id&&o.scene===SC);if(o)o.draw=vazio;}};
+  apaga();setTimeout(apaga,200);
+  P('catAnt',23,14,17,19);P('casaMerc',10,7,4,4);P('refinAnt',56,14,16,16);P('bolsaAnt',42,14,14,12);P('steenAnt',0,30,24,16);P('kraanAnt',43,33,9,8);P('tinturaria',62,6,4,5);
+  {const o=P('casaMerc',10,7,4,4);if(o)o.door=2;}
+  P('nauAnt',27,44,12,5);
+  /* gente e coisas: cada um no seu lugar no mapa novo */
+  const NP={refinador:[60,31],agenteSchetz:[14,12],comercianteBolsa:[50,27],boticarioAnt:[5,12],carregadorAnt:[53,40],tintureiro:[64,12]};
+  const OB={placaSchetz:[16,12],mapa54_antuerpia54:[24,40],barrisAnt:[57,34],ob54_caixote_antuerpia54_nauAnt:[24,42],ob54_barril_antuerpia54_nauAnt:[25,40],
+    c54_antuerpia_tenda_pao_17_16:[30,34],c54_antuerpia_tenda_tecidos_23_17:[35,34],c54_antuerpia_carrinho_8_18:[25,38],c54_barril_40_18:[41,31],c54_sacas_11_18:[62,33],c54_ancoraCorda_29_16:[66,34]};
+  const poe=()=>{for(const n of npcs)if(n.scene===SC&&NP[n.id]){n.x=NP[n.id][0];n.y=NP[n.id][1];}
+    for(const o of objects)if(o.scene===SC&&OB[o.id]){o.x=OB[o.id][0];o.y=OB[o.id][1];}};
+  poe();
+  const ANDA=c=>c==='.'||c==='D'||c==='Q'||c==='A';
+  const pode=(x,y)=>G[y]&&ANDA(G[y][x]);
+  const CHEGA=[27,43],PORTA=[12,11];
+  const ocupa=(x,y,self)=>objects.some(o=>o!==self&&o.scene===SC&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))
+     ||npcs.some(n=>n!==self&&n.scene===SC&&n.x===x&&n.y===y)||(x===CHEGA[0]&&y===CHEGA[1])||(x===PORTA[0]&&y===PORTA[1]);
+  const cabe=(o,x,y)=>{for(let j=0;j<(o.h||1);j++)for(let i=0;i<(o.w||1);i++)if(!pode(x+i,y+j)||ocupa(x+i,y+j,o))return false;return true;};
+  const perto=(o,x,y)=>{for(let r=0;r<20;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;
+      const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<MW_&&Y<MH_&&cabe(o,X,Y))return [X,Y];}return [x,y];};
+  const FIXOS=new Set(PREDIOS);
+  /* caminhos dos passantes: ruas e cais do mapa novo */
+  const ROTAS=[[[2,12],[17,12]],[[23,12],[70,12]],[[17,25],[17,29],[40,29],[40,14]],[[24,34],[40,34],[40,31],[56,31]],[[52,32],[70,32]]];
+  const arruma=()=>{poe();
+    for(const o of objects){if(o.scene!==SC||FIXOS.has(o.id))continue;if(!cabe(o,o.x,o.y)){const p=perto(o,o.x,o.y);o.x=p[0];o.y=p[1];}}
+    for(const n of npcs){if(n.scene!==SC)continue;if(!pode(n.x,n.y)||ocupa(n.x,n.y,n)){const p=perto({w:1,h:1},n.x,n.y);n.x=p[0];n.y=p[1];}}
+    try{let i=0;for(const w of walkers){if(w.scene!==SC)continue;const r=ROTAS[i++%ROTAS.length];
+      if(w.path)w.path=r.map(q=>q.slice());const p=r[0];if(!pode(w.x,w.y)||!w.__an2){w.__an2=1;w.x=w.fx=p[0];w.y=w.fy=p[1];w.px=p[0]*T;w.py=p[1]*T;}}}catch(_){}};
+  arruma();setTimeout(arruma,0);setTimeout(arruma,1500);
+  /* quem chega de navio ou volta do banquete cai em lugar certo */
+  {const g0=goScene;goScene=function(to,x,y,dir,after){if(to===SC&&!(G[y]&&ANDA(G[y][x]))){x=CHEGA[0];y=CHEGA[1];}return g0.call(this,to,x,y,dir,after);};}
+  setTimeout(()=>{try{LABELS_XS.antuerpia54=[['Catedral de Nossa Senhora',30,12.6],['Casa do mercador',12,5.6],['Bolsa (1531)',49,12.6],['Refinaria de açúcar',63.5,12.6],
+    ['Tinturaria',64,5.6],['Steen',12,28.6],['Guindaste',47,31.6],['Cais do Escalda',62,34.6],['Rio Escalda',52,49]];}catch(_){}},0);
+  {const o0=TILE_INFO.O;TILE_INFO.O=(x,y)=>cur===SC?{name:'Rio Escalda',text:['O rio Escalda leva ao mar do Norte. Por ele chegam navios de Lisboa, da Inglaterra, da Alemanha e da Itália: Antuérpia é o maior porto da Europa.']}:o0(x,y);}
+  {const c0=TILE_INFO.C;TILE_INFO.C=(x,y)=>{if(cur===SC){const k=K[x+','+y];
+     const T_={casa:['Casas de Antuérpia','Casas de tijolo, estreitas e altas, com a empena em degraus virada para a rua.'],
+       catedral:['Catedral de Nossa Senhora','A torre, terminada em 1521, é a mais alta dos Países Baixos. Dá para vê-la do rio, de muito longe.'],
+       steen:['O Steen','O velho castelo de pedra na beira do Escalda.'],
+       refin:['Refinaria','Aqui o açúcar do Brasil é fervido de novo até ficar branco.'],bolsa:['Bolsa de Antuérpia','Mercadores de toda a Europa se encontram aqui todo dia para negociar.'],
+       kraan:['Guindaste','Homens andam dentro da roda para levantar a carga dos navios.'],carga:['Carga do porto','Barris, caixas e fardos que chegam e saem pelo Escalda.'],
+       cais:['Cais do Escalda','O cais de pedra onde os navios descarregam.'],nau:['Nau no cais','A nau que leva o viajante de volta. As velas estão recolhidas enquanto carregam a carga.'],fonte:['Fonte da praça','Água para quem trabalha na praça e no cais.'],arvore:['Árvore','Uma árvore da praça.']}[k];
+     if(T_)return {name:T_[0],text:[T_[1]]};}return c0(x,y);};}
+  /* chão: em 16 px no mapa interno (AN54_MAPA) e em 32 px de verdade na tela (AN54_MAPA2X) */
+  const IM=new Image();let ok=false;IM.onload=()=>{ok=true;try{if(cur===SC){buildStatic();buildOcc&&buildOcc();}}catch(_){}};IM.src=A.AN54_MAPA;
+  const bs=buildStatic;buildStatic=function(){bs();try{if(cur===SC&&ok){sc.imageSmoothingEnabled=false;sc.drawImage(IM,0,0);}}catch(_){}};
+  const I2=new Image();I2.src=A.AN54_MAPA2X||'';
+  {const di=ctx.drawImage;ctx.drawImage=function(src){
+     if(src===stat&&cur===SC&&arguments.length===9&&I2.complete&&I2.naturalWidth){const a=arguments;di.apply(this,a);
+       return di.call(this,I2,a[1]*2,a[2]*2,a[3]*2,a[4]*2,a[5],a[6],a[7],a[8]);}
+     return di.apply(this,arguments);};}
+  setTimeout(()=>{try{if(cur===SC){buildStatic();buildOcc();mmDirty=true;}}catch(_){}},0);
+}catch(e){console.warn('an54',e);}})();
 /* ---- fontes: o Pátio do Colégio hoje, o desenho da colina e o mapa do Triângulo ---- */
 (function(){
   if(typeof A==='undefined'||typeof FONTES==='undefined')return;
