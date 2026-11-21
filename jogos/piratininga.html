@@ -22522,6 +22522,26 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   new MutationObserver(some).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});
   some();
 }catch(e){console.warn('v209 sem cartão',e);}})();
+/* ===== v216 — GUARDAR O JOGO NO APARELHO (abre rápido e funciona sem internet) =====
+   Pedido do professor (21/11/2026). Registra o arquivo piratininga-sw.js, que guarda a página e os
+   desenhos no celular ou computador. Da segunda vez o jogo abre do que ficou guardado, até sem internet.
+   Avisos: "✓ Jogo guardado neste aparelho" (primeira vez) e "Versão nova baixada" (quando há atualização). */
+(function(){try{
+  if(!('serviceWorker' in navigator)||!window.isSecureContext||/^file:/.test(location.protocol))return;
+  const aviso=(txt,ms)=>{try{let a=document.getElementById('avisoGuardado');if(!a){a=document.createElement('div');a.id='avisoGuardado';
+      a.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:9900;max-width:min(92vw,420px);background:#20301e;color:#e8f6d8;border:2px solid #7fbf6a;border-radius:8px;padding:8px 12px;font:600 14px/1.35 system-ui,sans-serif;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.4);cursor:pointer';
+      a.onclick=()=>a.remove();document.body.appendChild(a);}
+    a.textContent=txt;clearTimeout(a.__t);a.__t=setTimeout(()=>{try{a.remove();}catch(_){}},ms||7000);}catch(_){}};
+  navigator.serviceWorker.addEventListener('message',ev=>{const d=ev.data||{};if(d.pira!=='guardado')return;
+    if(d.nova)aviso('Há uma versão nova do jogo. Ela já foi baixada e aparece na próxima vez que você abrir.',9000);
+    else{let ja=false;try{ja=localStorage.getItem('pira_guardado_aviso')==='1';}catch(_){}
+      /* o aviso aparece uma vez só por aparelho; só conta como visto depois de 4 s na tela (a página pode recarregar ao trocar de época bem na hora) */
+      if(!ja){aviso('✓ Jogo guardado neste aparelho. Da próxima vez ele abre rápido, até sem internet.',8000);setTimeout(()=>{try{localStorage.setItem('pira_guardado_aviso','1');}catch(_){}},4000);}}});
+  try{navigator.serviceWorker.startMessages();}catch(_){}
+  const reg=()=>navigator.serviceWorker.register('piratininga-sw.js').catch(e=>console.warn('guardar no aparelho',e));
+  if(document.readyState==='complete')setTimeout(reg,1500);else window.addEventListener('load',()=>setTimeout(reg,1500));
+  window.__guardado={aviso};
+}catch(e){console.warn('v216 guardar',e);}})();
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);

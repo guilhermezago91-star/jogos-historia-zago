@@ -31,3 +31,12 @@ Abra `uso_arte.json`, ache a imagem e acrescente a época (`"e2"`). Rode a ferra
 ## Imagens em WebP sem perda (v209)
 
 `python3 jogos/ferramentas/png_para_webp.py` troca as imagens PNG embutidas por WebP sem perda (desenho pixel por pixel igual, arquivo menor). Confere cada imagem; se mudaria um pixel ou ficaria maior, deixa como estava. Depois rode `abertura_rapida.py`.
+
+## Jogo guardado no aparelho (v216)
+
+`jogos/piratininga-sw.js` guarda `piratininga.html` e os pacotes `arte/pac_*.js?v=...` no celular ou computador. Da segunda vez o jogo abre do que ficou guardado, até sem internet.
+
+- Versão nova no GitHub: na primeira vez que a pessoa abre, ainda vê a anterior; a nova é baixada por trás (página + todos os pacotes) e aparece na vez seguinte, com o aviso "Há uma versão nova do jogo".
+- **Para conferir uma versão recém-publicada: abra o jogo, espere o aviso de versão nova e abra de novo.**
+- Depende da lista de pacotes que o `abertura_rapida.py` escreve na página (`"f":"pac_...js?v=..."`). Sempre rode a ferramenta antes de subir.
+- Se um dia precisar desligar: troque o conteúdo do `piratininga-sw.js` por um que apague o cache `piratininga-1` e chame `self.registration.unregister()`.
