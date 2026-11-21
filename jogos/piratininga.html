@@ -373,7 +373,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=fc8eb325","kb":282,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=f4ea5e07","kb":1592,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=fbde469e","kb":6985,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cf25be29","kb":281,"m":2},{"f":"pac_e23.js?v=0a1eee97","kb":425,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=f4ea5e07","kb":1592,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=fbde469e","kb":6985,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -23449,6 +23449,18 @@ window.__DOCS22={
         'As vozes das mulheres: em 1922 operárias, normalistas e feministas lutavam por coisas diferentes; o voto feminino só veio em 1932.')};}
     return h0(n);};
 }catch(e){console.warn('mulheres 1922',e);}})();
+
+/* ===== v231 — ÚLTIMOS BONECOS DO ESTILO ANTIGO TROCADOS POR HD (pedido do professor, 21/11/2026) =====
+   Varredura de todas as cenas achou 3 desenhos antigos (cabeçudos de 16 px). Este bloco troca:
+   Fotógrafo ambulante de 1888 (fotoRua88) -> boneco HD N88_fotografoRua;
+   Tropa de Santo Amaro e Tropa da Penha (1888) -> tropeiro HD montado na mula (cav30|mula_hd|tropeiroBan).
+   D. João III foi arrumado pelo professor em outra conversa. */
+(function(){try{
+  const T={fotoRua88:'h22_n|fotografoRua|0',tropaSA88:'cav30|mula_hd|tropeiroBan',tropaPenha88:'cav30|mula_hd|tropeiroBan'};
+  const aplica=()=>{try{for(const L of [npcs,walkers])for(const p of L){const s=T[p.id];if(s&&p.spr!==s)p.spr=s;}}catch(_){}};
+  aplica();let k=0;const it=setInterval(()=>{aplica();if(++k>90)clearInterval(it);},1000);
+  const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);aplica();return r;};
+}catch(e){console.warn('bonecos antigos',e);}})();
 
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /* ===== v203 — MENOS ESPAÇO PRETO EM TODOS OS FORMATOS E ABERTURA SEM 1554 NO FUNDO (pedido do professor, 21/11/2026) =====
