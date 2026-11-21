@@ -373,7 +373,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=0bf8ea21","kb":233,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=e3acbc3c","kb":1485,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=13bfede6","kb":5061,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=fc8eb325","kb":282,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=4e4411ca","kb":1528,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=8336f97c","kb":5148,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -21957,6 +21957,490 @@ window.__paulista82Ready=Promise.all(ready);
   aplica();let k=0;const it=setInterval(()=>{aplica();if(++k>120)clearInterval(it);},1000);
   const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);try{aplica();}catch(_){}return r;};
 }catch(e){console.warn('bonecos canva 22',e);}})();
+
+/* ===== v215 — MINI-JOGOS, MISSÃO DO FRIEDENREICH E MUSEU DA MOCHILA (gamificação, pedido do professor, 21/11/2026) =====
+   Base comum: janela bonita dos mini-jogos (moldura de madeira, faixa com o título, cena do Canva ao fundo, placar),
+   ajudas para desenhar bonecos HD e para salvar o que foi feito (mini-jogos e documentos examinados).
+   Cenas de fundo: MJ_telefonista (1922), MJ_cafe (1888), MJ_tropa (1830), MJ_fabrica (1922), nos arquivos de arte de cada época.
+   Se a cena ainda não carregou, o jogo pinta um fundo simples no lugar. */
+(function(){try{
+  const st=document.createElement('style');st.textContent=`
+  #ovQuiz:has(.mjBox){position:fixed;inset:0;z-index:60;overflow-y:auto;align-items:flex-start;padding:max(8px,env(safe-area-inset-top)) 6px 12px}
+  #quizBox.mjBox{padding:0;max-height:none;margin:auto 0;flex-shrink:0;gap:0;overflow:hidden;background:#3a2418;border:3px solid #141b1b;box-shadow:0 0 0 3px #b8864a inset,0 10px 30px rgba(0,0,0,.55);max-width:min(860px,96vw);width:min(860px,96vw)}
+  .mjTop{display:flex;align-items:center;gap:10px;background:linear-gradient(#c98a4b,#9a5d32);border-bottom:3px solid #141b1b;padding:8px 12px;color:#fff6e3;font-family:var(--f);text-shadow:0 2px 0 #4a2414}
+  .mjTop .mjAno{background:#141b1b;color:#f1c471;border-radius:3px;padding:2px 7px;font-size:15px;letter-spacing:1px}
+  .mjTop h2{margin:0;font-size:clamp(17px,2.6vw,23px);font-family:var(--f);color:#fff6e3;flex:1;line-height:1.1}
+  .mjTop .mjX{background:#5e3428;color:#fff6e3;border:2px solid #141b1b;border-radius:3px;font-family:var(--f);font-size:16px;padding:2px 9px;cursor:pointer}
+  .mjStage{position:relative;background:#141b1b;line-height:0}
+  .mjStage canvas{width:100%;height:auto;image-rendering:pixelated;display:block;touch-action:manipulation;cursor:pointer}
+  .mjHud{display:flex;gap:6px;flex-wrap:wrap;line-height:1;background:#2a1a12;padding:6px 10px;border-top:3px solid #141b1b}
+  .mjHud span{background:rgba(20,27,27,.82);color:#fff6e3;border:2px solid #f1c471;border-radius:4px;padding:4px 8px;font-family:var(--f);font-size:clamp(13px,1.9vw,16px)}
+  .mjFoot{background:#f3e6c8;color:#3a2418;padding:10px 14px 12px;font-family:var(--f);border-top:3px solid #141b1b}
+  .mjFoot p{margin:0 0 8px;font-size:clamp(14px,2.1vw,17px);line-height:1.35}
+  .mjFoot .row{display:flex;gap:8px;flex-wrap:wrap}
+  .mjFoot .btn{font-family:var(--f)}
+  .mjCard{background:#f3e6c8;color:#3a2418;padding:16px 18px;font-family:var(--f)}
+  .mjCard h3{margin:0 0 6px;font-size:clamp(18px,2.8vw,24px);color:#7a3a1e}
+  .mjCard p{margin:0 0 8px;font-size:clamp(14px,2.1vw,17px);line-height:1.4}
+  .mjStars{font-size:28px;letter-spacing:4px;color:#d9a020;text-shadow:0 2px 0 #6a4410;margin:4px 0 8px}
+  `;document.head.appendChild(st);
+
+  /* imagens do arquivo de arte (carregam na hora) */
+  const IMC={};const img=k=>{if(IMC[k])return IMC[k];if(typeof A==='undefined'||typeof A[k]!=='string')return null;const i=new Image();i.src=A[k];return IMC[k]=i;};
+  const ok=i=>i&&i.complete&&i.naturalWidth>0;
+
+  /* boneco HD (folha N88 de 512x64): dir 0 frente, 1 costas, 2 esquerda, 3 direita; passo 0..3 */
+  const boneco=(g,key,x,y,dir,passo,esc)=>{const i=img('N88_'+key);if(!ok(i))return false;const f=(dir||0)*4+((passo||0)&3);esc=esc||1;
+    g.drawImage(i,f*32,0,32,64,Math.round(x-16*esc),Math.round(y-64*esc),32*esc,64*esc);return true;};
+
+  /* fundo: cena do Canva preenchendo o quadro, ou um degradê no lugar */
+  const fundo=(g,W,H,key,c1,c2)=>{const i=img(key);if(ok(i)){const s=Math.max(W/i.naturalWidth,H/i.naturalHeight),w=i.naturalWidth*s,h=i.naturalHeight*s;g.imageSmoothingEnabled=false;g.drawImage(i,(W-w)/2,(H-h)/2,w,h);return true;}
+    const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,c1||'#4a3a2a');gr.addColorStop(1,c2||'#1d2526');g.fillStyle=gr;g.fillRect(0,0,W,H);return false;};
+
+  /* janela do mini-jogo */
+  let aberto=null;
+  const abrir=o=>{mcqOpen=true;ovQuiz.hidden=false;const box=$('quizBox');box.innerHTML='';box.classList.add('mjBox');
+    const top=document.createElement('div');top.className='mjTop';const ano=document.createElement('span');ano.className='mjAno';ano.textContent=o.ano||'';
+    const h=document.createElement('h2');h.textContent=o.titulo;const x=document.createElement('button');x.type='button';x.className='mjX';x.textContent='✕';x.setAttribute('aria-label','Fechar');
+    top.append(ano,h,x);const stage=document.createElement('div');stage.className='mjStage';const cv=document.createElement('canvas');cv.width=o.W||768;cv.height=o.H||384;
+    const hud=document.createElement('div');hud.className='mjHud';stage.append(cv);const foot=document.createElement('div');foot.className='mjFoot';
+    const p=document.createElement('p');const row=document.createElement('div');row.className='row';foot.append(p,row);box.append(top,stage,hud,foot);
+    const g=cv.getContext('2d');g.imageSmoothingEnabled=false;
+    const J={box,cv,g,hud,p,row,stage,foot,vivo:true,raf:0,
+      chips:a=>{hud.innerHTML='';for(const t of a){const s=document.createElement('span');s.textContent=t;hud.appendChild(s);}},
+      botoes:a=>{row.innerHTML='';return a.map(([t,f,cl])=>{const b=document.createElement('button');b.type='button';b.className='btn'+(cl?' '+cl:'');b.textContent=t;b.onclick=f;row.appendChild(b);return b;});},
+      ponto:ev=>{const r=cv.getBoundingClientRect();return [(ev.clientX-r.left)*cv.width/r.width,(ev.clientY-r.top)*cv.height/r.height];},
+      loop:f=>{let t0=performance.now();const tick=now=>{if(!J.vivo)return;const dt=Math.min(.05,(now-t0)/1000);t0=now;f(dt,now/1000);J.raf=requestAnimationFrame(tick);};J.raf=requestAnimationFrame(tick);},
+      fechar:()=>{J.vivo=false;cancelAnimationFrame(J.raf);box.classList.remove('mjBox');ovQuiz.hidden=true;mcqOpen=false;aberto=null;o.aoFechar&&o.aoFechar();}};
+    x.onclick=J.fechar;aberto=J;return J;};
+
+  /* tela final bonita, com estrelas */
+  const final=(J,estrelas,titulo,linhas,botoes)=>{J.vivo=false;cancelAnimationFrame(J.raf);J.stage.style.opacity='.55';
+    const c=document.createElement('div');c.className='mjCard';const s=document.createElement('div');s.className='mjStars';s.textContent='★'.repeat(estrelas)+'☆'.repeat(3-estrelas);
+    const h=document.createElement('h3');h.textContent=titulo;c.append(s,h);for(const l of linhas){const p=document.createElement('p');p.textContent=l;c.appendChild(p);}
+    J.foot.replaceWith(c);const row=document.createElement('div');row.className='row';c.appendChild(row);
+    for(const [t,f] of botoes){const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=t;b.onclick=f;row.appendChild(b);}};
+
+  /* recordes e documentos ficam no salvamento do jogo */
+  const estreito=()=>Math.min(window.innerWidth,document.documentElement.clientWidth||9999)<620;
+  const MJ=window.__MJ={estreito,img,ok,boneco,fundo,abrir,final,rec:{},docs:new Set(),ff:(getComputedStyle(document.documentElement).getPropertyValue('--f')||'sans-serif').trim()};
+  if(typeof saveSets==='function'){const s0=saveSets;saveSets=function(){const o=s0()||{};o.mj=MJ.rec;o.docs=[...MJ.docs];return o;};}
+  if(typeof loadSets==='function'){const l0=loadSets;loadSets=function(v){l0(v);try{if(v&&v.mj)Object.assign(MJ.rec,v.mj);if(v&&Array.isArray(v.docs))v.docs.forEach(d=>MJ.docs.add(d));}catch(_){}};}
+
+  /* missão nova: registra no quadro de missões da época */
+  MJ.missao=(k,era,titulo,onde,passos,giver)=>{Q[k]={era,title:titulo,where:onde,steps:passos,step:null,count:0,done:false};
+    const L=era===4?QE4:era===3?QE3:era===2?QE2:QE1;if(L&&!L.includes(k))L.push(k);(GIVER[giver]=GIVER[giver]||[]).push(k);
+    setTimeout(()=>{try{QT[k]={giver:'n:'+giver,steps:passos.map(()=>'n:'+giver)};}catch(_){}},0);};
+  /* conversa: liga um personagem a uma ação */
+  MJ.fala=f=>{const h0=questHook;questHook=function(n){const r=f(n);return r||h0(n);};};
+  /* mini-jogo como missão: fala com quem oferece, joga, com 2 estrelas ou mais volta e responde a pergunta; depois pode jogar de novo */
+  MJ.jogoMissao=c=>{MJ.missao(c.K,c.era,c.titulo,c.onde,[c.passo,'Fale de novo com '+c.quem],c.giver);
+    const jogar=()=>c.jogar(st=>{MJ.rec[c.K]=Math.max(MJ.rec[c.K]||0,st);if(st>=2&&Q[c.K].step===0){qNext(c.K);toast('Agora fale de novo com '+c.quem);}try{save();}catch(_){}});
+    MJ.fala(n=>{if(n.id!==c.giver)return null;const q=Q[c.K];if(!q)return null;
+      if(q.step===null&&!q.done)return{pages:c.intro,after:()=>{qStart(c.K);jogar();}};
+      if(q.step===0)return{only:true,pages:[c.denovo||'Vamos tentar de novo? Com duas estrelas você consegue!'],after:jogar};
+      if(q.step===1)return{only:true,pages:c.fim,after:()=>finishMission(c.K,c.titulo,...c.pergunta)};
+      if(q.done)return{pages:[],after:()=>askChoice(c.titulo,'Seu recorde: '+'★'.repeat(MJ.rec[c.K]||0)+'☆'.repeat(3-(MJ.rec[c.K]||0))+'. Quer jogar de novo?',['Jogar de novo','Agora não'],i=>{if(i===0)jogar();})};
+      return null;});};
+  /* som curto */
+  MJ.som=k=>{try{sfx(k||'blip');}catch(_){}};
+  /* réis de prêmio (uma vez por mini-jogo) */
+  MJ.premio=(K,v)=>{try{if(MJ.rec['$'+K])return 0;MJ.rec['$'+K]=1;reis+=v;updHUD();if(typeof updReis==='function')updReis();return v;}catch(_){return 0;}};
+}catch(e){console.warn('mini-jogos base',e);}})();
+
+/* missão: a bola do Friedenreich (1922) — liga o futebol da elite (Paulistano) ao futebol da várzea e dos operários */
+(function(){try{const MJ=window.__MJ;if(!MJ)return;
+  const K='bolaFried22';
+  MJ.missao(K,4,'A bola do Friedenreich','Fale com Arthur Friedenreich, ao lado do Campo do Paulistano, no Jardim América.',
+    ['Procure a bola na várzea do Tietê: fale com o menino da várzea','Descubra por que a várzea não joga no Paulistano: pergunte ao torcedor do Corinthians','Leve a bola de volta ao Friedenreich'],'friedenreich');
+  setTimeout(()=>{try{QT[K]={giver:'n:friedenreich',steps:['n:meninoVarzea','n:torcedorCorinthians','n:friedenreich']};}catch(_){}},0);
+  MJ.fala(n=>{const q=Q[K];if(!q||q.done)return null;
+    if(n.id==='friedenreich'&&q.step===null)return{pages:["Ei, você! Domingo fui ver o jogo da várzea, lá no Tietê, e a molecada ficou com a minha bola de treino.","Busca para mim? É uma bola de couro, cheia de remendos. (Esta missão é ficção do jogo.)"],after:()=>qStart(K)};
+    if(n.id==='friedenreich'&&(q.step===0||q.step===1))return{only:true,pages:["E a minha bola? Ficou com o menino da várzea, perto do Tietê."]};
+    if(n.id==='meninoVarzea'&&q.step===0)return{only:true,pages:["A bola do Fried? Tá aqui comigo! Mas me diz uma coisa...","Ele joga no Paulistano, lá no Jardim América. Eu também jogo bem! Por que eu não posso jogar lá?","Pergunta pro torcedor do Corinthians, perto da Ponte Grande. Ele sabe dessas coisas. Leva a bola!"],after:()=>{qNext(K);toast('Você pegou a bola do Friedenreich');}};
+    if(n.id==='torcedorCorinthians'&&q.step===1)return{only:true,pages:["Por que a várzea não joga no Paulistano? Porque o Paulistano é clube de sócio, e ser sócio custa caro.","E o futebol dos clubes grandes é amador: ninguém ganha para jogar. Só joga quem não precisa ficar o dia inteiro na fábrica.","Por isso os operários criaram os próprios times. O Corinthians nasceu assim, em 1910, no Bom Retiro. E na várzea tem time de todo bairro!"],after:()=>qNext(K)};
+    if(n.id==='friedenreich'&&q.step===2)return{only:true,pages:["Minha bola! Obrigado, viu?","Você descobriu, né? O Paulistano é clube da elite. Eu entrei porque meu pai é um comerciante alemão, eu estudei e jogo desde menino nos clubes dos alemães.","Mas minha mãe é uma mulher negra. Tem gente na arquibancada que não esquece disso, e eu ouço xingamento.","Um dia o futebol vai ser profissional, e o menino da várzea vai poder jogar nos clubes grandes. Em 1922 ainda não é assim."],
+      after:()=>finishMission(K,'A bola do Friedenreich','Por que os meninos da várzea não jogavam no Paulistano em 1922?',
+        ['O Paulistano era clube da elite: ser sócio custava caro, e o futebol amador era para quem não precisava trabalhar o dia inteiro','Os meninos da várzea não sabiam jogar futebol','Era proibido jogar futebol na várzea'],0,
+        'Nos anos 1920 o futebol dos grandes clubes era amador e de sócios ricos. Os operários jogavam na várzea e criaram clubes como o Corinthians. O futebol só virou profissão em 1933.',
+        'A bola do Friedenreich: o futebol da elite era amador e de sócios; os operários jogavam na várzea. Friedenreich, filho de mãe negra, enfrentou o racismo nas arquibancadas.')};
+    return null;});
+}catch(e){console.warn('missão Friedenreich',e);}})();
+
+/* mini-jogo: "Alô, central!" — a telefonista liga as chamadas à mão (1922) */
+(function(){try{const MJ=window.__MJ;if(!MJ)return;
+  const B=['Centro','Brás','Mooca','Bom Retiro','Lapa','Penha','Santana','Ipiranga','Liberdade','Consolação','Vila Mariana','Pinheiros'];
+  const CH=[['Estação da Luz','Centro','Chame o armazém do Brás: o café chegou!','Brás'],['Padaria do Brás','Brás','Ligue para a fábrica de tecidos da Mooca!','Mooca'],
+    ['Loja da 25 de Março','Centro','Ligue para o fornecedor de tecidos do Bom Retiro.','Bom Retiro'],['Mãe aflita','Mooca','Chame o médico da Liberdade, depressa!','Liberdade'],
+    ['Redação do jornal','Centro','Ligue para o repórter na Penha: como está a festa?','Penha'],['Armazém da Lapa','Lapa','Ligue para o comissário de café no Centro.','Centro'],
+    ['Padre da Sé','Centro','Ligue para a igreja de Santana.','Santana'],['Escola Normal','Consolação','Ligue para a professora do Ipiranga.','Ipiranga'],
+    ['Escritório da Companhia City','Centro','Ligue para o canteiro de obras em Pinheiros.','Pinheiros'],['Leiteiro da Vila Mariana','Vila Mariana','Ligue para o armazém da Consolação.','Consolação'],
+    ['Fábrica do Ipiranga','Ipiranga','Chame o depósito da Lapa!','Lapa'],['Pensão de Santana','Santana','Ligue para o hotel do Centro.','Centro'],
+    ['Oficina da Penha','Penha','Ligue para a loja de ferragens da Mooca.','Mooca'],['Senhora da Consolação','Consolação','Ligue para a costureira de Vila Mariana.','Vila Mariana']];
+  const jogar=fim=>{const E=MJ.estreito();const W=E?480:768,H=E?600:384;
+    const J=MJ.abrir({titulo:'Alô, central! A mesa telefônica',ano:'1922',W,H});const g=J.g;
+    const cols=E?3:4,PX=E?14:60,PY=E?118:150,PW=W-2*PX,PH=H-PY-14,cw=PW/cols,rh=(PH-20)/(12/cols),fs=E?21:14;
+    const tom=B.map((b,i)=>{const c=i%cols,r=i/cols|0;return{b,x:PX+cw*(c+.5),y:PY+30+rh*r+rh*.32,w:cw-14};});
+    const lista=CH.slice().sort(()=>Math.random()-.5).slice(0,10);let n=0,certos=0,erros=0,t=0,lim=9,cur=null,flash=0,msg='',msgT=0,fio=null,mx=W/2,my=H/2;
+    const pede=()=>{J.p.innerHTML='';if(!cur){J.p.textContent='Uma lâmpada acende na tomada de quem está ligando. Leia o pedido e toque no bairro certo.';return;}
+      const b=document.createElement('b');b.textContent='☎ '+cur[0]+' ('+cur[1]+'): ';const s=document.createElement('span');s.textContent='“'+cur[2]+'”';J.p.append(b,s);};
+    const nova=()=>{if(n>=lista.length)return acabar();cur=lista[n];t=0;lim=Math.max(5.5,10-n*.4);fio=null;pede();MJ.som('blip');};
+    const acabar=()=>{const st=certos>=9?3:certos>=7?2:certos>=5?1:0;const pr=st>=2?MJ.premio('telefone22',300):0;
+      MJ.final(J,st,st>=2?'Muito bem, telefonista!':st===1?'Quase! Ligue mais rápido.':'A mesa ficou congestionada!',
+        [`Você completou ${certos} de ${lista.length} ligações.`+(pr?` Ganhou ${pr} réis.`:''),
+         'Em 1922, quase toda ligação passava pelas mãos de uma telefonista: ela atendia, ouvia o pedido e ligava o cordão na tomada certa.',
+         'Era um dos empregos novos para moças. Exigia rapidez, voz educada e silêncio, com chefes vigiando o tempo todo.'],
+        [['Jogar de novo',()=>{J.fechar();jogar(fim);}],['Sair',()=>{J.fechar();fim(st);}]]);};
+    J.cv.addEventListener('pointermove',ev=>{[mx,my]=J.ponto(ev);});
+    J.cv.addEventListener('pointerdown',ev=>{if(!J.vivo||!cur)return;const [x,y]=J.ponto(ev);mx=x;my=y;
+      const k=tom.find(o=>Math.abs(x-o.x)<o.w/2&&Math.abs(y-(o.y+8))<rh/2);if(!k)return;
+      if(k.b===cur[3]){certos++;fio={a:tom.find(o=>o.b===cur[1]),b:k};msg='Ligado!';msgT=1;MJ.som('blip');cur=null;n++;J.p.textContent='Ligação completada. Próxima chamada...';setTimeout(()=>{if(J.vivo)nova();},750);}
+      else{erros++;flash=.4;msg='Linha errada!';msgT=1;MJ.som('door');}});
+    const lamp=(x,y,r,on,cor)=>{g.fillStyle='#2a1a12';g.beginPath();g.arc(x,y,r+2,0,7);g.fill();g.fillStyle=on?cor:'#6a4a32';g.beginPath();g.arc(x,y,r,0,7);g.fill();
+      if(on){g.fillStyle=cor+'55';g.beginPath();g.arc(x,y,r*2.2,0,7);g.fill();g.fillStyle='#fffbe0';g.fillRect(x-r/2,y-r/2,2,2);}};
+    J.botoes([['Sair',()=>{J.fechar();fim(0);}]]);nova();
+    J.loop((dt,tt)=>{if(cur){t+=dt;if(t>=lim){erros++;msg='Desligou!';msgT=1.1;MJ.som('door');n++;cur=null;J.p.textContent='Demorou demais e a pessoa desligou.';setTimeout(()=>{if(J.vivo)nova();},700);}}
+      msgT-=dt;flash=Math.max(0,flash-dt);
+      MJ.fundo(g,W,H,'MJ_telefonista','#6a4a32','#2a1a12');g.fillStyle='rgba(20,15,10,.2)';g.fillRect(0,0,W,H);
+      if(cur){const k=Math.max(0,1-t/lim),bw=W-2*PX;g.fillStyle='#141b1b';g.fillRect(PX-3,PY-38,bw+6,22);g.fillStyle='#e9d8b0';g.fillRect(PX,PY-35,bw,16);g.fillStyle=k>.35?'#5a9a3e':'#c0392b';g.fillRect(PX,PY-35,bw*k,16);
+        g.fillStyle='#141b1b';g.font='bold '+(fs-3)+'px '+MJ.ff;g.textAlign='left';g.fillText('☎ '+cur[1]+' chamando',PX+6,PY-22);}
+      g.fillStyle='#141b1b';g.fillRect(PX-6,PY-6,PW+12,PH+12);g.fillStyle='#5e3428';g.fillRect(PX,PY,PW,PH);g.fillStyle='#7a4a2e';g.fillRect(PX+6,PY+6,PW-12,PH-12);
+      for(let i=0;i<PW-12;i+=24){g.fillStyle='rgba(0,0,0,.08)';g.fillRect(PX+6+i,PY+6,2,PH-12);}
+      g.fillStyle='#d9a020';g.fillRect(PX+6,PY+6,PW-12,3);g.fillStyle='#4a2414';g.fillRect(PX+6,PY+PH-9,PW-12,3);
+      const R=E?15:12;
+      for(const o of tom){g.fillStyle='#141b1b';g.beginPath();g.arc(o.x,o.y,R+2,0,7);g.fill();g.fillStyle='#d9a020';g.beginPath();g.arc(o.x,o.y,R,0,7);g.fill();g.fillStyle='#6a4410';g.beginPath();g.arc(o.x,o.y,R*.55,0,7);g.fill();g.fillStyle='#1a1008';g.beginPath();g.arc(o.x,o.y,R*.35,0,7);g.fill();}
+      const cordao=(a,bx,by,cor)=>{g.strokeStyle='#141b1b';g.lineWidth=8;g.beginPath();g.moveTo(a.x,a.y);g.quadraticCurveTo((a.x+bx)/2,Math.max(a.y,by)+50,bx,by);g.stroke();g.strokeStyle=cor;g.lineWidth=5;g.stroke();g.fillStyle='#d9a020';g.fillRect(bx-5,by-5,10,10);};
+      if(fio)cordao(fio.a,fio.b.x,fio.b.y,'#c0392b');else if(cur){const a=tom.find(o=>o.b===cur[1]);if(a)cordao(a,mx,my,'#8a2a1e');}
+      for(const o of tom){const quem=cur&&o.b===cur[1];const alvoOk=fio&&fio.b===o;const lw=o.w-8,ly=o.y+R+6,lh=fs+8;
+        g.fillStyle='#141b1b';g.fillRect(o.x-lw/2-2,ly-2,lw+4,lh+4);g.fillStyle=quem?'#ffe7a0':'#e9d8b0';g.fillRect(o.x-lw/2,ly,lw,lh);
+        g.fillStyle='#3a2418';g.font='bold '+fs+'px '+MJ.ff;g.textAlign='center';g.fillText(o.b,o.x,ly+fs);
+        lamp(o.x+R+16,o.y-R+2,E?7:5,quem&&(Math.floor(tt*4)%2===0)||alvoOk,alvoOk?'#7fe07a':'#ffcc33');}
+      if(msgT>0){g.textAlign='center';g.font='bold '+(fs+10)+'px '+MJ.ff;const yy=PY+PH/2;g.fillStyle='#141b1b';g.fillText(msg,W/2+3,yy+3);g.fillStyle=msg==='Ligado!'?'#c9e09a':'#ffd0b8';g.fillText(msg,W/2,yy);}
+      if(flash>0){g.fillStyle=`rgba(192,57,43,${flash*.6})`;g.fillRect(0,0,W,H);}
+      J.chips(['Ligações: '+certos+' de '+lista.length,'Erros: '+erros]);});};
+  MJ.jogoMissao({K:'telefone22',era:4,titulo:'Alô, central!',giver:'telefonista22',quem:'a telefonista',
+    onde:'Fale com a telefonista, no mapa dos bairros de 1922.',passo:'Atenda as chamadas na mesa telefônica (2 estrelas ou mais)',
+    intro:["Hoje a central está lotada! Me ajuda na mesa telefônica?","Quando uma lâmpada acende, alguém está ligando. Você escuta o pedido e liga o cordão na tomada do bairro certo. Rápido!"],
+    fim:["Você trabalhou como uma telefonista de verdade!","Cada ligação de São Paulo passa por mesas como esta, nas mãos de moças como nós."],
+    pergunta:['Em 1922, como uma ligação telefônica chegava ao outro lado da cidade?',['Uma telefonista ligava os cordões à mão, na mesa da central','O telefone discava sozinho, sem ninguém','A ligação ia pelo rádio'],0,
+      'Em 1922 a telefonista atendia, ouvia o pedido e ligava o cordão na tomada certa. Era um trabalho novo, quase sempre de moças, com muita pressa e vigilância.',
+      'Alô, central!: as telefonistas ligavam as chamadas à mão; era um dos novos empregos das moças em 1922.'],jogar});
+  window.__mjTel=jogar;
+}catch(e){console.warn('mini-jogo telefonista',e);}})();
+
+/* mini-jogo: "Café no trem" — carregar as sacas no vagão para Santos (1888) */
+(function(){try{const MJ=window.__MJ;if(!MJ)return;
+  /* um carregador novo na estação, ao lado do ferroviário (espera a estação existir) */
+  let tent=0;const poe=()=>{try{if(npcs.find(n=>n.id==='carregCafe88'))return;const f=npcs.find(n=>n.id==='ferroviario'&&n.scene==='k_estacao');if(!f){if(++tent<60)setTimeout(poe,500);return;}
+    npcIn('k_estacao','carregCafe88','colono',f.x+2,f.y+1,'Carregador de café',["Sessenta quilos cada saca, nas costas, o dia inteiro.","O trem para Santos não espera ninguém!"],'Carregador de café: as sacas de 60 quilos iam nas costas dos carregadores até os vagões da ferrovia.');
+    const cn=npcs.find(n=>n.id==='carregCafe88');if(cn)cn.spr='h22_n|carregadorS|0';}catch(e){console.warn('carregador café',e);}};poe();
+  const saca=(g,x,y,s,furada,rot)=>{g.save();g.translate(x,y);g.rotate(rot||0);const w=36*s,h=26*s;
+    const corpo=(c,e)=>{g.fillStyle=c;g.beginPath();g.moveTo(-w/2+e,-h/2+4*s+e);g.quadraticCurveTo(-w/2-3*s+e,0,-w/2+2*s+e,h/2-e);g.quadraticCurveTo(0,h/2+4*s-e,w/2-2*s-e,h/2-e);g.quadraticCurveTo(w/2+3*s-e,0,w/2-e,-h/2+4*s+e);g.quadraticCurveTo(0,-h/2+1*s+e,-w/2+e,-h/2+4*s+e);g.fill();};
+    g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.ellipse(2*s,h/2+3*s,w/2,4*s,0,0,7);g.fill();
+    corpo('#4a2e18',-2);corpo('#b8894f',0);
+    g.fillStyle='#d6ad6e';g.beginPath();g.ellipse(-w/6,-h/6,w/4,h/5,0,0,7);g.fill();
+    g.fillStyle='rgba(90,56,26,.45)';for(let i=-w/2+5*s;i<w/2-3*s;i+=5*s)g.fillRect(i,-h/2+5*s,1*s,h-8*s);
+    for(const sx of [-1,1]){g.fillStyle='#4a2e18';g.beginPath();g.moveTo(sx*(w/2-1*s),-h/2+3*s);g.lineTo(sx*(w/2+5*s),-h/2-4*s);g.lineTo(sx*(w/2-6*s),-h/2+1*s);g.fill();g.fillStyle='#a07840';g.beginPath();g.moveTo(sx*(w/2-2*s),-h/2+3*s);g.lineTo(sx*(w/2+3*s),-h/2-2*s);g.lineTo(sx*(w/2-6*s),-h/2+2*s);g.fill();}
+    g.fillStyle='#2e4a7a';g.fillRect(-9*s,-3*s,18*s,9*s);g.fillStyle='#e9d8b0';g.fillRect(-7*s,-1*s,14*s,5*s);g.fillStyle='#2e4a7a';g.fillRect(-5*s,1*s,10*s,1*s);
+    if(furada){g.fillStyle='#2a140a';g.beginPath();g.ellipse(w/3,h/4,4*s,3*s,0,0,7);g.fill();g.fillStyle='#4a2414';for(let i=0;i<6;i++){g.fillRect(w/3-2*s+((i*5)%3)*2*s,h/4+3*s+i*3*s,3*s,2*s);}}
+    g.restore();};
+  const jogar=fim=>{const E=MJ.estreito();const W=E?480:768,H=E?560:384;const J=MJ.abrir({titulo:'Café no trem para Santos',ano:'1888',W,H});const g=J.g;
+    const META=15,TEMPO=45;let t=0,boas=0,ruins=0,caiu=0,sac=[],voo=[],prox=0,msg='',msgT=0;
+    /* rampa: do alto à esquerda até embaixo à direita; vagão em cima à direita */
+    const R0=E?[30,170]:[40,120],R1=E?[450,470]:[560,330];const VG=E?[300,40,170,90]:[600,40,150,96];
+    const pos=k=>[R0[0]+(R1[0]-R0[0])*k,R0[1]+(R1[1]-R0[1])*k];
+    const acabar=()=>{J.vivo=false;const st=boas>=META&&ruins===0?3:boas>=META-3?2:boas>=8?1:0;const pr=st>=2?MJ.premio('cafeTrem88',200):0;
+      MJ.final(J,st,st>=2?'O trem partiu cheio para Santos!':'O trem partiu com espaço vazio...',
+        [`Sacas boas no vagão: ${boas}. Sacas furadas que você mandou: ${ruins}. Sacas que caíram: ${caiu}.`+(pr?` Ganhou ${pr} réis.`:''),
+         'Em 1888, o café das fazendas do interior chegava de trem a São Paulo e descia a serra pela São Paulo Railway até o porto de Santos. De lá ia de navio para a Europa e os Estados Unidos.',
+         'Cada saca pesava 60 quilos e era carregada nas costas. Em 13 de maio de 1888 acabou a escravidão: nas estações trabalhavam libertos e imigrantes, lado a lado.'],
+        [['Jogar de novo',()=>{J.fechar();jogar(fim);}],['Sair',()=>{J.fechar();fim(st);}]]);};
+    J.p.textContent='Toque nas sacas boas para jogar no vagão. Não mande saca furada: o comprador recusa café estragado!';J.botoes([['Sair',()=>{J.fechar();fim(0);}]]);
+    J.cv.addEventListener('pointerdown',ev=>{if(!J.vivo)return;const [x,y]=J.ponto(ev);let alvo=null,d=1e9;
+      for(const s of sac){const [sx,sy]=pos(s.k);const dd=Math.hypot(x-sx,y-sy);if(dd<(E?52:44)&&dd<d){d=dd;alvo=s;}}if(!alvo)return;
+      sac.splice(sac.indexOf(alvo),1);const [sx,sy]=pos(alvo.k);voo.push({x:sx,y:sy,f:alvo.f,t:0});
+      if(alvo.f){ruins++;msg='Saca furada! Café estragado.';msgT=1.2;MJ.som('door');}else{boas++;MJ.som('blip');}});
+    J.loop((dt,tt)=>{t+=dt;if(t>=TEMPO&&J.vivo)return acabar();prox-=dt;
+      if(prox<=0){sac.push({k:0,f:Math.random()<.22,v:.16+Math.min(.18,t*.004)+Math.random()*.05});prox=Math.max(.55,1.25-t*.015);}
+      for(const s of sac)s.k+=s.v*dt;for(const s of sac.filter(s=>s.k>=1)){caiu++;msg=s.f?'A saca furada caiu. Ainda bem!':'Uma saca caiu no chão!';msgT=1;if(s.f)caiu--;}sac=sac.filter(s=>s.k<1);
+      MJ.fundo(g,W,H,'MJ_cafe','#8a6a42','#3a2a1a');g.fillStyle='rgba(20,15,10,.15)';g.fillRect(0,0,W,H);
+      /* vagão */
+      const [vx,vy,vw,vh]=VG;g.fillStyle='#141b1b';g.fillRect(vx-4,vy-4,vw+8,vh+8);g.fillStyle='#6a3a24';g.fillRect(vx,vy,vw,vh);g.fillStyle='#8a5234';for(let i=0;i<vw;i+=16)g.fillRect(vx+i,vy,10,vh);
+      const cheio=Math.min(1,boas/META);g.fillStyle='#b8894f';g.fillRect(vx+6,vy+vh-6-(vh-12)*cheio,vw-12,(vh-12)*cheio);g.fillStyle='#d2a868';for(let i=0;i<Math.min(boas,META);i++)g.fillRect(vx+8+(i%5)*((vw-16)/5),vy+vh-12-Math.floor(i/5)*((vh-12)/3),(vw-16)/5-4,4);
+      g.fillStyle='#141b1b';g.fillRect(vx+10,vy+vh,14,14);g.fillRect(vx+vw-24,vy+vh,14,14);g.fillStyle='#fff6e3';g.font='bold '+(E?18:15)+'px '+MJ.ff;g.textAlign='center';g.fillText('S.P.R. → SANTOS',vx+vw/2,vy-10);
+      /* rampa de madeira */
+      g.strokeStyle='#141b1b';g.lineWidth=E?30:26;g.beginPath();g.moveTo(...R0);g.lineTo(...R1);g.stroke();g.strokeStyle='#9a6a3e';g.lineWidth=E?24:20;g.stroke();g.strokeStyle='#c08a52';g.lineWidth=4;g.stroke();
+      for(const s of sac){const [sx,sy]=pos(s.k);saca(g,sx,sy-14,E?1.5:1.25,s.f,Math.sin(s.k*30)*.15);}
+      for(const v of voo){v.t+=dt*1.8;const k=Math.min(1,v.t);const tx=v.f?W/2:vx+vw/2,ty=v.f?H+40:vy+vh/2;const x=v.x+(tx-v.x)*k,y=v.y+(ty-v.y)*k-Math.sin(k*Math.PI)*90;saca(g,x,y,(E?1.5:1.25)*(1-k*.3),v.f,k*6);}voo=voo.filter(v=>v.t<1);
+      /* relógio do trem */
+      const k=Math.max(0,1-t/TEMPO);g.fillStyle='#141b1b';g.fillRect(12,H-30,W-24,20);g.fillStyle='#e9d8b0';g.fillRect(15,H-27,W-30,14);g.fillStyle=k>.25?'#5a9a3e':'#c0392b';g.fillRect(15,H-27,(W-30)*k,14);
+      if(msgT>0){msgT-=dt;g.textAlign='center';g.font='bold '+(E?24:22)+'px '+MJ.ff;g.fillStyle='#141b1b';g.fillText(msg,W/2+2,H/2+2);g.fillStyle='#ffd0b8';g.fillText(msg,W/2,H/2);}
+      J.chips(['Sacas no vagão: '+boas+' de '+META,'Furadas: '+ruins,'Trem parte em '+Math.ceil(TEMPO-t)+' s']);});};
+  MJ.jogoMissao({K:'cafeTrem88',era:3,titulo:'Café no trem',giver:'carregCafe88',quem:'o carregador de café',
+    onde:'Fale com o carregador de café, na Estação da Luz.',passo:'Encha o vagão de café antes de o trem partir (2 estrelas ou mais)',
+    intro:["Ô, ajuda aqui! O trem para Santos sai daqui a pouco e o vagão está vazio.","As sacas descem pela rampa. Joga as boas no vagão, mas cuidado com as furadas: café estragado o comprador não aceita!"],
+    fim:["Vagão cheio! Esse café vai descer a serra e atravessar o mar.","E eu? Eu fico aqui, carregando a próxima saca."],
+    pergunta:['Para onde ia o café que saía de São Paulo de trem em 1888?',['Para o porto de Santos, e de lá de navio para a Europa e os Estados Unidos','Para o Rio Amazonas','Ficava todo na cidade de São Paulo'],0,
+      'O café descia a Serra do Mar pela São Paulo Railway até Santos, o grande porto do café, e de lá seguia de navio para o exterior.',
+      'Café no trem: o café ia de trem até Santos e de navio para a Europa e os Estados Unidos; as sacas de 60 kg iam nas costas dos carregadores.'],jogar});
+  window.__mjCafe=jogar;
+}catch(e){console.warn('mini-jogo café',e);}})();
+
+/* mini-jogo: "Descer a serra" — guiar a tropa de mulas pela Calçada do Lorena até Santos (1830) */
+(function(){try{const MJ=window.__MJ;if(!MJ)return;
+  const ETAPAS=[
+    {lugar:'Saída de São Paulo',txt:'A tropa sai de São Paulo com 6 fardos de açúcar. Antes da serra, o céu escurece: vem chuva forte.',
+     op:[['Esperar a chuva passar no rancho',s=>{s.dias+=1;return 'A tropa dormiu no rancho. Perdeu um dia, mas ninguém se machucou.';}],
+         ['Seguir mesmo assim',s=>{if(Math.random()<.6){s.fardos-=1;s.dias+=.5;return 'Na pedra molhada uma mula escorregou e um fardo rolou ribanceira abaixo!';}s.dias+=.5;return 'Deu sorte: a chuva passou rápido.';}]]},
+    {lugar:'Alto da Serra',txt:'No alto da serra, uma mula começa a mancar: perdeu uma ferradura nas pedras.',
+     op:[['Parar e pôr ferradura nova',s=>{s.dias+=.5;return 'O tropeiro tinha cravos e ferradura na bruaca. Meio dia de trabalho, e a mula seguiu firme.';}],
+         ['Dividir a carga entre as outras mulas',s=>{s.cansadas=true;s.dias+=.5;return 'As outras mulas levam mais peso. Vão chegar cansadas lá embaixo.';}],
+         ['Deixar a mula e o fardo no rancho',s=>{s.fardos-=1;return 'Um fardo ficou para trás, guardado no rancho.';}]]},
+    {lugar:'Calçada do Lorena',txt:'Começa a descida: o caminho de pedras faz curvas e mais curvas na mata. A neblina fecha.',
+     op:[['Descer devagar, em fila, puxando a primeira mula',s=>{s.dias+=.5;if(s.cansadas&&Math.random()<.4){s.fardos-=1;return 'Devagar foi melhor, mas uma mula cansada tropeçou e perdeu um fardo.';}return 'Curva por curva, a tropa desceu inteira. A Calçada foi feita para isso.';}],
+         ['Apressar a tropa para ganhar tempo',s=>{if(Math.random()<(s.cansadas?.8:.5)){s.fardos-=1;return 'Na pressa, uma mula escorregou na curva. Um fardo se perdeu na mata.';}return 'Desceram rápido, por sorte sem acidente.';}]]},
+    {lugar:'Registro do Cubatão',txt:'Lá embaixo, no Cubatão, tem o registro: o fiscal do governo cobra o imposto de passagem das cargas.',
+     op:[['Pagar o imposto',s=>{s.imposto=true;return 'O fiscal anota a carga e libera a tropa. O imposto ajuda a pagar o caminho e o governo.';}],
+         ['Tentar passar por uma trilha escondida',s=>{s.dias+=1;if(Math.random()<.5){s.fardos-=1;return 'A trilha era ruim e longa. Um fardo se perdeu no mangue, e ainda assim o fiscal viu.';}return 'A trilha era ruim e longa: um dia perdido no meio do mangue.';}]]},
+    {lugar:'Porto de Santos',txt:'Do Cubatão, a carga segue pelo rio e pelo mangue, muitas vezes de canoa, até Santos. No porto, o açúcar é vendido. O que a tropa leva de volta para o planalto?',
+     op:[['Sal, tecidos e ferramentas que chegam da Europa',s=>{s.volta=true;return 'Isso! As tropas desciam com açúcar e subiam com sal e mercadorias importadas.';}],
+         ['Neve das montanhas',s=>'Neve? Em Santos? Não. As tropas subiam com sal e mercadorias importadas.'],
+         ['Nada: a tropa volta vazia',s=>'Voltar vazio era perder viagem! As tropas subiam com sal e mercadorias importadas.']]}];
+  const jogar=fim=>{const E=MJ.estreito();const W=E?480:768,H=E?520:384;const J=MJ.abrir({titulo:'Descer a serra com a tropa',ano:'1830',W,H});const g=J.g;
+    const P=E?[[60,40],[400,110],[90,200],[400,290],[100,380],[400,470]]:[[50,50],[700,95],[90,170],[700,230],[120,300],[690,350]];
+    const s={fardos:6,dias:0,cansadas:false,imposto:false,volta:false};let et=0,pos=0,alvo=0,anda=false;
+    const ponto=k=>{const i=Math.min(P.length-2,Math.floor(k)),f=k-i;return [P[i][0]+(P[i+1][0]-P[i][0])*f,P[i][1]+(P[i+1][1]-P[i][1])*f,P[i+1][0]>P[i][0]?1:3];};
+    const mostra=()=>{if(et>=ETAPAS.length)return acabar();const e=ETAPAS[et];J.p.innerHTML='';const b=document.createElement('b');b.textContent=(et+1)+'. '+e.lugar+': ';J.p.append(b,document.createTextNode(e.txt));
+      J.botoes(e.op.map(([t,f])=>[t,()=>{const r=f(s);MJ.som('blip');J.p.textContent=r;J.botoes([['Seguir viagem ➜',()=>{et++;alvo=Math.min(P.length-1,et);anda=true;J.botoes([]);J.p.textContent='A tropa segue pelo caminho...';}]]);}]));};
+    const acabar=()=>{const st=s.fardos>=5&&s.dias<=2&&s.volta?3:s.fardos>=4&&s.volta?2:s.fardos>=3?1:0;const pr=st>=2?MJ.premio('tropa30',160):0;
+      MJ.final(J,st,`A tropa chegou a Santos com ${s.fardos} de 6 fardos.`,[`Viagem: ${Math.ceil(s.dias)+2} dias.`+(pr?` Ganhou ${pr} réis.`:''),
+        'Em 1830, o açúcar do planalto descia a Serra do Mar no lombo das mulas, pela Calçada do Lorena, um caminho de pedras aberto em 1792.',
+        'No Cubatão o governo cobrava imposto, e a carga seguia pelo rio e pelo mangue até Santos. Na volta, as tropas subiam com sal e mercadorias da Europa.'],
+        [['Jogar de novo',()=>{J.fechar();jogar(fim);}],['Sair',()=>{J.fechar();fim(st);}]]);};
+    mostra();
+    J.loop((dt,tt)=>{if(anda){pos=Math.min(alvo,pos+dt*.55);if(pos>=alvo){anda=false;mostra();}}
+      MJ.fundo(g,W,H,'MJ_tropa','#3a6a3a','#1a3a2a');g.fillStyle='rgba(10,20,15,.18)';g.fillRect(0,0,W,H);
+      /* caminho de pedras */
+      g.lineCap='round';g.lineJoin='round';g.strokeStyle='rgba(20,27,27,.55)';g.lineWidth=E?18:16;g.beginPath();g.moveTo(...P[0]);for(const q of P)g.lineTo(...q);g.stroke();
+      g.strokeStyle='rgba(191,174,144,.75)';g.lineWidth=E?12:10;g.stroke();g.strokeStyle='#bfae90';g.lineWidth=3;g.setLineDash([6,8]);g.stroke();g.setLineDash([]);
+      P.forEach((q,i)=>{if(i===0)return;const feito=i<=Math.floor(pos+.001);g.fillStyle='#141b1b';g.beginPath();g.arc(q[0],q[1],E?14:11,0,7);g.fill();g.fillStyle=feito?'#7fbf5a':'#f1c471';g.beginPath();g.arc(q[0],q[1],E?11:8,0,7);g.fill();
+        g.fillStyle='#141b1b';g.font='bold '+(E?15:12)+'px '+MJ.ff;g.textAlign='center';g.fillText(String(i),q[0],q[1]+(E?5:4));});
+      /* tropa: tropeiro na frente e mulas atrás */
+      const mula=MJ.img('A22_mula_hd'),passo=anda?Math.floor(tt*8)%4:0;
+      for(let i=Math.min(5,s.fardos);i>=0;i--){const k=Math.max(0,pos-i*(E?.12:.09));const [x,y,dir]=ponto(k);
+        if(i===0){if(!MJ.boneco(g,'tropeiroBan',x,y+6,dir===1?3:2,passo,E?1.1:1.25)){g.fillStyle='#5e3428';g.fillRect(x-6,y-26,12,26);}continue;}
+        if(MJ.ok(mula)){const linha=dir===1?1:3;const fr=linha*4+passo;g.drawImage(mula,fr*40,0,40,32,x-20*(E?1.3:1.55),y-28*(E?1.3:1.55),40*(E?1.3:1.55),32*(E?1.3:1.55));}
+        else{g.fillStyle='#6a4a32';g.fillRect(x-14,y-16,28,14);}
+        g.fillStyle='#e9d8b0';g.fillRect(x-8,y-(E?36:42),16,9);g.fillStyle='#8a6034';g.fillRect(x-8,y-(E?36:42),16,2);}
+      J.chips(['Fardos de açúcar: '+s.fardos+' de 6','Dias de viagem: '+(Math.ceil(s.dias)+2),'Etapa '+Math.min(et+1,5)+' de 5']);});};
+  MJ.jogoMissao({K:'tropa30',era:2,titulo:'Descer a serra',giver:'viajante30_1',quem:'o tropeiro que sobe de Santos',
+    onde:'Fale com o tropeiro que sobe de Santos, na cidade de 1830.',passo:'Leve a tropa até Santos com pelo menos 4 fardos (2 estrelas)',
+    intro:["Eu acabei de subir de Santos. Agora preciso de alguém para levar a próxima tropa serra abaixo.","São seis fardos de açúcar no lombo das mulas. Cada decisão no caminho conta: chuva, pedra, fiscal... Vai encarar?"],
+    fim:["Chegou com a carga! Você é tropeiro de verdade.","Sem as tropas, o açúcar não descia e o sal não subia. A cidade dependia da gente."],
+    pergunta:['Como as mercadorias desciam de São Paulo até o porto de Santos em 1830?',['No lombo de tropas de mulas, pela Calçada do Lorena, na Serra do Mar','De trem, pela ferrovia','De caminhão, pela estrada asfaltada'],0,
+      'Em 1830 não havia trem nem caminhão. As tropas de mulas desciam a serra pela Calçada do Lorena, de pedras, e subiam com sal e mercadorias importadas.',
+      'Descer a serra: em 1830 o açúcar descia a Serra do Mar em tropas de mulas, pela Calçada do Lorena, e as tropas subiam com sal e mercadorias da Europa.'],jogar});
+  window.__mjTropa=jogar;
+}catch(e){console.warn('mini-jogo tropa',e);}})();
+
+/* mini-jogo: "Um dia no tear" — emendar os fios que arrebentam antes do contramestre ver (1922) */
+(function(){try{const MJ=window.__MJ;if(!MJ)return;
+  const tear=(g,x,y,w,h,tt,quebrado,ok)=>{const L='#1e2a2a',F='#3e5656',F2='#56706e';
+    g.fillStyle='rgba(0,0,0,.3)';g.fillRect(x+8,y+h-2,w-4,10);
+    /* pés e laterais de ferro */
+    for(const sx of [x,x+w-14]){g.fillStyle=L;g.fillRect(sx,y+6,14,h-4);g.fillStyle=F;g.fillRect(sx+2,y+8,10,h-8);g.fillStyle=F2;g.fillRect(sx+2,y+8,3,h-8);g.fillStyle=L;g.fillRect(sx-3,y+h-6,20,6);}
+    /* rolo de urdume (fios) atrás */
+    g.fillStyle=L;g.fillRect(x+10,y,w-20,16);g.fillStyle='#8a6a42';g.fillRect(x+12,y+2,w-24,12);g.fillStyle='#e9e2d0';g.fillRect(x+12,y+4,w-24,6);g.fillStyle='#fffaf0';g.fillRect(x+12,y+4,w-24,2);
+    /* fios esticados */
+    const fios=Math.floor((w-36)/5);g.fillStyle='#ece5d2';for(let i=0;i<fios;i++){if(quebrado&&i===Math.floor(fios/2))continue;g.fillRect(x+18+i*5,y+16,1.5,h*.42);}
+    /* pente (batente) que vai e vem */
+    const bat=y+16+h*.36+Math.sin(tt*9+x)*3;g.fillStyle=L;g.fillRect(x+12,bat,w-24,7);g.fillStyle='#8a8f86';g.fillRect(x+12,bat+1,w-24,3);
+    /* lançadeira */
+    const lx=x+16+((Math.sin(tt*6+x)*.5+.5)*(w-50));g.fillStyle='#4a2414';g.fillRect(lx-1,bat-5,20,7);g.fillStyle='#b8783e';g.fillRect(lx,bat-4,18,5);g.fillStyle='#e0b070';g.fillRect(lx+3,bat-3,12,1);
+    /* pano tecido e rolo da frente */
+    g.fillStyle='#d8cfb8';g.fillRect(x+14,y+h*.6,w-28,h*.18);g.fillStyle='#c4b99e';for(let i=0;i<w-28;i+=4)g.fillRect(x+14+i,y+h*.6,1,h*.18);
+    g.fillStyle=L;g.fillRect(x+10,y+h*.76,w-20,14);g.fillStyle='#cfc4a8';g.fillRect(x+12,y+h*.76+2,w-24,10);g.fillStyle='#efe6cc';g.fillRect(x+12,y+h*.76+3,w-24,3);
+    /* polia da correia */
+    g.fillStyle=L;g.beginPath();g.arc(x+w-7,y+10,11,0,7);g.fill();g.fillStyle='#7a8a86';g.beginPath();g.arc(x+w-7,y+10,8,0,7);g.fill();g.strokeStyle=L;g.lineWidth=2;const an=tt*8;g.beginPath();g.moveTo(x+w-7,y+10);g.lineTo(x+w-7+Math.cos(an)*7,y+10+Math.sin(an)*7);g.stroke();
+    if(quebrado){const pisca=Math.floor(tt*6)%2===0;g.strokeStyle='#ece5d2';g.lineWidth=2;g.beginPath();g.moveTo(x+w/2,y+16);g.quadraticCurveTo(x+w/2+20,y+h*.25,x+w/2+8,y+h*.42);g.stroke();
+      g.fillStyle='#141b1b';g.beginPath();g.arc(x+w/2,y-10,17,0,7);g.fill();g.fillStyle=pisca?'#c0392b':'#f1c471';g.beginPath();g.arc(x+w/2,y-10,15,0,7);g.fill();g.fillStyle='#fff6e3';g.font='bold 22px '+MJ.ff;g.textAlign='center';g.fillText('!',x+w/2,y-2);}
+    if(ok>0){g.fillStyle='#141b1b';g.font='bold 20px '+MJ.ff;g.textAlign='center';g.fillText('emendado!',x+w/2+2,y-6-(1-ok)*20+2);g.fillStyle=`rgba(160,240,140,${ok})`;g.fillText('emendado!',x+w/2,y-6-(1-ok)*20);}};
+  const jogar=fim=>{const E=MJ.estreito();const W=E?480:768,H=E?560:384;const J=MJ.abrir({titulo:'Um dia no tear',ano:'1922',W,H});const g=J.g;
+    const cols=E?2:3,rows=E?3:2,tw=E?170:180,th=E?110:100,gx=(W-cols*tw)/(cols+1),gy=E?40:36;
+    const T=[];for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)T.push({x:gx+c*(tw+gx),y:(E?78:70)+r*(th+gy),q:0,ok:0});
+    const DUR=60;let t=0,emendas=0,multas=0,prox=1.2,msg='',msgT=0,apito=0;
+    const hora=()=>{const m=6*60+Math.floor(t/DUR*12*60);return String(Math.floor(m/60)).padStart(2,'0')+'h'+String(m%60).padStart(2,'0');};
+    const acabar=()=>{J.vivo=false;MJ.som('apito');const st=multas<=1?3:multas<=3?2:multas<=6?1:0;const pr=st>=2?MJ.premio('tear22',200):0;
+      MJ.final(J,st,'Apito das seis: acabou o turno!',[`Fios emendados: ${emendas}. Multas: ${multas}.`+(pr?` Ganhou ${pr} réis.`:''),
+        'Nas fábricas de tecidos de 1922, a jornada passava de 10 horas, com multas por atraso e por erro. Mulheres e meninas eram boa parte das operárias e ganhavam menos que os homens.',
+        'Em 1917, operárias e operários pararam São Paulo na Greve Geral. Pediam jornada de 8 horas, aumento de salário e o fim do trabalho de crianças menores de 14 anos.'],
+        [['Jogar de novo',()=>{J.fechar();jogar(fim);}],['Sair',()=>{J.fechar();fim(st);}]]);};
+    J.p.textContent='Quando um fio arrebenta, o tear acende um sinal vermelho. Toque nele depressa para emendar o fio, antes que o contramestre veja e dê multa!';J.botoes([['Sair',()=>{J.fechar();fim(0);}]]);
+    J.cv.addEventListener('pointerdown',ev=>{if(!J.vivo)return;const [x,y]=J.ponto(ev);const o=T.find(o=>x>=o.x-6&&x<=o.x+tw+6&&y>=o.y-26&&y<=o.y+th+6);if(!o)return;
+      if(o.q>0){o.q=0;o.ok=1;emendas++;MJ.som('blip');}});
+    MJ.som('apito');
+    J.loop((dt,tt)=>{t+=dt;if(t>=DUR&&J.vivo)return acabar();prox-=dt;
+      if(prox<=0){const livres=T.filter(o=>o.q<=0);if(livres.length){livres[Math.floor(Math.random()*livres.length)].q=Math.max(1.5,2.8-t*.02);}prox=Math.max(.45,1.3-t*.014)*(.7+Math.random()*.6);}
+      for(const o of T){if(o.q>0){o.q-=dt;if(o.q<=0){o.q=0;multas++;msg='Multa! O contramestre viu o fio arrebentado.';msgT=1.3;MJ.som('door');}}o.ok=Math.max(0,o.ok-dt*1.2);}
+      MJ.fundo(g,W,H,'MJ_fabrica','#6a3a2a','#2a1a12');g.fillStyle='rgba(20,15,10,.35)';g.fillRect(0,0,W,H);
+      /* eixo e correias no teto */
+      g.fillStyle='#141b1b';g.fillRect(0,18,W,8);g.fillStyle='#5a6a6a';g.fillRect(0,20,W,4);
+      for(const o of T){g.strokeStyle='rgba(60,40,30,.9)';g.lineWidth=4;g.beginPath();g.moveTo(o.x+tw-10,22);g.lineTo(o.x+tw-10,o.y+8);g.stroke();}
+      for(const o of T)tear(g,o.x,o.y,tw,th,tt,o.q>0,o.ok);
+      /* relógio da fábrica */
+      g.fillStyle='#141b1b';g.fillRect(W-128,28,116,34);g.fillStyle='#f3e6c8';g.fillRect(W-125,31,110,28);g.fillStyle='#3a2418';g.font='bold 20px '+MJ.ff;g.textAlign='center';g.fillText('⏰ '+hora(),W-70,52);
+      if(msgT>0){msgT-=dt;g.font='bold '+(E?20:20)+'px '+MJ.ff;g.textAlign='center';g.fillStyle='#141b1b';g.fillText(msg,W/2+2,H-16);g.fillStyle='#ffd0b8';g.fillText(msg,W/2,H-18);}
+      J.chips(['Fios emendados: '+emendas,'Multas: '+multas]);});};
+  MJ.jogoMissao({K:'tear22',era:4,titulo:'Um dia no tear',giver:'tecela22',quem:'a tecelã',
+    onde:'Fale com a tecelã, dentro da fábrica de tecidos.',passo:'Trabalhe um turno nos teares com no máximo 3 multas (2 estrelas)',
+    intro:["Você é a nova ajudante? Então presta atenção: aqui são seis teares para cuidar.","Quando um fio arrebenta, o tear para e acende o sinal. Emenda depressa! Se o contramestre vê, é multa no salário."],
+    fim:["Doze horas assim, todo dia. As mãos ficam cortadas de fio.","Foi por isso que paramos tudo na greve de 1917. A gente quer oito horas de trabalho e respeito."],
+    pergunta:['Por que operárias e operários fizeram a Greve Geral de 1917 em São Paulo?',['Por jornada de 8 horas, salário melhor e fim do trabalho de crianças','Porque queriam fechar todas as fábricas para sempre','Porque o futebol tinha sido proibido'],0,
+      'As jornadas eram longas, os salários baixos, havia multas e crianças trabalhando nas máquinas. Em 1917 a greve parou a cidade com essas reivindicações.',
+      'Um dia no tear: jornadas longas, multas e salários baixos nas fábricas de tecidos; em 1917 a Greve Geral pediu 8 horas e o fim do trabalho infantil.'],jogar});
+  window.__mjTear=jogar;
+}catch(e){console.warn('mini-jogo fábrica',e);}})();
+
+/* museu da mochila: os documentos de 1922 e as 4 perguntas de historiador (a resposta certa vem primeiro; o jogo embaralha) */
+window.__DOCS22={
+ plebe:{quem:['Militantes anarquistas, operários e tipógrafos que faziam o jornal',['O governo de São Paulo','Os donos das fábricas']],
+   para:['Convencer os trabalhadores a se organizar e lutar por direitos',['Vender anúncios de lojas finas','Contar as notícias da alta sociedade']],
+   conta:['Que os operários lutavam por 8 horas de trabalho, salário melhor e direito de greve',['Que todos estavam satisfeitos com o trabalho','Que as fábricas pagavam muito bem']],
+   esconde:['O lado dos patrões e do governo: o jornal mostra só o ponto de vista dos anarquistas',['Nada: um jornal sempre mostra todos os lados','O preço do café na Bolsa']],
+   nota:'Todo jornal tem um ponto de vista. A Plebe era perseguida pela polícia e às vezes fechada.'},
+ bilheteBonde:{quem:['A Light, a companhia estrangeira (canadense) dona dos bondes elétricos',['A Prefeitura, que fazia os bilhetes à mão','Os próprios passageiros']],
+   para:['Provar que o passageiro pagou a passagem',['Entrar no cinema','Votar nas eleições']],
+   conta:['Que o bonde elétrico ligava o centro aos bairros e tinha um preço fixo',['Que a cidade não tinha transporte','Que o bonde era puxado por burros']],
+   esconde:['Quem não podia pagar e ia a pé, e quanto a passagem pesava no salário',['O nome do maquinista do trem','O horário do Theatro Municipal']],
+   nota:'Um papelzinho comum conta como a cidade se espalhou pelos trilhos dos bondes.'},
+ i22_ponto:{quem:['O escritório da fábrica, que controlava a entrada e a saída das operárias',['A própria tecelã, para lembrar do trabalho','A escola noturna']],
+   para:['Controlar o horário: quem chegava atrasado tinha desconto ou multa',['Dar um prêmio para as melhores operárias','Mostrar o salário dos homens']],
+   conta:['Que a jornada era longa e o tempo das operárias era vigiado',['Que as operárias escolhiam o próprio horário','Que a fábrica fechava ao meio-dia']],
+   esconde:['O cansaço, o barulho das máquinas e o salário menor das mulheres',['A cor dos tecidos produzidos','O nome do dono da fábrica']],
+   nota:'Um documento feito pelo patrão também conta a história dos trabalhadores, se a gente pergunta bem.'},
+ carta:{quem:['Um imigrante italiano que já morava em São Paulo',['Um ministro do governo da Itália','Um fazendeiro paulista']],
+   para:['Chamar a família para vir trabalhar no Brasil',['Pedir dinheiro emprestado ao banco','Vender café para a Itália']],
+   conta:['Que muitos imigrantes vieram chamados por parentes que já estavam aqui',['Que ninguém queria vir para o Brasil','Que os imigrantes vinham sozinhos, sem conhecer ninguém']],
+   esconde:['As dificuldades: o imigrante podia contar só o lado bom para animar a família',['O endereço da família na Itália','A língua em que foi escrita']],
+   nota:'Cartas são fontes pessoais: mostram sentimentos e planos, mas também o que a pessoa quis contar.'},
+ i22_recMappin:{quem:['A loja Mappin Stores, para anunciar no jornal',['Um cliente reclamando do preço','A fábrica de tecidos do Brás']],
+   para:['Vender camisas inglesas para quem podia pagar',['Ensinar a costurar camisas','Avisar sobre uma greve']],
+   conta:['Os preços e o gosto dos ricos por produtos importados',['Que todos compravam no Mappin','Que as camisas eram de graça']],
+   esconde:['Que a maioria das famílias não podia pagar esses preços',['O endereço da loja','O tamanho das camisas']],
+   nota:'Anúncio sempre mostra o lado bom do produto. Ele revela quem era o freguês desejado.'},
+ i22_recMatarazzo:{quem:['A empresa Matarazzo, que pagou a página no jornal',['Os operários das fábricas Matarazzo','Um professor de História']],
+   para:['Mostrar o tamanho e o poder da empresa na festa do Centenário',['Pedir ajuda ao governo','Anunciar uma greve']],
+   conta:['Que a Matarazzo tinha fábricas, navios e filiais até no exterior',['Que a empresa estava falindo','Que São Paulo não tinha indústrias']],
+   esconde:['Os operários, os salários e as greves que aconteceram nas fábricas',['O nome da empresa','A data da Independência']],
+   nota:'Propaganda de empresa mostra máquinas e lucros. Quem trabalhava nelas quase nunca aparece.'},
+ programa22:{quem:['Os artistas modernistas, com o apoio de paulistas ricos',['A polícia da cidade','Os operários da Mooca']],
+   para:['Anunciar os festivais de música, poesia e pintura no Theatro Municipal',['Convocar uma greve','Vender passagens de trem']],
+   conta:['Que um grupo de artistas queria uma arte nova, moderna e brasileira',['Que todo mundo gostou da Semana','Que a Semana aconteceu no Rio de Janeiro']],
+   esconde:['As vaias do público e que a festa era coisa da elite da cidade',['Os nomes dos artistas','O mês em que aconteceu']],
+   nota:'A Semana de 1922 ficou famosa depois. Na época, muita gente vaiou e quase ninguém do povo foi.'},
+ i22_boletim:{quem:['Mulheres organizadas que lutavam por direitos, como as de Bertha Lutz',['Os deputados que eram contra o voto feminino','Uma loja de chapéus']],
+   para:['Defender o direito das mulheres de votar, estudar e trabalhar',['Ensinar receitas de bolo','Vender ingressos de baile']],
+   conta:['Que em 1922 as mulheres ainda não podiam votar',['Que as mulheres já votavam desde 1822','Que ninguém lutava por direitos']],
+   esconde:['A voz das operárias e das mulheres negras, que aparece pouco nesses boletins',['O endereço da federação','O ano de 1922']],
+   nota:'O voto feminino só veio em 1932. Cada grupo de mulheres lutava pelo que mais faltava na sua vida.'},
+ i22_jornalNeg:{quem:['A comunidade negra de São Paulo, com seus próprios jornalistas',['Os grandes jornais da elite','O governo do estado']],
+   para:['Contar a vida da comunidade e denunciar o racismo',['Anunciar camisas inglesas','Publicar o preço do café']],
+   conta:['Que os negros paulistanos tinham clubes, bailes, escolas e lutavam contra o racismo',['Que não havia racismo em São Paulo','Que a comunidade negra não lia jornais']],
+   p4:'O que este jornal mostra que os grandes jornais escondiam?',esconde:['A vida e a luta da comunidade negra paulistana',['O preço do café na Bolsa','As notícias da corte da Inglaterra']],
+   nota:'A imprensa negra é uma fonte preciosa: conta a história que os outros jornais deixavam de fora.'},
+ i22_convite:{quem:['Um clube recreativo criado por negros paulistanos',['Um clube de brancos ricos','A Prefeitura']],
+   para:['Convidar os sócios e amigos para um baile',['Cobrar imposto dos bailes','Proibir a entrada no clube']],
+   conta:['Que, proibidos de entrar nos clubes de brancos, os negros criaram os próprios clubes',['Que todos os clubes aceitavam todo mundo','Que ninguém dançava em 1922']],
+   p4:'O que este convite mostra que outras fontes quase não mostram?',esconde:['A vida social e a organização dos negros paulistanos',['Os preços do Mappin','O horário dos bondes']],
+   nota:'Festa também é história: os clubes negros eram lugar de alegria, de organização e de resistência.'},
+ i22_caderneta:{quem:['O armazém da fazenda, que anotava o que o colono comprava',['O próprio colono, para guardar dinheiro','O banco da cidade']],
+   para:['Registrar a dívida, descontada do pagamento no fim do ano',['Fazer uma lista de presentes','Contar os pés de café']],
+   conta:['Que muitas famílias de colonos viviam endividadas com a fazenda',['Que os colonos ficavam ricos depressa','Que tudo no armazém era de graça']],
+   esconde:['Se os preços do armazém eram justos: quem anotava era o lado da fazenda',['O nome do colono','O que é café']],
+   nota:'Muitos colonos não sabiam ler e não podiam conferir a conta. A dívida prendia a família à fazenda.'},
+ i22_postalPorto:{quem:['Um fotógrafo e uma editora de cartões-postais',['Os estivadores do porto','O capitão de um navio']],
+   para:['Ser vendido e mandado como lembrança, mostrando um porto moderno',['Registrar a carga de cada navio','Cobrar o imposto do café']],
+   conta:['Que Santos era o grande porto do café, com navios, guindastes e armazéns',['Que Santos não tinha porto','Que o café saía de avião']],
+   esconde:['O trabalho pesado dos estivadores, que carregavam sacas de 60 quilos',['O mar','Os navios']],
+   nota:'Foto de postal escolhe o ângulo mais bonito. Vale perguntar: o que ficou fora do quadro?'}
+};
+
+/* museu da mochila: examinar cada documento como historiador (quem fez, para quê, o que conta, o que não mostra) */
+(function(){try{const MJ=window.__MJ,D=window.__DOCS22;if(!MJ||!D)return;
+  const st=document.createElement('style');st.textContent=`
+  .msBody{background:#f3e6c8;color:#3a2418;font-family:var(--f);padding:14px}
+  .msFicha{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:start}
+  @media (max-width:560px){.msFicha{grid-template-columns:84px 1fr;gap:10px}}
+  .msObj{background:#e2cfa4;border:3px solid #3a2418;box-shadow:inset 0 0 0 3px #f6ead0;border-radius:3px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
+  .msObj canvas{width:100%;max-width:96px;image-rendering:pixelated}
+  .msObj small{font-size:12px;text-align:center;color:#6a4a32}
+  .msTit{margin:0 0 4px;font-size:clamp(18px,2.8vw,23px);color:#7a3a1e}
+  .msTxt{margin:0 0 8px;font-size:clamp(14px,2.1vw,16px);line-height:1.4;font-style:italic}
+  .msLentes{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+  .msLentes span{border:2px solid #3a2418;border-radius:12px;padding:3px 9px;font-size:13px;background:#efe0bd;opacity:.6}
+  .msLentes span.at{opacity:1;background:#f1c471}
+  .msLentes span.ok{opacity:1;background:#c9e09a}
+  .msQ{background:#fff6e3;border:3px solid #3a2418;border-radius:4px;padding:10px 12px}
+  .msQ h4{margin:0 0 8px;font-size:clamp(16px,2.4vw,19px)}
+  .msQ .opts{display:flex;flex-direction:column;gap:6px}
+  .msQ .opt{text-align:left;font-family:var(--f);font-size:clamp(14px,2.1vw,16px);padding:8px 10px;border:2px solid #3a2418;border-radius:3px;background:#f3e6c8;color:#3a2418;cursor:pointer}
+  .msQ .opt:hover{background:#f1c471}
+  .msQ .opt.no{background:#f4b8a4;opacity:.7}
+  .msFb{margin:8px 0 0;font-size:15px;min-height:1.2em}
+  .msCarimbo{position:absolute;right:-10px;bottom:-12px;transform:rotate(-14deg) scale(.4);opacity:0;border:3px solid #a8281e;color:#a8281e;font-weight:bold;padding:2px 6px;font-size:14px;background:rgba(243,230,200,.85);letter-spacing:1px;transition:all .35s cubic-bezier(.3,1.6,.5,1)}
+  .msCarimbo.on{transform:rotate(-14deg) scale(1);opacity:1}
+  .msLista{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+  .msLista button{background:#e2cfa4;border:3px solid #3a2418;border-radius:3px;padding:6px;font-family:var(--f);font-size:12px;color:#3a2418;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
+  .msLista button canvas{width:56px;image-rendering:pixelated}
+  .msLista button.vazio{opacity:.45;cursor:default}
+  .msLista button.feito{background:#d8e8b8}
+  .msLista button.feito::after{content:'✓';position:absolute;top:2px;right:6px;color:#3a7a2a;font-size:18px;font-weight:bold}
+  .slot.docSlot{box-shadow:0 0 0 2px #f1c471}
+  .slot.docFeito{box-shadow:0 0 0 2px #7fbf5a}
+  #msBtnMuseu{margin-top:8px;font-family:var(--f)}
+  `;document.head.appendChild(st);
+  const IDS=Object.keys(D);const item=id=>ITEMS.find(i=>i.id===id);
+  const icone=(it,px)=>{const c=document.createElement('canvas');c.width=16;c.height=16;const x=c.getContext('2d');x.imageSmoothingEnabled=false;try{if(it&&it.got)x.drawImage(IMG.IT,it.i*16,0,16,16,0,0,16,16);else{x.fillStyle='#8a6a4a';x.font='12px sans-serif';x.textAlign='center';x.fillText('?',8,12);}}catch(_){}if(px)c.style.width=px+'px';return c;};
+  const LENTES=[['quem','👤 Quem fez?','Quem fez este documento?'],['para','🎯 Para quê?','Para que este documento foi feito?'],['conta','📜 O que conta?','O que este documento conta sobre 1922?'],['esconde','🔍 O que não mostra?','O que este documento NÃO mostra?']];
+  const embaralha=a=>a.map(v=>[Math.random(),v]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
+  const janela=titulo=>{mcqOpen=true;ovQuiz.hidden=false;const box=$('quizBox');box.innerHTML='';box.classList.add('mjBox');
+    const top=document.createElement('div');top.className='mjTop';const ano=document.createElement('span');ano.className='mjAno';ano.textContent='1922';const h=document.createElement('h2');h.textContent=titulo;
+    const x=document.createElement('button');x.type='button';x.className='mjX';x.textContent='✕';x.onclick=fechar;top.append(ano,h,x);const body=document.createElement('div');body.className='msBody';box.append(top,body);return body;};
+  const fechar=()=>{const box=$('quizBox');box.classList.remove('mjBox');ovQuiz.hidden=true;mcqOpen=false;try{renderGrid();}catch(_){}};
+  const lista=()=>{const body=janela('Museu da mochila');const feitos=IDS.filter(id=>MJ.docs.has(id)).length;
+    const p=document.createElement('p');p.style.cssText='margin:0 0 10px;font-size:16px;line-height:1.4';p.textContent=`Documentos são pistas do passado. Examine cada um como historiador: quem fez, para quê, o que conta e o que não mostra. Examinados: ${feitos} de ${IDS.length}.`;
+    const g=document.createElement('div');g.className='msLista';
+    for(const id of IDS){const it=item(id);const b=document.createElement('button');b.type='button';const tem=it&&it.got;b.className=tem?(MJ.docs.has(id)?'feito':''):'vazio';
+      const nm=document.createElement('span');nm.textContent=tem?it.name:'Ainda não encontrado';b.append(icone(it),nm);if(tem)b.onclick=()=>examinar(id);g.appendChild(b);}
+    const row=document.createElement('div');row.className='row';row.style.marginTop='12px';const bf=document.createElement('button');bf.type='button';bf.className='btn';bf.textContent='Fechar';bf.onclick=fechar;row.appendChild(bf);body.append(p,g,row);};
+  const examinar=id=>{const it=item(id),d=D[id];if(!it||!d)return;const body=janela('Examinar como historiador');
+    const ficha=document.createElement('div');ficha.className='msFicha';const obj=document.createElement('div');obj.className='msObj';const sm=document.createElement('small');sm.textContent='Museu da mochila';
+    const car=document.createElement('div');car.className='msCarimbo';car.textContent='EXAMINADO';obj.append(icone(it),sm,car);
+    const dir=document.createElement('div');const h=document.createElement('h3');h.className='msTit';h.textContent=it.name;const tx=document.createElement('p');tx.className='msTxt';tx.textContent=Array.isArray(it.text)?it.text.join(' '):it.text;
+    const len=document.createElement('div');len.className='msLentes';const chips=LENTES.map(([k,t])=>{const s=document.createElement('span');s.textContent=t;len.appendChild(s);return s;});
+    dir.append(h,tx,len);ficha.append(obj,dir);const q=document.createElement('div');q.className='msQ';body.append(ficha,q);
+    let n=0;const passo=()=>{chips.forEach((c,i)=>{c.className=i<n?'ok':i===n?'at':'';});q.innerHTML='';
+      if(n>=4){const ja=MJ.docs.has(id);MJ.docs.add(id);car.classList.add('on');MJ.som('pista');let pr=0;if(!ja){pr=MJ.premio('doc_'+id,50);try{addDiary('Documento',it.name+': '+d.nota);}catch(_){}try{save();}catch(_){}}
+        const h4=document.createElement('h4');h4.textContent='Documento examinado!'+(pr?` +${pr} réis`:'');const p=document.createElement('p');p.style.cssText='margin:0 0 10px;font-size:16px;line-height:1.4';p.textContent=d.nota;
+        const row=document.createElement('div');row.className='row';const prox=IDS.find(k=>k!==id&&!MJ.docs.has(k)&&item(k)&&item(k).got);
+        const bt=(t,f)=>{const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=t;b.onclick=f;row.appendChild(b);};
+        if(prox)bt('Próximo documento',()=>examinar(prox));bt('Ver o museu',lista);bt('Fechar',fechar);q.append(h4,p,row);return;}
+      const [k,,perg]=LENTES[n];const [certa,erradas]=d[k];const h4=document.createElement('h4');h4.textContent=(n===3&&d.p4)?d.p4:perg;const ops=document.createElement('div');ops.className='opts';const fb=document.createElement('p');fb.className='msFb';
+      for(const o of embaralha([certa,...erradas])){const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o;
+        b.onclick=()=>{if(o===certa){MJ.som('blip');fb.textContent='Isso!';fb.style.color='#3a7a2a';ops.querySelectorAll('button').forEach(x=>x.disabled=true);setTimeout(()=>{n++;passo();},650);}
+          else{b.classList.add('no');b.disabled=true;fb.textContent=['Pense de novo: quem tinha motivo e meios para fazer este papel?','Pense de novo: o que a pessoa queria que acontecesse com ele?','Pense de novo: leia de novo a descrição do documento.','Pense de novo: o que ficou de fora? De quem é o ponto de vista?'][n];fb.style.color='#a8281e';}};ops.appendChild(b);}
+      q.append(h4,ops,fb);};passo();};
+  window.__museu={lista,examinar};
+  /* na mochila: destaque nos documentos e botão do museu */
+  if(typeof renderGrid==='function'){const r0=renderGrid;renderGrid=function(){r0.apply(this,arguments);try{if(era!==4){const b0=$('msBtnMuseu');if(b0)b0.hidden=true;return;}const g=$('itemGrid');const its=itemsE();
+      [...g.children].forEach((b,i)=>{const it=its[i];if(!it||!D[it.id])return;b.classList.add(MJ.docs.has(it.id)?'docFeito':'docSlot');
+        if(it.got){const o=b.onclick;b.onclick=()=>{o&&o();const inf=$('itemInfo');if(!inf)return;const bb=document.createElement('button');bb.type='button';bb.className='btn';bb.style.cssText='display:block;margin-top:6px';bb.textContent=MJ.docs.has(it.id)?'🔍 Ver de novo como historiador':'🔍 Examinar como historiador';bb.onclick=()=>examinar(it.id);inf.appendChild(bb);};}});
+      let bm=$('msBtnMuseu');if(!bm){bm=document.createElement('button');bm.id='msBtnMuseu';bm.type='button';bm.className='btn';const inf=$('itemInfo');(inf&&inf.parentNode?inf.parentNode:g.parentNode).insertBefore(bm,inf?inf.nextSibling:g.nextSibling);bm.onclick=lista;}
+      bm.textContent=`🏛 Museu da mochila: ${IDS.filter(id=>MJ.docs.has(id)).length} de ${IDS.length} documentos examinados`;bm.hidden=false;}catch(e){console.warn('museu',e);}};}
+  /* quando pega um documento novo, avisa */
+  const avis=new Set();setInterval(()=>{try{if(era!==4)return;for(const id of IDS){const it=item(id);if(it&&it.got&&!avis.has(id)){avis.add(id);if(!MJ.docs.has(id)&&started)setTimeout(()=>toast('Documento novo! Examine na Mochila → Museu'),1800);}}}catch(_){}},1500);
+  setTimeout(()=>{try{for(const id of IDS){const it=item(id);if(it&&it.got)avis.add(id);}}catch(_){}},1200);
+}catch(e){console.warn('museu da mochila',e);}})();
 
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /* ===== v203 — MENOS ESPAÇO PRETO EM TODOS OS FORMATOS E ABERTURA SEM 1554 NO FUNDO (pedido do professor, 21/11/2026) =====
