@@ -21672,6 +21672,71 @@ window.__paulista82Ready=Promise.all(ready);
 }catch(e){console.warn('bonecos canva 22',e);}})();
 
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
+/* ===== v203 — MENOS ESPAÇO PRETO EM TODOS OS FORMATOS E ABERTURA SEM 1554 NO FUNDO (pedido do professor, 21/11/2026) =====
+   1) A abertura "máquina do tempo" cobre a tela inteira: o "1554" da barra de cima não aparece mais
+      quando a pessoa escolhe 1830, 1888 ou 1922.
+   2) Tablets e janelas médias (que não eram nem "celular" nem "computador") agora usam a tela toda:
+      em pé, a tela do jogo fica mais alta; deitado, mais larga.
+   3) Salas pequenas: em vez de encolher a tela e deixar faixa preta, o jogo aproxima a sala (no máximo 3 vezes; 2 no computador de tela grande)
+      até ela encher a tela; a câmera acompanha o viajante. Funciona junto com a v135, sem brigar com ela. */
+(function(){try{
+  const st=document.createElement('style');
+  st.textContent='#ovIntro{position:fixed!important;inset:0!important;z-index:9500!important;padding:max(8px,env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))!important}'+
+    '#ovIntro canvas{max-width:min(900px,100%)!important;max-height:72vh!important;width:auto!important;height:auto!important;aspect-ratio:16/9}'+
+    'body.telaTablet .app{max-width:none!important}';
+  document.head.appendChild(st);
+  const scr=document.querySelector('.screen'),app=document.querySelector('.app'),hud=document.querySelector('.hud'),pad=document.querySelector('.pad');
+  const coarse=()=>matchMedia('(hover:none) and (pointer:coarse)').matches;
+  const phone=()=>coarse()&&Math.min(innerWidth,innerHeight)<600;
+  const pcMedia=()=>matchMedia('(min-width:900px) and (min-height:520px)').matches;
+  const deitadoBaixo=()=>matchMedia('(orientation:landscape) and (max-height:520px)').matches;
+  /* tablet ou janela média: não é celular e não é o computador que a v137 já ajusta */
+  const outro=()=>!phone()&&!(pcMedia()&&!coarse())&&!deitadoBaixo();
+  function poe(w,h){w=Math.round(w);h=Math.round(h);w-=w%2;h-=h%2;if(w===VW&&h===VH)return;
+    VW=w;VH=h;cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;if(scr)scr.style.aspectRatio=VW+'/'+VH;
+    try{document.documentElement.style.setProperty('--ar',String(VW/VH));}catch(_){}try{nightCv.width=VW;nightCv.height=VH;}catch(_){}try{mmDirty=true;}catch(_){}}
+  function fitOutro(){
+    document.body.classList.toggle('telaTablet',outro());
+    if(!outro()){if(scr&&scr.dataset.v2w){scr.style.width='';scr.style.marginInline='';delete scr.dataset.v2w;}return;}
+    if(scr){scr.style.width='';scr.dataset.v2w='1';}
+    const cs=getComputedStyle(app);
+    if(pcMedia()){ /* tablet deitado: botões à direita, igual ao computador */
+      const avH=innerHeight-76,avW=app.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-(pad?pad.getBoundingClientRect().width:190)-22;
+      poe(Math.max(256,Math.min(576,224*avW/Math.max(200,avH))),224);
+    }else{ /* em pé (ou janela estreita): botões embaixo */
+      const w=(scr.clientWidth||innerWidth-24);
+      const avH=innerHeight-(hud?hud.offsetHeight:40)-(pad?pad.offsetHeight:90)-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-30;
+      const vw=Math.max(256,Math.min(352,Math.round(w/3)));
+      let vh;if(w/Math.max(100,avH)>256/224){vh=224;poe(Math.max(256,Math.min(576,224*w/Math.max(100,avH))),vh);}  /* janela larga e baixa: tela mais larga */
+      else{vh=Math.max(224,Math.min(Math.round(vw*1.9),Math.floor(vw*avH/w)));poe(vw,vh);}
+      /* a tela nunca passa da altura disponível (sem rolar a página), mesmo quando a sala aproxima */
+      if(scr){scr.style.width='min(100%, calc('+Math.max(160,Math.floor(avH))+'px * var(--ar,1.14)))';scr.style.marginInline='auto';}
+    }
+  }
+  let tm=0;const later=()=>{clearTimeout(tm);tm=setTimeout(fitOutro,320);};
+  addEventListener('resize',later);addEventListener('orientationchange',later);setTimeout(fitOutro,60);setTimeout(fitOutro,900);
+  /* salas pequenas: aproximar em vez de encolher */
+  let cheio=null,fim=null;
+  const r0=render;
+  render=function(){
+    try{
+      if(!fim||VW!==fim[0]||VH!==fim[1])cheio=[VW,VH]; /* alguém (giro da tela, v137, celular) mudou o tamanho: esse é o tamanho cheio */
+      const rideOn=(typeof ride!=='undefined'&&ride);
+      const cw=MW*T,ch=MH*T,W=cheio[0],H=cheio[1];
+      if(!rideOn&&(cw<W||ch<H)){
+        const A=W/H;let w,h;
+        if(cw/ch>A){h=Math.min(ch,H);w=h*A;}else{w=Math.min(cw,W);h=w/A;}
+        const z=(pcMedia()&&!coarse())?2:3,mw=W/z,mh=H/z; /* aproxima no máximo 3 vezes (2 vezes no computador de tela grande) */
+        if(w<mw){w=mw;h=w/A;}if(h<mh){h=mh;w=h*A;}
+        w=Math.min(w,cw,W);h=Math.min(h,ch,H);
+        poe(w,h);
+      }else if(VW!==W||VH!==H)poe(W,H);
+    }catch(_){}
+    const r=r0.apply(this,arguments);
+    fim=[VW,VH];return r;
+  };
+  window.__telaV2=()=>({VW,VH,cheio,MW,MH,outro:outro()});
+}catch(e){console.warn('tela v203',e);}})();
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
