@@ -349,7 +349,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=860e5dd1","kb":8543,"m":1},{"f":"pac_e1234.js?v=ca07eb09","kb":2177,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=0bf8ea21","kb":233,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=e3acbc3c","kb":1485,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=d9cd7a53","kb":5065,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=860e5dd1","kb":8543,"m":1},{"f":"pac_e1234.js?v=ca07eb09","kb":2177,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=0bf8ea21","kb":233,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=e3acbc3c","kb":1485,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=0c017fbf","kb":5114,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -19719,7 +19719,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v200) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v201) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -20499,11 +20499,11 @@ window.__paulista82Ready=Promise.all(ready);
       for(let y=0;y<=21;y++)for(let x=130;x<=145;x++){if(!/[.,fdV]/.test(M[y][x]))continue;
         const cx=x+.5,cy=y+.5;M[y][x]=(x===138||x===139||y===10||y===11)?'d':(dentro(PQ.lago,cx,cy)<1&&dentro(PQ.ilha,cx,cy)>1)?'W':'.';}
       const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
-      const pp=(id,k,x,y,nm,tx)=>{if(!A[k]||ocp(x,y)||M[y][x]==='W'||objects.some(o=>o.id===id))return;const im=new Image();im.src=A[k];
-        objects.push({id,scene:S,x,y,w:1,h:1,name:nm,text:tx,__jm:1,draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth,h=im.naturalHeight;c.fillStyle='rgba(20,16,24,.22)';c.fillRect(Math.round(X+8-w*.3),Y+13,Math.round(w*.6),3);c.drawImage(im,Math.round(X+8-w/2),Y+16-h);}});};
+      const pp=(id,k,x,y,nm,tx,sc)=>{if(!A[k]||ocp(x,y)||M[y][x]==='W'||objects.some(o=>o.id===id))return;const im=new Image();im.src=A[k];sc=sc||1;
+        objects.push({id,scene:S,x,y,w:1,h:1,name:nm,text:tx,__jm:1,draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=Math.round(im.naturalWidth*sc),h=Math.round(im.naturalHeight*sc);c.fillStyle='rgba(20,16,24,.22)';c.fillRect(Math.round(X+8-w*.3),Y+13,Math.round(w*.6),3);c.drawImage(im,Math.round(X+8-w/2),Y+16-h,w,h);}});};
       const AR=['Árvore nova do parque',['As árvores do parque ainda são novas: foram plantadas nas obras que acabaram neste ano.']],PA=['Palmeira',['Uma fileira de palmeiras acompanha a rua interna do parque.']],BA=['Banco do parque',['Um banco de frente para o lago.']],PO=['Poste de luz elétrica',['Luz elétrica nas ruas internas do parque.']],CA=['Canteiro de flores',['Um canteiro de flores no meio do gramado.']];
-      [[133,3],[135,6],[142,3],[143,6],[142,15],[143,18],[130,9],[145,12],[131,21],[144,1]].forEach((q,i)=>pp('jm_dpArv'+i,i%3===1?'ANH_arvore_florida':'ANH_arvore_verde',q[0],q[1],AR[0],AR[1]));
-      [1,5,14,18].forEach(y=>{pp('jm_dpPalA'+y,'ANH_palmeira',137,y,PA[0],PA[1]);pp('jm_dpPalB'+y,'ANH_palmeira',140,y,PA[0],PA[1]);});
+      [[133,3],[135,6],[142,3],[143,6],[142,15],[143,18],[130,9],[145,12],[131,21],[144,1]].forEach((q,i)=>pp('jm_dpArv'+i,i%3===1?'ANH_arvore_florida':'ANH_arvore_verde',q[0],q[1],AR[0],AR[1],.6));
+      [1,5,14,18].forEach(y=>{pp('jm_dpPalA'+y,'ANH_palmeira',137,y,PA[0],PA[1],.7);pp('jm_dpPalB'+y,'ANH_palmeira',140,y,PA[0],PA[1],.7);});
       pp('jm_dpCan1','ANH_canteiro_florido',134,4,CA[0],CA[1]);pp('jm_dpCan2','ANH_canteiro_florido',142,17,CA[0],CA[1]);
       pp('jm_dpBan1','ANH_banco_A',132,21,BA[0],BA[1]);pp('jm_dpBan2','ANH_banco_A',136,21,BA[0],BA[1]);pp('jm_dpBan3','ANH_banco_A',131,13,BA[0],BA[1]);
       pp('jm_dpPos1','ANH_poste_dois_globos_A',137,9,PO[0],PO[1]);pp('jm_dpPos2','ANH_poste_dois_globos_A',140,12,PO[0],PO[1]);
@@ -20513,6 +20513,53 @@ window.__paulista82Ready=Promise.all(ready);
       if(typeof drawSign==='function'&&!ocp(137,12)&&!objects.some(o=>o.id==='jm_dpPlaca'))objects.push({id:'jm_dpPlaca',scene:S,x:137,y:12,w:1,h:1,draw:drawSign,name:'Placa',text:['Parque Dom Pedro II. Aqui era a várzea do Carmo, que o Tamanduateí alagava. O rio foi posto num canal reto e a várzea, aterrada, virou parque, entregue em 1922, no Centenário da Independência.','Folha da Noite, 27 de julho de 1922: o prefeito Firmiano Pinto determinou que nas ruas internas do parque só circulem veículos de condução pessoal com rodas de borracha, numa só direção. Carga, só pelas ruas de fora. É proibido estacionar.'],__jm:1});
       try{if(!C.P.some(q=>q&&/D\. PEDRO/.test(q.t||'')))C.P.push({t:'PARQUE D. PEDRO II',x:142*16+8,y:10*16+12,w:110,largo:1});}catch(_){}
     }}catch(e){console.warn('parque Dom Pedro JM',e);}
+    /* ===== v201 — CENTRO DE 1922: MERCADO VELHO, GENERAL CARNEIRO E PALÁCIO DAS INDÚSTRIAS — Mercado Velho de 1867 na esquina da General Carneiro com a 25 de Março, com o Mercado dos Caipiras ao lado e vendedores no chão; paredão de pedra com chafariz e postes de madeira na ladeira; Palácio das Indústrias no parque; árvores novas, trecho ainda sem jardim e placa das lavadeiras; loja de Assad Abdalla e Nagib Salem (pedido do professor, 21/11/2026) ===== */
+    try{if(M[67]&&M[67][141]!==undefined){
+      const ocp=(x,y,me)=>objects.some(o=>o!==me&&o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+      const some=(x0,y0,x1,y1)=>{for(const o of objects){if(o.scene!==S||o.enter)continue;const w=o.w||1,h=o.h||1;if(o.x>=x0&&o.x+w-1<=x1&&o.y>=y0&&o.y+h-1<=y1)o.scene='__fora';else if(h===1&&/^jm_q_/.test(o.id)&&o.y>=y0&&o.y<=y1){let a=o.x,b=o.x+w-1;while(b>=a&&b>=x0&&b<=x1)b--;while(a<=b&&a>=x0&&a<=x1)a++;if(b<a)o.scene='__fora';else{o.x=a;o.w=b-a+1;}}}
+        if(rel.quintais)rel.quintais=rel.quintais.filter(q=>!(q[0]>=x0&&q[0]<=x1&&q[1]>=y0&&q[1]<=y1));};
+      const foto=(o,key,larg,fundo)=>{const im=new Image();im.src=A[key];o.draw=function(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth/2,h=im.naturalHeight/2;c.drawImage(im,Math.round(X+larg*8-w/2),Math.round(Y+fundo*16-h),w,h);};};
+      /* --- Mercado Velho na esquina, pátio de venda e Mercado dos Caipiras --- */
+      const mv=objects.find(o=>o.id==='mercado25'&&o.scene===S),mc=objects.find(o=>o.id==='mercCaipiras22'&&o.scene===S),dep=objects.find(o=>o.id==='pt_56'&&o.scene===S);
+      if(mv&&A.JM22_mercado_velho){some(130,48,141,61);for(let y=48;y<=61;y++)for(let x=130;x<=139;x++)M[y][x]='p';for(let y=54;y<=57;y++)for(let x=140;x<=141;x++)M[y][x]='p';
+        mv.x=130;mv.y=49;mv.w=10;mv.h=5;mv.door=5;mv.__canva=1;mv.name='Mercado Velho (Mercado da Rua 25 de Março)';foto(mv,'JM22_mercado_velho',10,5);
+        if(dep){dep.x=137;dep.y=58;}
+        if(mc){const ox=mc.x,oy=mc.y;mc.x=130;mc.y=58;for(let y=62;y<=63;y++)for(let x=130;x<=135;x++)M[y][x]='p';
+          for(const o of objects)if(o.scene===S&&o!==mc&&!o.enter&&o.x>=ox-1&&o.x<=ox+6&&o.y>=oy-1&&o.y<=oy+6&&/^gl2_caipiras|^fvCarga2/.test(o.id)){o.x=135+(o.id[0]==='f'?1:0);o.y=o.id[0]==='f'?59:61;}}
+        /* gente e mercadoria no chão, como na fotografia de Vincenzo Pastore (c. 1910) */
+        const TX=['Verduras, frutas e cereais vendidos no chão, diante do mercado. O fotógrafo Vincenzo Pastore registrou cenas assim nesta esquina por volta de 1910.'];
+        const chao=(id,t,x,y)=>{if(ocp(x,y)||M[y][x]!=='p')return;objects.push({id,scene:S,x,y,w:1,h:1,name:['Cestos de verdura','Sacos de cereal','Caixote de frutas'][t],text:TX,__jm:1,draw(c,X,Y){
+          c.fillStyle='rgba(20,16,24,.22)';c.fillRect(X+1,Y+13,14,2);
+          if(t===0){c.fillStyle='#8a5a2b';c.fillRect(X+2,Y+7,12,7);c.fillStyle='#b5813f';for(let i=0;i<12;i+=2)c.fillRect(X+2+i,Y+8,1,5);c.fillStyle='#6b4420';c.fillRect(X+2,Y+7,12,1);c.fillStyle='#5f9a3a';c.fillRect(X+3,Y+4,10,3);c.fillStyle='#86bd52';c.fillRect(X+4,Y+3,3,2);c.fillRect(X+9,Y+4,3,1);c.fillStyle='#d9582f';c.fillRect(X+7,Y+5,2,2);}
+          else if(t===1){c.fillStyle='#b8a57a';c.fillRect(X+1,Y+6,7,8);c.fillRect(X+8,Y+8,7,6);c.fillStyle='#d6c79c';c.fillRect(X+2,Y+6,4,2);c.fillRect(X+9,Y+8,4,2);c.fillStyle='#8f7d57';c.fillRect(X+1,Y+13,14,1);c.fillRect(X+7,Y+8,1,6);c.fillStyle='#6f5f3f';c.fillRect(X+3,Y+5,2,1);c.fillRect(X+10,Y+7,2,1);}
+          else{c.fillStyle='#9a6b3a';c.fillRect(X+2,Y+7,12,7);c.fillStyle='#7a5129';c.fillRect(X+2,Y+9,12,1);c.fillRect(X+2,Y+12,12,1);c.fillRect(X+2,Y+7,1,7);c.fillRect(X+13,Y+7,1,7);c.fillStyle='#e0a030';c.fillRect(X+3,Y+5,3,3);c.fillRect(X+7,Y+4,3,3);c.fillStyle='#d9582f';c.fillRect(X+10,Y+5,3,3);c.fillStyle='#f0c860';c.fillRect(X+4,Y+5,1,1);c.fillRect(X+8,Y+4,1,1);}}});};
+        [[131,55,0],[132,55,1],[137,55,2],[138,55,0],[133,57,1],[136,57,0],[139,57,2],[131,48,2]].forEach((q,i)=>chao('jm_mvChao'+i,q[2],q[0],q[1]));
+        const lv=(id,x,y)=>{const n=npcs.find(q=>q.id===id&&q.scene===S);if(n&&!ocp(x,y)){n.x=x;n.y=y;n.px=x*16;n.py=y*16;}};
+        lv('vendAves22',132,56);lv('sitiante22',134,56);lv('ambulante22',139,55);
+        if(typeof drawSign==='function'&&!ocp(140,54))objects.push({id:'jm_mvPlaca',scene:S,x:140,y:54,w:1,h:1,draw:drawSign,name:'Placa',text:['Mercado Velho, de 1867, na esquina da Rua General Carneiro com a Rua 25 de Março. É baixo e comprido, de tijolo, com arcadas. Aqui a cidade se abastece.','Ao lado fica o Mercado dos Caipiras, onde sitiantes e tropeiros vendem verduras, frutas e aves. O grande Mercado Municipal da Rua da Cantareira ainda não existe: só abre em 1933.','[A posição exata dos pavilhões está por conferir com a planta de 1913.]'],__jm:1});
+        try{if(!C.P.some(q=>q&&/MERCADO VELHO/.test(q.t||'')))C.P.push({t:'MERCADO VELHO',x:135*16,y:55*16+12,w:96,largo:1});}catch(_){}
+      }
+      /* --- General Carneiro: paredão de pedra, chafariz e postes de madeira --- */
+      rel.paredao={x0:128,x1:129,y0:48,y1:61};
+      for(let y=46;y<=47;y++)for(let x=130;x<=139;x++)if(/[.,fd]/.test(M[y][x]))M[y][x]='D';/* a ladeira é rua calçada de ponta a ponta */
+      if(A.AL_chafariz&&!ocp(130,48)&&!objects.some(o=>o.id==='jm_gcChafariz')){const im=new Image();im.src=A.AL_chafariz;objects.push({id:'jm_gcChafariz',scene:S,x:130,y:48,w:1,h:1,name:'Chafariz do paredão',text:['Um chafariz de pedra ao pé do paredão que segura o alto da colina, no começo da descida da Rua General Carneiro.'],__jm:1,draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;c.drawImage(im,Math.round(X+8-im.naturalWidth/2),Y+16-im.naturalHeight);}});}
+      [[121,43],[127,43],[133,48],[138,48],[124,49]].forEach((q,i)=>{const x=q[0],y=q[1];if(!M[y]||M[y][x]!=='p'||ocp(x,y))return;objects.push({id:'jm_gcPoste'+i,scene:S,x,y,w:1,h:1,name:'Poste de madeira',text:['Poste de madeira carregado de fios: luz, telefone e a rede do bonde.'],__jm:1,draw(c,X,Y){
+        c.fillStyle='rgba(20,16,24,.22)';c.fillRect(X+5,Y+14,6,2);c.fillStyle='#5a3f25';c.fillRect(X+7,Y-34,2,49);c.fillStyle='#7a5a38';c.fillRect(X+7,Y-34,1,49);
+        c.fillStyle='#4a3320';c.fillRect(X+1,Y-31,14,2);c.fillRect(X+2,Y-25,12,2);c.fillStyle='#cfd6d8';for(const i of [1,5,10,14])c.fillRect(X+i,Y-33,1,2);for(const i of [2,6,9,13])c.fillRect(X+i,Y-27,1,2);
+        c.fillStyle='rgba(30,30,34,.55)';c.fillRect(X-8,Y-32,9,1);c.fillRect(X+15,Y-32,9,1);c.fillRect(X-8,Y-26,10,1);c.fillRect(X+14,Y-26,10,1);}});});
+      /* --- Palácio das Indústrias (do outro lado do rio na cidade real; aqui, no parque, para caber) --- */
+      if(rel.parqueDP&&A.JM22_palacio_industrias&&!objects.some(o=>o.id==='jm_palIndustrias')){const PQ=rel.parqueDP;PQ.el.shift();PQ.seg.shift();
+        for(const o of objects)if(o.scene===S&&!o.enter&&o.x>=130&&o.x<=137&&o.y>=0&&o.y<=8)o.scene='__fora';
+        const o={id:'jm_palIndustrias',scene:S,x:130,y:2,w:8,h:6,name:'Palácio das Indústrias',text:['Palácio das Indústrias, feito para mostrar a produção das fazendas e das fábricas de São Paulo. Recebe exposições desde 1920; neste ano de 1922 abriga a 1ª Exposição Geral de Belas Artes.','A inauguração oficial só acontece em 29 de abril de 1924.','[Na cidade real o palácio fica do outro lado do Tamanduateí. No jogo ele está deste lado do rio para caber no mapa.]'],__jm:1};foto(o,'JM22_palacio_industrias',8,6);objects.push(o);}
+      /* --- parque: trecho ainda sem jardim e placa das lavadeiras --- */
+      rel.semJardim={x0:130,x1:139,y0:62,y1:67};
+      if(typeof drawSign==='function'&&!ocp(144,53)&&!objects.some(o=>o.id==='jm_dpLav'))objects.push({id:'jm_dpLav',scene:S,x:144,y:53,w:1,h:1,draw:drawSign,name:'Placa',text:['Antes do parque, lavadeiras lavavam roupa nesta beira do Tamanduateí e estendiam as peças no capim para quarar.','Com o rio posto no canal e a várzea transformada em jardim, esse trabalho foi sendo empurrado para longe daqui. O parque novo ainda tem trechos sem jardim: a obra não acabou de todo.'],__jm:1});
+      /* --- loja documentada da 25 de Março --- */
+      const lj=objects.find(o=>o.scene===S&&/Elias Had/.test(o.name||''));if(lj){lj.name='Assad Abdalla & Nagib Salem — tecidos e armarinhos';lj.text=['Assad Abdalla e Nagib Salem vieram de Homs, na Síria, e chegaram ao Brasil em 1895. A firma deles funciona na Rua 25 de Março desde 1905.','Em 1910 abriram este sobrado novo: loja embaixo, moradia em cima, com as iniciais dos donos na fachada. Daqui saem tecidos e armarinhos para mascates e lojas dos bairros.','[Fonte: Stephanie G. de Andrade, Anais do Museu Paulista, 2021. O desenho da fachada é aproximado.]'];}
+      /* quem ficou dentro de prédio novo vai para o lugar livre mais perto */
+      for(const n of npcs){if(n.scene!==S)continue;const in1=n.x>=128&&n.x<=141&&n.y>=47&&n.y<=63,in2=n.x>=130&&n.x<=137&&n.y>=0&&n.y<=8;if(!in1&&!in2)continue;if(!ocp(n.x,n.y)&&/[pDde.,fV]/.test(M[n.y][n.x]))continue;
+        let ok=0;for(let r=1;r<9&&!ok;r++)for(let dy=-r;dy<=r&&!ok;dy++)for(let dx=-r;dx<=r&&!ok;dx++){const x=n.x+dx,y=n.y+dy;if(M[y]&&/[pd.]/.test(M[y][x]||'')&&!ocp(x,y)&&!npcs.some(q=>q!==n&&q.scene===S&&q.x===x&&q.y===y)){n.x=x;n.y=y;n.px=x*16;n.py=y*16;ok=1;}}}
+      rel.mercadoVelho=1;}}catch(e){console.warn('Mercado Velho JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
@@ -20633,6 +20680,16 @@ window.__paulista82Ready=Promise.all(ready);
               if(m<.26)c=m>.2?'#b39f6c':saibro(px,py);else if(ch==='W')c=grama(px,py);}
             if(c){g.fillStyle=c;g.fillRect(px,py,1,1);}}}
       }catch(e){console.warn('parque Dom Pedro pintura JM',e);}
+      try{const MP=window.__centro22.M,h3=(a,b)=>{let n=(a*374761393+b*668265263)|0;n=(n^(n>>>13))*1274126177|0;return (n^(n>>>16))>>>0;};
+        const W=rel.paredao;if(W)for(let y=W.y0;y<=W.y1;y++){if(MP[y][128]!=='C'||MP[y][129]!=='C')continue;const Y=y*16,X=128*16;
+          for(let j=0;j<16;j++)for(let i=0;i<32;i++){let c;if(i<9){const q=h3(X+i,Y+j)%100;c=q<6?'#86ab58':q<12?'#5c8440':'#74a04e';}
+            else if(i<13)c=((Y+j)%8<2)?'#d8d2c2':(i===9||i===12?'#8f8a7c':'#bdb7a6');
+            else{const bj=(Y+j)%6,bi=(i+((((Y+j)/6)|0)%2?4:0))%9;c=(bj===0||bi===0)?'#6f6a60':(h3((X+i)>>1,(Y+j)>>1)%7===0?'#a39d8f':'#8f8a7e');if(i>28)c='#5e5a52';}
+            g.fillStyle=c;g.fillRect(X+i,Y+j,1,1);}}
+        const J=rel.semJardim;if(J)for(let y=J.y0;y<=J.y1;y++)for(let x=J.x0;x<=J.x1;x++){if(MP[y][x]!=='V')continue;const X=x*16,Y=y*16;
+          for(let j=0;j<16;j++)for(let i=0;i<16;i++){const q=h3(X+i,Y+j)%100,q2=h3((X+i)>>2,(Y+j)>>2)%10;g.fillStyle=q<6?'#9c8254':q<12?'#c9b07c':q2<2?'#8fa35a':'#b79b68';g.fillRect(X+i,Y+j,1,1);}
+          if(h3(x*3,y*7)%4===0){g.fillStyle='#6b4a2a';g.fillRect(X+8,Y+4,1,9);g.fillStyle='#5f9a3a';g.fillRect(X+6,Y+3,5,3);g.fillStyle='#86bd52';g.fillRect(X+7,Y+2,2,2);}}
+      }catch(e){console.warn('paredao e trecho sem jardim JM',e);}
     }catch(e){console.warn('calcada JM',e);}};}
   let n=0;const tenta=()=>{try{if(roda()||++n>20)return;}catch(e){console.warn('quadra de teste JM',e);return;}setTimeout(tenta,700);};
   setTimeout(tenta,3600);
