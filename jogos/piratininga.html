@@ -17990,7 +17990,7 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
       if(cur!=='sp22'||!dentro(player)||pertoFica(player.x,player.y)){ini0=true;return;}ini0=true;const p=[104,66]; /* v113: começa na frente da Catedral da Sé */let q=null;for(let r=0;r<14&&!q;r++)for(let b=p[1]-r;b<=p[1]+r&&!q;b++)for(let a=p[0]-r;a<=p[0]+r&&!q;a++)if(naRede(a,b)&&!ocup(a,b)&&!naSaida(a,b))q=[a,b];
       if(q){setScene(S);player.x=q[0];player.y=q[1];player.px=q[0]*T;player.py=q[1]*T;try{reveal(q[0],q[1]);}catch(_){}}}catch(_){}},250);
   /* 7) missões e roteiro apontam para o lugar novo das coisas que mudaram */
-  const acerta=()=>{try{const foi=id=>objects.some(o=>o.scene===S&&o.id===id);const tr=s=>{const m=/^o:sp22\/(.+)$/.exec(s||'');return m&&foi(m[1])?'o:'+S+'/'+m[1]:s;};rel.missoes=rel.missoes||0;
+  const acerta=()=>{try{try{QT;}catch(_){return;} /* v223: missões ainda não existem? espera a próxima vez (antes dava o aviso 'liga missoes') */const foi=id=>objects.some(o=>o.scene===S&&o.id===id);const tr=s=>{const m=/^o:sp22\/(.+)$/.exec(s||'');return m&&foi(m[1])?'o:'+S+'/'+m[1]:s;};rel.missoes=rel.missoes||0;
     for(const k in QT){const q=QT[k];const g=tr(q.giver);if(g!==q.giver){q.giver=g;rel.missoes++;}if(q.steps)q.steps=q.steps.map(s=>{const n=tr(s);if(n!==s)rel.missoes++;return n;});}
     if(typeof ROTEIRO!=='undefined'&&ROTEIRO[4])for(const p of ROTEIRO[4]){if(p.sc==='sp22'&&p.obj&&foi(p.obj)){p.sc=S;rel.roteiro=(rel.roteiro||0)+1;}}}catch(e){console.warn('liga missoes',e);}};
   acerta();setTimeout(acerta,1500);setTimeout(acerta,5000);
@@ -23344,6 +23344,11 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   }catch(_){}return r;};
   setTimeout(()=>{try{updHUD();updQuest();}catch(_){}},800);
 }catch(e){console.warn('v221 objetivo único',e);}})();
+/* ===== v223 — MISSÕES DE 1922 LIGADAS NA HORA CERTA =====
+   Pedido do professor (21/11/2026). O ajudante "acerta" do centro de 1922 (leva missões e roteiro para os prédios
+   do centro novo) era chamado também antes de as missões existirem e deixava o aviso "liga missoes" no console.
+   Agora, nessas vezes, ele só espera: a linha dele ganhou uma conferência marcada "v223". As chamadas de depois
+   (1,5 s e 5 s) continuam fazendo o trabalho, como antes. Nenhum outro comportamento mudou. */
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
