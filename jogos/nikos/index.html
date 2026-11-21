@@ -2766,7 +2766,7 @@ function drawMap(){
   mc.fillStyle='rgba(234,163,106,.16)';mc.fillRect(MX(-27),MZ(-26),54*1.7,72*1.7);
   mc.font='bold 22px Alegreya Sans, sans-serif';mc.textAlign='center';mc.fillStyle='#f4e7d3';
   mc.fillText('Ágora',MX(0),MZ(36));mc.fillText('Acrópole',MX(ACRO.x),MZ(ACRO.z)+8);mc.fillText('Pnyx',MX(PNYX.x),MZ(PNYX.z)+8);
-  for(const p of PLACES){mc.fillStyle=p.seen?'#9fae5c':'#eaa36a';mc.beginPath();mc.arc(MX(p.x),MZ(p.z),5,0,7);mc.fill();}
+  for(const p of PLACES){if(!placeShown(p))continue;mc.fillStyle=p.seen?'#9fae5c':'#eaa36a';mc.beginPath();mc.arc(MX(p.x),MZ(p.z),5,0,7);mc.fill();}
   const t=target();if(t){mc.strokeStyle='#fff';mc.lineWidth=3;mc.beginPath();mc.arc(MX(t[0]),MZ(t[1]),16+Math.sin(performance.now()/300)*4,0,7);mc.stroke();}
   mc.save();mc.translate(MX(P.x),MZ(P.z));mc.rotate(-P.a+Math.PI);mc.fillStyle='#fff';mc.strokeStyle='#1b130e';mc.lineWidth=3;
   mc.beginPath();mc.moveTo(0,-14);mc.lineTo(10,10);mc.lineTo(0,5);mc.lineTo(-10,10);mc.closePath();mc.stroke();mc.fill();mc.restore();
@@ -2917,7 +2917,7 @@ function tolosDialog(){S.gov.tolos=1;renderTasks();sceneDialog([
   ()=>dlg('Um problema do mercado','Os pesos oficiais','<p>Um comerciante entra reclamando: o <b>peixeiro</b> da ágora lhe vendeu peixe com um peso "leve" demais. Um prítane vai até a prateleira onde ficam os <b>pesos e medidas oficiais</b> da cidade, guardados aqui na Tólos, e manda um fiscal <b>conferir a balança do peixeiro</b>. Se estiver errada: multa.</p>'),
   back=>dlg('Hora de ir','Abrir a assembleia','<p>O chefe dos prítanes do dia se levanta: hoje é <b>dia de assembleia</b>, e são os prítanes que a <b>convocam e presidem</b>. Os 50 saem em direção à colina da Pnyx. Nikos vai atrás deles.</p>',[{t:'Voltar a passear ▸',main:true,f:back}]),
 ]);}
-function trialDialog(){sceneDialog([
+function trialDialog(){S.julg=true;sceneDialog([
   ()=>dlg('Heliaia · tribunal do povo','O caso de hoje','<p>O arauto anuncia: "<b>Um fazendeiro é acusado de ter arrancado uma oliveira sagrada de Atena</b> do seu terreno, para vender a madeira." As oliveiras sagradas pertencem à deusa. Se for condenado, ele será <b>expulso de Atenas</b> e perderá todos os bens.</p><p>Nos bancos, <b>501 jurados</b> sorteados hoje de manhã. Nenhum é juiz de profissão: são cidadãos comuns, como Nikos.</p>'),
   ()=>{clock(true,25);dlg('Fala o acusador','Com o relógio de água correndo','<p>"Jurados! No terreno dele havia uma oliveira sagrada, cercada por uma grade. Hoje só há um <b>buraco no chão</b>. Ele cortou a árvore da deusa para ganhar dinheiro com a madeira!"</p><p>A água escorre do pote de cima para o de baixo. <b>Quando acabar, ele tem de parar de falar.</b></p>');},
   ()=>{clock(true,25);dlg('Fala o acusado','Sem advogado, por si mesmo','<p>"Jurados, comprei esse terreno há três anos. <b>Já não havia oliveira ali</b>: um raio a derrubou durante a guerra, antes de mim. Perguntem aos vizinhos! Por que eu arriscaria perder tudo o que tenho por um pouco de lenha?"</p>');},
@@ -3491,7 +3491,7 @@ function spk(f,name){if(theatreLabel){scene.remove(theatreLabel);theatreLabel=nu
 function endPlay(){spk(null);S.inTheatre=false;hideDlg();P.locked=false;player.g.visible=true;
   P.x=TEATRO.cx-6.2;P.z=TEATRO.cz-2.5;P.a=Math.PI/2;collide();$('joy').hidden=false;}
 function watchPlay(){
-  S.inTheatre=true;P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;markDiscovery('peca');
+  S.inTheatre=true;S.peca=true;P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;markDiscovery('peca');
   P.x=TEATRO.cx-1.3;P.z=TEATRO.cz-7.6;P.a=0;
   const {hecuba:He,taltibio:Ta,andromaca:An}=TEATRO;
   runSeq([
@@ -5160,9 +5160,52 @@ $('btnLost').before(btnBook);
 // ---------- ajudas de diálogo ----------
 function lockUI(focus,lift=0){P.locked=true;$('card').hidden=true;nearPlace=null;$('joy').hidden=true;if(focus)talkCam(focus,lift);}
 // câmera de conversa: fica entre Nikos e quem fala, olhando para o rosto
-function talkCam(f,lift=0){let dx=P.x-f[0],dz=P.z-f[1],d=Math.hypot(dx,dz);if(d<.3){dx=Math.sin(P.a+Math.PI);dz=Math.cos(P.a+Math.PI);d=1;}dx/=d;dz/=d;
-  const cx=f[0]+dx*3.4-dz*1.1,cz=f[1]+dz*3.4+dx*1.1,fy=H(f[0],f[1])+lift;
-  ROWCAM.want.set(cx,Math.max(fy,H(cx,cz)+lift)+2.0,cz);ROWCAM.look.set(f[0],fy+1.35,f[1]);S.inRow=true;player.g.visible=false;}
+/* ===== câmera das conversas que mostra quem fala (pedido do professor, 21/11/2026) =====
+   Antes a câmera ia sempre para o mesmo lado e às vezes ficava numa parede, numa coluna ou atrás de alguém.
+   Agora ela procura, em volta de quem fala, um lugar de onde o rosto aparece sem nada na frente. */
+const TALK_RAY=new THREE.Raycaster(),TALK_SPH=new THREE.Sphere();
+function talkObstacles(T,R){const list=[];
+  scene.traverseVisible(o=>{if(!o.isMesh||o.isSprite||o===beacon)return;
+    let p=o;while(p){if(p===player.g||p===arrow)return;p=p.parent;}
+    const m=o.material;if(m&&!Array.isArray(m)&&(m.side===THREE.BackSide||(m.transparent&&m.opacity<.5)))return;
+    const g=o.geometry;if(!g||!g.attributes||!g.attributes.position)return;
+    const tris=(g.index?g.index.count:g.attributes.position.count)/3;if(tris>20000)return;   // blocos grandes: as paredes deles já estão nas colisões
+    if(!g.boundingSphere)g.computeBoundingSphere();
+    TALK_SPH.copy(g.boundingSphere).applyMatrix4(o.matrixWorld);
+    if(!o.isInstancedMesh){if(TALK_SPH.radius>300)return;if(TALK_SPH.center.distanceTo(T)-TALK_SPH.radius>R)return;}
+    list.push(o);});
+  return list;}
+// um ponto do chão está dentro de uma parede, casa, coluna ou muro do jogo?
+function talkInside(x,z,cols){for(const c of cols){
+    if(c.seg){const[ax,az,bx,bz]=c.seg,vx=bx-ax,vz=bz-az;let t=((x-ax)*vx+(z-az)*vz)/(vx*vx+vz*vz);t=Math.max(0,Math.min(1,t));if(Math.hypot(x-ax-vx*t,z-az-vz*t)<c.r+.15)return true;continue;}
+    if(c.r){if(Math.hypot(x-c.x,z-c.z)<c.r+.1)return true;continue;}
+    const dx=x-c.x,dz=z-c.z,a=c.rot||0,cs=Math.cos(a),sn=Math.sin(a);if(Math.abs(dx*cs-dz*sn)<c.hw+.1&&Math.abs(dx*sn+dz*cs)<c.hd+.1)return true;}
+  return false;}
+function talkClear(T,C,obs,lift,cols,figs){const dir=C.clone().sub(T),len=dir.length();dir.normalize();
+  for(let k=1;k<=12;k++){const q=T.clone().addScaledVector(dir,len*k/12);
+    if(q.y<H(q.x,q.z)+lift+.25)return false;                                   // morro no caminho
+    if(Math.hypot(q.x-T.x,q.z-T.z)>.6&&talkInside(q.x,q.z,cols))return false;  // parede, casa ou coluna no caminho
+    for(const f of figs)if(Math.hypot(q.x-f[0],q.z-f[1])<.4&&q.y<f[2]+1.95)return false;}  // outra pessoa na frente
+  TALK_RAY.set(T,dir);TALK_RAY.near=.45;TALK_RAY.far=len;TALK_RAY.camera=camera;
+  try{return TALK_RAY.intersectObjects(obs,false).length===0;}catch(e){return true;}}
+function talkCam(f,lift=0){
+  // se o ponto da conversa está ao lado de uma pessoa, a câmera mira essa pessoa
+  // e, se a pessoa está de frente para algum lado, a câmera fica na frente dela, para mostrar o rosto
+  let face=null;{let bd=lift?1.2:2.5;for(const g of FIGS){if(g===player||(g.hide&&!g.g.visible))continue;const e=g.g.matrixWorld.elements,d=Math.hypot(e[12]-f[0],e[14]-f[1]);if(d<bd){bd=d;f=[e[12],e[14]];face=g.g.rotation.y;}}}
+  const fy=H(f[0],f[1])+lift,T=new THREE.Vector3(f[0],fy+1.5,f[1]);
+  let a0=Math.atan2(P.x-f[0],P.z-f[1]);if(Math.hypot(P.x-f[0],P.z-f[1])<.3)a0=P.a+Math.PI;
+  if(face!==null)a0=face;
+  let C=null;
+  try{scene.updateMatrixWorld();const obs=talkObstacles(T,6);
+    const near=(x,z,r)=>Math.hypot(x-f[0],z-f[1])<r;
+    const cols=colliders.filter(c=>c.seg?true:near(c.x,c.z,(c.r||Math.max(c.hw||0,c.hd||0))+6));
+    const figs=[];for(const g of FIGS){if(g===player||!g.g.visible)continue;const e=g.g.matrixWorld.elements;if(near(e[12],e[14],6)&&!near(e[12],e[14],.6))figs.push([e[12],e[14],e[13]]);}
+    outer:for(const dist of[3.4,2.6,1.9])for(const da of[.3,-.3,.75,-.75,1.2,-1.2,1.7,-1.7,2.3,-2.3,2.9,-2.9]){
+      const a=a0+da,cx=f[0]+Math.sin(a)*dist,cz=f[1]+Math.cos(a)*dist,c=new THREE.Vector3(cx,Math.max(fy,H(cx,cz)+lift)+1.9,cz);
+      if(talkClear(T,c,obs,lift,cols,figs)){C=c;break outer;}}
+  }catch(e){console.warn('câmera da conversa',e);}
+  if(!C){const dx=Math.sin(a0),dz=Math.cos(a0),cx=f[0]+dx*3.4-dz*1.1,cz=f[1]+dz*3.4+dx*1.1;C=new THREE.Vector3(cx,Math.max(fy,H(cx,cz)+lift)+2.0,cz);}
+  ROWCAM.want.copy(C);ROWCAM.look.set(f[0],fy+.95,f[1]);S.inRow=true;player.g.visible=false;}   // olhar um pouco abaixo do rosto: o rosto fica acima do quadro de texto
 function freeUI(){hideDlg();if(!S.inParth){S.inRow=false;player.g.visible=true;}P.locked=false;$('joy').hidden=false;canvas.focus();}
 function setBtns(list){const B=$('dBtns');B.innerHTML='';list.forEach(b=>{const e=document.createElement('button');e.textContent=b.t;if(b.ghost)e.className='ghost';if(b.main)e.dataset.main='1';e.onclick=b.f;B.appendChild(e);});}
 // perguntas: alternativas embaralhadas; errar dá dica e nova tentativa, sem perder nada
@@ -5354,7 +5397,14 @@ function renderDock(){const el=$('guideDock');if(!MIS.on)return;const st=MIS.ste
     const y=H(P.x,P.z);camPos.set(P.x-Math.sin(P.a)*7.5,y+3.6,P.z-Math.cos(P.a)*7.5);camLook.set(P.x,y+1.7,P.z);canvas.focus();};
   row.append(go,bk);$('guideContinue').after(row);}
 // ---------- a cada quadro ----------
-EXTRA_TICKS.push(()=>{if(!MIS.on){beacon.visible=arrow.visible=false;return;}
+EXTRA_TICKS.push(()=>{if(!MIS.on){
+    // exploração livre: a mesma luz dourada leva ao lugar escolhido em "Grandes momentos" ou em "Lugares"
+    const t=chosenDestination&&!P.locked&&$('dlg').hidden&&$('start').hidden?chosenDestination.at:null;
+    if(!t){beacon.visible=arrow.visible=false;return;}
+    const d=Math.hypot(P.x-t[0],P.z-t[1]);
+    if(d<6){chosenDestination=null;beacon.visible=arrow.visible=false;toast('Você chegou!');return;}
+    beacon.visible=!S.inParth;beacon.position.set(t[0],H(t[0],t[1])+13,t[1]);beacon.material.opacity=.16+Math.sin(t0*3)*.06;
+    arrow.visible=d>7&&!S.inParth;arrow.position.set(P.x,H(P.x,P.z)+2.75+Math.sin(t0*4)*.06,P.z);arrow.rotation.y=Math.atan2(t[0]-P.x,t[1]-P.z);return;}
   const busy=!$('dlg').hidden||P.locked||!$('start').hidden;
   $('guideDock').hidden=busy||!MIS.step()||!book.hidden;
   const st=MIS.step(),t=st&&!busy?misTarget():null;
@@ -5393,6 +5443,83 @@ function begin(skip){
   camPos.set(P.x,H(P.x,P.z)+20,P.z+25);camLook.set(P.x,H(P.x,P.z),P.z);
   if(GUIDE_MODE){startGuided();}else if(skip)startAssembly();else canvas.focus();
 }
+
+/* ===== grandes momentos da exploração livre e telas de celular (pedido do professor, 21/11/2026) =====
+   1) Exploração livre com rumo: seis grandes momentos do dia, sem ordem e sem obrigação, cada um com "Mostrar o caminho".
+      Os círculos no chão e os pontos do minimapa aparecem só perto de Nikos (e nos lugares dos grandes momentos).
+   2) Celular: a abertura rola; o painel da esquerda começa recolhido; os botões da direita ficam num "☰ Mais";
+      o cartão rola com os botões sempre à vista; sem "(E)" nos botões de toque. */
+const placeAt=id=>()=>{const p=PLACES.find(q=>q.id===id);return p?[p.x,p.z]:null;};
+const MOMENTOS=[
+ {ico:'🙋',t:'Votar na assembleia',onde:'na colina da Pnyx',done:()=>!!S.assembly,at:()=>[PNYX.x,PNYX.z-6],place:null},
+ {ico:'⚖️',t:'Assistir a um julgamento',onde:'no tribunal, a Heliaia, na ágora',done:()=>!!S.julg,at:placeAt('julgamento'),place:'julgamento'},
+ {ico:'🎭',t:'Ver "As Troianas" no teatro',onde:'no teatro, ao pé da Acrópole',done:()=>!!S.peca,at:placeAt('peca'),place:'peca'},
+ {ico:'🚣',t:'Remar numa trirreme',onde:'no porto do Pireu',done:()=>!!EXTRA.remo,at:placeAt('trirreme'),place:'trirreme'},
+ {ico:'🏃',t:'Correr em Olímpia',onde:'pelo portal azul da ágora',done:()=>!!EXTRA.olimpiadas,at:placeAt('portal_olimpia'),place:'portal_olimpia'},
+ {ico:'🍲',t:'Jantar com a família',onde:'na casa de Nikos, no Cerâmico',done:()=>!!EXTRA.jantar,at:placeAt('jantar'),place:'jantar'},
+];
+const MOM_PLACES=new Set(MOMENTOS.map(m=>m.place).filter(Boolean));
+function placeShown(p){return Math.hypot(P.x-p.x,P.z-p.z)<40||(!MIS.on&&MOM_PLACES.has(p.id));}
+const isSmall=()=>matchMedia('(max-width:700px), (max-height:520px)').matches;
+const isTouch=()=>matchMedia('(pointer:coarse)').matches;
+{ const st=document.createElement('style');st.textContent=`
+#start{overflow-y:auto;place-items:start center}
+#start>.box{margin:auto}
+#momBtn{display:block;width:100%;margin:6px 0 2px;min-height:44px;font-size:17px;border:2px solid var(--olive);background:rgba(159,174,92,.16);color:var(--bone)}
+#hud.min #momBtn{width:auto;display:inline-block;margin:6px 0 0;padding:6px 10px}
+.mom-list{display:grid;gap:8px;margin:10px 0}
+.mom{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;padding:8px 10px;border:2px solid #5a3f2e;border-radius:8px;background:rgba(0,0,0,.25)}
+.mom.ok{border-color:var(--olive)}
+.mom .i{font-size:30px;text-align:center;font-family:"Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.mom b{display:block;font-size:19px}.mom small{display:block;font-size:15px;opacity:.85}
+.mom button{min-height:44px;font-size:15px;padding:6px 10px}
+#toolsToggle{display:none}
+#cardBtns{position:sticky;bottom:0;background:inherit;padding-bottom:4px}
+#guideDock .mis-row button{width:auto!important;min-width:0}
+#guideDock .mis-row button:first-child{flex:1}
+@media (max-width:700px),(max-height:520px){
+  #toolsBar #toolsToggle{display:block;min-height:44px;font-size:16px;font-weight:700}
+  #toolsBar.fold>button:not(#toolsToggle):not(#btnLost):not(#btnBook){display:none}
+  #toolsBar button{min-height:42px}
+  #hud.min .lbl{font-size:13px;letter-spacing:.06em}
+  #hud.min{max-width:calc(100vw - 150px - env(safe-area-inset-right,0px));box-sizing:border-box}
+  #hud.min #momBtn{font-size:15px;padding:5px 8px}
+  #card:not([hidden]){display:flex;flex-direction:column}
+  #card #cardText{overflow-y:auto;min-height:0}
+}
+@media (max-width:540px){.mom{grid-template-columns:34px 1fr}.mom button{grid-column:1 / -1}}
+@media (max-height:520px){
+  #map{width:110px!important;height:110px!important}
+  #toolsBar{top:calc(130px + env(safe-area-inset-top,0px))!important}
+  #card:not([hidden]){width:min(520px,calc(100vw - 195px - env(safe-area-inset-right,0px)))!important;max-height:calc(100dvh - 140px)!important;bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;right:calc(125px + env(safe-area-inset-right,0px))!important}
+}`;document.head.appendChild(st);}
+// botão dos grandes momentos, logo abaixo do título do painel
+const momBtn=document.createElement('button');momBtn.id='momBtn';momBtn.className='ghost';
+document.querySelector('#hud .lbl').after(momBtn);
+function momCount(){return MOMENTOS.filter(m=>m.done()).length;}
+function renderMomBtn(){const t='⭐ Grandes momentos: '+momCount()+' de '+MOMENTOS.length;if(momBtn.textContent!==t)momBtn.textContent=t;momBtn.hidden=MIS.on;}
+function showMomentos(){
+  showOverlay('Grandes momentos do dia','<p>Seis coisas que valem a visita. <b>Não há ordem nem obrigação</b>: escolha uma, siga a luz dourada e continue explorando no caminho.</p><div class="mom-list">'+
+    MOMENTOS.map((m,i)=>'<div class="mom'+(m.done()?' ok':'')+'"><span class="i">'+m.ico+'</span><span><b>'+(m.done()?'✓ ':'')+m.t+'</b><small>'+m.onde+'</small></span><button class="ghost" data-mom="'+i+'">Mostrar o caminho</button></div>').join('')+'</div>');
+  document.querySelectorAll('[data-mom]').forEach(b=>b.onclick=()=>{const m=MOMENTOS[+b.dataset.mom],at=m.at();if(!at)return;
+    chosenDestination={t:m.t,at};closeOverlay();toast('Siga a luz dourada: '+m.t+'.');});}
+momBtn.onclick=showMomentos;
+// botão "☰ Mais" que guarda os botões da direita no celular
+const toolsToggle=document.createElement('button');toolsToggle.id='toolsToggle';toolsToggle.textContent='☰ Mais';toolsToggle.setAttribute('aria-expanded','false');
+$('toolsBar').prepend(toolsToggle);
+toolsToggle.onclick=()=>{const tb=$('toolsBar'),open=tb.classList.toggle('fold')===false;toolsToggle.textContent=open?'✕ Fechar':'☰ Mais';toolsToggle.setAttribute('aria-expanded',String(open));};
+$('toolsBar').addEventListener('click',e=>{if(e.target!==toolsToggle&&e.target.tagName==='BUTTON'&&isSmall()&&!$('toolsBar').classList.contains('fold')){$('toolsBar').classList.add('fold');toolsToggle.textContent='☰ Mais';toolsToggle.setAttribute('aria-expanded','false');}});
+// no toque, os botões não mostram a tecla (E) do computador
+refreshCard=(orig=>function(){orig();if(isTouch())$('cardBtns').querySelectorAll('button').forEach(b=>{if(b.textContent.includes(' (E)'))b.textContent=b.textContent.replace(' (E)','');});})(refreshCard);
+// ao começar: título certo no Modo Missão, painéis recolhidos em tela pequena e uma dica dos grandes momentos
+begin=(orig=>function(skip){orig(skip);
+  document.querySelector('#hud .lbl').textContent=MIS.on?'Modo Missão · Livro dos Deuses':'Atenas · visite como quiser';
+  renderMomBtn();
+  if(isSmall()){setMin('hud',true);$('toolsBar').classList.add('fold');}
+  if(!MIS.on&&!skip)setTimeout(()=>{if(!P.locked&&$('dlg').hidden)toast('Dica: toque em ⭐ Grandes momentos para escolher o que ver.');},2500);
+})(begin);
+// a cada instante: contador dos momentos e círculos só perto de Nikos
+{ let acc=0;EXTRA_TICKS.push(dt=>{acc+=dt;if(acc<.3)return;acc=0;renderMomBtn();for(const p of PLACES)if(p.ring)p.ring.visible=placeShown(p);}); }
 })();
 </script>
 
