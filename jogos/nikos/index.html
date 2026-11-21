@@ -2966,6 +2966,31 @@ function collide(){
   if(H(P.x,P.z)<-0.75){if(collide.ok){P.x=collide.ok[0];P.z=collide.ok[1];}}else collide.ok=[P.x,P.z];
 }
 
+/* ===== limite do mundo — o Nikos não anda até o fim do mundo (pedido do professor, 21/11/2026) ===== */
+// O Nikos só anda onde o jogo tem coisa: a cidade e uma faixa de campo em volta, os campos,
+// a estrada entre as Muralhas Longas até o Pireu e o território de Olímpia. Fora disso, a cerca para ele.
+const WORLD={toastT:0};
+function worldAtenas(x,z){
+  if(x<-178&&z>-118)return false;                                    // daqui para lá é Olímpia: só pelo portal
+  if(Math.hypot(x/195,(z+40)/170)<=1)return true;                    // a cidade, as muralhas e o campo logo em volta
+  for(const f of FIELDS)if(Math.hypot(x-f.x,z-f.z)<=34)return true;  // os campos de olival, trigo e vinha
+  for(const p of PLACES)if(Math.hypot(x-p.x,z-p.z)<=30)return true;  // cada lugar com cartão no mapa
+  // estrada do Pireu, entre as duas Muralhas Longas
+  {const ax=-146,az=-95,bx=-312,bz=-322,vx=bx-ax,vz=bz-az;let t=((x-ax)*vx+(z-az)*vz)/(vx*vx+vz*vz);t=Math.max(0,Math.min(1,t));
+   if(Math.hypot(x-ax-vx*t,z-az-vz*t)<=40)return true;}
+  return Math.hypot(x+300,z+305)<=55;                                // o porto do Pireu
+}
+function worldOlimpia(x,z){return x<-182&&x>-336&&z>-112&&z<75;}      // estádio, hipódromo, templo de Zeus
+function inWorld(x,z){return worldAtenas(x,z)||worldOlimpia(x,z);}
+// chamada depois de cada passo: se o passo sai do mundo, o Nikos desliza pela cerca ou fica parado
+function worldFence(lx,lz){
+  if(inWorld(P.x,P.z)||!inWorld(lx,lz))return;                       // dentro, ou já estava fora (teleporte): não mexe
+  const nx=P.x,nz=P.z;
+  if(inWorld(nx,lz)){P.z=lz;}else if(inWorld(lx,nz)){P.x=lx;}else{P.x=lx;P.z=lz;}
+  const now=performance.now();
+  if(now-WORLD.toastT>4000){WORLD.toastT=now;toast('Daqui para a frente não há nada. Volte para a cidade.');}
+}
+
 // ---------- laço ----------
 let VISUAL_UPGRADE=null;
 try{if(window.AtenasUpgrade&&typeof window.AtenasUpgrade.init==='function'){
@@ -3030,7 +3055,7 @@ function step(now){
     fwd=Math.max(-1,Math.min(1,fwd));turn=Math.max(-1,Math.min(1,turn));
     const run=keys.ShiftLeft||keys.ShiftRight||Math.hypot(joy.x,joy.y)>.95;
     P.a+=turn*dt*2.3+CAMCTL.dragA;CAMCTL.dragA=0;const v=fwd*(run?11:6)*(fwd<0?.5:1),vs=side*(run?8:4.5);
-    const lx=P.x,lz=P.z;P.x+=Math.sin(P.a)*v*dt-Math.cos(P.a)*vs*dt;P.z+=Math.cos(P.a)*v*dt+Math.sin(P.a)*vs*dt;collide();speed=Math.max(Math.abs(v),Math.abs(vs));if(!isFinite(P.x)||!isFinite(P.z)){P.x=isFinite(lx)?lx:-24;P.z=isFinite(lz)?lz:62;}
+    const lx=P.x,lz=P.z;P.x+=Math.sin(P.a)*v*dt-Math.cos(P.a)*vs*dt;P.z+=Math.cos(P.a)*v*dt+Math.sin(P.a)*vs*dt;collide();worldFence(lx,lz);speed=Math.max(Math.abs(v),Math.abs(vs));if(!isFinite(P.x)||!isFinite(P.z)){P.x=isFinite(lx)?lx:-24;P.z=isFinite(lz)?lz:62;}
     let best=null,bd=4.5;for(const p of PLACES){const d=Math.hypot(P.x-p.x,P.z-p.z);if(d<bd){bd=d;best=p;}}
     if(quiet&&Math.hypot(P.x-quiet.x,P.z-quiet.z)>6)quiet=null;
     if(best&&best===quiet)best=null;
