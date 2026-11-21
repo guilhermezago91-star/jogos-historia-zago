@@ -373,7 +373,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=fc8eb325","kb":282,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=f4ea5e07","kb":1592,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=0275149a","kb":6777,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=5c00e677","kb":993,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=fc8eb325","kb":282,"m":2},{"f":"pac_e23.js?v=40d89377","kb":424,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=f4ea5e07","kb":1592,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=e8f49438","kb":6929,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -22834,7 +22834,7 @@ window.__paulista82Ready=Promise.all(ready);
   const T={
    /* mulheres do povo */
    donaVila:MP+'|0',lavadeiraC:MP+'|1',moradoraLapa:MP+'|2',bairro22_7:MP+'|3',bairro22_17:MP+'|0',bairro22_23:MP+'|4',
-   lavadeiraBix:MP+'|1',zo22n_141:MP+'|2',br_maeCarta:MP+'|3',br_fregA:MP+'|5',br_fregB:MP+'|1',compradoraMerc22:MP+'|2',
+   lavadeiraBix:'lavadeiraNegra22|1',zo22n_141:MP+'|2',br_maeCarta:MP+'|3',br_fregA:MP+'|5',br_fregB:MP+'|1',compradoraMerc22:MP+'|2',
    devotaSG22:MP+'|4',lotes22_3:MP+'|0',lotes22_7:MP+'|4',porteira22_1:MP+'|1',porteira22_4:MP+'|3',porteira22_12:MP+'|2',
    moocaS22n_4:MP+'|5',empregadaRica22:MP+'|0',donaHorta22:MP+'|3',mooca22n_3:MP+'|1',passanteS2:MP+'|1',nonna:MP+'|4',
    /* senhoras ricas */
@@ -23349,6 +23349,63 @@ window.__DOCS22={
   const avis=new Set();setInterval(()=>{try{if(era!==4)return;for(const id of IDS){const it=item(id);if(it&&it.got&&!avis.has(id)){avis.add(id);if(!MJ.docs.has(id)&&started)setTimeout(()=>toast('Documento novo! Examine na Mochila → Museu'),1800);}}}catch(_){}},1500);
   setTimeout(()=>{try{for(const id of IDS){const it=item(id);if(it&&it.got)avis.add(id);}}catch(_){}},1200);
 }catch(e){console.warn('museu da mochila',e);}})();
+
+/* ===== v228 — SÃO PAULO NEGRA EM 1922: JOSÉ CORREIA LEITE, SEU BENEDITO, DONA SEBASTIANA, TIA OLÍMPIA, LUZIA E LINO DO KOSMOS + MISSÃO "O JORNAL DA NOSSA GENTE" (pedido do professor, 21/11/2026) =====
+   Personagens negros com nome, boneco próprio (Canva) e retrato. José Correia Leite é real (nasceu em 1900 e fundou O Clarim d'Alvorada em 1924);
+   os outros são ficção baseada na história: o Grêmio Kosmos (1908), a imprensa negra (O Menelick, O Alfinete, A Liberdade),
+   a Igreja do Rosário dos Homens Pretos derrubada em 1903 e reerguida no Largo do Paiçandu em 1906, as lavadeiras do Saracura.
+   Folhas novas no arte_1922.js: N88_lavadeiraNegra22, N88_domesticaNegra22, N88_doceiraNegra22, N88_rapazTerno22, N88_carregIdoso22.
+   Só põe gente (1 quadradinho) em lugar livre, por último; não mexe em chão nem em prédio. */
+(function(){try{
+  const P=[
+   ['ng22_correia','sp22',[26,70],'rapazTerno22|0','José Correia Leite',
+    ["Meu nome é José Correia Leite. Nasci aqui em São Paulo, em 1900.","Os jornais grandes quase não falam da nossa gente. E quando falam, muitas vezes é para falar mal.","Já existem jornais nossos, como O Alfinete e A Liberdade. Um dia eu ainda faço mais um!"],
+    "José Correia Leite: jovem negro paulistano; em 1924 ajudou a fundar O Clarim d'Alvorada, um dos jornais mais importantes da imprensa negra."],
+   ['ng22_benedito','sp22',[106,61],'carregIdoso22|0','Seu Benedito, carregador da Luz',
+    ["Carrego mala e saco aqui na Estação da Luz faz mais de trinta anos.","Tenho as costas cansadas, mas a cabeça boa: lembro de tudo."],
+    'Seu Benedito: nasceu escravizado numa fazenda de café; depois da Abolição, sem terra e sem escola, virou carregador na Estação da Luz.'],
+   ['ng22_sebastiana','sp22',[76,108],'lavadeiraNegra22|0','Dona Sebastiana, lavadeira do Saracura',
+    ["Lavo roupa no córrego do Saracura desde menina.","A trouxa é pesada, mas é ela que põe comida na mesa."],
+    'Dona Sebastiana: lavadeira do Saracura, no Bexiga, bairro onde moravam muitas famílias negras.'],
+   ['ng22_olimpia','m_centro22',[10,42],'doceiraNegra22|0','Tia Olímpia, doceira do Rosário',
+    ["Olha a cocada, olha o pé de moleque!","Vendo doce aqui na porta da Igreja do Rosário dos Homens Pretos."],
+    'Tia Olímpia: doceira na porta da Igreja do Rosário dos Homens Pretos, no Largo do Paiçandu.'],
+   ['ng22_luzia','sp22',[45,80],'domesticaNegra22|0','Luzia, empregada doméstica',
+    ["Sou Luzia, tenho 17 anos. Trabalho de empregada num palacete aqui de Higienópolis.","Acordo antes de todo mundo e durmo no quartinho dos fundos. Folga, só no domingo à tarde.","No domingo eu vou ao baile do Grêmio Kosmos com as minhas amigas. Lá a gente é tratada com respeito."],
+    'Luzia: em 1922, o trabalho doméstico em casas de famílias ricas era o emprego mais comum das mulheres negras de São Paulo.'],
+   ['ng22_lino','sp22',[21,92],'rapazTerno22|2','Lino, sócio do Grêmio Kosmos',
+    ["Sou o Lino, sócio do Grêmio Kosmos, o maior clube negro de São Paulo. Foi fundado em 1908.","Nos clubes dos brancos a gente não entra. Então fizemos o nosso, com baile, música e festa.","Clube também é lugar de juntar forças: a gente ajuda quem precisa e conversa sobre os nossos direitos."],
+    'Grêmio Kosmos: fundado em 1908, era a maior associação negra de São Paulo; seus bailes reuniam muita gente.']];
+  /* a Lavadeira do Saracura que já existia ganha o boneco novo de lavadeira */
+  const troca={lavadeiraBix:'lavadeiraNegra22|1',maeBexiga:'lavadeiraNegra22|3'};
+  const poe=()=>{for(const [id,sc,[x0,y0],spr,nome,lines,diary] of P){if(npcs.find(n=>n.id===id))continue;const S=SCN[sc];if(!S||!S.map)continue;
+      const M=S.map,H=M.length,W=M[0].length;const ok=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y);
+      let p=null;for(let r=0;r<8&&!p;r++)for(let y=y0-r;y<=y0+r&&!p;y++)for(let x=x0-r;x<=x0+r&&!p;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))===r&&ok(x,y))p=[x,y];}
+      if(!p)continue;try{npcIn(sc,id,'colono',p[0],p[1],nome,lines,diary);}catch(e){continue;}const n=npcs.find(n=>n.id===id);if(n)n.spr='h22_n|'+spr;}
+    for(const [id,s] of Object.entries(troca)){const n=npcs.find(n=>n.id===id);if(n)n.spr='h22_n|'+s;}};
+  let tent=0;const tenta=()=>{try{poe();}catch(e){console.warn('negros 1922',e);}if(P.some(p=>!npcs.find(n=>n.id===p[0]))&&++tent<40)setTimeout(tenta,500);};
+  setTimeout(tenta,0);
+  const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);try{for(const [id,s] of Object.entries(troca)){const n=npcs.find(n=>n.id===id);if(n)n.spr='h22_n|'+s;}}catch(_){}return r;};
+
+  /* missão: o jornal da nossa gente */
+  const K='jornalNegro22';
+  Q[K]={era:4,title:'O jornal da nossa gente',where:'Fale com José Correia Leite, perto do jornaleiro da imprensa negra, no mapa dos bairros de 1922.',
+    steps:['Ouça a história de Seu Benedito, carregador da Estação da Luz','Ouça Dona Sebastiana, lavadeira do Saracura, no Bexiga','Ouça Tia Olímpia, na porta da Igreja do Rosário, no centro','Volte e conte tudo a José Correia Leite'],step:null,count:0,done:false};
+  if(!QE4.includes(K))QE4.push(K);(GIVER.ng22_correia=GIVER.ng22_correia||[]).push(K);
+  setTimeout(()=>{try{QT[K]={giver:'n:ng22_correia',steps:['n:ng22_benedito','n:ng22_sebastiana','n:ng22_olimpia','n:ng22_correia']};}catch(_){}},0);
+  const h0=questHook;questHook=function(n){const q=Q[K];if(q&&!q.done){
+    if(n.id==='ng22_correia'&&q.step===null)return{pages:["Me ajuda numa coisa? Quero juntar histórias da nossa gente para um jornal.","Converse com três pessoas: Seu Benedito, carregador da Estação da Luz; Dona Sebastiana, lavadeira do Saracura, no Bexiga; e Tia Olímpia, que vende doce na porta da Igreja do Rosário."],after:()=>qStart(K)};
+    if(n.id==='ng22_correia'&&q.step<3)return{only:true,pages:["Ainda faltam histórias. Siga a ordem: Seu Benedito, Dona Sebastiana e Tia Olímpia."]};
+    if(n.id==='ng22_benedito'&&q.step===0)return{only:true,pages:["Quer a minha história para o jornal? Então escuta.","Nasci escravizado, numa fazenda de café perto de Campinas. Tinha uns 28 anos no dia 13 de maio de 1888.","Livre, vim para São Paulo. Mas nas fábricas os patrões preferiam os imigrantes. Sobrou para mim carregar mala e saco aqui na estação.","Liberdade sem terra, sem escola e sem trabalho digno é liberdade pela metade. Escreve isso no seu jornal, moço."],after:()=>qNext(K)};
+    if(n.id==='ng22_sebastiana'&&q.step===1)return{only:true,pages:["Para o jornal do Correia? Pois anota.","Eu lavo a roupa das famílias ricas da Avenida Paulista aqui no córrego do Saracura. Subo e desço o morro com a trouxa na cabeça.","Aqui no Bexiga moram famílias negras desde o tempo da escravidão. Depois vieram os italianos, e hoje a gente vive junto, no mesmo morro.","Minha filha trabalha de empregada em Higienópolis. Só folga no domingo, e domingo é dia de baile no Kosmos!"],after:()=>qNext(K)};
+    if(n.id==='ng22_olimpia'&&q.step===2)return{only:true,pages:["Uma história para o jornal? Tenho uma boa.","A nossa igreja ficava em outro lugar: no Largo do Rosário, bem no meio da cidade. Em 1903 a prefeitura derrubou tudo para alargar o centro.","A irmandade recebeu este terreno aqui no Paiçandu e levantou a igreja nova em 1906. Tiraram a gente do centro, mas a fé e a festa continuam, com coroação de rei e rainha do Congo."],after:()=>qNext(K)};
+    if(n.id==='ng22_correia'&&q.step===3)return{only:true,pages:["Que histórias! A escravidão acabou, mas o racismo continua: no trabalho, na moradia, até na igreja que tiraram do centro.","Por isso a nossa gente tem os próprios jornais, os próprios clubes, os próprios bailes. É assim que a gente se informa, se encontra e se defende.","Esse jornal ainda vai sair. (Em 1924, José Correia Leite ajudou a fundar O Clarim d'Alvorada.)"],
+      after:()=>finishMission(K,'O jornal da nossa gente','Por que a comunidade negra de São Paulo criou jornais e clubes próprios nos anos 1920?',
+        ['Porque era excluída de muitos clubes e quase não aparecia nos grandes jornais, e queria se organizar contra o racismo','Porque não gostava de ler os jornais grandes','Porque a lei obrigava cada grupo a ter o seu próprio clube'],0,
+        'Depois da Abolição, a população negra continuou enfrentando o racismo no trabalho, na moradia e na vida social. Jornais como O Alfinete, A Liberdade e O Clarim d\'Alvorada, e clubes como o Grêmio Kosmos, eram lugares para se informar, se divertir e lutar por direitos.',
+        'O jornal da nossa gente: depois de 1888, a comunidade negra paulistana criou jornais, clubes e bailes para se informar, se encontrar e lutar contra o racismo.')};}
+    return h0(n);};
+}catch(e){console.warn('São Paulo negra 1922',e);}})();
 
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /* ===== v203 — MENOS ESPAÇO PRETO EM TODOS OS FORMATOS E ABERTURA SEM 1554 NO FUNDO (pedido do professor, 21/11/2026) =====
