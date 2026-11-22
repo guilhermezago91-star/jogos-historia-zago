@@ -19589,6 +19589,33 @@ setTimeout(function(){try{
   setTimeout(troca,5200);setTimeout(troca,9000);
 }catch(e){console.warn('bichos 1830',e);}})();
 
+/* ===== v244 — 1830: MINIJOGO "DESCENDO A SERRA PELO CAMINHO DO LORENA" — depois das missões dele, o tropeiro convida o aluno a descer a serra com a mula Teimosa; o minijogo abre em tela cheia, fora do mapa (arquivo lorena-1830.html); no fim entra no diário e, na primeira descida, paga 20 réis por saco entregue (pedido do professor, 21/11/2026) ===== */
+(function(){try{
+  let ov=null,pago=false;
+  function fecha(){if(!ov)return;ov.remove();ov=null;mcqOpen=false;try{save();}catch(_){}}
+  function abre(){if(ov)return;mcqOpen=true;ov=document.createElement('div');ov.id='ovLorena';
+    ov.style.cssText='position:fixed;inset:0;z-index:99999;background:#1d2a1f';
+    const f=document.createElement('iframe');f.src='lorena-1830.html';f.title='Descendo a serra pelo Caminho do Lorena';f.style.cssText='border:0;width:100%;height:100%;display:block';
+    f.onload=()=>{try{f.contentWindow.focus();}catch(_){}};
+    const x=document.createElement('button');x.type='button';x.textContent='✕ Sair';x.setAttribute('aria-label','Sair do minijogo e voltar para São Paulo');
+    x.style.cssText='position:absolute;top:calc(8px + env(safe-area-inset-top,0px));right:calc(8px + env(safe-area-inset-right,0px));z-index:2;font:700 14px system-ui,sans-serif;background:#e9d7ad;color:#2a2118;border:2px solid #6b4a2a;border-radius:6px;padding:6px 10px;cursor:pointer';
+    x.onclick=fecha;ov.append(f,x);document.body.appendChild(ov);}
+  window.__lorena30=abre;
+  const DIARIO='A Calçada do Lorena (1790–1792) era o caminho de pedra entre o planalto e Cubatão. As tropas desciam a Serra do Mar em zigue-zague levando açúcar, que seguia de barco até Santos.';
+  window.addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object'||!d.lorena)return;
+    if(d.lorena==='fim'){const s=Math.max(0,Math.min(8,d.sacos|0));
+      try{if(!diary.some(x=>x.kind==='Fonte'&&x.text===DIARIO))addDiary('Fonte',DIARIO);}catch(_){}
+      if(!pago){pago=true;const r=s*20;if(r>0){reis+=r;try{updClockHUD();}catch(_){}}setTimeout(()=>{try{toast(r>0?`Seu Bento pagou ${r} réis pelos ${s} sacos entregues.`:'Seu Bento não pagou nada: não chegou nenhum saco!');}catch(_){}},400);}
+      try{save();}catch(_){}}
+    if(d.lorena==='sair')fecha();});
+  const h0=questHookX;questHookX=function(n){const r=h0(n);if(r)return r;
+    let e=0;try{e=eraOf(n.scene||'sp');}catch(_){}
+    if(n.id==='tropeiro'&&e===2){const fez=Q.mula&&Q.mula.done;
+      return{pages:[fez?'A Teimosa voltou da várzea! Agora ela precisa descer a serra com 8 sacos de açúcar até Cubatão.':'Amanhã cedo eu desço a serra com a mula Teimosa: 8 sacos de açúcar até Cubatão.','Quer me ajudar a guiar a mula pela Calçada do Lorena?'],
+        after:()=>askChoice('Caminho do Lorena','Descer a Serra do Mar com o tropeiro e a mula Teimosa?',['Bora descer!','Agora não'],i=>{if(i===0)abre();})};}
+    return r;};
+}catch(e){console.warn('lorena 1830',e);}})();
+
 /* v124: tropa é muita mula junta. Pouso dos tropeiros com mulas descansando em volta do rancho. */
 setTimeout(function(){try{const S='sp';const r=objects.find(o=>o.scene===S&&/rancho|hospedaria/i.test(o.id+' '+(o.name||''))&&(o.w||1)>=3);if(!r||!window.__mula30)return;
   const M=SCN[S].map;const livre=(x,y)=>M[y]&&!'DdRWBCSXT'.includes(M[y][x])&&!objects.some(o=>(o.scene||'pira')===S&&x>=o.x-1&&x<o.x+(o.w||1)+1&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&Math.abs(n.x-x)<=1&&n.y===y)&&!ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
