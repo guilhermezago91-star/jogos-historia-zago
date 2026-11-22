@@ -19656,6 +19656,45 @@ setTimeout(function(){try{
     return r;};
 }catch(e){console.warn('lorena 1830',e);}})();
 
+/* ===== v249 — 1830: GENTE ENTERRADA DENTRO DA SÉ — as 4 lápides do chão, uma cova aberta, o coveiro da irmandade contando como eram os enterros em 1830 e a nave cheia de fiéis rezando (mulheres de um lado, homens do outro) (pedido do professor, 22/11/2026) ===== */
+(function(){try{
+  const S='i_se';
+  /* cova aberta e coveiro */
+  setTimeout(function(){try{if(objects.some(o=>o.id==='covaAberta30'))return;
+    objects.push({id:'covaAberta30',scene:S,x:11,y:7,w:2,h:1,name:'Cova aberta',
+      text:['Uma cova aberta no chão da igreja, com a terra amontoada do lado. Amanhã tem enterro.','A tampa de madeira, com o número, fica encostada esperando.'],
+      draw:function(c,X,Y){c.fillStyle='rgba(30,20,10,.3)';c.fillRect(X+1,Y+3,31,13);c.fillStyle='#2a1a0e';c.fillRect(X+2,Y+2,28,12);c.fillStyle='#1a1008';c.fillRect(X+4,Y+4,24,8);
+        c.fillStyle='#6a4426';c.fillRect(X+2,Y+2,28,2); // borda de terra
+        c.fillStyle='#7a5030';c.beginPath();c.moveTo(X+20,Y+2);c.lineTo(X+27,Y-6);c.lineTo(X+33,Y+2);c.fill();c.fillStyle='#8a6038';c.fillRect(X+24,Y-3,4,2);
+        c.fillStyle='#8a5a32';c.fillRect(X-2,Y-10,4,14);c.fillStyle='#a06a3c';c.fillRect(X-2,Y-10,4,2); // tampa encostada
+        c.fillStyle='#6a6a66';c.fillRect(X+29,Y-12,1,14);c.fillStyle='#8a8a86';c.fillRect(X+27,Y+1,5,3);}}); // pá
+    if(!npcs.some(n=>n.id==='coveiro30'))npcs.push({id:'coveiro30',spr:'aguadeiro',scene:S,x:13,y:7,dir:'left',name:'Coveiro da irmandade',
+      lines:['Cuidado onde pisa! Debaixo deste chão tem gente. Muita gente.',
+        'Em São Paulo, quem morre é enterrado aqui dentro da igreja. Debaixo dessas lápides e do chão todo tem gente.',
+        'Quem é rico fica pertinho do altar. Quem é pobre fica perto da porta, onde todo mundo pisa.',
+        'Quem não tem dinheiro nem irmandade vai para o Cemitério dos Aflitos, no caminho de Santo Amaro. É para lá que levam os escravizados e os enforcados.',
+        'O cheiro? Por isso o padre capricha no incenso! E abre bem as janelas no verão.',
+        'Os doutores andam dizendo que isso faz mal à saúde e que o certo é um cemitério fora da cidade. Imagina, enterrar longe da igreja!'],
+      diary:'Em 1830, os mortos eram enterrados dentro das igrejas, em covas no chão: os ricos perto do altar, os pobres perto da porta. Pobres e escravizados iam para o Cemitério dos Aflitos. O Cemitério da Consolação, fora da cidade, só abriu em 1858.'});
+    /* fiéis rezando: parados, de frente para o altar, sem balão e sem contar como conversa */
+    const F=[['h22_n|n88_casa|0',1,5,'Senhora rezando',['Ave Maria, cheia de graça…','Psiu! O padre está rezando em latim.']],
+      ['h22_n|seg_mulher|0',3,5,'Mulher rezando',['Rezo pela alma da minha mãe. Ela está enterrada aqui mesmo, perto do altar.']],
+      ['h22_n|beneditaRes|0',5,5,'Mulher rezando o terço',['Estou no terceiro mistério do terço. Não me faça perder a conta!']],
+      ['h22_n|n88_casa|1',1,7,'Senhora de mantilha',['As mulheres ficam deste lado, os homens do outro. É o costume.']],
+      ['h22_n|n88_casa|2',5,7,'Moça rezando',['Minha avó diz que, quando eu morrer, vou ficar pertinho da porta. Que consolo…']],
+      ['h22_n|seg_mulher|1',2,8,'Mulher rezando',['Ai, que joelho! Mas a gente reza de pé mesmo.']],
+      ['h22_n|seg_homem|0',14,5,'Homem rezando',['Pater noster, qui es in caelis…','Não entendo o latim, mas rezo assim mesmo.']],
+      ['h22_n|portugues|0',15,7,'Comerciante rezando',['Já paguei a irmandade: quando eu morrer, garanto uma cova aqui dentro.']],
+      ['h22_n|seg_liberto|0',11,9,'Homem liberto rezando',['Sou da Irmandade do Rosário. Lá também se enterra gente dentro da igreja.']],
+      ['h22_n|tropeiroBan|0',15,9,'Tropeiro rezando',['Vim pedir proteção antes de descer a serra.']],
+      ['h22_n|seg_homem|1',12,10,'Homem rezando',['Psiu… o sermão de hoje vai ser comprido.']]];
+    F.forEach(([spr,x,y,name,lines],i)=>{const id='fielSe30_'+i;if(npcs.some(n=>n.id===id))return;
+      if(objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===S&&n.x===x&&n.y===y))return;
+      npcs.push({id,spr,scene:S,x,y,dir:'up',__fixo:'up',nextTurn:1e9,talked:true,piada:true,name,lines,diary:''});});
+    try{if(cur===S){buildOcc();buildStatic();}}catch(_){}
+  }catch(e){console.warn('coveiro Sé',e);}},3600);
+}catch(e){console.warn('enterros Sé',e);}})();
+
 /* v124: tropa é muita mula junta. Pouso dos tropeiros com mulas descansando em volta do rancho. */
 setTimeout(function(){try{const S='sp';const r=objects.find(o=>o.scene===S&&/rancho|hospedaria/i.test(o.id+' '+(o.name||''))&&(o.w||1)>=3);if(!r||!window.__mula30)return;
   const M=SCN[S].map;const livre=(x,y)=>M[y]&&!'DdRWBCSXT'.includes(M[y][x])&&!objects.some(o=>(o.scene||'pira')===S&&x>=o.x-1&&x<o.x+(o.w||1)+1&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&Math.abs(n.x-x)<=1&&n.y===y)&&!ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
