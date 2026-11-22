@@ -371,7 +371,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cf25be29","kb":281,"m":2},{"f":"pac_e23.js?v=0a1eee97","kb":425,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=f4ea5e07","kb":1592,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=2f8d21d3","kb":7424,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cf25be29","kb":281,"m":2},{"f":"pac_e23.js?v=0a1eee97","kb":425,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=8f735edd","kb":1626,"m":4},{"f":"pac_e34.js?v=9f1d3968","kb":1038,"m":12},{"f":"pac_e4.js?v=da9bef78","kb":7523,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -24248,6 +24248,78 @@ window.__DOCS22={
   setTimeout(()=>{try{const dc=drawChar;drawChar=function(id,X,Y,dir,fr){if(id==='player'&&player.vehicle==='bike'){try{if(desenha(X,Y,dir))return;}catch(e){}}return dc.apply(this,arguments);};}catch(e){console.warn('bicicleta',e);}},3200);
   window.__bici={BIKES,desenha,desce};
 }catch(e){console.warn('bicicleta',e);}})();
+
+/* ===== v246 — PROFISSÕES DE 1888 E 1922 COM BONECO PRÓPRIO (Canva) E GENTE NOVA (pedido do professor, 21/11/2026) =====
+   Quem usava boneco emprestado ganha o seu: delegado, acendedor, amolador, mascates, vereadores, prefeito, senador, Washington Luís, lambe-lambe, caixeiros.
+   Gente nova em 1922: dois guardas da Guarda Cívica (farda azul e capacete à inglesa, conforme fotos do professor), deputado estadual, gari, chofer de praça, guarda sanitário, vendedor de bilhete de loteria, carteiro.
+   Gente nova em 1888: delegado, dentista, mascate sírio, amolador, leiteiro com a vaca, quitandeira liberta, carteiro.
+   Folhas novas N88_* no arte_1922.js e no arte_1888.js. Só põe gente (1 quadradinho) em lugar livre, por último; não mexe em chão nem em prédio. */
+(function(){try{
+  const tem=k=>typeof A!=='undefined'&&typeof A['N88_'+k]==='string';
+  /* trocas de boneco: id da pessoa -> folha nova|variação */
+  const TROCA={delegado22:'delegado22|0',acendedor22:'acendedor22|0',amolador:'amolador88|1',
+    mascate1:'mascateSirio22|0',br_mascateHoms:'mascateSirio22|2',br_antonioMussi:'mascateSirio22|1',br_mascateBananal:'mascateSirio22|3',
+    mascateSirio:'mascateLibanes22|0',vida22_0:'mascateLibanes22|2',mascateArm22:'mascateArmenio22|0',
+    vereador1_22:'vereador22|0',vereador2_22:'vereador22|2',prefeitoFirmiano:'prefeito22|0',freitasValle:'senador22|0',washingtonLuis:'washington22|0',
+    lambelambe:'lambelambe22|0',caixeiroArm22:'caixeiroFin|2',jm_caixeiroFA:'caixeiroFin|3'};
+  const P=[
+   /* 1922 */
+   ['pf22_deputado','m_centro22',[106,47],'deputado22|0','Deputado estadual',
+    ["Sou deputado estadual: ajudo a fazer as leis do Estado de São Paulo.","Quase todos nós somos do Partido Republicano Paulista, o PRP. Quem manda no partido manda no Estado.","A eleição é de voto aberto: todo mundo fica sabendo em quem você votou. E mulher não vota, nem quem não sabe ler."],
+    'Deputado estadual: em 1922 o PRP dominava a política paulista; o voto era aberto e mulheres e analfabetos não votavam.'],
+   ['pf22_gari','m_centro22',[100,67],'gari22|0','Gari da Limpeza Pública',
+    ["Varro a rua e jogo o lixo na carroça da Limpeza Pública, puxada a burro.","A cidade cresce sem parar, e o lixo cresce junto. Cada dia tem mais gente, mais loja e mais papel no chão."],
+    'Limpeza Pública: com a cidade crescendo depressa, varrer as ruas e recolher o lixo virou serviço da prefeitura.'],
+   ['pf22_chofer','m_centro22',[96,61],'taxista22|0','Chofer de praça',
+    ["Sou chofer de praça: levo passageiro de automóvel por toda a cidade.","Alguns carros de praça já têm taxímetro, um relógio que marca quanto o passageiro vai pagar.","Antes, quem tinha pressa alugava um tílburi, puxado a cavalo. Agora é tudo motor e buzina!"],
+    'Chofer de praça: nos anos 1920 os automóveis de aluguel substituíam os tílburis puxados a cavalo.'],
+   ['pf22_sanitario','sp22',[95,38],'sanitario22|0','Guarda sanitário',
+    ["Sou do Serviço Sanitário do Estado. Visito casas e cortiços procurando água parada, lixo e doença.","Em 1918 a gripe espanhola matou milhares de pessoas em São Paulo. Desde então a gente vigia ainda mais.","Quem não toma a vacina contra a varíola leva bronca! Vacina salva vida."],
+    'Serviço Sanitário: depois da gripe espanhola de 1918, o governo vigiava cortiços, desinfetava casas e vacinava contra a varíola.'],
+   ['pf22_bilhete','m_centro22',[103,64],'bilheteiro22|0','Vendedor de bilhete de loteria',
+    ["Olha a sorte grande! Bilhete da loteria! Quem compra hoje fica rico amanhã!","Quem mais compra é o operário. Gasta o pouco que tem sonhando sair do cortiço."],
+    'Loteria: vendedores de bilhetes andavam pelo centro; muita gente pobre apostava sonhando ficar rica.'],
+   ['pf22_carteiro','m_centro22',[18,19],'carteiro22|0','Carteiro',
+    ["Entrego cartas e telegramas por toda a cidade. Ando quilômetros por dia!","O Palácio dos Correios, aqui no Anhangabaú, está ficando pronto. Vai ser o maior da cidade."],
+    'Correios e Telégrafos: em 1922 o Palácio dos Correios do Vale do Anhangabaú ficava pronto.'],
+   ['pf22_guarda1','m_centro22',[97,71],'guardaCivica22|0','Guarda cívico',
+    ["Sou da Guarda Cívica, da Força Pública. Faço a ronda nas ruas do centro.","Repare no capacete: a nossa farda foi inspirada na polícia de Londres.","Alguns colegas fazem a ronda de bicicleta. É mais rápido que a pé!"],
+    'Guarda Cívica: em 1921 os guardas da Força Pública policiavam as ruas de São Paulo, com farda azul e capacete à inglesa.'],
+   ['pf22_guarda2','m_centro22',[66,50],'guardaCivica22|2','Guarda cívico',
+    ["Apito, cassetete e muita caminhada: é a vida do guarda.","Os jornais vivem reclamando da polícia. Dizem que a gente chega tarde, e às vezes é violenta, até com jornalista."],
+    'Polícia e imprensa: nos anos 1920 os jornais paulistas criticavam a polícia, inclusive por violência contra jornalistas.'],
+   /* 1888 */
+   ['pf88_delegado','sp88',[74,62],'delegado88|0','Delegado de polícia',
+    ["Sou delegado de polícia da capital da província.","Até poucos meses atrás, me mandavam procurar escravizados fugidos. Mas o povo escondia os fugitivos, e os caifazes os levavam para o Jabaquara, em Santos.","No fim, até o Exército pediu para não caçar mais fugitivos. Agora, com a Lei Áurea, isso acabou de vez."],
+    'Polícia e fugas: em 1887 e 1888 as fugas em massa das fazendas paulistas, ajudadas pelos caifazes, apressaram o fim da escravidão.'],
+   ['pf88_dentista','sp88',[70,69],'dentista88|0','Cirurgião-dentista',
+    ["Sou cirurgião-dentista. Arranco dente estragado e faço dentadura.","Dói, sim! Por isso muita gente só vem quando não aguenta mais.","Quem não pode pagar dentista procura o barbeiro, que também arranca dente."],
+    'Dentista em 1888: tratar dos dentes doía e custava caro; os mais pobres recorriam a barbeiros.'],
+   ['pf88_mascate','sp88',[92,67],'mascate88|0','Mascate sírio',
+    ["Cheguei da Síria há pouco tempo. Somos poucos aqui ainda.","Levo a caixa nas costas e vendo de porta em porta: tecido, linha, botão, perfume.","Vendo fiado e volto no mês seguinte para cobrar. Um dia vou ter loja própria!"],
+    'Mascates sírio-libaneses: os primeiros chegaram a São Paulo nos anos 1880 e vendiam de porta em porta.'],
+   ['pf88_amolador','sp88',[60,74],'amolador88|0','Amolador',
+    ["Cheguei da Itália no ano passado, junto com milhares de outros imigrantes.","Quando toco a minha flautinha, as donas de casa já sabem: chegou o amolador de facas e tesouras!"],
+    'Amoladores: muitos eram imigrantes italianos, que chegavam aos milhares no fim dos anos 1880.'],
+   ['pf88_leiteiro','sp88',[50,61],'leiteiro88|0','Leiteiro',
+    ["Leite fresquinho, tirado na hora!","Trago a vaca até a porta da freguesa e tiro o leite na frente dela. Assim ninguém diz que eu pus água no leite!"],
+    'Leiteiro: em 1888 o leite era tirado na porta da casa, com a vaca levada pelas ruas.'],
+   ['pf88_quitandeira','sp88',[83,57],'quitandeira88|0','Quitandeira',
+    ["Olha a quitanda! Cuscuz, pé de moleque, banana e cará!","Vendo neste tabuleiro há muitos anos. Foi com o dinheiro dele que comprei a minha liberdade, moeda por moeda."],
+    'Quitandeiras: mulheres negras vendiam comida em tabuleiros pelas ruas; algumas juntaram dinheiro para comprar a própria alforria.'],
+   ['pf88_carteiro','sp88',[63,53],'carteiro88|0','Carteiro',
+    ["Entrego as cartas que chegam pelo trem de Santos e do Rio de Janeiro.","Muita gente não sabe ler. Aí me pedem para ler a carta em voz alta, na porta mesmo."],
+    'Carteiro: em 1888 a maioria da população não sabia ler; o carteiro às vezes lia as cartas em voz alta.']];
+  const poe=()=>{for(const [id,sc,[x0,y0],spr,nome,lines,diary] of P){if(npcs.find(n=>n.id===id))continue;if(!tem(spr.split('|')[0]))continue;const S=SCN[sc];if(!S||!S.map)continue;
+      const M=S.map,H=M.length,W=M[0].length;const ok=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y);
+      let p=null;for(let r=0;r<8&&!p;r++)for(let y=y0-r;y<=y0+r&&!p;y++)for(let x=x0-r;x<=x0+r&&!p;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))===r&&ok(x,y))p=[x,y];}
+      if(!p)continue;try{npcIn(sc,id,'colono',p[0],p[1],nome,lines,diary);}catch(e){continue;}const n=npcs.find(n=>n.id===id);if(n)n.spr='h22_n|'+spr;}};
+  const troca=()=>{for(const [id,s] of Object.entries(TROCA)){if(!tem(s.split('|')[0]))continue;const n=npcs.find(n=>n.id===id);if(n&&n.spr!=='h22_n|'+s)n.spr='h22_n|'+s;}};
+  let tent=0;const tenta=()=>{try{poe();troca();}catch(e){console.warn('profissões',e);}if((P.some(p=>tem(p[3].split('|')[0])&&!npcs.find(n=>n.id===p[0]))||tent<6)&&++tent<40)setTimeout(tenta,500);};
+  setTimeout(tenta,0);
+  const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);try{troca();}catch(_){}return r;};
+  window.__profissoes={P,TROCA};
+}catch(e){console.warn('profissões',e);}})();
 
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /* ===== v203 — MENOS ESPAÇO PRETO EM TODOS OS FORMATOS E ABERTURA SEM 1554 NO FUNDO (pedido do professor, 21/11/2026) =====
