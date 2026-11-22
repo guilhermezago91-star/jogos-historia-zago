@@ -21459,7 +21459,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v245) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v257) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -21595,15 +21595,9 @@ window.__paulista82Ready=Promise.all(ready);
       rel.movidos.push('Solar da Marquesa -> ao lado do Pátio do Colégio');}}
     /* gente, bichos e objetos de pegar que ficaram debaixo dos prédios vão para a calçada */
     const preso=(x,y)=>objects.some(o=>o.scene===S&&o.__jm&&(o.w||1)>1&&x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h);
-    /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): durante uma busca de lugar (perto, arremate da 17ª rodada) nada muda de lugar,
-       então os quadradinhos ocupados são listados uma vez por busca. Mesmas respostas. */
-    let OC2=null;const mapa2=()=>{const z=new Set(),K=(x,y)=>{if(x>=0&&y>=0&&x<4096)z.add(y*4096+x);};
-      for(const o of objects){if(o.scene!==S)continue;const w=o.w||1,h=o.h||1;for(let y=Math.ceil(o.y);y<o.y+h;y++)for(let x=Math.ceil(o.x);x<o.x+w;x++)K(x,y);}
-      for(const n of npcs)if(n.scene===S&&Number.isInteger(n.x)&&Number.isInteger(n.y))K(n.x,n.y);return z;};
-    const livre=(x,y)=>M[y]&&'Dp.,'.includes(M[y][x])&&((OC2&&x>=0&&y>=0&&x<4096&&Number.isInteger(x)&&Number.isInteger(y))?!OC2.has(y*4096+x):(!preso(x,y)&&!objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)));
+    const livre=(x,y)=>M[y]&&'Dp.,'.includes(M[y][x])&&!preso(x,y)&&!objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&n.x===x&&n.y===y);
     const cabe=(x,y,w)=>{for(let i=0;i<w;i++)if(!livre(x+i,y))return false;return true;};
-    const perto=(x,y,w)=>{OC2=mapa2();try{return perto0(x,y,w);}finally{OC2=null;}};
-    const perto0=(x,y,w)=>{w=w||1;for(let r=1;r<16;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const xx=x+dx,yy=y+dy;if(xx<1||xx>C.W-2||yy<1||yy>C.H-2)continue;if(cabe(xx,yy,w))return [xx,yy];}return null;};
+    const perto=(x,y,w)=>{w=w||1;for(let r=1;r<16;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const xx=x+dx,yy=y+dy;if(xx<1||xx>C.W-2||yy<1||yy>C.H-2)continue;if(cabe(xx,yy,w))return [xx,yy];}return null;};
     /* ---- 5ª RODADA: lado oeste da Praça da Sé. O Edifício Guinle ocupa a frente toda da quadra, no tamanho cheio
        (desenho de prédio de escritórios; o prédio de Escritórios genérico sai). ---- */
     const guinle=objects.find(o=>o.scene===S&&o.id==='guinle')||nome(/Edif[íi]cio Guinle/);
@@ -22106,19 +22100,18 @@ window.__paulista82Ready=Promise.all(ready);
     /* (3) placas com nome de rua e de largo: quando há gente embaixo, a placa fica quase transparente para não tapar ninguém */
     try{const P2=C.P.splice(0);const FP='700 8px "Cinzel","DejaVu Serif",serif';const wo2=waterOverlay;
       waterOverlay=function(camX,camY){if(wo2)wo2.apply(this,arguments);if(cur!==S)return;try{ctx.save();ctx.font=FP;ctx.textAlign='center';ctx.textBaseline='middle';
-        const gente=[[player.px,player.py]];for(const n of npcs)if(n.scene===S&&Math.abs(n.x-player.x)<26&&Math.abs(n.y-player.y)<18)gente.push([n.x*T,n.y*T]);
-        if(typeof walkers!=='undefined')for(const w of walkers)if(w.scene===S&&w.px!=null&&Math.abs(w.px-player.px)<420&&Math.abs(w.py-player.py)<290)gente.push([w.px,w.py]);
+        const gente=[[player.px,player.py]];/* v257: só o jogador apaga a placa (ver bloco NOMES DE RUA SEMPRE À VISTA) */
         for(const p of P2){const X=p.x-camX,Y=p.y-camY,hw=p.w/2;if(p.v?(X<-8||X>VW+8||Y<-hw||Y>VH+hw):(X<-hw||X>VW+hw||Y<-8||Y>VH+8))continue;
           const x0=p.v?p.x-7:p.x-hw,x1=p.v?p.x+7:p.x+hw,y0=p.v?p.y-hw:p.y-7,y1=p.v?p.y+hw:p.y+7;const tapa2=gente.some(g=>g[0]+15>x0&&g[0]+1<x1&&g[1]+16>y0&&g[1]-16<y1);
-          ctx.save();ctx.globalAlpha=tapa2?.22:1;ctx.translate(X,Y);if(p.v)ctx.rotate(-Math.PI/2);ctx.fillStyle='#f4f1e6';ctx.fillRect(-hw,-6,p.w,12);ctx.fillStyle=p.cor||(p.largo?'#7a2a1c':'#17357e');ctx.fillRect(-hw+1,-5,p.w-2,10);ctx.fillStyle='#fff';ctx.fillText(p.t,0,.5);ctx.restore();}
+          ctx.save();ctx.globalAlpha=tapa2?.45:1;ctx.translate(X,Y);if(p.v)ctx.rotate(-Math.PI/2);ctx.fillStyle='#f4f1e6';ctx.fillRect(-hw,-6,p.w,12);ctx.fillStyle=p.cor||(p.largo?'#7a2a1c':'#17357e');ctx.fillRect(-hw+1,-5,p.w-2,10);ctx.fillStyle='#fff';ctx.fillText(p.t,0,.5);ctx.restore();}
         ctx.restore();}catch(_){}};rel.placas=P2.length;}catch(e){console.warn('placas JM',e);}
     /* 17ª rodada, arremate: objeto pequeno que mudou de lugar não pode formar barreira nem ficar na frente de porta */
     try{if(rel.r17&&rel.__a17){const bom=(xx,yy)=>M[yy]&&'DdS'.includes(M[yy][xx])&&livre(xx,yy)&&[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]].every(v=>M[yy+v[1]]&&'DdSeRp'.includes(M[yy+v[1]][xx+v[0]])&&livre(xx+v[0],yy+v[1]));
       const portas=new Set();for(const o of objects)if(o.scene===S&&o.door!=null&&(o.w||1)*(o.h||1)>1){portas.add((o.x+o.door)+','+(o.y+o.h));portas.add((o.x+o.door)+','+(o.y+o.h+1));}
-      for(const [q,pos] of rel.__a17){if(q.scene!==S)continue;const mudou=(q.x+','+q.y)!==pos,naPorta=portas.has(q.x+','+q.y);if(!mudou&&!naPorta)continue;const ox=q.x,oy=q.y;q.x=-9;let best=null;OC2=mapa2();
+      for(const [q,pos] of rel.__a17){if(q.scene!==S)continue;const mudou=(q.x+','+q.y)!==pos,naPorta=portas.has(q.x+','+q.y);if(!mudou&&!naPorta)continue;const ox=q.x,oy=q.y;q.x=-9;let best=null;
         for(let r=0;r<14&&!best;r++)for(let dy=-r;dy<=r&&!best;dy++)for(let dx=-r;dx<=r&&!best;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const xx=ox+dx,yy=oy+dy;if(xx<1||yy<1||xx>C.W-2||yy>C.H-2)continue;if(bom(xx,yy)&&!portas.has(xx+','+yy))best=[xx,yy];}
-        OC2=null;if(best){q.x=best[0];q.y=best[1];}else q.x=ox;}
-      delete rel.__a17;}}catch(e){OC2=null;console.warn('arremate r17',e);}
+        if(best){q.x=best[0];q.y=best[1];}else q.x=ox;}
+      delete rel.__a17;}}catch(e){console.warn('arremate r17',e);}
     try{if(window.__transito&&window.__transito.V)delete window.__transito.V[S];}catch(_){}
     try{if(typeof walkers!=='undefined')for(let i=walkers.length-1;i>=0;i--){const w=walkers[i];if(w.scene!==S||!w.path)continue;if(w.path.some(pt=>objects.some(q=>q.scene===S&&(q.w||1)*(q.h||1)>1&&pt[0]>=q.x&&pt[0]<q.x+(q.w||1)&&pt[1]>=q.y&&pt[1]<q.y+(q.h||1)))){walkers.splice(i,1);rel.pedestresFora=(rel.pedestresFora||0)+1;}}}catch(_){}
     /* ===== v168 — CENTRO DE 1922: TELHADOS COM PAREDE E VOLUME — cada telhado de cenário vira um prédio visto de frente e de cima (telhado de duas águas, beiral, parede com janelas), menos zinco, lotes separados (pedido do professor, 20/11/2026) ===== */
@@ -22439,16 +22432,11 @@ window.__paulista82Ready=Promise.all(ready);
       const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
       const porta=(x,y)=>objects.some(o=>o.scene===S&&o.enter&&Math.abs(x-(o.x+(o.door!=null?o.door:((o.w||1)>>1))))<=1&&y>=o.y+(o.h||1)&&y<=o.y+(o.h||1)+1);
       const bloq=(x,y)=>objects.some(o=>o.scene===S&&!o.enter&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||objects.some(o=>o.scene===S&&o.enter&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
-      /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): mesma conta, feita uma vez só. */
-      const cel=(z,x,y)=>{if(x>=0&&y>=0&&x<4096)z.add(y*4096+x);},chave=(x,y)=>Number.isInteger(x)&&Number.isInteger(y)&&x>=0&&y>=0&&x<4096;
       const perto=(re,dx)=>{const o=objects.find(q=>q.scene===S&&o0(q)&&re.test(q.name||''));if(!o)return null;const sx=o.x+(o.door!=null?o.door:((o.w||1)>>1)),sy=o.y+(o.h||1);
-        const OB=new Set(),OP=new Set();for(const q of objects){if(q.scene!==S)continue;const w=q.w||1,h=q.h||1;for(let y=Math.ceil(q.y);y<q.y+h;y++)for(let x=Math.ceil(q.x);x<q.x+w;x++){cel(OB,x,y);cel(OP,x,y);}}
-        for(const n of npcs)if(n.scene===S&&chave(n.x,n.y))cel(OP,n.x,n.y);for(const i of ITEMS)if(i.scene===S&&chave(i.x,i.y))cel(OP,i.x,i.y);
-        const bloqR=(x,y)=>chave(x,y)?OB.has(y*4096+x):bloq(x,y),ocpR=(x,y)=>chave(x,y)?OP.has(y*4096+x):ocp(x,y);
-        const seen=new Set([sx+','+sy]),Q=[[sx,sy,0]];let best=null;let qh=0;
-        while(qh<Q.length){const [x,y,d]=Q[qh++];if(d>14)break;
-          if(d>=2&&x>=2&&x<=M[0].length-3&&!ocpR(x,y)&&!porta(x,y)){if(M[y][x]==='p'){if(!dx||Math.sign(x-sx)===Math.sign(dx))return [x,y];if(!best||best.ch!=='p')best=Object.assign([x,y],{ch:'p'});}else if(M[y][x]==='D'&&!best&&d>=3)best=Object.assign([x,y],{ch:'D'});}
-          for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=x+a,Y=y+b,k=X+','+Y;if(seen.has(k)||!M[Y]||!/[pDdeSR.,f]/.test(M[Y][X]||'')||bloqR(X,Y))continue;seen.add(k);Q.push([X,Y,d+1]);}}
+        const seen=new Set([sx+','+sy]),Q=[[sx,sy,0]];let best=null;
+        while(Q.length){const [x,y,d]=Q.shift();if(d>14)break;
+          if(d>=2&&x>=2&&x<=M[0].length-3&&!ocp(x,y)&&!porta(x,y)){if(M[y][x]==='p'){if(!dx||Math.sign(x-sx)===Math.sign(dx))return [x,y];if(!best||best.ch!=='p')best=Object.assign([x,y],{ch:'p'});}else if(M[y][x]==='D'&&!best&&d>=3)best=Object.assign([x,y],{ch:'D'});}
+          for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=x+a,Y=y+b,k=X+','+Y;if(seen.has(k)||!M[Y]||!/[pDdeSR.,f]/.test(M[Y][X]||'')||bloq(X,Y))continue;seen.add(k);Q.push([X,Y,d+1]);}}
         return best?[best[0],best[1]]:null;};
       const o0=q=>true;
       const L=[['bola',56,/Mosteiro de S/,4,'Bola de futebol','Uma bola de couro costurado, com câmara de ar. Em 1922 o futebol enche os campos de várzea e os estádios dos clubes: Paulistano, Corinthians, Palestra Italia.'],
@@ -22503,7 +22491,7 @@ window.__paulista82Ready=Promise.all(ready);
       const naFrente=(x,y)=>objects.some(o=>o.scene===S&&o.door!=null&&y===o.y+(o.h||1)&&x===o.x+o.door);
       const perto=(re,dx,dy,fx,fy)=>{const o=re?objects.find(o=>o.scene===S&&re.test(o.name||'')):null;return o?[o.x+((o.w||1)>>1)+dx,o.y+(o.h||1)+dy]:[fx,fy];};
       const placa=(re,fx,fy)=>{const q=(C.P||[]).find(q=>re.test(q.t||''));return q?[Math.round(q.x/16),Math.round(q.y/16)]:[fx,fy];};
-      const acha=(c)=>{const vis=new Set();let fila=[c];vis.add(c+'');for(let k=0;k<1200&&fila.length;k++){const [x,y]=fila.shift();if(M[y]&&/[pD]/.test(M[y][x]||'')&&!ocp(x,y)&&!naFrente(x,y))return [x,y];for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const n=[x+a,y+b];if(n[1]>=0&&n[1]<98&&n[0]>=0&&n[0]<150&&!vis.has(n+'')){vis.add(n+'');fila.push(n);}}}return null;};
+      const acha=(c)=>{const vis=new Set();let fila=[c];vis.add(c+'');for(let k=0;k<1200&&fila.length;k++){const [x,y]=fila.shift();if(M[y]&&/[pD]/.test(M[y][x]||'')&&!ocp(x,y)&&!naFrente(x,y)&&[[1,0],[-1,0],[0,1],[0,-1]].filter(([a,b])=>M[y+b]&&/[pD]/.test(M[y+b][x+a]||'')&&!ocp(x+a,y+b)).length>=2)return [x,y];for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const n=[x+a,y+b];if(n[1]>=0&&n[1]<98&&n[0]>=0&&n[0]<150&&!vis.has(n+'')){vis.add(n+'');fila.push(n);}}}return null;};
       const sb=perto(/^Largo de S[ãa]o Bento/,0,2,100,24);
       const L=[
        ['loja_japao',[sb[0],sb[1]+1],'Recorte: Loja do Japão','Anúncio de Carnaval da Loja do Japão (Garcia da Silva & Cia.), na Rua de São Bento, nº 46: lança-perfume, serpentinas, confete colorido e dourado e máscaras. No Carnaval, o centro se enchia de corsos e bailes, e a Rua São Bento era onde se fazia a compra.','Fonte histórica: anúncio de revista','Loja do Japão: tudo para o Carnaval','Anúncio da Loja do Japão, de Garcia da Silva & Cia., Rua de São Bento, nº 46, São Paulo, na revista A Cigarra: lança-perfume "Rodo", serpentinas "Iris", "Anakonda" e "Condor", confete de cores variadas e de ouro, máscaras. "Fazemos os melhores preços do mercado."'],
@@ -22531,7 +22519,82 @@ window.__paulista82Ready=Promise.all(ready);
       const L=[['m_palacio','jm22_medalha',1],['m_correios','jm22_telegrama',1],['m_academia','jm22_tinteiro',1],['m_redacao','jm22_jornal',1],['m_discos','jm22_disco',1],['m_discos','jm22_rec_casa_odeon',-1]];
       for(const [k,id,l] of L)dentro(k,id,l);}
     }catch(e){console.warn('objetos dentro JM',e);}
+    /* ===== v257 — CENTRO DE 1922: MIOLO DAS QUADRAS — travessas de terra com casas de frente para elas e casas encostadas na rua de cima, no lugar dos quintais vazios (pedido do professor, 21/11/2026) ===== */
+    try{if(!rel.miolo){
+      const qs=()=>objects.filter(o=>o.scene===S&&/^jm_q_/.test(o.id));
+      const ehQ=(x,y)=>qs().some(o=>y>=o.y&&y<o.y+(o.h||1)&&x>=o.x&&x<o.x+(o.w||1));
+      const gente=(x,y)=>npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)||(typeof ITEMS!=='undefined'&&ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y));
+      const livre=(x0,y0,x1,y1)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)if(!ehQ(x,y)||gente(x,y))return false;
+        return !qs().some(o=>(o.h||1)!==1&&!(o.y+(o.h||1)-1<y0||o.y>y1||o.x+(o.w||1)-1<x0||o.x>x1));};
+      const tiraQ=(x0,y0,x1,y1)=>{for(const o of qs()){const w=o.w||1;if(o.y<y0||o.y>y1||o.x+w-1<x0||o.x>x1)continue;
+          const a=o.x,b=o.x+w-1;if(b>x1)objects.push(Object.assign({},o,{id:o.id+'_r'+(x1+1),x:x1+1,w:b-x1}));if(a<x0)o.w=x0-a;else o.scene='__fora';}
+        if(rel.quintais)rel.quintais=rel.quintais.filter(q=>!(q[0]>=x0&&q[0]<=x1&&q[1]>=y0&&q[1]<=y1));};
+      const KS=[['g_residencia_2x2_1',4,0],['g_sobrado_3x2_1',6,1],['g_colonial_2x1_1',4,0],['g_residencia_2x2_2',4,0],['g_sobrado_3x2_2',6,1],['g_colonial_2x1_2',4,0],['g_loja_2x2_1',4,0]];
+      const fila=(x0,x1,base,pref)=>{let x=x0,i=(x0+base)%KS.length,n=0;while(x<=x1){let k=KS[i%KS.length];if(x+k[1]-1>x1){k=KS.find(q=>q[1]<=x1-x+1);if(!k)break;}
+          if(MAN[k[0]]&&A['PC_'+k[0]]){const o={id:pref+x+'_'+base,scene:S,x,y:base-4,w:1,h:1,name:k[2]?'Sobrado':'Casa',text:k[2]?['Um sobrado de vila, de frente para a travessa: comércio pequeno embaixo, família em cima.']:['Uma casa de vila, numa travessa de terra no miolo da quadra. Aluguel mais barato que na rua principal.']};objects.push(o);grande(o,k[0],x,base-4,k[1],null,null,[(x+base)%3?'t':'p',TELHA[(x+base)%4]],base);o.__gen=1;n++;}
+          x+=k[1];i++;}return n;};
+      /* 1. travessas: 4 linhas de casas + rua de terra que sai numa rua de verdade */
+      const TV=[[14,23,8,2],[72,83,12,1],[0,7,52,1]];let nTv=0,nCasas=0;rel.ruasSul=rel.ruasSul||[];
+      for(const [a,b,y,lr] of TV){const L=y+4;if(!livre(a,y,b,L+lr-1))continue;tiraQ(a,y,b,L+lr-1);
+        for(let yy=y;yy<L;yy++)for(let x=a;x<=b;x++)M[yy][x]='p';for(let yy=L;yy<L+lr;yy++)for(let x=a;x<=b;x++)M[yy][x]='d';
+        nCasas+=fila(a,b,L,'jm_tv_');rel.ruasSul.push([a,b,L,L+lr-1]);nTv++;}
+      /* 2. casas de enchimento sobem até a rua de cima; o quintal que ficava atrás vira calçada na frente delas */
+      const fx=objects.filter(o=>o.scene===S&&/^jm_fx_/.test(o.id)&&!o.enter).sort((p,q)=>p.y-q.y||p.x-q.x);
+      const sobe=o=>{let h=0;while(h<5){const y=o.y-1-h;let ok=true;for(let x=o.x;x<o.x+(o.w||1);x++)if(!ehQ(x,y)||gente(x,y)){ok=false;break;}if(!ok)break;h++;}return h;};
+      const grupos=[];for(const o of fx){const g=grupos.find(g=>g.y===o.y&&g.x1+1===o.x);if(g){g.l.push(o);g.x1=o.x+(o.w||1)-1;}else grupos.push({y:o.y,x1:o.x+(o.w||1)-1,l:[o]});}
+      let nSobe=0;for(const g of grupos){const h=Math.min(...g.l.map(sobe));if(h<1)continue;
+        for(const o of g.l){const w=o.w||1,y0=o.y;tiraQ(o.x,y0-h,o.x+w-1,y0-1);o.y-=h;for(let y=o.y;y<y0+o.h;y++)for(let x=o.x;x<o.x+w;x++)if(M[y])M[y][x]='p';nSobe++;(rel.mioloS=rel.mioloS||[]).push([o.x,o.y,h]);}}
+      rel.miolo=[nTv,nCasas,nSobe,qs().reduce((s,o)=>s+(o.w||1)*(o.h||1),0)];}
+    }catch(e){console.warn('miolo das quadras JM',e);}
+    /* ===== v257 — CENTRO DE 1922: SEM MURO DO CARMO — sai o muro do convento e a faixa de fundos atrás da Igreja da Boa Morte (o Carmo não entra no centro), e a banca de jornais sai de cima da placa do Largo do Carmo (pedido do professor, 21/11/2026) ===== */
+    try{if(!rel.semCarmo){let n=0;
+      for(const o of objects)if(o.scene===S&&(/^jm_fundos[23]$/.test(o.id)||/Convento do Carmo|Muro do convento/.test(o.name||''))){
+        for(let y=o.y;y<o.y+(o.h||1);y++)for(let x=o.x;x<o.x+(o.w||1);x++)if(M[y]&&M[y][x]!==undefined&&!/[DdeRSW]/.test(M[y][x]))M[y][x]='p';o.scene='__fora';n++;}
+      const bc=objects.find(o=>o.scene===S&&o.id==='rtp4');
+      if(bc){const pl={x0:119,x1:127,y0:65,y1:66};const ocp=(x,y)=>objects.some(o=>o!==bc&&o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(q=>q.scene===S&&q.x===x&&q.y===y)||(typeof ITEMS!=='undefined'&&ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y));
+        const porta=(x,y)=>objects.some(o=>o.scene===S&&o.enter&&o.door!=null&&Math.abs(x-(o.x+o.door))<=1&&y>=o.y+(o.h||1)&&y<=o.y+(o.h||1)+1);
+        let p=null;for(const y of [64,65])for(let x=124;x>=108&&!p;x--){if(x+2>=pl.x0&&x<=pl.x1&&y>=pl.y0&&y<=pl.y1)continue;let ok=true;for(let k=0;k<3;k++)if(!M[y]||!/[pD]/.test(M[y][x+k]||'')||ocp(x+k,y)||porta(x+k,y)||ocp(x+k,y+1)&&ocp(x+k,y-1))ok=false;if(ok)p=[x,y];}
+        if(p){bc.x=p[0];bc.y=p[1];rel.banca=p;}}
+      rel.semCarmo=n;}
+    }catch(e){console.warn('sem Carmo JM',e);}
 
+    /* ===== v257 — CENTRO DE 1922: CICLISTAS COM BONECO NOVO (pedido do professor, 21/11/2026) ===== */
+    try{if(typeof walkers!=='undefined'){const TROCA={crianca:'x22_entregador_de_farmacia',caixeiro:'x22_entregador_de_farmacia',tipografo:'x22_mecanico_de_bicicletas',colono:'x22_mecanico_de_bicicletas'};let nb=0;
+      for(const w of walkers){if(w.spr==='bike'&&TROCA[w.rider||'crianca']){w.rider=TROCA[w.rider||'crianca'];nb++;}else if(w.spr==='bike'&&!/^x22_/.test(w.rider||'')&&!/^(h|n)22_/.test(w.rider||'')){w.rider='x22_entregador_de_farmacia';nb++;}}
+      rel.ciclistas=nb;}}catch(e){console.warn('ciclistas',e);}
+    /* ===== v257 — CENTRO DE 1922: VIADUTOS DO LADO DO BRÁS VIRAM SAÍDA — as duas pontes da beira direita do centro acabavam na borda do mapa sem saída; agora levam ao Brás (pedido do professor, 22/11/2026) ===== */
+    try{const SA=C.saidas;if(SA&&!SA.some(e=>e.__jm)){const w0=(C.P.find(q=>q.t==='SAÍDA: BRÁS')||{}).w||96;
+      for(const e of [{n:'Brás, pela ponte',r:[148,68,149,71],d:[134,98],pl:[143.5,72.6,false],t:'SAÍDA: BRÁS',__jm:1},{n:'Brás, pela ponte do Parque D. Pedro II',r:[148,10,149,13],d:[137,70],pl:[144,11.6,false],t:'SAÍDA: BRÁS',__jm:1}]){
+        SA.push(e);C.P.push({t:e.t,w:w0,x:Math.round(e.pl[0]*16),y:Math.round(e.pl[1]*16),v:false,cor:'#1f6b3a'});}
+      /* a última fileira da ponte fica embaixo do guarda-corpo: não se anda por ela */
+      for(const MM of [M,SCN[S]&&SCN[S].map]){if(!MM||!MM[71])continue;for(let x=146;x<=149;x++){if(Array.isArray(MM[71]))MM[71][x]='#';else MM[71]=MM[71].slice(0,x)+'#'+MM[71].slice(x+1);}}
+      rel.saidasPonte=2;}}catch(e){console.warn('saidas ponte',e);}
+    /* ===== v257 — CENTRO DE 1922: RUAS SEMPRE LIVRES — objeto pequeno (poste, caixote, cadeira, banca) que fecha uma rua estreita, sozinho ou em diagonal com outro, é levado para o lado; ninguém fica sem passar (pedido do professor, 21/11/2026) ===== */
+    try{if(!rel.ruasLivres){
+      const W0=M[0].length,H0=M.length;
+      const andavel=(x,y)=>M[y]&&/[pDdeSR.,f]/.test(M[y][x]||'');
+      const ocupa=(x,y,sem)=>objects.some(o=>o!==sem&&o.scene===S&&(o.w||0)*(o.h||0)>0&&x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h);
+      const livreT=(x,y,sem)=>andavel(x,y)&&!ocupa(x,y,sem);
+      const comps=(cx,cy,R,sem,tira)=>{const id=new Map(),lab=[];let n=0;
+        for(let y=cy-R;y<=cy+R;y++)for(let x=cx-R;x<=cx+R;x++){const k=x+','+y;if(id.has(k)||x<0||y<0||x>=W0||y>=H0)continue;
+          const ok=(a,b)=>livreT(a,b,sem)||(tira&&a>=tira.x&&a<tira.x+tira.w&&b>=tira.y&&b<tira.y+tira.h&&andavel(a,b)&&!ocupa(a,b,sem));
+          if(!ok(x,y))continue;n++;const q=[[x,y]];id.set(k,n);
+          while(q.length){const [a,b]=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=a+dx,Y=b+dy,kk=X+','+Y;if(id.has(kk)||Math.abs(X-cx)>R||Math.abs(Y-cy)>R||X<0||Y<0||X>=W0||Y>=H0||!ok(X,Y))continue;id.set(kk,n);q.push([X,Y]);}}}
+        return id;};
+      const trava=(o)=>{const R=6,cx=o.x,cy=o.y;const com=comps(cx,cy,R,null,null),sem=comps(cx,cy,R,o,null);
+        const borda=[];for(const [k,c] of sem){const [x,y]=k.split(',').map(Number);if(Math.abs(x-cx)===R||Math.abs(y-cy)===R)borda.push([k,c]);}
+        for(const [k1,c1] of borda)for(const [k2,c2] of borda)if(c1===c2&&com.get(k1)&&com.get(k2)&&com.get(k1)!==com.get(k2))return true;
+        /* o objeto sozinho ocupa a única passagem: no 'com' as bordas ficam em pedaços diferentes */
+        return false;};
+      const pequenos=objects.filter(o=>o.scene===S&&!o.enter&&!/^jm_q_|^jm_fx_|^pt_|^pc_|^jm_tv_|^jm_tapa_/.test(o.id)&&(o.w||0)>0&&(o.h||0)>0&&(o.w||1)*(o.h||1)<=3&&(o.w||1)<=3&&(o.h||1)===1&&andavel(o.x,o.y));
+      const movidos=[];let nTrava=0;
+      for(const o of pequenos){if(!trava(o))continue;nTrava++;let ok=false;const x0=o.x,y0=o.y;
+        for(let r=1;r<=5&&!ok;r++)for(let dy=-r;dy<=r&&!ok;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=x0+dx,y=y0+dy;
+          let livre=true;for(let k=0;k<(o.w||1);k++)if(!(M[y]&&/[p]/.test(M[y][x+k]||''))||ocupa(x+k,y,o)||npcs.some(n=>n.scene===S&&n.x===x+k&&n.y===y)||(typeof ITEMS!=='undefined'&&ITEMS.some(i=>i.scene===S&&i.x===x+k&&i.y===y)))livre=false;
+          if(!livre)continue;o.x=x;o.y=y;if(!trava(o)){ok=true;movidos.push([o.id,x0,y0,x,y]);break;}o.x=x0;o.y=y0;}
+        if(!ok){movidos.push([o.id,x0,y0,'fora']);o.scene='__fora';}}
+      rel.ruasLivres=[nTrava,movidos.length];rel.ruasLivresLista=movidos;}
+    }catch(e){console.warn('ruas livres JM',e);}
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
@@ -22729,7 +22792,460 @@ window.__paulista82Ready=Promise.all(ready);
         bans.sort((a,b)=>a[1]-b[1]).forEach(q=>ban(q[0],q[1]));}
       }catch(e){console.warn('Ladeira Porto Geral pintura JM',e);}
     }catch(e){console.warn('calcada JM',e);}};}
-  let n=0;const tenta=()=>{try{if(roda()||++n>20)return;}catch(e){console.warn('quadra de teste JM',e);return;}setTimeout(tenta,700);};
+  /* ===== v257 — ENCHENTE: QUEM ESTÁ NA ÁGUA SAI — quando o rio sobe com a chuva, as pessoas paradas na parte alagada vão para o chão seco mais perto e voltam quando a água baixa (pedido do professor, 21/11/2026) ===== */
+  try{if(!window.__jmEnch){window.__jmEnch=1;const fora=[];
+    setInterval(()=>{try{if(typeof floodLvl==='undefined'||typeof cur==='undefined')return;
+      const sc=cur,R=floodLvl*8.5;
+      if(fora.length&&(floodLvl<.05||fora[0].sc!==sc)){for(const f of fora.splice(0)){const n=f.n;if(n.scene===f.sc&&(f.sc!==sc||freeAt(f.sc,f.x,f.y))){n.x=f.x;n.y=f.y;if('px' in n){n.px=f.x*T;n.py=f.y*T;}}n.__fl=0;}}
+      if(!['sp','sp88','arr','sp22'].includes(sc)||floodSc!==sc||!floodD||R<1)return;
+      const molha=(x,y)=>{const d=floodD[y*MW+x];return d>0&&d<=R+1.5;};
+      for(const n of npcs){if(n.scene!==sc||n.__fl||!molha(n.x,n.y))continue;let p=null;
+        for(let r=1;r<=16&&!p;r++)for(let y=n.y-r;y<=n.y+r&&!p;y++)for(let x=n.x-r;x<=n.x+r;x++){if(Math.max(Math.abs(x-n.x),Math.abs(y-n.y))!==r||x<0||y<0||x>=MW||y>=MH)continue;if(floodD[y*MW+x]>0&&floodD[y*MW+x]<=R+4)continue;if(freeAt(sc,x,y)){p=[x,y];break;}}
+        if(!p)continue;fora.push({n,sc,x:n.x,y:n.y});n.__fl=1;n.x=p[0];n.y=p[1];if('px' in n){n.px=p[0]*T;n.py=p[1]*T;}}
+      window.__jmTeste&&(window.__jmTeste.enchente=fora.length);}catch(_){}},700);}
+  }catch(e){console.warn('enchente JM',e);}
+  /* ===== v257 — CENTRO DE 1922: SAÍDAS SEMPRE FUNCIONAM — depois de sair por uma saída (o Brás leva direto ao Leste), as outras saídas do centro voltavam a não perguntar nada; agora a saída é liberada mesmo quando a viagem muda de rumo (pedido do professor, 21/11/2026) ===== */
+  try{if(!window.__jmSai){window.__jmSai=1;const g0=goScene;
+    goScene=function(to,x,y,dir,after){if(typeof after==='function'&&typeof cur!=='undefined'&&cur==='m_centro22'){let feito=false;const uma=function(){if(feito)return;feito=true;try{after.apply(this,arguments);}catch(_){}};
+        const t0=Date.now(),vigia=setInterval(()=>{if(feito||Date.now()-t0>6000){clearInterval(vigia);uma();return;}if(cur!=='m_centro22'&&!sceneFade){clearInterval(vigia);setTimeout(uma,300);}},250);
+        return g0.call(this,to,x,y,dir,uma);}
+      return g0.apply(this,arguments);};}
+  }catch(e){console.warn('saidas JM',e);}
+  /* ===== v257 — CENTRO DE 1922: NOMES DE RUA SEMPRE À VISTA — a placa só fica transparente quando o próprio jogador passa por cima; gente e veículos passando não apagam mais o nome da rua (pedido do professor, 21/11/2026) ===== */
+  /* ===== v257 — INTERIORES: CASAS E LOJAS DE 1922 NO MODELO POKÉMON (pedido do professor, 21/11/2026) ===== */
+(function(){try{
+/* desenhista das casas de 1922 no modelo Pokémon/Stardew (skill interiores-piratininga) */
+var __CASA22=(function(){
+  const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
+  const tt=()=>(typeof performance!=='undefined'?performance.now():0)/1000;
+  const MW={k:'#3e2414',d:'#5e3a1e',m:'#86562e',l:'#a8723f',h:'#cc9658'};
+  const ME={k:'#2a140c',d:'#4a2418',m:'#6e3a28',l:'#8a4e34'};
+  const FE={k:'#1e1e22',d:'#2a2a2e',m:'#5a5e66',l:'#9ca2aa',h:'#c8ccd4'};
+  const BA={k:'#3e1a0c',d:'#7a3418',m:'#b85a34',l:'#d87a4e',h:'#e08a5a'};
+  const PB={k:'#a89a88',d:'#efe8dc',m:'#f4f0e6',l:'#ffffff'};
+  const OU={k:'#7a5a1e',d:'#8a6a1e',m:'#c8a040',l:'#d8b060',h:'#e0b850'};
+  const VI={k:'#5e4a3a',d:'#86b6cc',m:'#9ccbe0',l:'#d4ecf6',h:'#e8f4f8'};
+  const PL={k:'#2e6a32',d:'#3e7a3a',m:'#4e8a40',l:'#5a9a48'};
+  const SOMBRA='rgba(50,25,10,.25)';
+  const SH=(c,x,b,w)=>R(c,x,b-2,w,3,SOMBRA);
+  /* grade de letras: uma letra por ponto */
+  const grade=(c,X,Y,linhas,pal)=>{for(let j=0;j<linhas.length;j++){const L=linhas[j];for(let i=0;i<L.length;i++){const col=pal[L[i]];if(col)R(c,X+i,Y+j,1,1,col);}}};
+  const CADEIRA=['...KKKKKKKKKK...','..KmhhhhhhhhmK..','..KmKKKKKKKKmK..','..Km.KmllmK.mK..','..Km.KKKKKK.mK..','..Km........mK..','..KmK......KmK..','.KKKKKKKKKKKKKK.','KssssssssssssSSK','KsSsSsSsSsSsSsSK','KSSSSSSSSSSSSSSK','.KKKKKKKKKKKKKK.','..Kd........dK..','..Kd.KKKKKK.dK..','..Kd.KdddK..dK..','..Kd........dK..','..KK........KK..'];
+  const PCAD={K:MW.k,d:MW.d,m:MW.m,h:MW.h,l:MW.l,s:'#e2c27c',S:'#c8a058'};
+
+  /* ---------------- parede, chão, porta ---------------- */
+  function sala(s,W,H,sx,G,tema){
+    tema=tema||{};
+    const PW=W*16,FB=H*16-16,FY=48;
+    R(s,0,0,PW,H*16,'#1e1712');
+    let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+    /* chão de tábuas: fileiras de 4 px, desencontradas */
+    const velha=tema.chao==='velha';
+    const tons=velha?['#8a6440','#7e5a38','#946c46','#80603c']:(tema.tons||['#c48c52','#b98249','#cd965c','#bf884f']);
+    const cl=velha?'#a07a50':'#d8a46a',es=velha?'#5e4026':'#9a6a3a',fr=velha?'#4e3420':'#8a5a30';
+    for(let y=FY;y<FB;y+=4){let x=16-Math.floor(rnd()*30);
+      while(x<PW-16){const L=20+Math.floor(rnd()*25);const a=Math.max(x,16),z=Math.min(x+L,PW-16);
+        if(z>a){R(s,a,y,z-a,4,tons[Math.floor(rnd()*4)]);R(s,a,y,z-a,1,cl);R(s,a,y+3,z-a,1,es);R(s,z-1,y,1,4,fr);}
+        x+=L;}}
+    if(velha)for(let i=0;i<W*H/3;i++)R(s,16+rnd()*(PW-34),FY+rnd()*(FB-FY-2),2,1,'#4e3420');
+    /* outros chãos, quadradinho por quadradinho */
+    const pisoDe=(x,y)=>typeof tema.piso==='function'?tema.piso(x,y):(tema.chao||'tabua');
+    for(let y=3;y<H-1;y++)for(let x=1;x<W-1;x++){const p=pisoDe(x,y),X=x*16,Y=y*16;
+      if(p==='terra'){R(s,X,Y,16,16,'#c9a172');for(let k=0;k<7;k++){const px=X+Math.floor(rnd()*15),py=Y+Math.floor(rnd()*15);R(s,px,py,1+(k%2),1,['#b98f60','#d6b084','#ad8456'][k%3]);}}
+      else if(p==='tijoleira'){for(let j=0;j<2;j++){const yy=Y+j*8,off=((y*2+j)%2)*8;for(let i=-8;i<16;i+=16){const xx=X+i+off,a=Math.max(xx,X),z=Math.min(xx+16,X+16);if(z<=a)continue;R(s,a,yy,z-a,8,'#9a4e30');R(s,a+ (a===xx?1:0),yy+1,z-a-(a===xx?1:0)-(z===xx+16?1:0),6,['#c8704a','#bd6844','#d07a52'][(x*3+y+j+i)&1?1:(x+j)%3]);R(s,a+1,yy+1,Math.max(0,z-a-2),1,'#e0906a');}}}
+      else if(p==='xadrez'){const a=((x+y)%2)?(tema.xa||'#d8cfc0'):(tema.xb||'#b8ae9c');R(s,X,Y,16,16,a);R(s,X,Y,16,1,'rgba(255,255,255,.18)');R(s,X,Y+15,16,1,'rgba(0,0,0,.08)');}
+      else if(p==='velha'){R(s,X,Y,16,16,'rgba(50,25,10,.38)');if((x*7+y*5)%4===0)R(s,X+3+(x%9),Y+5+(y%7),2,1,'#3e2414');}
+      else if(p==='pedra'){R(s,X,Y,16,16,'#8e8a80');R(s,X+1,Y+1,14,14,['#c8c4b8','#bcb8ac','#d2cec2'][(x*7+y*3)%3]);R(s,X+1,Y+1,14,1,'#dedad0');}}
+    /* sombra das paredes sobre o chão */
+    R(s,16,FY,PW-32,3,'rgba(60,30,10,.28)');R(s,16,FY+3,PW-32,3,'rgba(60,30,10,.14)');
+    R(s,16,FY,3,FB-FY,'rgba(60,30,10,.18)');R(s,PW-19,FY,3,FB-FY,'rgba(60,30,10,.18)');
+    /* face de parede (serve para a do fundo e para as de dentro) */
+    const tipo=tema.tipo||'listrada';
+    const base=tema.parede||(tipo==='listrada'?'#e9dcbc':tipo==='cortico'?'#d8c8a8':'#efe6d2');
+    const face=(x0,y0,w,h)=>{R(s,x0,y0,w,h,base);
+      if(tipo==='listrada'){const lis=tema.listra||'#ddcca6',flor=tema.flor||'#c9a477';for(let x=x0;x<x0+w;x+=8)R(s,x+2,y0+2,3,h-13,lis);
+        for(let y=y0+5;y<y0+h-12;y+=10)for(let x=x0+((y/10|0)%2?4:12);x<x0+w;x+=16){R(s,x,y,1,1,flor);R(s,x-1,y+1,1,1,flor);R(s,x+1,y+1,1,1,flor);R(s,x,y+2,1,1,flor);}}
+      else{for(let k=0;k<w*h/40;k++)R(s,x0+rnd()*(w-6),y0+rnd()*(h-12),3+rnd()*5,2+rnd()*3,tipo==='cortico'?'#c8a888':'rgba(0,0,0,.04)');
+        if(tipo==='taipa')for(let k=0;k<w/12;k++)R(s,x0+rnd()*(w-10),y0+rnd()*(h-14),6+rnd()*8,3,'#e2d6be');
+        if(tipo==='cortico'){for(let k=0;k<w/20;k++){const xx=x0+rnd()*(w-14),yy=y0+3+rnd()*(h-20);R(s,xx,yy,8+rnd()*6,5+rnd()*4,'#b88c64');R(s,xx+1,yy+1,4,2,'#a07650');}
+          R(s,x0,y0+h-16,w,5,'rgba(70,90,60,.18)');}}
+      if(tema.lambri&&h>=20){R(s,x0,y0+h-13,w,2,MW.m);R(s,x0,y0+h-13,w,1,MW.l);R(s,x0,y0+h-11,w,9,'#6a4226');for(let x=x0;x<x0+w-12;x+=16){R(s,x+2,y0+h-10,12,7,MW.d);R(s,x+3,y0+h-9,10,5,'#76492a');R(s,x+3,y0+h-9,10,1,'#8a5a34');}R(s,x0,y0+h-2,w,2,MW.k);return;}
+      const bar=tema.barra||(tipo==='taipa'?'#b0703e':'#6f8a5c'),bl=tema.barraLuz||(tipo==='taipa'?'#c88a52':'#8aa874');
+      if(h<20){R(s,x0,y0+h-5,w,3,bar);R(s,x0,y0+h-5,w,1,bl);R(s,x0,y0+h-2,w,2,MW.k);return;}
+      R(s,x0,y0+h-11,w,9,bar);R(s,x0,y0+h-11,w,1,bl);if(tipo==='taipa')for(let k=0;k<w/10;k++)R(s,x0+rnd()*(w-4),y0+h-9+rnd()*5,3,1,'#8a5430');
+      R(s,x0,y0+h-2,w,2,MW.k);};
+    R(s,0,0,PW,7,'#4a3628');R(s,0,6,PW,1,'#2e2018');for(let x=4;x<PW;x+=14)R(s,x,0,6,6,'#5e4430');
+    face(16,7,PW-32,41);
+    if(tipo==='listrada'){R(s,16,7,PW-32,2,tema.friso||'#cdb88e');R(s,16,9,PW-32,1,'rgba(60,30,10,.15)');}
+    /* paredes de dentro: tampa por cima e face pintada onde há chão embaixo */
+    if(G)for(let y=3;y<H-1;y++)for(let x=1;x<W-1;x++){if(G[y][x]!=='#')continue;const X=x*16,Y=y*16;const baixo=G[y+1]&&G[y+1][x]!=='#'&&y+1<H-1;
+      R(s,X,Y,16,16,'#5a4434');R(s,X,Y,16,1,'#7a6250');
+      if(baixo){R(s,X,Y,16,4,'#5a4434');R(s,X,Y+3,16,1,'#2e2018');const t0=tipo;face(X,Y+4,16,12);}
+      if(G[y][x-1]!=='#')R(s,X,Y,1,16,'#7a6250');if(G[y][x+1]!=='#')R(s,X+15,Y,1,16,'#2e2018');}
+    /* paredes dos lados */
+    for(const x0 of [10,PW-16]){R(s,x0,0,6,FB+6,'#5a4434');R(s,x0===10?15:PW-16,0,1,FB+6,'#7a6250');}
+    R(s,0,0,10,H*16,'#1e1712');R(s,PW-10,0,10,H*16,'#1e1712');
+    /* parede de baixo */
+    R(s,10,FB,PW-20,6,'#5a4434');R(s,10,FB,PW-20,1,'#7a6250');R(s,0,FB+6,PW,10,'#1e1712');
+    /* porta: vão de 32 px com tábuas e batentes, capacho meio para dentro */
+    const dx=sx*16;R(s,dx,FB,32,16,'#b98249');for(let y=FB;y<FB+16;y+=4){R(s,dx,y,32,1,'#d8a46a');R(s,dx,y+3,32,1,'#9a6a3a');}
+    R(s,dx-2,FB-2,2,18,MW.k);R(s,dx+32,FB-2,2,18,MW.k);
+    if(tema.capacho!==false){R(s,dx+3,FB-4,26,9,'#5a1418');R(s,dx+4,FB-3,24,7,'#a8323a');R(s,dx+4,FB-3,24,1,'#d05a5a');for(let i=0;i<24;i+=4)R(s,dx+5+i,FB+1,2,1,'#d05a5a');}
+  }
+
+  /* ---------------- móveis ---------------- */
+  const LIB={
+   mesa(c,X,Y,o){const w=o.w*16,h=(o.h||1)*16,b=Y+h;SH(c,X+2,b,w-4);
+     R(c,X+3,b-7,2,7,MW.k);R(c,X+w-5,b-7,2,7,MW.k);R(c,X+3,b-7,1,6,MW.d);R(c,X+w-5,b-7,1,6,MW.d);
+     R(c,X+1,b-h,w-2,h-6,MW.k);R(c,X+2,b-h+1,w-4,h-10,MW.l);R(c,X+2,b-h+1,w-4,1,MW.h);R(c,X+2,b-9,w-4,2,MW.m);R(c,X+2,b-7,w-4,1,MW.d);
+     /* toalha xadrez */
+     const tx=X+5,tw=w-10,th=h-9;R(c,tx,b-h+1,tw,th,'#f4f0e6');for(let j=0;j<th-1;j+=2)for(let i=(j/2)%2*2;i<tw;i+=4)R(c,tx+i,b-h+1+j,2,2,o.toalha||'#c8404a');
+     for(let i=0;i<tw;i+=2)R(c,tx+i,b-8,1,2,i%4?'#f4f0e6':'#c8404a');
+     /* moringa de barro, bule e prato com pão */
+     R(c,X+9,b-21,6,8,BA.k);R(c,X+10,b-20,4,6,BA.m);R(c,X+10,b-20,1,4,BA.l);R(c,X+11,b-23,2,2,BA.k);R(c,X+11,b-22,2,1,BA.d);
+     R(c,X+w-15,b-19,8,6,FE.k);R(c,X+w-14,b-18,6,4,PB.d);R(c,X+w-14,b-18,2,1,'#ffffff');R(c,X+w-16,b-17,2,1,FE.k);R(c,X+w-12,b-20,2,1,FE.k);R(c,X+w-7,b-17,2,2,FE.k);
+     R(c,X+20,b-14,9,4,PB.k);R(c,X+21,b-14,7,3,PB.l);R(c,X+22,b-15,5,3,'#b07a3a');R(c,X+22,b-15,5,1,'#d8a060');},
+   banco(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+2,b,w-4);
+     R(c,X+3,b-6,2,6,MW.k);R(c,X+w-5,b-6,2,6,MW.k);R(c,X+(w>>1)-1,b-6,2,6,MW.k);
+     R(c,X+1,b-11,w-2,6,MW.k);R(c,X+2,b-10,w-4,3,MW.l);R(c,X+2,b-10,w-4,1,MW.h);R(c,X+2,b-7,w-4,1,MW.m);},
+   cadeira(c,X,Y){const b=Y+16;SH(c,X+2,b,12);grade(c,X,b-17,CADEIRA,PCAD);},
+   balanco(c,X,Y){const b=Y+16,f=Math.round(Math.sin(tt()*1.6));SH(c,X+1,b,14);
+     R(c,X,b-3,16,2,MW.k);R(c,X+1,b-3,14,1,MW.m);grade(c,X,b-19+f,CADEIRA.slice(0,12),PCAD);R(c,X+2,b-8+f,2,5,MW.k);R(c,X+12,b-8+f,2,5,MW.k);},
+   cama(c,X,Y){const b=Y+32;SH(c,X+1,b,14);
+     /* cabeceira */
+     R(c,X+1,Y-6,14,12,MW.k);R(c,X+2,Y-5,12,10,MW.m);R(c,X+2,Y-5,12,2,MW.l);R(c,X+2,Y-5,12,1,MW.h);R(c,X+4,Y-2,8,5,MW.d);R(c,X+7,Y-4,2,1,OU.m);
+     /* colchão e lençol */
+     R(c,X+1,Y+5,14,b-Y-10,MW.k);R(c,X+2,Y+5,12,b-Y-11,PB.d);R(c,X+3,Y+6,10,6,PB.l);R(c,X+3,Y+11,10,1,PB.k);
+     /* colcha de retalhos */
+     const cs=['#a8303a','#e2c27c','#5a8ab0','#4e8a40','#c8404a','#efe8dc'];for(let j=0;j<4;j++)for(let i=0;i<3;i++)R(c,X+2+i*4,Y+14+j*4,4,4,cs[(i+j*2)%6]);
+     R(c,X+2,Y+14,12,1,'rgba(255,255,255,.35)');
+     /* pé da cama */
+     R(c,X+1,b-6,14,6,MW.k);R(c,X+2,b-5,12,4,MW.m);R(c,X+2,b-5,12,1,MW.l);R(c,X+2,b-1,2,1,MW.k);},
+   bau(c,X,Y){const b=Y+16;SH(c,X+1,b,14);R(c,X+1,b-13,14,13,MW.k);R(c,X+2,b-12,12,4,MW.l);R(c,X+2,b-12,12,1,MW.h);R(c,X+2,b-8,12,7,MW.m);R(c,X+2,b-8,12,1,MW.d);
+     R(c,X+4,b-12,1,11,FE.m);R(c,X+11,b-12,1,11,FE.m);R(c,X+7,b-7,2,3,OU.m);R(c,X+7,b-7,1,1,OU.h);},
+   fogao(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);
+     /* chaminé de ferro subindo pela parede */
+     R(c,X+2,Y-30,5,24,FE.k);R(c,X+3,Y-30,3,24,FE.m);R(c,X+3,Y-30,1,24,FE.l);R(c,X+1,Y-31,7,2,FE.k);
+     /* corpo de alvenaria caiada com barra de tijolo */
+     R(c,X+1,b-15,w-2,15,BA.k);R(c,X+2,b-14,w-4,4,FE.d);R(c,X+2,b-14,w-4,1,FE.m);
+     for(const cx of [X+8,X+18]){R(c,cx-3,b-13,7,2,FE.k);R(c,cx-2,b-13,5,1,FE.l);}
+     R(c,X+2,b-10,w-4,9,'#e8dcc4');R(c,X+2,b-10,w-4,1,'#f4ecd8');R(c,X+2,b-3,w-4,2,BA.m);
+     /* boca do fogo */
+     R(c,X+5,b-9,9,6,FE.k);const f=Math.floor(tt()*6)%2;R(c,X+6,b-8,7,4,f?'#e2602e':'#f1a040');R(c,X+7,b-7,5,2,f?'#f1a040':'#fde8a0');
+     R(c,X+17,b-9,8,5,FE.k);R(c,X+18,b-8,6,3,FE.m);R(c,X+19,b-8,2,1,FE.h);
+     /* panela de ferro com tampa */
+     R(c,X+5,b-19,8,6,FE.k);R(c,X+6,b-18,6,4,FE.d);R(c,X+6,b-18,6,1,FE.m);R(c,X+8,b-20,2,1,FE.k);R(c,X+4,b-17,1,2,FE.k);R(c,X+13,b-17,1,2,FE.k);
+     if(f){R(c,X+8,b-24,1,2,'rgba(255,255,255,.5)');R(c,X+9,b-26,1,2,'rgba(255,255,255,.35)');}else{R(c,X+9,b-24,1,2,'rgba(255,255,255,.5)');R(c,X+8,b-26,1,2,'rgba(255,255,255,.35)');}},
+   costura(c,X,Y){const b=Y+16;SH(c,X+1,b,14);
+     R(c,X+2,b-5,1,5,FE.k);R(c,X+13,b-5,1,5,FE.k);R(c,X+3,b-3,10,1,FE.k);R(c,X+5,b-2,6,2,FE.m);
+     R(c,X+1,b-10,14,5,MW.k);R(c,X+2,b-9,12,2,MW.l);R(c,X+2,b-9,12,1,MW.h);R(c,X+2,b-7,12,1,MW.m);
+     R(c,X+3,b-17,10,8,FE.k);R(c,X+4,b-16,8,2,FE.d);R(c,X+4,b-14,2,4,FE.d);R(c,X+10,b-14,2,4,FE.d);R(c,X+5,b-16,5,1,OU.m);R(c,X+4,b-11,7,1,OU.m);
+     R(c,X+12,b-16,3,3,OU.m);R(c,X+13,b-15,1,1,OU.h);R(c,X+5,b-10,1,1+(Math.floor(tt()*14)%2),FE.h);R(c,X+8,b-12,4,2,'#c8404a');},
+   filtro(c,X,Y){const b=Y+16;SH(c,X+2,b,12);
+     R(c,X+3,b-6,10,6,MW.k);R(c,X+4,b-5,8,2,MW.l);R(c,X+4,b-3,1,3,MW.d);R(c,X+11,b-3,1,3,MW.d);
+     R(c,X+4,b-16,8,10,BA.k);R(c,X+5,b-15,6,8,BA.m);R(c,X+5,b-15,2,6,BA.l);R(c,X+4,b-12,8,1,BA.d);
+     R(c,X+5,b-22,6,6,BA.k);R(c,X+6,b-21,4,4,BA.m);R(c,X+6,b-21,1,3,BA.l);R(c,X+5,b-23,6,1,BA.d);
+     R(c,X+11,b-9,3,1,FE.m);R(c,X+13,b-9,1,2,FE.m);R(c,X+13,b-6,1,1+(Math.floor(tt()*3)%2),'#9ccbe0');},
+   oratorio(c,X,Y){const b=Y+16;R(c,X+2,b-6,12,2,MW.k);R(c,X+3,b-6,10,1,MW.l);
+     R(c,X+3,b-25,10,19,MW.k);R(c,X+4,b-24,8,17,MW.m);R(c,X+5,b-21,6,13,'#f4ecd8');c.fillStyle=MW.k;R(c,X+2,b-27,12,2,MW.k);R(c,X+5,b-29,6,2,MW.k);R(c,X+7,b-31,2,2,OU.m);
+     R(c,X+7,b-19,2,2,'#e0b890');R(c,X+6,b-17,4,7,'#5a8ab0');R(c,X+6,b-17,4,1,'#9ccbe0');
+     for(const vx of [X+3,X+12]){R(c,vx,b-9,1,3,PB.l);const f=Math.floor(tt()*5+vx)%2;R(c,vx,b-11,1,2,f?'#f1a040':'#fde8a0');}
+     c.fillStyle='rgba(255,210,120,.16)';c.beginPath();c.arc(X+8,b-10,9,0,7);c.fill();},
+   retrato(c,X,Y){const b=Y+16;c.fillStyle=OU.k;c.beginPath();c.ellipse(X+8,b-18,6,8,0,0,7);c.fill();c.fillStyle=OU.m;c.beginPath();c.ellipse(X+8,b-18,5,7,0,0,7);c.fill();
+     c.fillStyle='#e8dcc0';c.beginPath();c.ellipse(X+8,b-18,4,6,0,0,7);c.fill();R(c,X+7,b-22,3,3,'#c89a70');R(c,X+7,b-23,3,1,'#3a2a20');R(c,X+5,b-19,7,6,'#2a2a2e');R(c,X+7,b-19,3,2,PB.l);R(c,X+8,b-27,1,1,OU.h);},
+   janela(c,X,Y,o){const w=o.w*16,b=Y+16,x0=X+(w-24)/2;
+     R(c,x0-1,b-37,26,32,MW.k);R(c,x0,b-36,24,30,VI.m);R(c,x0,b-36,24,10,VI.l);R(c,x0+11,b-36,2,30,PB.m);R(c,x0,b-22,24,2,PB.m);R(c,x0+2,b-34,4,4,VI.h);R(c,x0+14,b-34,3,2,VI.h);
+     R(c,x0-3,b-40,30,4,MW.m);R(c,x0-3,b-40,30,1,MW.h);R(c,x0-3,b-37,30,1,MW.k);
+     for(const cx of [x0-4,x0+22]){R(c,cx,b-36,6,28,'#7a1e28');R(c,cx+1,b-36,4,27,'#a8303a');R(c,cx+1,b-36,1,27,'#c8404a');R(c,cx,b-20,6,2,OU.m);}
+     R(c,x0-3,b-7,30,3,PB.k);R(c,x0-3,b-7,30,1,PB.m);},
+   escada(c,X,Y){const b=Y+32;SH(c,X,b,16);
+     for(let i=0;i<8;i++){const y=b-5-i*6;R(c,X+1,y,14,6,MW.k);R(c,X+2,y+1,12,2,MW.l);R(c,X+2,y+1,12,1,MW.h);R(c,X+2,y+3,12,2,MW.d);}
+     R(c,X,b-50,2,50,MW.k);R(c,X+14,b-50,2,50,MW.k);R(c,X+15,b-50,1,48,MW.m);R(c,X+1,b-52,15,2,MW.k);},
+   tapete(c,X,Y,o){const w=o.w*16,b=Y+16;const cs=['#a8303a','#e2c27c','#5a8ab0','#7a3418','#4e8a40'];
+     R(c,X+2,b-12,w-4,10,'#5a1418');for(let i=0;i<w-6;i++)R(c,X+3+i,b-11,1,8,cs[Math.floor(i/3)%5]);R(c,X+3,b-11,w-6,1,'rgba(255,255,255,.25)');
+     for(let i=0;i<w-6;i+=2){R(c,X+3+i,b-13,1,1,PB.m);R(c,X+3+i,b-2,1,1,PB.m);}},
+   guardalouca(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);
+     R(c,X+1,b-42,w-2,42,ME.k);R(c,X+2,b-41,w-4,3,ME.l);R(c,X+0,b-44,w,3,ME.k);R(c,X+1,b-43,w-2,1,ME.l);
+     /* parte de cima: portas de vidro com louça */
+     R(c,X+3,b-37,w-6,19,ME.d);for(const px of [X+3,X+(w>>1)]){R(c,px,b-37,(w-6)/2,19,ME.k);R(c,px+1,b-36,(w-6)/2-2,17,'#c4dce4');}
+     for(let j=0;j<2;j++){const yy=b-35+j*8;R(c,X+4,yy+6,w-8,1,ME.m);for(let i=0;i<(w-10)/5;i++){if(j===0){R(c,X+5+i*5,yy,4,5,PB.k);R(c,X+6+i*5,yy+1,2,3,PB.l);R(c,X+6+i*5,yy+2,2,1,'#5a8ab0');}else{R(c,X+5+i*5,yy+2,4,3,PB.k);R(c,X+6+i*5,yy+3,2,1,PB.l);R(c,X+9+i*5,yy+3,1,1,PB.k);}}}
+     R(c,X+5,b-35,1,4,VI.h);R(c,X+(w>>1)+2,b-35,1,3,VI.h);
+     /* tampo e gavetas */
+     R(c,X+1,b-17,w-2,3,ME.l);R(c,X+1,b-17,w-2,1,'#a8664a');R(c,X+3,b-13,w-6,5,ME.m);R(c,X+3,b-7,w-6,5,ME.m);R(c,X+3,b-8,w-6,1,ME.k);
+     R(c,X+(w>>1)-1,b-11,2,1,OU.m);R(c,X+(w>>1)-1,b-5,2,1,OU.m);R(c,X+2,b-1,2,1,ME.k);R(c,X+w-4,b-1,2,1,ME.k);},
+   samambaia(c,X,Y){const b=Y+16;SH(c,X+3,b,10);
+     R(c,X+5,b-8,6,8,MW.k);R(c,X+6,b-7,4,6,MW.m);R(c,X+5,b-9,6,1,MW.l);
+     R(c,X+4,b-14,8,6,'#3a2414');R(c,X+5,b-13,6,4,'#5e3c24');R(c,X+5,b-13,6,1,'#7a5434');
+     const f=[[-6,-6],[-4,-10],[0,-12],[4,-10],[6,-6],[-7,-1],[7,-1],[-2,-8],[2,-8]];for(const [dx,dy] of f){for(let k=0;k<4;k++){const xx=X+8+Math.round(dx*k/3),yy=b-15+Math.round(dy*k/3)+(k>2?1:0);R(c,xx,yy,2,2,k%2?PL.m:PL.l);}R(c,X+8+dx,b-15+dy,1,1,PL.k);}
+     R(c,X+7,b-16,2,2,PL.d);},
+   lavatorio(c,X,Y){const b=Y+16;SH(c,X+1,b,14);
+     R(c,X+2,b-7,1,7,MW.k);R(c,X+13,b-7,1,7,MW.k);R(c,X+3,b-3,10,1,MW.k);
+     R(c,X+1,b-11,14,4,MW.k);R(c,X+2,b-10,12,2,MW.l);R(c,X+2,b-10,12,1,MW.h);R(c,X+2,b-8,12,1,MW.m);
+     R(c,X+2,b-14,9,4,PB.k);R(c,X+3,b-14,7,3,PB.l);R(c,X+4,b-13,5,1,'#9ccbe0');
+     R(c,X+9,b-20,5,8,PB.k);R(c,X+10,b-19,3,6,PB.l);R(c,X+10,b-17,3,1,'#5a8ab0');R(c,X+13,b-18,1,3,PB.k);R(c,X+9,b-21,3,1,PB.k);
+     R(c,X+1,b-9,2,6,PB.d);R(c,X+1,b-9,2,1,'#c8404a');},
+   cesto(c,X,Y,o){const b=Y+16,nm=(o&&o.name)||'';SH(c,X+2,b,12);
+     R(c,X+2,b-9,12,9,'#6a4a1e');for(let j=0;j<8;j+=2)for(let i=(j/2)%2;i<11;i+=2)R(c,X+3+i,b-8+j,1,2,'#c8a058');R(c,X+3,b-8,10,1,'#e2c27c');
+     if(/flor/i.test(nm)){const cs=['#c8404a','#e0b850','#efe8dc','#e0606a','#9a6ac0'];for(let i=0;i<9;i++){const x=X+3+(i*4)%11,y=b-15+((i*5)%5);R(c,x,y+2,1,3,PL.m);R(c,x-1,y,3,3,cs[i%5]);R(c,x,y+1,1,1,'#fde8a0');}return;}
+     if(/p[ãa]es/i.test(nm)){for(let i=0;i<4;i++){const x=X+3+i*3;R(c,x,b-14+(i%2),4,4,'#8a5a20');R(c,x+1,b-14+(i%2),2,2,'#d8a060');}return;}
+     if(/ovos/i.test(nm)){for(let i=0;i<5;i++){const x=X+3+i*2,y=b-12-(i%2)*2;R(c,x,y,3,3,'#efe0c8');R(c,x,y,1,1,'#ffffff');}return;}
+     R(c,X+3,b-13,10,5,'#5a8ab0');R(c,X+4,b-13,4,2,'#9ccbe0');R(c,X+8,b-12,5,3,'#efe8dc');R(c,X+8,b-12,5,1,'#ffffff');R(c,X+10,b-14,3,2,'#c8404a');},
+   cabide(c,X,Y){const b=Y+16;SH(c,X+4,b,8);
+     R(c,X+4,b-2,8,2,MW.k);R(c,X+7,b-28,2,27,MW.k);R(c,X+7,b-28,1,26,MW.l);R(c,X+4,b-27,8,1,MW.k);
+     R(c,X+3,b-30,10,3,'#2a2a2e');R(c,X+5,b-33,6,3,'#2a2a2e');R(c,X+5,b-31,6,1,'#7a1e28');
+     R(c,X+3,b-24,10,13,'#3a3a42');R(c,X+4,b-23,3,11,'#4e4e58');R(c,X+7,b-24,2,6,'#efe8dc');R(c,X+7,b-22,2,4,'#7a1e28');},
+   espada(c,X,Y){const b=Y+16;SH(c,X+3,b,10);
+     R(c,X+4,b-8,8,8,BA.k);R(c,X+5,b-7,6,6,BA.m);R(c,X+5,b-7,2,5,BA.l);R(c,X+4,b-9,8,2,BA.d);
+     for(const [dx,h] of [[5,12],[7,16],[9,14],[11,10],[6,9],[10,11]]){R(c,X+dx,b-9-h,2,h,PL.k);R(c,X+dx,b-9-h+1,1,h-1,PL.l);R(c,X+dx+1,b-9-h/2,1,2,'#e2c27c');}},
+   panelas(c,X,Y,o){const b=Y+16;if(o&&o.y<=2){const w=o.w*16;R(c,X+2,b-34,w-4,2,MW.k);R(c,X+2,b-34,w-4,1,MW.l);const it=[[FE.k,FE.m,7],[BA.k,BA.m,6],['#a89a88','#c8ccd4',8],[FE.k,FE.d,5]];for(let i=0;i<(w-6)/8;i++){const q=it[i%4],x=X+4+i*8;R(c,x+3,b-32,1,3,FE.k);R(c,x,b-29,q[2],q[2]-1,q[0]);R(c,x+1,b-28,q[2]-2,q[2]-3,q[1]);R(c,x+1,b-28,1,q[2]-4,'rgba(255,255,255,.25)');}return;}SH(c,X+1,b,14);
+     R(c,X+1,b-30,14,30,MW.k);R(c,X+2,b-29,12,28,MW.d);for(const yy of [b-21,b-12,b-3]){R(c,X+2,yy,12,2,MW.l);R(c,X+2,yy,12,1,MW.h);}
+     R(c,X+3,b-27,5,6,FE.k);R(c,X+4,b-26,3,4,FE.m);R(c,X+9,b-26,4,5,'#c8ccd4');R(c,X+9,b-26,4,1,'#ffffff');R(c,X+10,b-27,2,1,FE.k);
+     R(c,X+3,b-18,4,6,PB.k);R(c,X+4,b-17,2,4,PB.l);R(c,X+4,b-15,2,1,'#5a8ab0');R(c,X+8,b-17,5,5,BA.k);R(c,X+9,b-16,3,3,BA.m);
+     R(c,X+3,b-9,10,6,'#c8a058');R(c,X+3,b-9,10,1,'#e2c27c');R(c,X+5,b-8,2,4,'#a07e3a');R(c,X+9,b-8,2,4,'#a07e3a');},
+   lenha(c,X,Y){const b=Y+16;SH(c,X+1,b,14);
+     R(c,X+1,b-10,14,10,'#6a4a1e');for(let j=0;j<3;j++)for(let i=0;i<3-(j>1?1:0);i++){const cx=X+2+i*4+(j>1?2:0),cy=b-5-j*4;R(c,cx,cy,4,4,'#5e3a1e');R(c,cx+1,cy+1,2,2,'#c89a60');R(c,cx+1,cy+1,1,1,'#e2b878');}},
+   relparede(c,X,Y){const b=Y+16;R(c,X+3,b-38,10,24,MW.k);R(c,X+4,b-37,8,22,MW.m);R(c,X+4,b-37,8,1,MW.h);
+     c.fillStyle=PB.k;c.beginPath();c.arc(X+8,b-31,4,0,7);c.fill();c.fillStyle=PB.l;c.beginPath();c.arc(X+8,b-31,3,0,7);c.fill();R(c,X+8,b-33,1,2,MW.k);R(c,X+8,b-31,2,1,MW.k);
+     R(c,X+5,b-25,6,8,MW.d);const s=Math.round(Math.sin(tt()*3)*2);R(c,X+8+s,b-25,1,5,OU.m);R(c,X+7+s,b-20,3,2,OU.m);R(c,X+7+s,b-20,1,1,OU.h);},
+   folhinha(c,X,Y){const b=Y+16;R(c,X+3,b-30,11,15,PB.k);R(c,X+4,b-29,9,13,PB.l);R(c,X+4,b-29,9,4,'#a8303a');R(c,X+8,b-32,1,2,MW.k);
+     for(let j=0;j<3;j++)for(let i=0;i<4;i++)R(c,X+5+i*2,b-24+j*3,1,1,(i===2&&j===1)?'#a8303a':'#5a5e66');},
+   lampada(c,X,Y){const b=Y+16;R(c,X+7,b-46,1,20,FE.k);R(c,X+5,b-27,6,3,'#4e8a40');R(c,X+5,b-27,6,1,'#5a9a48');R(c,X+6,b-24,4,4,'#fff6c8');R(c,X+7,b-23,2,2,'#ffffff');
+     c.fillStyle='rgba(255,210,120,.16)';c.beginPath();c.arc(X+8,b-21,11,0,7);c.fill();},
+   gaiola(c,X,Y){const b=Y+16,p=Math.floor(tt()*2)%2;R(c,X+7,b-44,1,8,FE.k);R(c,X+3,b-36,10,1,OU.k);
+     R(c,X+3,b-35,10,14,'rgba(0,0,0,0)');for(let i=0;i<11;i+=2)R(c,X+3+i,b-35,1,13,OU.m);R(c,X+2,b-22,12,2,OU.k);R(c,X+3,b-22,10,1,OU.l);R(c,X+4,b-37,8,2,OU.m);
+     R(c,X+6,b-28-p,4,3,'#e8c838');R(c,X+9,b-29-p,2,2,'#e8c838');R(c,X+10,b-29-p,1,1,FE.k);R(c,X+11,b-28-p,1,1,'#e08a5a');R(c,X+5,b-27-p,2,1,'#c8a020');}
+   ,
+   talha(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+3,b-15,10,15,BA.k);R(c,X+4,b-14,8,13,BA.m);R(c,X+4,b-14,3,11,BA.l);R(c,X+4,b-3,8,2,BA.d);R(c,X+5,b-17,6,3,BA.k);R(c,X+6,b-16,4,1,BA.d);R(c,X+4,b-18,8,2,MW.m);R(c,X+4,b-18,8,1,MW.h);R(c,X+10,b-17,4,1,FE.l);R(c,X+13,b-18,1,4,FE.m);},
+   pote(c,X,Y){const b=Y+16;SH(c,X+3,b,10);R(c,X+4,b-12,8,12,BA.k);R(c,X+5,b-11,6,10,BA.m);R(c,X+5,b-11,2,8,BA.l);R(c,X+6,b-14,4,3,BA.k);R(c,X+7,b-13,2,1,BA.d);R(c,X+5,b-7,6,1,BA.d);},
+   catre(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+1,b-4,2,4,MW.k);R(c,X+w-3,b-4,2,4,MW.k);
+     R(c,X+1,b-12,w-2,8,MW.k);R(c,X+2,b-11,w-4,5,'#c6a46c');for(let i=2;i<w-2;i+=3)R(c,X+i,b-11,1,5,'#957444');R(c,X+2,b-11,w-4,1,'#e2c896');
+     R(c,X+3,b-13,9,5,PB.k);R(c,X+4,b-12,7,3,PB.l);R(c,X+13,b-12,w-16,5,'#7a8a6a');R(c,X+13,b-12,w-16,1,'#9aaa86');R(c,X+2,b-6,w-4,2,MW.m);},
+   esteira(c,X,Y,o){const w=o.w*16,h=(o.h||1)*16;R(c,X+1,Y+2,w-2,h-4,'#a07e3a');for(let j=3;j<h-3;j+=2)R(c,X+2,Y+j,w-4,1,(j%4==1)?'#c8a058':'#e2c27c');R(c,X+2,Y+3,w-4,1,'#e2c27c');R(c,X+3,Y+4,8,5,PB.k);R(c,X+4,Y+5,6,3,PB.l);},
+   colchao(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+1,b-10,w-2,9,'#957444');R(c,X+2,b-9,w-4,6,'#e2c896');for(let i=4;i<w-3;i+=5)R(c,X+i,b-8,1,4,'#c6a46c');R(c,X+2,b-4,w-4,2,'#c6a46c');R(c,X+3,b-11,8,4,PB.k);R(c,X+4,b-10,6,2,PB.l);R(c,X+14,b-9,w-17,5,'#7a1e28');R(c,X+14,b-9,w-17,1,'#a8303a');},
+   galinhas(c,X,Y){const b=Y+16,p=Math.floor(tt()*3)%2;SH(c,X+1,b,14);R(c,X+1,b-12,14,12,MW.k);R(c,X+2,b-11,12,10,'#8a6a3a');for(let i=0;i<12;i+=3)R(c,X+2+i,b-11,1,10,MW.d);R(c,X+1,b-13,14,2,MW.m);R(c,X+1,b-13,14,1,MW.h);
+     R(c,X+4,b-8-p,5,4,PB.l);R(c,X+8,b-9-p,2,2,PB.l);R(c,X+9,b-10-p,1,1,'#c8404a');R(c,X+10,b-9-p,1,1,'#e0b850');R(c,X+9,b-6,4,3,'#a8723f');R(c,X+12,b-7,1,1,'#c8404a');R(c,X+3,b-3,10,1,'#e2c27c');},
+   quadro(c,X,Y,o){const w=o.w*16,b=Y+16,x0=X+3,ww=w-6;R(c,x0,b-36,ww,20,OU.k);R(c,x0+1,b-35,ww-2,18,OU.m);R(c,x0+1,b-35,ww-2,1,OU.h);R(c,x0+3,b-33,ww-6,14,'#9ccbe0');R(c,x0+3,b-25,ww-6,6,'#4e8a40');R(c,x0+3,b-27,ww/2,3,'#5a9a48');R(c,x0+ww-12,b-28,6,4,PB.l);R(c,x0+ww-12,b-30,6,2,'#a8303a');R(c,x0+5,b-31,3,1,PB.l);},
+   lampiao(c,X,Y){const b=Y+16;R(c,X+7,b-36,2,4,FE.m);R(c,X+5,b-33,6,2,FE.k);R(c,X+5,b-31,6,8,VI.k);R(c,X+6,b-30,4,6,'#fff0c0');const f=Math.floor(tt()*5)%2;R(c,X+7,b-28,2,3,f?'#f1a040':'#fde8a0');R(c,X+5,b-23,6,3,FE.m);R(c,X+5,b-23,6,1,FE.l);
+     c.fillStyle='rgba(255,210,120,.16)';c.beginPath();c.arc(X+8,b-27,10,0,7);c.fill();},
+   lampiaoq(c,X,Y){const b=Y+16;SH(c,X+4,b,8);R(c,X+4,b-3,8,3,FE.m);R(c,X+5,b-12,6,9,VI.k);R(c,X+6,b-11,4,7,'#fff0c0');const f=Math.floor(tt()*5)%2;R(c,X+7,b-9,2,3,f?'#f1a040':'#fde8a0');R(c,X+5,b-14,6,2,FE.k);R(c,X+7,b-17,2,3,FE.k);
+     c.fillStyle='rgba(255,210,120,.16)';c.beginPath();c.arc(X+8,b-8,10,0,7);c.fill();},
+   latas(c,X,Y){const b=Y+16;SH(c,X+1,b,14);const cs=[['#a8303a','#c8404a'],['#c8a040','#e0b850'],['#5a8ab0','#9ccbe0'],['#4e8a40','#5a9a48']];
+     for(let i=0;i<3;i++){const x=X+1+i*5,cc=cs[i];R(c,x,b-10,5,10,FE.k);R(c,x+1,b-9,3,8,cc[0]);R(c,x+1,b-9,3,1,cc[1]);R(c,x+1,b-6,3,2,PB.l);}const cc=cs[3];R(c,X+4,b-17,6,7,FE.k);R(c,X+5,b-16,4,5,cc[0]);R(c,X+5,b-16,4,1,cc[1]);},
+   fogaoferro(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+w-8,Y-24,4,20,FE.k);R(c,X+w-7,Y-24,2,20,FE.m);
+     R(c,X+2,b-4,2,4,FE.k);R(c,X+w-4,b-4,2,4,FE.k);R(c,X+1,b-15,w-2,12,FE.k);R(c,X+2,b-14,w-4,3,FE.m);R(c,X+2,b-14,w-4,1,FE.l);for(const cx of [X+8,X+19]){R(c,cx-3,b-14,7,2,FE.d);}
+     R(c,X+2,b-11,w-4,7,FE.d);R(c,X+4,b-10,9,5,FE.k);const f=Math.floor(tt()*6)%2;R(c,X+5,b-9,7,3,f?'#e2602e':'#f1a040');R(c,X+16,b-10,10,5,FE.m);R(c,X+17,b-9,8,1,FE.h);R(c,X+20,b-8,2,1,OU.m);
+     R(c,X+17,b-19,7,5,'#c8ccd4');R(c,X+17,b-19,7,1,'#ffffff');R(c,X+24,b-18,2,2,FE.k);R(c,X+19,b-20,3,1,FE.k);},
+   pilao(c,X,Y){const b=Y+16;SH(c,X+3,b,10);R(c,X+4,b-11,8,11,MW.k);R(c,X+5,b-10,6,9,MW.m);R(c,X+5,b-10,2,8,MW.l);R(c,X+5,b-11,6,2,MW.d);R(c,X+7,b-24,2,15,MW.k);R(c,X+7,b-24,1,14,MW.h);R(c,X+6,b-25,4,2,MW.k);},
+   tamborete(c,X,Y){const b=Y+16;SH(c,X+3,b,10);R(c,X+4,b-6,2,6,MW.k);R(c,X+10,b-6,2,6,MW.k);R(c,X+3,b-10,10,5,MW.k);R(c,X+4,b-9,8,2,MW.l);R(c,X+4,b-9,8,1,MW.h);R(c,X+4,b-7,8,1,MW.m);},
+   fogareiro(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+3,b-9,10,9,FE.k);R(c,X+4,b-8,8,7,FE.m);R(c,X+5,b-6,6,3,FE.k);const f=Math.floor(tt()*6)%2;R(c,X+6,b-5,4,1,f?'#e2602e':'#f1a040');
+     R(c,X+3,b-14,10,5,FE.k);R(c,X+4,b-13,8,3,'#c8ccd4');R(c,X+4,b-13,8,1,'#ffffff');R(c,X+2,b-12,1,2,FE.k);R(c,X+13,b-12,1,2,FE.k);},
+   tina(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+1,b-11,w-2,11,MW.k);R(c,X+2,b-10,w-4,9,MW.m);for(let i=4;i<w-3;i+=4)R(c,X+i,b-9,1,8,MW.l);R(c,X+1,b-8,w-2,1,FE.m);R(c,X+1,b-3,w-2,1,FE.m);R(c,X+3,b-10,w-6,3,'#5a8ab0');R(c,X+4,b-10,3,1,'#9ccbe0');},
+   tanque(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+1,b-14,w-2,14,'#8e8a80');R(c,X+2,b-13,w-4,4,'#d2cec2');R(c,X+2,b-13,w-4,1,'#e8e4da');R(c,X+4,b-12,w/2-5,3,'#5a8ab0');R(c,X+5,b-12,3,1,'#9ccbe0');for(let i=0;i<4;i++)R(c,X+w/2+1,b-12+i,w/2-4,1,i%2?'#bcb8ac':'#c8c4b8');R(c,X+2,b-9,w-4,8,'#bcb8ac');R(c,X+2,b-9,w-4,1,'#8e8a80');
+     R(c,X+5,b-20,2,7,FE.m);R(c,X+5,b-20,5,2,FE.m);R(c,X+9,b-19,1,2,FE.l);},
+   bica(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+6,b-22,4,18,'#8e8a80');R(c,X+7,b-21,2,16,'#c8c4b8');R(c,X+9,b-17,4,2,FE.m);R(c,X+12,b-15,1,5+(Math.floor(tt()*8)%2),'#9ccbe0');R(c,X+3,b-6,11,6,'#8e8a80');R(c,X+4,b-5,9,3,'#5a8ab0');R(c,X+5,b-5,3,1,'#9ccbe0');},
+   latrina(c,X,Y){const b=Y+16;SH(c,X,b,16);R(c,X+1,b-30,14,30,MW.k);R(c,X+2,b-29,12,28,MW.m);for(let i=0;i<4;i++)R(c,X+3+i*3,b-29,1,28,MW.d);R(c,X+6,b-24,4,3,MW.k);R(c,X+11,b-15,2,2,OU.m);R(c,X,b-32,16,3,MW.k);R(c,X+1,b-31,14,1,MW.l);},
+   varal(c,X,Y,o){const w=o.w*16,b=Y+16;R(c,X+1,b-24,2,24,MW.k);R(c,X+w-3,b-24,2,24,MW.k);R(c,X+2,b-23,w-4,1,PB.k);const cs=['#efe8dc','#a8303a','#5a8ab0','#e0b850','#ffffff','#4e8a40'];
+     const s=Math.round(Math.sin(tt()*2));for(let i=0;i<o.w*2;i++){const x=X+5+i*7+(i%2?s:0),col=cs[(i+o.x)%6];R(c,x,b-22,6,8+(i%3)*2,col);R(c,x,b-22,6,1,'rgba(0,0,0,.15)');R(c,x+2,b-23,1,2,MW.k);}SH(c,X+2,b,w-4);},
+   prateleira(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+1,b-26,w-2,26,MW.k);R(c,X+2,b-25,w-4,24,MW.d);
+     for(const yy of [b-17,b-9]){R(c,X+2,yy,w-4,2,MW.l);R(c,X+2,yy,w-4,1,MW.h);}const cs=(o&&o.cs)||['#a8303a','#e0b850','#5a8ab0','#efe8dc','#4e8a40'];
+     for(let j=0;j<2;j++)for(let i=0;i<(w-6)/5;i++){const x=X+3+i*5,yy=b-24+j*8;R(c,x,yy,4,7,FE.k);R(c,x+1,yy+1,2,5,cs[(i+j*2)%5]);R(c,x+1,yy+3,2,1,PB.l);}
+     R(c,X+3,b-7,w-6,6,'#c8a058');R(c,X+3,b-7,w-6,1,'#e2c27c');},
+   cartaz(c,X,Y){const b=Y+16;R(c,X+2,b-36,12,18,PB.k);R(c,X+3,b-35,10,16,'#f4ecd8');R(c,X+3,b-35,10,3,'#a8303a');for(let j=0;j<5;j++)R(c,X+4,b-30+j*2,8-(j%2)*2,1,'#5a5e66');R(c,X+7,b-37,2,2,FE.m);},
+   roupeiro(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+1,b-40,w-2,40,ME.k);R(c,X,b-42,w,3,ME.k);R(c,X+1,b-41,w-2,1,ME.l);
+     const pw=(w-4)/2;for(const px of [X+2,X+2+pw]){R(c,px,b-38,pw,33,ME.m);R(c,px+1,b-37,pw-2,1,ME.l);R(c,px+2,b-34,pw-4,12,ME.d);R(c,px+2,b-19,pw-4,10,ME.d);}
+     R(c,X+(w>>1)-2,b-24,1,3,OU.m);R(c,X+(w>>1)+1,b-24,1,3,OU.m);R(c,X+2,b-5,w-4,4,ME.d);R(c,X+2,b-1,2,1,ME.k);R(c,X+w-4,b-1,2,1,ME.k);},
+   penteadeira(c,X,Y){const b=Y+16;SH(c,X+1,b,14);R(c,X+2,b-6,2,6,MW.k);R(c,X+12,b-6,2,6,MW.k);R(c,X+1,b-12,14,6,MW.k);R(c,X+2,b-11,12,2,MW.l);R(c,X+2,b-11,12,1,MW.h);R(c,X+2,b-9,12,3,MW.m);R(c,X+7,b-8,2,1,OU.m);
+     R(c,X+3,b-27,10,15,MW.k);R(c,X+4,b-26,8,13,VI.m);R(c,X+4,b-26,8,4,VI.l);R(c,X+5,b-25,2,3,VI.h);R(c,X+3,b-14,3,2,'#c8404a');R(c,X+10,b-15,2,3,PB.l);},
+   piano(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+1,b-30,w-2,30,ME.k);R(c,X+2,b-29,w-4,14,ME.m);R(c,X+2,b-29,w-4,1,ME.l);R(c,X+4,b-27,w-8,8,ME.d);R(c,X+6,b-26,w-12,2,OU.m);
+     R(c,X+1,b-15,w-2,4,ME.k);R(c,X+2,b-14,w-4,3,PB.l);for(let i=2;i<w-3;i+=3)R(c,X+i+1,b-14,1,2,ME.k);R(c,X+2,b-11,w-4,8,ME.m);R(c,X+3,b-10,w-6,1,ME.l);R(c,X+3,b-3,2,3,ME.k);R(c,X+w-5,b-3,2,3,ME.k);
+     R(c,X+8,b-33,4,3,PB.l);R(c,X+w-10,b-34,2,4,OU.m);R(c,X+w-10,b-36,2,2,'#fde8a0');},
+   poltrona(c,X,Y,o){const b=Y+16,V={k:'#3e2414',d:'#7a1e28',m:'#a8303a',l:'#c8404a',h:'#e0606a'};SH(c,X+1,b,14);
+     R(c,X+1,b-20,14,20,V.k);R(c,X+2,b-19,12,7,V.m);R(c,X+2,b-19,12,1,V.h);R(c,X+5,b-17,1,1,OU.m);R(c,X+10,b-17,1,1,OU.m);R(c,X+1,b-12,3,9,V.d);R(c,X+12,b-12,3,9,V.d);R(c,X+1,b-12,3,1,V.l);R(c,X+12,b-12,3,1,V.l);
+     R(c,X+4,b-12,8,4,V.l);R(c,X+4,b-12,8,1,V.h);R(c,X+4,b-8,8,4,V.d);R(c,X+2,b-3,2,3,MW.k);R(c,X+12,b-3,2,3,MW.k);},
+   mesinha(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+7,b-8,2,7,ME.k);R(c,X+4,b-2,8,2,ME.k);c.fillStyle=ME.k;c.beginPath();c.ellipse(X+8,b-10,7,3,0,0,7);c.fill();c.fillStyle=ME.l;c.beginPath();c.ellipse(X+8,b-10.5,6,2,0,0,7);c.fill();
+     R(c,X+3,b-11,10,1,'#f4f0e6');R(c,X+5,b-15,5,4,PB.k);R(c,X+6,b-14,3,2,PB.l);R(c,X+10,b-14,1,1,PB.k);R(c,X+7,b-16,1,1,OU.m);R(c,X+10,b-12,3,1,PB.l);},
+   relogiope(c,X,Y){const b=Y+16;SH(c,X+3,b,10);R(c,X+3,b-44,10,44,ME.k);R(c,X+4,b-43,8,42,ME.m);R(c,X+2,b-46,12,3,ME.k);R(c,X+3,b-45,10,1,ME.l);
+     c.fillStyle=OU.m;c.beginPath();c.arc(X+8,b-37,4,0,7);c.fill();c.fillStyle=PB.l;c.beginPath();c.arc(X+8,b-37,3,0,7);c.fill();R(c,X+8,b-39,1,2,ME.k);R(c,X+8,b-37,2,1,ME.k);
+     R(c,X+5,b-31,6,18,ME.d);R(c,X+6,b-30,4,16,VI.k);const s=Math.round(Math.sin(tt()*3)*2);R(c,X+8+s,b-30,1,11,OU.m);R(c,X+7+s,b-20,3,3,OU.m);R(c,X+7+s,b-20,1,1,OU.h);R(c,X+4,b-10,8,8,ME.d);R(c,X+5,b-9,6,1,ME.l);},
+   estante(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+1,b-40,w-2,40,MW.k);R(c,X+2,b-39,w-4,38,MW.d);R(c,X,b-42,w,3,MW.k);R(c,X+1,b-41,w-2,1,MW.l);
+     const cs=['#7a1e28','#2e6a32','#5a3a6a','#86562e','#3a4a6a','#a8303a'];for(let j=0;j<4;j++){const yy=b-38+j*9;R(c,X+2,yy+8,w-4,1,MW.l);for(let i=0;i<w-5;i+=2){const hh=6+((i+j)%3);R(c,X+3+i,yy+8-hh,2,hh,cs[(i+j*2)%6]);R(c,X+3+i,yy+9-hh,2,1,OU.l);}}},
+   bacia(c,X,Y,o){return LIB.lavatorio(c,X,Y,o);}   ,
+   balcao(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X,b,w);R(c,X,b-15,w,15,MW.k);R(c,X+1,b-14,w-2,4,MW.l);R(c,X+1,b-14,w-2,1,MW.h);R(c,X+1,b-10,w-2,9,MW.m);R(c,X+1,b-10,w-2,1,MW.d);
+     for(let i=3;i<w-8;i+=12){R(c,i+X,b-8,9,6,MW.d);R(c,i+X+1,b-7,7,1,MW.l);}R(c,X+1,b-2,w-2,1,MW.d);
+     R(c,X+w-13,b-21,10,8,FE.k);R(c,X+w-12,b-20,8,6,OU.m);R(c,X+w-12,b-20,8,1,OU.h);R(c,X+w-11,b-18,6,2,OU.k);R(c,X+w-10,b-23,4,3,OU.m);
+     R(c,X+4,b-17,9,3,FE.k);R(c,X+5,b-16,7,1,FE.l);R(c,X+8,b-20,1,4,FE.k);R(c,X+5,b-21,7,1,FE.m);},
+   vitrine(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X,b,w);R(c,X,b-16,w,16,MW.k);R(c,X+1,b-15,w-2,9,VI.k);R(c,X+2,b-14,w-4,7,'#cfe4ec');
+     const cs=o.cs||['#c8a040','#a8303a','#5a8ab0','#efe8dc','#4e8a40'];for(let i=0;i<(w-6)/5;i++){R(c,X+3+i*5,b-12,4,4,cs[i%cs.length]);R(c,X+3+i*5,b-12,4,1,'rgba(255,255,255,.4)');}
+     R(c,X+3,b-14,w-6,1,VI.h);R(c,X+1,b-6,w-2,5,MW.m);R(c,X+1,b-6,w-2,1,MW.l);R(c,X+1,b-1,2,1,MW.k);R(c,X+w-3,b-1,2,1,MW.k);},
+   saco(c,X,Y,o){const b=Y+16;SH(c,X+2,b,12);R(c,X+3,b-13,10,13,'#3a2414');R(c,X+4,b-12,8,11,'#c6a46c');R(c,X+4,b-12,3,9,'#e2c896');R(c,X+4,b-3,8,2,'#957444');R(c,X+6,b-15,4,3,'#3a2414');R(c,X+7,b-14,2,1,'#957444');R(c,X+6,b-8,4,3,o.marca||'#4e8a40');},
+   caixote(c,X,Y){const b=Y+16;SH(c,X+1,b,14);R(c,X+1,b-13,14,13,MW.k);R(c,X+2,b-12,12,3,MW.h);R(c,X+2,b-9,12,8,MW.l);R(c,X+2,b-6,12,1,MW.m);R(c,X+2,b-9,1,8,MW.m);R(c,X+13,b-9,1,8,MW.m);R(c,X+5,b-12,1,3,MW.m);R(c,X+10,b-12,1,3,MW.m);},
+   barril(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+3,b-15,10,15,MW.k);R(c,X+4,b-14,8,13,MW.m);R(c,X+4,b-14,2,13,MW.l);R(c,X+3,b-15,10,3,MW.k);R(c,X+4,b-14,8,2,MW.h);R(c,X+3,b-10,10,1,FE.m);R(c,X+3,b-4,10,1,FE.m);R(c,X+8,b-9,1,4,MW.d);},
+   escriv(c,X,Y,o){const w=o.w*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+2,b-6,2,6,MW.k);R(c,X+w-4,b-6,2,6,MW.k);R(c,X+1,b-14,w-2,9,MW.k);R(c,X+2,b-13,w-4,4,MW.l);R(c,X+2,b-13,w-4,1,MW.h);R(c,X+2,b-9,w-4,3,MW.m);R(c,X+(w>>1)-1,b-8,2,1,OU.m);
+     R(c,X+5,b-14,8,4,PB.k);R(c,X+6,b-14,6,3,PB.l);R(c,X+7,b-13,4,1,'#5a5e66');R(c,X+w-9,b-16,4,4,FE.k);R(c,X+w-8,b-15,2,2,'#2a3a6a');R(c,X+w-6,b-19,1,4,PB.l);},
+   relogio(c,X,Y,o){return LIB.relparede(c,X,Y,o);}
+
+
+  };
+  /* quem é cada objeto da casa (pelo nome do id) */
+  const ALIAS={janelav:'janela',moringa:'pote',cadeirabalanco:'balanco',varalint:'varal',banquinho:'tamborete',lampparede:'lampiao',cristaleira:'guardalouca',bancoIgreja:'banco'};
+  const TIPO=o=>{const id=o.id||'',nm=o.name||'';
+    if(/filtro/i.test(nm))return 'filtro';if(/^orat/i.test(nm))return 'oratorio';if(/lampi/i.test(nm)&&o.y<=2)return 'lampiao';
+    if(/_m117_/.test(id)){if(o.scene!=='m_t_casa')return null;if(/_m117_2$/.test(id))return 'tapete';if(/_m117_3$/.test(id))return 'cadeira';return null;}
+    let t=id.replace(/^jmcasa_/,'').replace(/^m_[a-z0-9_]*?_(?=[a-z]+\d*$)/,'');t=t.replace(/(_[a-z]?\d*|\d+)$/,'').replace(/(_[a-z]?\d*|\d+)$/,'');t=ALIAS[t]||t;
+    if(SEGUROS&&o.scene&&SALAS[o.scene]&&SALAS[o.scene].loja&&!SEGUROS.test(t))return null;
+    return LIB[t]?t:null;};
+  var SEGUROS=/^(mesa|banco|cadeira|cama|bau|prateleira|balcao|vitrine|saco|caixote|barril|escriv|janela|retrato|cartaz|relogio|lampada|costura|tapete|guardalouca|roupeiro|piano|penteadeira|bacia|oratorio|estante|tamborete|pote|latas|tanque)$/;
+  /* o que entra em cada casa: tema da sala (null = não repinta) e peças a mais [tipo,x,y,w,h,nome,texto] */
+  const AZUL={tipo:'caiada',barra:'#5a7aa0',barraLuz:'#7a9ac0'};
+  const COMERCIANTE={tema:{parede:'#dfe4cc',listra:'#d0d8b8',flor:'#9aa870',barra:'#6e4a2e',barraLuz:'#8a6040'},encher:[
+    ['relparede',3,2,1,1,'Relógio de parede','Tique-taque. Na casa do comerciante, ninguém se atrasa para abrir a loja.'],['retrato',6,2,1,1,'Retrato da família',null],
+    ['cadeira',6,5,1,1,'Cadeira',null],['cadeira',10,5,1,1,'Cadeira',null],['samambaia',12,3,1,1,'Samambaia',null],['lavatorio',4,3,1,1,'Bacia e jarro',null],
+    ['balanco',12,7,1,1,'Cadeira de balanço',null],['cabide',1,8,1,1,'Cabideiro','O chapéu e o paletó do comerciante, prontos para descer para a loja.'],
+    ['espada',11,8,1,1,'Vaso de espada-de-são-jorge',null],['bau',1,5,1,1,'Baú',null],['folhinha',10,2,1,1,null,null],['lampada',8,2,1,1,null,null]]};
+  const PALACETE={tema:null,encher:[
+    ['estante',4,3,1,1,'Estante de livros','Livros franceses: na casa dos ricos, ler em francês é sinal de fineza.'],['relogiope',11,3,1,1,'Relógio de pé',null],
+    ['guardalouca',13,3,2,1,'Cristaleira','Cristais e porcelana que vieram da Europa.'],['poltrona',6,7,1,1,'Poltrona',null],
+    ['mesinha',8,7,1,1,'Mesinha de chá','Chá com biscoitos às cinco da tarde, à moda inglesa.'],['poltrona',10,7,1,1,'Poltrona',null],['samambaia',1,6,1,1,'Samambaia',null]]};
+  const SALAS={
+   m_t_casa:{tema:{},muda:[[/^Orat/,8,2],[/^Filtro/,9,3]],encher:[
+    ['guardalouca',1,3,2,1,'Guarda-louça','A louça boa fica guardada para dia de visita e para o almoço de domingo.'],
+    ['samambaia',3,3,1,1,'Samambaia','A samambaia no banquinho enfeita a sala.'],
+    ['panelas',5,3,1,1,'Prateleira das panelas','Panela de ferro, caneca de ágata e a lata de banha.'],
+    ['lavatorio',11,3,1,1,'Bacia e jarro','É aqui que a gente lava o rosto de manhã.'],
+    ['cadeira',1,5,1,1,'Cadeira',null],['balanco',1,7,1,1,'Cadeira de balanço','A cadeira de balanço é da avó. Ninguém mais senta nela.'],
+    ['cesto',10,7,1,1,'Cesto de roupa','Roupa para costurar: a dona da casa costura para fora.'],
+    ['cabide',11,8,1,1,'Cabideiro','O chapéu do pai fica aqui. Ninguém sai de casa sem chapéu.'],
+    ['espada',12,8,1,1,'Vaso de espada-de-são-jorge','Espada-de-são-jorge perto da porta, para proteger a casa, diz a vizinha.'],
+    ['relparede',9,2,1,1,null,null],['folhinha',5,2,1,1,null,null],['lampada',7,2,1,1,null,null],['gaiola',10,2,1,1,null,null]]},
+   m_casa:{tema:{tipo:'taipa',chao:'terra',capacho:false},encher:[['cadeira',5,5,1,1,'Cadeira',null],['cadeira',9,5,1,1,'Cadeira',null]]},
+   m_vila:{tema:Object.assign({chao:'tijoleira'},AZUL),encher:[['cadeira',5,5,1,1,'Cadeira',null],['cadeira',9,5,1,1,'Cadeira',null]]},
+   m_qvila:{tema:Object.assign({piso:(x,y)=>x>=11?'tijoleira':'tabua'},AZUL),muda:[[/^Regulamento/,7,2]],encher:[
+    ['oratorio',5,2,1,1,'Oratório','O santo da família fica no quarto, com uma vela acesa.'],['roupeiro',5,6,1,1,'Guarda-roupa',null],['cesto',1,6,1,1,'Cesto de roupa',null],
+    ['guardalouca',9,3,1,1,'Guarda-louça','Os pratos bons ficam guardados para o domingo.'],['cadeira',7,6,1,1,'Cadeira',null],
+    ['mesa',11,9,2,1,'Mesa da cozinha',null],['cadeira',11,10,1,1,'Cadeira',null],['balanco',1,9,1,1,'Cadeira de balanço',null],
+    ['costura',4,10,1,1,'Máquina de costura','À noite, a mulher do operário costura para completar o salário.'],['folhinha',13,2,1,1,null,null]]},
+   m_cortico:{tema:{tipo:'cortico',chao:'velha',capacho:false},encher:[
+    ['oratorio',7,2,1,1,'Oratório','O santo da família, trazido de longe, com uma vela acesa.'],['bau',4,3,1,1,'Baú',null],
+    ['cesto',11,7,1,1,'Cesto de roupa','Roupa para lavar para fora: é o ganha-pão de muitas mulheres do cortiço.']]},
+   m_qcortico:{tema:{tipo:'cortico',piso:(x,y)=>(x>=5&&x<=14)?'terra':'velha',capacho:false},encher:[
+    ['tina',13,3,1,1,'Tina',null],['cesto',8,4,1,1,'Cesto de roupa',null],['galinhas',6,12,1,1,'Galinheiro','As galinhas do cortiço dão ovo para todo mundo... quando ninguém pega primeiro.'],
+    ['lenha',13,12,1,1,'Lenha',null],['tamborete',13,9,1,1,'Banquinho',null],['folhinha',4,2,1,1,null,null],['pote',1,8,1,1,'Moringa',null],['tamborete',4,12,1,1,'Banquinho',null],
+    ['bau',15,3,1,1,'Baú','Tudo o que a família trouxe de longe cabe neste baú.'],['panelas',15,10,1,1,'Prateleira das panelas',null],['pote',18,12,1,1,'Moringa',null]]},
+   m_up_t_casa:{tema:{parede:'#ecd8cc',listra:'#e0c6b8',flor:'#c8908a',barra:'#8a5a6a',barraLuz:'#a87888'},encher:[
+    ['balanco',12,7,1,1,'Cadeira de balanço','A avó passa a tarde aqui, contando histórias de quando era moça.'],['costura',1,5,1,1,'Máquina de costura',null],['cesto',12,8,1,1,'Cesto de roupa',null],
+    ['cabide',1,8,1,1,'Cabideiro',null],['samambaia',12,3,1,1,'Samambaia',null],['relparede',11,2,1,1,'Relógio de parede','O relógio marca a hora de acordar para o trabalho.'],
+    ['folhinha',3,2,1,1,null,null],['retrato',6,2,1,1,'Retrato de casamento','O casamento dos avós, numa foto de estúdio.'],['cadeira',9,6,1,1,'Cadeira',null]]}
+  };
+  for(const k of ['relojoaria','papelaria','tabacaria','tecidos','calcados','livraria','flores','presentes','armazem','padaria','fotografo'])SALAS['m_up_t_'+k]=COMERCIANTE;
+  for(const k of ['m_palacete','m_palaceteP','m_carvalho','m_palCE'])SALAS[k]=PALACETE;
+  /* moradores para as casas que estavam vazias: [id,boneco,x,y,nome,fala] */
+  const GENTE={
+   m_up_t_papelaria:[['moraPapel22','h22_x|chapeleira|2',5,6,'Esposa do papeleiro','Moramos em cima da papelaria. Na volta às aulas, desço para ajudar no balcão: é caderno, lápis e tinta para todo lado.']],
+   m_up_t_tabacaria:[['moraTabac22','h22_x|vendedor_de_charutos|1',5,6,'Dono da tabacaria','O cheiro de fumo sobe pela escada. A gente nem sente mais.']],
+   m_up_t_tecidos:[['moraTecid22','h22_x|chapeleira|3',5,6,'Esposa do comerciante de tecidos','Meu marido começou como mascate, com a mala de tecidos nas costas. Hoje temos loja e moramos em cima dela.']],
+   m_up_t_calcados:[['moraCalc22','h22_n|pop_33|3',5,6,'Filho do sapateiro','Meu pai diz que sapato de fábrica vai acabar com os sapateiros. Ele não acredita muito, não.']],
+   m_up_t_livraria:[['moraLivr22','h22_x|bibliotecario|0',5,6,'Livreiro','Aqui em casa tem mais livro que prato. Leio até na hora do almoço.']],
+   m_up_t_flores:[['moraFlor22','h22_x|floricultor|0',5,6,'Florista','As flores vêm das chácaras de madrugada. Quem acorda primeiro sou eu.']],
+   m_up_t_presentes:[['moraPres22','h22_x|aluna_de_grupo_escolar|0',5,6,'Filha do lojista','Quando a loja fecha, ajudo a contar o dinheiro do caixa. Meu pai diz que sou boa de conta.']],
+   m_up_t_armazem:[['moraArmz22','h22_x|parteira|0',5,6,'Esposa do dono do armazém','O fiado fica anotado na caderneta. Tem freguês que deve desde o Carnaval.']],
+   m_up_t_padaria:[['moraPada22','h22_x|confeiteiro|1',5,6,'Padeiro','Levanto às três da manhã para fazer o pão. Agora é hora de descansar.']],
+   m_up_t_fotografo:[['moraFoto22','h22_n|pop_33|4',5,6,'Filho do fotógrafo','Meu pai me deixa segurar o pano preto da máquina. Um dia vou ser fotógrafo também.']],
+   m_palacete:[['criadaPal22','h22_x|parteira|1',11,8,'Criada da casa','A patroa gosta de receber visitas no salão. Hoje vou servir chá para muita gente.']]};
+  for(const k in GENTE){SALAS[k]=Object.assign({},SALAS[k],{gente:GENTE[k]});}
+  /* lojas do centro: tema da sala e peças a mais, postas sozinhas onde não fecham caminho [tipo,largura,nome,texto] */
+  const T={verde:{tipo:'lisa',parede:'#d6dcc4',lambri:true},creme:{tipo:'lisa',parede:'#e8dcc0',lambri:true},rosa:{parede:'#ecd8cc',listra:'#e0c6b8',flor:'#c8908a',barra:'#8a5a6a',barraLuz:'#a87888'},
+    ocre:{tipo:'lisa',parede:'#e2c890',barra:'#a8303a',barraLuz:'#c8404a'},azul:{parede:'#d8e0e8',listra:'#c8d4e0',flor:'#7a9ac0',barra:'#3a4a6a',barraLuz:'#5a6a8a'},
+    cinza:{tipo:'lisa',parede:'#d4d0c8',barra:'#5a5e66',barraLuz:'#7a7e86'},vermelho:{parede:'#a8483a',listra:'#984034',flor:'#c86a5a',lambri:true}};
+  const loja=(tema,auto)=>({loja:true,tema,auto});
+  const LOJAS={
+   m_t_relojoaria:loja(T.verde,[['relparede',1,'Relógio de parede','Todos os relógios da loja marcam a mesma hora. Quase.'],['relparede',1,null,null],['relogiope',1,'Relógio de pé','Um relógio de pé custa mais que um ano de aluguel.'],['cadeira',1,'Cadeira',null],['samambaia',1,'Samambaia',null]]),
+   m_t_papelaria:loja(T.creme,[['estante',1,'Estante de cadernos',null],['cartaz',1,'Cartaz','CADERNOS, LÁPIS, TINTA E PENAS DE AÇO.'],['relparede',1,null,null],['caixote',1,'Caixote de papel',null],['cadeira',1,'Cadeira',null]]),
+   m_t_tabacaria:loja(T.ocre,[['cartaz',1,'Cartaz','CIGARROS, CHARUTOS E FUMO DE CORDA.'],['prateleira',1,'Caixas de charutos',null],['cadeira',1,'Cadeira',null],['samambaia',1,null,null],['folhinha',1,null,null]]),
+   m_t_tecidos:loja(T.rosa,[['prateleira',2,'Peças de tecido',null],['cabide',1,'Cabide com paletó',null],['cadeira',1,'Cadeira',null],['cadeira',1,'Cadeira',null],['relparede',1,null,null]]),
+   m_t_calcados:loja(T.rosa,[['cadeira',1,'Cadeira para provar sapato',null],['cadeira',1,'Cadeira',null],['prateleira',1,'Caixas de sapato',null],['cartaz',1,'Cartaz','SAPATOS SOB MEDIDA E DE FÁBRICA.'],['samambaia',1,null,null]]),
+   m_t_fotografo:loja(T.cinza,[['retrato',1,'Retrato de noiva','As noivas posam paradas, sem sorrir: a foto demora.'],['retrato',1,'Retrato de família',null],['cadeira',1,'Cadeira de pose',null],['samambaia',1,'Samambaia de cenário',null],['samambaia',1,null,null]]),
+   m_t_livraria:loja(T.verde,[['estante',1,'Estante de livros',null],['estante',1,'Estante de livros',null],['mesinha',1,'Mesinha',null],['cadeira',1,'Cadeira',null],['relparede',1,null,null]]),
+   m_t_flores:loja(T.verde,[['samambaia',1,'Samambaia',null],['samambaia',1,null,null],['espada',1,'Espada-de-são-jorge',null],['espada',1,null,null],['cesto',1,'Cesto de flores',null]]),
+   m_t_presentes:loja(T.rosa,[['guardalouca',2,'Cristaleira','Cristais e porcelanas para presente de casamento.'],['estante',1,'Estante',null],['relparede',1,null,null],['samambaia',1,null,null]]),
+   m_t_armazem:loja(Object.assign({chao:'tijoleira'},T.ocre),[['saco',1,'Saco de feijão',null],['saco',1,'Saco de arroz',null],['saco',1,'Saco de café',null],['barril',1,'Barril de banha',null],['barril',1,null,null],['caixote',1,'Caixote',null],['caixote',1,null,null],['latas',1,'Latas',null],['folhinha',1,null,null]]),
+   m_t_padaria:loja(Object.assign({chao:'tijoleira'},T.ocre),[['saco',1,'Saco de farinha',null],['saco',1,null,null],['cesto',1,'Cesto de pães',null],['prateleira',1,'Prateleira',null],['folhinha',1,null,null]]),
+   m_t_cafe:loja(Object.assign({chao:'xadrez'},T.verde),[['mesinha',1,'Mesinha',null],['mesinha',1,null,null],['cadeira',1,'Cadeira',null],['cadeira',1,null,null],['cartaz',1,'Cartaz','CAFÉ, MEDIA E PÃO COM MANTEIGA.'],['relparede',1,null,null],['samambaia',1,null,null]]),
+   m_t_tipografia:loja(T.cinza,[['caixote',1,'Caixote de papel',null],['caixote',1,null,null],['prateleira',1,'Prateleira de tinta',null],['cartaz',1,'Cartaz','FAZEM-SE CARTÕES DE VISITA E CONVITES.'],['folhinha',1,null,null]]),
+   m_t_escritorio:Object.assign({muda:[[/^Arquivo$/,10,3]]},loja(T.creme,[['estante',1,'Estante de pastas',null],['cadeira',1,'Cadeira',null],['relparede',1,null,null],['samambaia',1,null,null],['retrato',1,'Retrato do fundador',null]])),
+   m_t_reparticao:loja(T.verde,[['banco',3,'Banco de espera','Na repartição, tudo demora: carimbo, assinatura, outro carimbo.'],['estante',1,'Estante de processos',null],['relparede',1,null,null],['retrato',1,'Retrato do presidente do Estado',null],['cartaz',1,'Aviso','SILÊNCIO. AGUARDE A SUA VEZ.']]),
+   m_t_hotel:loja(T.azul,[['samambaia',1,'Samambaia',null],['poltrona',1,'Poltrona',null],['poltrona',1,null,null],['relparede',1,null,null],['retrato',1,null,null]]),
+   m_t_bilhar:loja(T.verde,[['cadeira',1,'Cadeira',null],['cadeira',1,null,null],['relparede',1,null,null],['cartaz',1,null,null]]),
+   m_t_mercado:loja({tipo:'lisa',parede:'#d8d0b8',barra:'#6f8a5c',chao:'pedra',capacho:false},[['saco',1,'Saco de batata',null],['saco',1,'Saco de cebola',null],['caixote',1,'Caixote de laranja',null],['caixote',1,null,null],['caixote',1,null,null],['barril',1,'Barril',null],['cesto',1,'Cesto de ovos',null],['cesto',1,null,null]]),
+   m_t_teatro:loja(T.vermelho,[['samambaia',1,null,null],['samambaia',1,null,null],['cartaz',1,'Cartaz','HOJE: COMÉDIA EM TRÊS ATOS.'],['cartaz',1,null,null]]),
+   m_t_camara:loja(T.creme,[['estante',1,'Estante de leis',null],['retrato',1,'Retrato',null],['retrato',1,null,null],['relogiope',1,'Relógio de pé',null],['cadeira',1,'Cadeira',null],['cadeira',1,null,null]]),
+   m_up_t_hotel:loja(T.azul,[['lavatorio',1,'Bacia e jarro',null],['cadeira',1,'Cadeira',null],['cabide',1,'Cabideiro',null],['samambaia',1,null,null]]),
+   m_up_t_escritorio:Object.assign({muda:[[/tapete/,4,7]]},loja(T.creme,[['estante',1,'Estante',null],['poltrona',1,'Poltrona',null],['relogiope',1,'Relógio de pé',null],['retrato',1,'Retrato',null]]))};
+  Object.assign(SALAS,LOJAS);
+  /* gente nas salas que não são casas e estavam vazias (lugar escolhido sozinho, sem fechar caminho) */
+  const VAZIAS={
+   m_estnorte:[['estnBilh22','h22_x|vendedor_de_automoveis|0','Bilheteiro da Estação do Norte','Daqui sai o trem para o Rio de Janeiro, pela Central do Brasil. A viagem leva a noite inteira.'],['estnViaj22','h22_n|pop_14|5','Viajante','Vou para o Rio procurar trabalho. Levo tudo o que tenho nesta mala.']],
+   m_sapataria:[['sapat22','h22_x|borracheiro|0','Sapateiro','Faço e conserto sapato. Muita gente agora compra o de fábrica, que é mais barato.']],
+   m_carpintaria:[['marcen22','h22_x|escultor|0','Marceneiro','Madeira de lei, cola quente e paciência: é assim que se faz um móvel que dura cem anos.']],
+   m_botica:[['farmac22','h22_x|entregador_de_farmacia|0','Farmacêutico','O remédio é feito aqui mesmo, com a receita do médico. Tem também xarope para tosse e sal de frutas.']],
+   m_santacasa:[['enfSC22','h22_x|enfermeira_da_santa_casa|0','Enfermeira da Santa Casa','A Santa Casa atende quem não pode pagar médico. Na gripe espanhola de 1918, faltou cama para tanta gente.']],
+   m_chocolate:[['opChoc22','h22_x|chapeleira|3','Operária da fábrica de chocolate','Embrulho os bombons um por um. No fim do dia, as mãos ficam cheirando a chocolate.']],
+   m_chapelaria:[['chapel22','h22_x|chapeleira|0','Chapeleira','Chapéu de palha para o verão, de feltro para o inverno. Ninguém sai à rua de cabeça descoberta.']],
+   m_banco:[['caixaBco22','h22_x|vendedor_de_automoveis|1','Caixa do banco','Aqui o dinheiro do café vira empréstimo: para fazendeiro, para ferrovia, para fábrica.']],
+   m_tecelagem:[['tecela22','h22_x|chapeleira|2','Operária tecelã','Trabalho dez horas por dia no tear. A greve de 1917 pediu oito horas, mas ainda não chegamos lá.'],['aprend22','h22_x|aluna_de_grupo_escolar|1','Menina aprendiz','Tenho catorze anos e já trabalho aqui. Em casa, todo mundo precisa ajudar.']],
+   m_cervejaria:[['cervej22','h22_x|confeiteiro|0','Mestre cervejeiro','Cerveja precisa de gelo e de paciência. A fábrica tem até máquina de fazer gelo.']],
+   m_bombeiros:[['bomb22','h22_x|bombeiro|0','Bombeiro','Quando o sino toca, é correr para a bomba. Incêndio em fábrica é o pior de todos.']],
+   m_correios:[['correio22','h22_x|reparador_de_maquinas_de_escrever|0','Funcionário dos Correios','Carta para o interior chega em dois ou três dias, de trem. Telegrama chega no mesmo dia.']],
+   m_oficina:[['opOfic22','h22_x|mecanico_de_bicicletas|1','Operário mecânico','Aqui se conserta máquina de fábrica. Se a máquina para, para tudo.']]};
+  for(const k in VAZIAS){SALAS[k]=Object.assign({tema:null},SALAS[k]||{},{genteAuto:VAZIAS[k]});}
+  var PAREDE_OBJ=/^(cartaz|relparede|retrato|folhinha|lampada|gaiola|quadro|oratorio)$/;
+  return {sala,LIB,TIPO,SALAS,R,PAREDE_OBJ};
+})();
+
+
+  const INV='[Personagem inventado para o jogo.]';
+  const poe=(K,t,x,y,w,h,name,text,id)=>{const f=__CASA22.LIB[t];const o={id,scene:K,x,y,w,h,name,text:text?[text]:null};o.draw=function(c,X,Y){f(c,X,Y,o);};objects.push(o);return o;};
+  const aplica=(K,cf)=>{const S=SCN[K];if(!S||S.__casa22)return;S.__casa22=1;
+    const M=S.map.map(r=>r.join?r.join(''):r),W=M[0].length,H=M.length;const sx=(S.__kit&&S.__kit.sx!=null)?S.__kit.sx:M[H-1].indexOf('x');
+    for(const [re,x,y] of (cf.muda||[])){const o=objects.find(o=>o.scene===K&&(re.test(o.name||'')||(!o.name&&re.test(o.id))));if(o){o.x=x;o.y=y;}}
+    if(cf.tema)for(const o of objects){if(o.scene!==K)continue;const t=__CASA22.TIPO(o);if(t){const f=__CASA22.LIB[t];o.draw=function(c,X,Y){f(c,X,Y,o);};}}
+    const tem=(x,y,w,h)=>objects.some(o=>o.scene===K&&x<o.x+(o.w||1)&&x+w>o.x&&y<o.y+(o.h||1)&&y+h>o.y)||npcs.some(n=>n.scene===K&&n.x>=x&&n.x<x+w&&n.y>=y&&n.y<y+h);
+    let i=0;for(const [t,x,y,w,h,name,text] of (cf.encher||[])){const id='jmcasa_'+K+'_'+t+(i++);if(objects.some(o=>o.id===id))continue;if(y>2&&tem(x,y,w,h))continue;poe(K,t,x,y,w,h,name,text,id);}
+    for(const [id,spr,x,y,name,fala] of (cf.gente||[])){if(npcs.some(n=>n.id===id)||tem(x,y,1,1))continue;try{addNPCs([{id,spr,x,y,dir:'down',name,lines:[fala,INV]}],K);}catch(e){console.warn('casa22 gente',e);}}
+    if(cf.genteAuto){const M2=M;const livre2=(x,y)=>M2[y]&&M2[y][x]==='.'&&!tem(x,y,1,1);
+      const alc=()=>{const seen=new Set(),q=[[sx,H-2],[sx+1,H-2]];while(q.length){const [x,y]=q.pop(),k=x+','+y;if(seen.has(k))continue;if(!M2[y]||M2[y][x]!=='.'||tem(x,y,1,1))continue;seen.add(k);q.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);}return seen;};
+      for(const [id,spr,name,fala] of cf.genteAuto){if(npcs.some(n=>n.id===id))continue;const A=alc();let pos=null;
+        for(let r=0;r<12&&!pos;r++)for(let y=Math.max(3,(H>>1)-r);y<=Math.min(H-3,(H>>1)+r)&&!pos;y++)for(let x=2;x<W-2&&!pos;x++){if(x>=sx-1&&x<=sx+2&&y>=H-3)continue;if(!livre2(x,y)||!A.has(x+','+y))continue;
+          let viz=0;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]])if(A.has((x+dx)+','+(y+dy)))viz++;if(viz>=3)pos=[x,y];}
+        if(pos)try{addNPCs([{id,spr,x:pos[0],y:pos[1],dir:'down',name,lines:[fala,INV]}],K);}catch(e){console.warn('casa22 gente',e);}}}
+    if(cf.auto){const reserva=new Set();
+      const livre=(x,y)=>M[y]&&M[y][x]==='.'&&!tem(x,y,1,1)&&!reserva.has(x+','+y);
+      const alcance=()=>{const seen=new Set(),q=[[sx,H-2],[sx+1,H-2]];while(q.length){const [x,y]=q.pop(),k=x+','+y;if(seen.has(k))continue;if(!M[y]||M[y][x]!=='.'||tem(x,y,1,1))continue;seen.add(k);q.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);}return seen;};
+      const tudoOk=()=>{const A=alcance();if(!A.has(sx+','+(H-2)))return false;for(const k of reserva)if(!A.has(k))return false;
+        const viz=(x,y,w,h)=>{for(let a=x;a<x+w;a++){if(A.has(a+','+(y-1))||A.has(a+','+(y+h)))return true;}for(let b=y;b<y+h;b++){if(A.has((x-1)+','+b)||A.has((x+w)+','+b))return true;}return false;};
+        return objects.every(o=>o.scene!==K||!o.name||viz(o.x,o.y,o.w||1,o.h||1))&&npcs.every(n=>n.scene!==K||viz(n.x,n.y,1,1));};
+      const perto=x=>x>=sx-1&&x<=sx+2;
+      for(const [t,w,name,text] of cf.auto){const id='jmcasa_'+K+'_'+t+(i++);let ok=false;
+        if(__CASA22.PAREDE_OBJ.test(t)){for(let x=1;x<W-1&&!ok;x++){if(M[3][x]!=='.'||!livre(x,3)||objects.some(o=>o.scene===K&&o.y<=2&&x>=o.x&&x<o.x+(o.w||1)))continue;
+            const o=poe(K,t,x,2,1,1,name,text,id);reserva.add(x+','+3);if(tudoOk())ok=true;else{objects.splice(objects.indexOf(o),1);reserva.delete(x+','+3);}}continue;}
+        const cand=[];for(let x=1;x<W-w;x++)cand.push([x,3]);for(let y=4;y<H-1;y++){cand.push([1,y]);cand.push([W-1-w,y]);}
+        for(const [x,y] of cand){if(ok)break;if(perto(x)&&y>=H-3)continue;let f=true;for(let a=0;a<w;a++)if(!livre(x+a,y))f=false;if(!f)continue;
+          const o=poe(K,t,x,y,w,1,name,text,id);if(tudoOk())ok=true;else objects.splice(objects.indexOf(o),1);}}}
+    (window.__jmCasa22=window.__jmCasa22||{})[K]=objects.filter(o=>o.scene===K).length;};
+  const bs=buildStatic;buildStatic=function(){bs();try{if(window.__semCasa22)return;const cf=__CASA22.SALAS[cur];if(!cf)return;aplica(cur,cf);if(!cf.tema)return;
+    const S=SCN[cur],M=S.map.map(r=>r.join?r.join(''):r),W=M[0].length,H=M.length;const sx=(S.__kit&&S.__kit.sx!=null)?S.__kit.sx:M[H-1].indexOf('x');
+    sc.imageSmoothingEnabled=false;__CASA22.sala(sc,W,H,sx,M,cf.tema);}catch(e){console.warn('casa22',e);}};
+}catch(e){console.warn('casa22',e);}})();
+/* ===== v257 — 1922: O COMEÇO NÃO MOSTRA MAIS O MAPA DOS BAIRROS ANTES DO CENTRO — no celular aparecia o Largo da Memória do mapa grande e só depois a Sé (pedido do professor, 22/11/2026) ===== */
+(function(){try{let ini=0,cap=null;const s0=setScene;
+  const cobre=()=>{const cv=document.getElementById('cv');if(!cv)return;if(!cap){cap=document.createElement('div');cap.style.cssText='position:fixed;background:#1e1712;pointer-events:none;z-index:5';document.body.appendChild(cap);}const r=cv.getBoundingClientRect();Object.assign(cap.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',display:'block'});};
+  setScene=function(k){try{if(k==='sp22'&&!window.__jm22ini){ini=performance.now();cobre();}if(k==='m_centro22'){window.__jm22ini=1;ini=0;if(cap)cap.style.display='none';}}catch(_){}return s0.apply(this,arguments);};
+  /* quem chega ao mapa dos bairros dentro do retângulo do centro (ex.: o portal de 1888 para 1922) vai direto para a frente da Sé, no centro */
+  const g0=goScene;goScene=function(to,x,y,dir,after){try{if(to==='sp22'&&SCN.m_centro22&&x>=58&&x<=132&&y>=64&&y<=112){let q=null;try{q=findFree('m_centro22',104,66,14);}catch(_){}q=q||[104,66];window.__jm22ini=1;return g0.call(this,'m_centro22',q[0],q[1],dir||'down',after);}}catch(_){}return g0.apply(this,arguments);};
+  setInterval(()=>{try{const on=ini&&cur==='sp22'&&performance.now()-ini<4000;
+    if(on)cobre();
+    else if(cap){cap.style.display='none';if(ini&&cur!=='sp22')ini=0;if(ini&&performance.now()-ini>=4000){ini=0;window.__jm22ini=1;}}}catch(_){}},40);
+}catch(e){console.warn('inicio 1922',e);}})();
+let n=0;const tenta=()=>{try{if(roda()||++n>20)return;}catch(e){console.warn('quadra de teste JM',e);return;}setTimeout(tenta,700);};
   setTimeout(tenta,3600);
 }catch(e){console.warn('quadra de teste JM',e);}})();
 
