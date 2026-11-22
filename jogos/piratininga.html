@@ -21459,7 +21459,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v262) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v263) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -22098,8 +22098,8 @@ window.__paulista82Ready=Promise.all(ready);
     for(const o of objects){if(o.scene!==S||!/^pt_/.test(o.id)||o.__gen||o.x<66||o.x>127||!((o.y>=94&&o.y<=97)||(o.x>=110&&o.y>=50&&o.y<=56)||(o.x>=88&&o.x<=105&&o.y>=33&&o.y<=49)))continue;const q=(o.x*7+o.y*13)%10,tp=q<4?'t':q<7?'z':'p';let cv=null;
       o.draw=function(c,X,Y){if(!cv)cv=pinta(this.w*16,this.h*16+4,tp,tp==='t'?TELHA[(this.x+this.y)%4]:'#8492a0',this.x*977+this.y*131,this.w>=2);c.drawImage(cv,X,Y-4);};rel.telhados++;}
     /* (3) placas com nome de rua e de largo: quando há gente embaixo, a placa fica quase transparente para não tapar ninguém */
-    try{const P2=C.P.splice(0);const FP='700 8px "Cinzel","DejaVu Serif",serif';const wo2=waterOverlay;
-      waterOverlay=function(camX,camY){if(wo2)wo2.apply(this,arguments);if(cur!==S)return;try{ctx.save();ctx.font=FP;ctx.textAlign='center';ctx.textBaseline='middle';
+    try{const P2=C.P.splice(0);window.__placas22=P2;const FP='700 8px "Cinzel","DejaVu Serif",serif';const wo2=waterOverlay;
+      waterOverlay=function(camX,camY){if(wo2)wo2.apply(this,arguments);if(cur!==S||window.__placasPequenas22)return;try{ctx.save();ctx.font=FP;ctx.textAlign='center';ctx.textBaseline='middle';
         const gente=[[player.px,player.py]];/* v257: só o jogador apaga a placa (ver bloco NOMES DE RUA SEMPRE À VISTA) */
         for(const p of P2){const X=p.x-camX,Y=p.y-camY,hw=p.w/2;if(p.v?(X<-8||X>VW+8||Y<-hw||Y>VH+hw):(X<-hw||X>VW+hw||Y<-8||Y>VH+8))continue;
           const x0=p.v?p.x-7:p.x-hw,x1=p.v?p.x+7:p.x+hw,y0=p.v?p.y-hw:p.y-7,y1=p.v?p.y+hw:p.y+7;const tapa2=gente.some(g=>g[0]+15>x0&&g[0]+1<x1&&g[1]+16>y0&&g[1]-16<y1);
@@ -23959,6 +23959,141 @@ window.__CASA22=__CASA22;
     (window.__jmSalas7b=window.__jmSalas7b||{})[K]={objetos:ok,recusados:rej};};
   const bs=buildStatic;buildStatic=function(){bs();try{if(window.__semCasa22)return;const K=cur,S=SCN[K];if(!CFG[K]||S.__salas7b)return;S.__salas7b=1;monta(K);}catch(e){console.warn('salas7b',e);}};
 }catch(e){console.warn('salas7b',e);}})();
+/* ===== v263 — 1922: RUAS DO CENTRO ORGANIZADAS (calçada com meio-fio, pista, praça de pedestre; gente na calçada, veículos na pista; banca e relógio fora da pista) (pedido do professor, 22/11/2026) ===== */
+(function(){try{
+  const K='m_centro22';
+  const isR=(M,x,y)=>{const c=(M[y]||[])[x];return c==='D'||c==='e';};
+  let G=null;/* G[y][x]: 0 nada | 'L' pista | 'C' calçada inteira | 'h' calçada estreita | 'P' praça; S[y][x]: lado do meio-fio */
+  const classifica=()=>{const M=SCN[K].map,W=M[0].length,H=M.length;G=[];const S=[];
+    for(let y=0;y<H;y++){G.push(new Array(W).fill(0));S.push(new Array(W).fill(null));}
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(!isR(M,x,y))continue;let a=x,b=x,c=y,d=y;while(isR(M,a-1,y))a--;while(isR(M,b+1,y))b++;while(isR(M,x,c-1))c--;while(isR(M,x,d+1))d++;
+      const h=b-a+1,v=d-c+1;if(Math.min(h,v)>8){let cheio=true;for(let dy=-3;dy<=3&&cheio;dy++)for(let dx=-3;dx<=3;dx++)if(!isR(M,x+dx,y+dy)){cheio=false;break;}G[y][x]=cheio?'P':'L';continue;}
+      const hor=v<=h,w=hor?v:h,i=hor?y-c:x-a;
+      if(M[y][x]==='e'){G[y][x]='L';continue;}
+      if(w>=4){if(i===0){G[y][x]='C';S[y][x]=hor?'down':'right';}else if(i===w-1){G[y][x]='C';S[y][x]=hor?'up':'left';}else G[y][x]='L';}
+      else{if(i===0){G[y][x]='h';S[y][x]=hor?'up':'left';}else if(i===w-1){G[y][x]='h';S[y][x]=hor?'down':'right';}else G[y][x]='L';}
+      G[y][x+'_hor']=hor;}
+    G.S=S;G.W=W;G.H=H;window.__ruaG=G;};
+  const anda=(x,y)=>{const g=(G[y]||[])[x];return g==='C'||g==='h'||g==='P';};
+  /* ---------- pintura ---------- */
+  const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
+  const lajes=(c,X,Y,w,h,base,junta,luz)=>{R(c,X,Y,w,h,base);for(let yy=Y;yy<Y+h;yy+=8){R(c,X,yy,w,1,junta);const off=((yy>>3)%2)*4;for(let xx=X+off;xx<X+w;xx+=8)R(c,xx,yy,1,8>Y+h-yy?Y+h-yy:8,junta);R(c,X,yy+1,w,1,luz);}};
+  const pinta=c=>{if(!G)return;const S=G.S;
+    for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){const g=G[y][x],X=x*16,Y=y*16;
+      if(g==='P'){R(c,X,Y,16,16,'#d9d0bc');R(c,X,Y,16,1,'#c6bca6');R(c,X,Y,1,16,'#c6bca6');R(c,X+1,Y+1,15,1,'#e6dfcf');if(((x+y)&1)===0){R(c,X+5,Y+5,6,6,'#d2c8b2');R(c,X+6,Y+6,4,4,'#dcd4c2');}}
+      else if(g==='C'){lajes(c,X,Y,16,16,'#d3ccbc','#b6ae9c','#e2ddd0');const s=S[y][x];
+        if(s==='down'){R(c,X,Y+13,16,2,'#e8e4da');R(c,X,Y+15,16,1,'#6e695e');}if(s==='up'){R(c,X,Y,16,1,'#6e695e');R(c,X,Y+1,16,2,'#e8e4da');}
+        if(s==='right'){R(c,X+13,Y,2,16,'#e8e4da');R(c,X+15,Y,1,16,'#6e695e');}if(s==='left'){R(c,X,Y,1,16,'#6e695e');R(c,X+1,Y,2,16,'#e8e4da');}}
+      else if(g==='h'){const s=S[y][x];
+        if(s==='up'){lajes(c,X,Y,16,7,'#d3ccbc','#b6ae9c','#e2ddd0');R(c,X,Y+7,16,1,'#e8e4da');R(c,X,Y+8,16,1,'#6e695e');}
+        if(s==='down'){lajes(c,X,Y+9,16,7,'#d3ccbc','#b6ae9c','#e2ddd0');R(c,X,Y+7,16,1,'#6e695e');R(c,X,Y+8,16,1,'#e8e4da');}
+        if(s==='left'){lajes(c,X,Y,7,16,'#d3ccbc','#b6ae9c','#e2ddd0');R(c,X+7,Y,1,16,'#e8e4da');R(c,X+8,Y,1,16,'#6e695e');}
+        if(s==='right'){lajes(c,X+9,Y,7,16,'#d3ccbc','#b6ae9c','#e2ddd0');R(c,X+7,Y,1,16,'#6e695e');R(c,X+8,Y,1,16,'#e8e4da');}}}};
+  /* ---------- coisas da rua saem da pista ---------- */
+  const PREDIO=o=>(o.w||1)>3||(o.h||1)>2||o.room||o.enter;
+  const FICA=/Automóvel de praça|Bicicleta|bonde/i;
+  const tiraDaPista=()=>{const portas=new Set();for(const o of objects)if(o.scene===K&&o.room&&o.door!=null)portas.add((o.x+o.door)+','+(o.y+(o.h||1)));
+    let mov=0,fic=0;
+    for(const o of objects){if(o.scene!==K||PREDIO(o)||FICA.test(o.name||''))continue;const w=o.w||1,h=o.h||1;let naPista=false;
+      for(let a=0;a<w;a++)for(let b=0;b<h;b++)if((G[o.y+b]||[])[o.x+a]==='L')naPista=true;if(!naPista)continue;
+      let best=null;for(let r=1;r<=7&&!best;r++)for(let dy=-r;dy<=r&&!best;dy++)for(let dx=-r;dx<=r&&!best;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const nx=o.x+dx,ny=o.y+dy;let ok=true;
+        for(let a=0;a<w&&ok;a++)for(let b=0;b<h&&ok;b++){const tx=nx+a,ty=ny+b;if(!anda(tx,ty)||portas.has(tx+','+ty)||(objects.some(q=>q!==o&&q.scene===K&&tx>=q.x&&tx<q.x+(q.w||1)&&ty>=q.y&&ty<q.y+(q.h||1)))||npcs.some(n=>n.scene===K&&n.x===tx&&n.y===ty))ok=false;}
+        if(ok)best=[nx,ny];}
+      if(best){o.x=best[0];o.y=best[1];mov++;}else fic++;}
+    return {mov,fic};};
+  /* ---------- caminhos: gente pela calçada, veículos pela pista ---------- */
+  const VEIC=/^(auto|carrocacafe|bike|carroca|caminhao|ford)/;
+  const ocup=()=>{const s=new Set();for(const o of objects)if(o.scene===K)for(let a=0;a<(o.w||1);a++)for(let b=0;b<(o.h||1);b++)s.add((o.x+a)+','+(o.y+b));for(const n of npcs)if(n.scene===K)s.add(n.x+','+n.y);return s;};
+  const SOLID_=typeof SOLID==='string'?SOLID:'TCW#';
+  const rota=(sx,sy,occ,alvo)=>{/* menor caminho: calçada custa 1, atravessar a pista custa 8 */const M=SCN[K].map;const D=new Map(),P=new Map(),q=[[0,sx,sy]];D.set(sx+','+sy,0);let fim=null,far=null,fd=0;
+    while(q.length){q.sort((a,b)=>a[0]-b[0]);const [d,x,y]=q.shift();if(d>(D.get(x+','+y)??1e9))continue;
+      if(anda(x,y)&&d>fd&&d<=alvo){fd=d;far=[x,y];}if(d>alvo)break;
+      for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+','+ny;const g=(G[ny]||[])[nx];if(!g||occ.has(k)||SOLID_.includes((M[ny]||[])[nx]))continue;const nd=d+(g==='L'?8:1);if(nd<(D.get(k)??1e9)){D.set(k,nd);P.set(k,x+','+y);q.push([nd,nx,ny]);}}}
+    if(!far)return null;const pts=[];let k=far[0]+','+far[1];while(k){pts.push(k.split(',').map(Number));k=P.get(k);}pts.reverse();
+    const out=[pts[0]];for(let i=1;i<pts.length-1;i++){const [ax,ay]=out[out.length-1],[bx,by]=pts[i+1];if(ax!==bx&&ay!==by)out.push(pts[i]);}out.push(pts[pts.length-1]);return out;};
+  const perto=(x,y,f,occ)=>{for(let r=0;r<=8;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const nx=x+dx,ny=y+dy;if(f(nx,ny)&&!occ.has(nx+','+ny))return [nx,ny];}return null;};
+  const faixa=(x,y,occ)=>{/* acha a pista larga (2 fileiras ou mais) e monta a volta: vai por uma faixa, volta pela outra */
+    const p=perto(x,y,(a,b)=>(G[b]||[])[a]==='L',occ);if(!p)return null;const [px,py]=p;const hor=G[py][px+'_hor'];
+    const L=(a,b)=>(G[b]||[])[a]==='L'&&!occ.has(a+','+b);
+    if(hor){let c=py,d=py;while(L(px,c-1))c--;while(L(px,d+1))d++;if(d-c<1)return null;const up=c,lo=d;let x1=px,x2=px;while(x2-px<22&&L(x2+1,up)&&L(x2+1,lo))x2++;while(px-x1<22&&L(x1-1,up)&&L(x1-1,lo))x1--;if(x2-x1<6)return null;
+      return [[x1,lo],[x2,lo],[x2,up],[x1,up],[x1,lo]];}
+    let a=px,b=px;while(L(a-1,py))a--;while(L(b+1,py))b++;if(b-a<1)return null;const le=a,ri=b;let y1=py,y2=py;while(y2-py<22&&L(le,y2+1)&&L(ri,y2+1))y2++;while(py-y1<22&&L(le,y1-1)&&L(ri,y1-1))y1--;if(y2-y1<6)return null;
+    return [[le,y1],[le,y2],[ri,y2],[ri,y1],[le,y1]];};
+  const refazCaminhos=()=>{const occ=ocup();let gente=0,veic=0,semVeic=0;
+    for(const w of walkers){if(w.scene!==K||!w.path||!w.path.length)continue;const p0=w.path[0];
+      if(VEIC.test(w.spr||'')){const f=faixa(p0[0],p0[1],occ);if(!f){semVeic++;continue;}w.path=f;w.__volta=1;veic++;}
+      else{const s=perto(p0[0],p0[1],anda,occ);if(!s)continue;const r=rota(s[0],s[1],occ,18+((w.id||'').length*7)%22);if(!r||r.length<2)continue;w.path=r;gente++;}
+      w.wi=1;w.step=1;w.x=w.fx=w.path[0][0];w.y=w.fy=w.path[0][1];w.px=w.x*T;w.py=w.y*T;w.prog=1;for(const m of (w.mules||[])){m.x=m.fx=w.x;m.y=m.fy=w.y;m.px=w.px;m.py=w.py;m.hidden=true;}}
+    return {gente,veic,semVeic};};
+  if(typeof walkersUpdate==='function'){const wu=walkersUpdate;walkersUpdate=function(dt){for(const w of walkers){if(w.__volta&&w.scene===cur&&w.path&&w.wi>=w.path.length-1&&w.x===w.path[w.path.length-1][0]&&w.y===w.path[w.path.length-1][1]){w.wi=1;w.step=1;}}return wu.apply(this,arguments);};}
+  /* ---------- nomes de rua: plaquinhas pequenas na calçada, em vez das faixas grandes no meio da rua ---------- */
+  let PLQ=[];
+  const placas=()=>{const C=window.__centro22;if(!C||!C.P)return 0;const vistos=new Set();PLQ=[];const TODAS=(window.__placas22||[]).concat(C.P);
+    for(const p of TODAS){const tx=Math.floor(p.x/16),ty=Math.floor(p.y/16);const ch=(x,y)=>{const g=(G[y]||[])[x];return g==='C'||g==='h'||g==='P';};
+      let best=null;for(let r=0;r<=4&&!best;r++)for(let dy=-r;dy<=r&&!best;dy++)for(let dx=-r;dx<=r&&!best;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;if(ch(tx+dx,ty+dy))best=[tx+dx,ty+dy];}
+      if(!best)best=[tx,ty];const k=p.t+'|'+Math.round(best[0]/10)+'|'+Math.round(best[1]/10);if(vistos.has(k))continue;vistos.add(k);PLQ.push({t:p.t,x:best[0],y:best[1],largo:p.largo,cor:p.cor});}
+    const n=TODAS.length;C.P.length=0;window.__placasPequenas22=1;return n;};
+  const FP='700 6px "Pixelify Sans","DejaVu Sans",sans-serif';
+  const wo2=(typeof waterOverlay==='function')?waterOverlay:null;
+  waterOverlay=function(camX,camY){if(wo2)wo2.apply(this,arguments);if(cur!==K||!PLQ.length)return;try{ctx.save();ctx.font=FP;ctx.textAlign='center';ctx.textBaseline='middle';
+    for(const p of PLQ){const X=Math.round(p.x*16+8-camX),Y=Math.round(p.y*16+2-camY);if(X<-60||X>VW+60||Y<-20||Y>VH+20)continue;const w=Math.ceil(ctx.measureText(p.t).width)+6;
+      ctx.fillStyle='#3a3a3a';ctx.fillRect(X-1,Y+3,2,9);ctx.fillStyle='rgba(10,14,20,.35)';ctx.fillRect(X-w/2+1,Y-3,w,8);
+      ctx.fillStyle='#f4f1e6';ctx.fillRect(X-w/2,Y-4,w,8);ctx.fillStyle=p.cor||(p.largo?'#7a2a1c':'#17357e');ctx.fillRect(X-w/2+1,Y-3,w-2,6);ctx.fillStyle='#fff';ctx.fillText(p.t,X,Y);}
+    ctx.restore();}catch(_){}};
+  let feito=false,t0=0;
+  const aplica=()=>{if(feito||cur!==K)return;if(!t0){t0=Date.now();return;}if(Date.now()-t0<6000)return;feito=true;
+    try{classifica();const a=tiraDaPista(),b=refazCaminhos();window.__jmRua22=Object.assign({placas:placas()},a,b);pinta(sc);}catch(e){console.warn('rua22',e);}};
+  setInterval(aplica,1000);
+  const bs=buildStatic;buildStatic=function(){bs();try{if(cur===K&&G&&feito){sc.imageSmoothingEnabled=false;pinta(sc);}}catch(e){console.warn('rua22',e);}};
+}catch(e){console.warn('rua22',e);}})();
+/* ===== v263 — 1922: VALE DO ANHANGABAÚ COM PROFUNDIDADE — trecho de teste do Viaduto do Chá (viaduto alto com treliça e pilares de ferro, encostas com muro e balaustrada, parque lá embaixo) (pedido do professor, 22/11/2026) ===== */
+(function(){try{
+  const K='m_centro22';
+  const R=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
+  const T16=16;
+  /* trecho de teste: linhas 28 a 63, viaduto nas linhas 42-45, colunas 50-63 */
+  const Y0=28,Y1=63,BX0=50,BX1=63,BY0=42,BY1=45,EX=64; /* EX: encosta leste (colunas 64-65) */
+  const FE={k:'#1e2622',d:'#2e3a34',m:'#4a5a52',l:'#6e8278',h:'#9aaea2'};
+  const PEDRA={k:'#6a6458',d:'#8e877a',m:'#b8b0a0',l:'#d6cfbf',h:'#ebe5d8'};
+  const fundo=(c)=>{/* o parque lá embaixo fica mais escuro e úmido */
+    for(let y=Y0;y<=Y1;y++)for(let x=48;x<=63;x++){if(y>=BY0&&y<=BY1)continue;const M=SCN[K].map;const ch=(M[y]||[])[x];if(ch!=='.'&&ch!=='d'&&ch!=='f'&&ch!=='D')continue;if(x<50&&y>=46)continue;
+      c.fillStyle='rgba(18,40,24,.20)';c.fillRect(x*T16,y*T16,T16,T16);}
+    /* sombra no pé da encosta leste (luz vem da esquerda: a encosta é clara, o pé é escuro) */
+    for(let y=Y0;y<=Y1;y++){if(y>=BY0&&y<=BY1)continue;const g=c.createLinearGradient(EX*T16,0,(EX-2)*T16,0);g.addColorStop(0,'rgba(10,25,15,.42)');g.addColorStop(1,'rgba(10,25,15,0)');c.fillStyle=g;c.fillRect((EX-2)*T16,y*T16,2*T16,T16);}};
+  const muroOeste=(c,x,ya,yb)=>{/* muro de arrimo do lado do Centro Novo: em cima balaustrada, embaixo a sombra que ele joga no vale */
+    const X=x*T16;const g=c.createLinearGradient(X,0,X+28,0);g.addColorStop(0,'rgba(10,25,15,.55)');g.addColorStop(1,'rgba(10,25,15,0)');c.fillStyle=g;c.fillRect(X,ya*T16,28,(yb-ya+1)*T16);
+    R(c,X-5,ya*T16,6,(yb-ya+1)*T16,PEDRA.k);R(c,X-4,ya*T16,4,(yb-ya+1)*T16,PEDRA.m);R(c,X-4,ya*T16,1,(yb-ya+1)*T16,PEDRA.h);
+    for(let y=ya*T16+2;y<(yb+1)*T16-2;y+=5){R(c,X-9,y,4,3,PEDRA.k);R(c,X-8,y,2,2,PEDRA.l);}R(c,X-10,ya*T16,2,(yb-ya+1)*T16,PEDRA.d);};
+  const encostaLeste=(c)=>{/* a encosta da colina desce para o vale em terraços com muro, gramado e palmeiras */
+    const X=EX*T16,W=2*T16;
+    for(let y=Y0;y<=Y1;y++){if(y>=BY0&&y<=BY1)continue;const M=SCN[K].map;if((M[y]||[])[EX]!=='C')continue;const Y=y*T16;
+      const g=c.createLinearGradient(X+W,0,X,0);g.addColorStop(0,'#7caa52');g.addColorStop(.55,'#5a8a40');g.addColorStop(1,'#3a6430');c.fillStyle=g;c.fillRect(X,Y,W,T16);
+      for(let i=0;i<6;i++){const sx=X+((y*13+i*7)%W),sy=Y+((y*5+i*11)%T16);R(c,sx,sy,1,2,'rgba(30,60,25,.5)');}
+      /* muros dos terraços */R(c,X+10,Y,3,T16,PEDRA.k);R(c,X+11,Y,1,T16,PEDRA.l);R(c,X+21,Y,3,T16,PEDRA.k);R(c,X+22,Y,1,T16,PEDRA.l);
+      /* balaustrada lá em cima, na beira da Rua Líbero Badaró */R(c,X+W-3,Y,3,T16,PEDRA.k);R(c,X+W-2,Y,1,T16,PEDRA.h);for(let yy=Y+1;yy<Y+T16;yy+=4){R(c,X+W-6,yy,3,3,PEDRA.d);R(c,X+W-5,yy,1,2,PEDRA.h);}
+      if(y%6===2){R(c,X+3,Y+2,2,10,'#6a4a2a');for(const [dx,dy] of [[-3,0],[3,0],[-2,-2],[2,-2],[0,-3]]){R(c,X+4+dx-2,Y+2+dy,5,2,'#2e6a32');}}}};
+  const viaduto=(c)=>{const X0=BX0*T16,X1=(BX1+1)*T16,Ya=BY0*T16,Yb=(BY1+1)*T16;
+    /* sombra do viaduto no parque (luz de cima à esquerda: a sombra cai para baixo e para a direita) */
+    c.fillStyle='rgba(8,20,12,.35)';c.beginPath();c.moveTo(X0+6,Yb);c.lineTo(X1+10,Yb);c.lineTo(X1+40,Yb+64);c.lineTo(X0+36,Yb+64);c.closePath();c.fill();
+    /* pilares de ferro descendo até o fundo do vale */
+    const nP=4;for(let i=0;i<=nP;i++){const px=Math.round(X0+4+(X1-X0-12)*i/nP);R(c,px-1,Yb,8,62,FE.k);R(c,px,Yb,6,62,FE.m);R(c,px,Yb,2,62,FE.h);R(c,px+5,Yb,1,62,FE.d);
+      for(let y=Yb+6;y<Yb+58;y+=8){R(c,px-1,y,8,1,FE.k);}R(c,px-4,Yb+60,14,4,PEDRA.k);R(c,px-3,Yb+60,12,2,PEDRA.l);}
+    /* treliça da lateral do viaduto (a face que se vê, virada para o sul) */
+    R(c,X0,Yb,X1-X0,22,FE.k);R(c,X0+1,Yb+1,X1-X0-2,3,FE.l);R(c,X0+1,Yb+18,X1-X0-2,3,FE.m);
+    c.strokeStyle=FE.l;c.lineWidth=1.5;c.beginPath();for(let x=X0+2;x<X1-10;x+=12){c.moveTo(x,Yb+4);c.lineTo(x+12,Yb+18);c.moveTo(x+12,Yb+4);c.lineTo(x,Yb+18);}c.stroke();
+    for(let x=X0+2;x<X1;x+=12)R(c,x,Yb+4,2,14,FE.h);
+    /* arcos embaixo da treliça */c.strokeStyle=FE.m;c.lineWidth=2;for(let i=0;i<nP;i++){const a=X0+4+(X1-X0-12)*i/nP+6,b=X0+4+(X1-X0-12)*(i+1)/nP;c.beginPath();c.moveTo(a,Yb+22);c.quadraticCurveTo((a+b)/2,Yb+44,b,Yb+22);c.stroke();}
+    /* tabuleiro: paralelepípedo, trilho do bonde e guarda-corpo dos dois lados */
+    R(c,X0,Ya,X1-X0,Yb-Ya,'#8a8478');for(let y=Ya;y<Yb;y+=4)for(let x=X0+((y>>2)&1)*3;x<X1;x+=6){R(c,x,y,5,3,'#9a948a');R(c,x,y,5,1,'#aaa498');}
+    R(c,X0,Ya+22,X1-X0,2,'#5a5650');R(c,X0,Ya+30,X1-X0,2,'#5a5650');R(c,X0,Ya+23,X1-X0,1,'#b8b4ac');R(c,X0,Ya+31,X1-X0,1,'#b8b4ac');
+    R(c,X0,Ya+4,X1-X0,6,'#c8c2b4');R(c,X0,Ya+9,X1-X0,1,'#7a756a');R(c,X0,Yb-10,X1-X0,6,'#c8c2b4');R(c,X0,Yb-10,X1-X0,1,'#e0dbd0');
+    for(const yy of [Ya,Yb-4]){R(c,X0,yy,X1-X0,4,FE.k);R(c,X0,yy+1,X1-X0,1,FE.h);for(let x=X0;x<X1;x+=3)R(c,x,yy-3,1,3,FE.d);R(c,X0,yy-4,X1-X0,1,FE.m);}
+    for(let x=X0+12;x<X1-4;x+=48)for(const yy of [Ya,Yb-4]){R(c,x,yy-14,2,14,FE.k);R(c,x-2,yy-17,6,4,FE.d);R(c,x-1,yy-16,4,2,'#ffe0a0');}
+    /* cabeceiras de pedra nas duas pontas */for(const x of [X0-6,X1-2]){R(c,x,Ya-4,8,Yb-Ya+30,PEDRA.k);R(c,x+1,Ya-3,6,Yb-Ya+28,PEDRA.m);R(c,x+1,Ya-3,6,2,PEDRA.h);}};
+  const pinta=c=>{c.save();fundo(c);muroOeste(c,48,Y0,BY0-1);muroOeste(c,50,BY1+1,Y1);encostaLeste(c);viaduto(c);c.restore();};
+  const bs=buildStatic;buildStatic=function(){bs();try{if(cur===K&&!window.__semVale22){sc.imageSmoothingEnabled=false;pinta(sc);}}catch(e){console.warn('vale22',e);}};
+  window.__vale22=1;
+}catch(e){console.warn('vale22',e);}})();
 let n=0;const tenta=()=>{try{if(roda()||++n>20)return;}catch(e){console.warn('quadra de teste JM',e);return;}setTimeout(tenta,700);};
   setTimeout(tenta,3600);
 }catch(e){console.warn('quadra de teste JM',e);}})();
