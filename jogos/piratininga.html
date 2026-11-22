@@ -21459,7 +21459,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v257) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v262) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -23200,6 +23200,7 @@ var __CASA22=(function(){
   var PAREDE_OBJ=/^(cartaz|relparede|retrato|folhinha|lampada|gaiola|quadro|oratorio)$/;
   return {sala,LIB,TIPO,SALAS,R,PAREDE_OBJ};
 })();
+window.__CASA22=__CASA22;
 
 
   const INV='[Personagem inventado para o jogo.]';
@@ -23245,6 +23246,719 @@ var __CASA22=(function(){
     if(on)cobre();
     else if(cap){cap.style.display='none';if(ini&&cur!=='sp22')ini=0;if(ini&&performance.now()-ini>=4000){ini=0;window.__jm22ini=1;}}}catch(_){}},40);
 }catch(e){console.warn('inicio 1922',e);}})();
+/* ===== v262 — 1922: CINEMAS, TEATROS, MERCADO, BOTEQUINS E LOJA DE DOCES CHEIOS POR DENTRO; IGREJAS, PREFEITURA, CORREIOS, OFICINA, TIPOGRAFIA, HOTEL, SAPATARIA E BARBEARIA COM GENTE E COISAS (pedido do professor, 22/11/2026) ===== */
+(function(){try{
+  const C22=(typeof __CASA22!=='undefined')?__CASA22:window.__CASA22;if(!C22||!C22.LIB||!C22.SALAS)return;
+  const R=C22.R,LIB=C22.LIB,SALAS=C22.SALAS;
+  const SH=(c,x,b,w)=>R(c,x,b-2,w,3,'rgba(50,25,10,.25)');
+  const MW={k:'#3e2414',d:'#5e3a1e',m:'#86562e',l:'#a8723f',h:'#cc9658'};
+  const FE={k:'#1e1e22',m:'#5a5e66',l:'#9ca2aa',h:'#c8ccd4'};
+  const OU={k:'#7a5a1e',m:'#c8a040',l:'#d8b060',h:'#e0b850'};
+  const PB={k:'#a89a88',d:'#efe8dc',m:'#f4f0e6',l:'#ffffff'};
+  const VE={k:'#3e2414',d:'#7a1e28',m:'#a8303a',l:'#c8404a',h:'#e0606a'};
+  const MA={k:'#2a140c',d:'#4a2c1a',m:'#6e4228',l:'#8a5a38',h:'#a8723f'};
+  const ci=(c,x,y,r,col)=>{c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();};
+  const el=(c,x,y,rx,ry,col)=>{c.fillStyle=col;c.beginPath();c.ellipse(x,y,rx,ry,0,0,7);c.fill();};
+
+  /* ---------- poltronas em fileira: veludo, couro e banco de madeira ---------- */
+  const FILA=(V,banco)=>function(c,X,Y,o){const n=o.w||1,b=Y+16;
+    for(let i=0;i<n;i++){const x=X+i*16;SH(c,x+1,b,14);
+      if(banco){R(c,x,b-17,16,9,MW.k);R(c,x+1,b-16,14,7,MW.m);R(c,x+1,b-16,14,2,MW.h);R(c,x+1,b-13,14,1,MW.d);
+        R(c,x,b-9,16,6,MW.k);R(c,x+1,b-8,14,4,MW.l);R(c,x+1,b-8,14,1,MW.h);R(c,x+1,b-3,2,3,MW.k);R(c,x+13,b-3,2,3,MW.k);continue;}
+      R(c,x+3,b-3,2,3,MW.k);R(c,x+11,b-3,2,3,MW.k);
+      R(c,x+3,b-18,10,10,V.k);R(c,x+4,b-17,8,8,V.m);R(c,x+4,b-17,8,2,V.h);R(c,x+5,b-15,1,5,V.l);R(c,x+10,b-14,1,4,V.d);
+      R(c,x+1,b-11,3,8,MW.k);R(c,x+2,b-10,1,6,MW.m);R(c,x+12,b-11,3,8,MW.k);R(c,x+13,b-10,1,6,MW.m);R(c,x+1,b-11,3,1,MW.h);R(c,x+12,b-11,3,1,MW.h);
+      R(c,x+3,b-9,10,6,V.k);R(c,x+4,b-8,8,4,V.l);R(c,x+4,b-8,8,1,V.h);}};
+  LIB.filaV=FILA(VE);
+  LIB.filaM=FILA({k:'#3e2414',d:'#5e3a1e',m:'#8a5a38',l:'#a8723f',h:'#cc9658'});
+  LIB.filaB=FILA(null,true);
+
+  /* ---------- mercado ---------- */
+  const mesaBanca=(c,X,Y,w,cor)=>{const b=Y+16;SH(c,X,b,w);R(c,X,b-9,w,9,MW.k);R(c,X+1,b-8,w-2,7,cor||MW.m);R(c,X+1,b-8,w-2,1,MW.h);R(c,X+1,b-4,w-2,1,MW.d);R(c,X+1,b-1,3,1,MW.k);R(c,X+w-4,b-1,3,1,MW.k);return b;};
+  LIB.bancaverdura=function(c,X,Y,o){const w=(o.w||2)*16,b=mesaBanca(c,X,Y,w);
+    for(let i=0;i<w-6;i+=8){ci(c,X+6+i,b-12,4,'#2e6a32');ci(c,X+6+i,b-12,3.2,'#4e8a40');ci(c,X+5+i,b-13,1.5,'#7ab058');}
+    for(let i=0;i<w-8;i+=8){R(c,X+9+i,b-13,2,7,'#d8742a');R(c,X+11+i,b-12,2,6,'#e88a3a');R(c,X+9+i,b-14,2,2,'#4e8a40');}
+    ci(c,X+4,b-9,2.2,'#c8302a');ci(c,X+w-5,b-9,2.2,'#c8302a');ci(c,X+w-8,b-10,2,'#e04a3a');
+    R(c,X+w-9,b-19,8,6,PB.d);R(c,X+w-9,b-19,8,1,PB.l);R(c,X+w-8,b-17,6,1,'#7a1e28');R(c,X+w-8,b-15,4,1,'#7a1e28');R(c,X+w-5,b-13,1,3,MW.k);};
+  LIB.bancapeixe=function(c,X,Y,o){const w=(o.w||2)*16,b=mesaBanca(c,X,Y,w,'#5a7a94');
+    R(c,X+2,b-13,w-4,5,'#cfe4ec');R(c,X+2,b-13,w-4,1,'#f4fafc');R(c,X+2,b-9,w-4,1,'#9ccbe0');
+    for(let i=0;i<w-10;i+=10){const x=X+5+i;el(c,x+3,b-11,5,2,'#7a8a96');el(c,x+3,b-11.4,4,1,'#b4c4cc');R(c,x+7,b-12,3,3,'#7a8a96');R(c,x,b-12,1,1,'#1e1e22');R(c,x+1,b-10,3,1,'#5a6a76');}
+    R(c,X+w-10,b-18,8,5,PB.d);R(c,X+w-10,b-18,8,1,PB.l);R(c,X+w-9,b-16,6,1,'#2a3a6a');R(c,X+w-9,b-14,4,1,'#2a3a6a');R(c,X+w-6,b-13,1,2,MW.k);};
+  LIB.bancaqueijo=function(c,X,Y,o){const w=(o.w||2)*16,b=mesaBanca(c,X,Y,w,'#a8723f');
+    R(c,X+2,b-9,w-4,1,PB.d);
+    for(let i=0;i<w-18;i+=11){const x=X+3+i;R(c,x,b-14,10,6,'#8a6a1e');R(c,x+1,b-15,8,6,'#e0b850');R(c,x+1,b-15,8,2,'#f0d070');R(c,x+7,b-11,3,3,'#d8a030');ci(c,x+3,b-11,1,'#b88a28');}
+    R(c,X+w-15,b-12,13,4,'#8a5a38');R(c,X+w-14,b-13,11,2,'#a8723f');for(let i=0;i<4;i++)el(c,X+w-12+i*3,b-13,1.4,1.8,'#f4ead0');
+    R(c,X+w-8,b-9,5,2,'#f0d878');};
+  LIB.balanca=function(c,X,Y){const b=Y+16;SH(c,X+3,b,10);R(c,X+5,b-3,6,3,FE.m);R(c,X+7,b-24,2,22,FE.m);R(c,X+7,b-24,1,22,FE.l);R(c,X+2,b-25,12,2,FE.k);R(c,X+2,b-25,12,1,FE.h);
+    R(c,X+2,b-23,1,8,FE.l);R(c,X+13,b-23,1,8,FE.l);R(c,X+0,b-15,5,2,FE.k);R(c,X+11,b-15,5,2,FE.k);R(c,X+1,b-16,3,1,FE.h);R(c,X+12,b-16,3,1,FE.h);R(c,X+12,b-18,3,2,'#3a3a40');R(c,X+7,b-27,2,2,OU.m);};
+  LIB.latao=function(c,X,Y){const b=Y+16;SH(c,X+1,b,14);
+    for(const dx of [1,8]){R(c,X+dx,b-15,7,15,FE.k);R(c,X+dx+1,b-14,5,13,FE.l);R(c,X+dx+1,b-14,2,13,FE.h);R(c,X+dx+4,b-14,2,13,FE.m);R(c,X+dx,b-12,7,1,FE.k);R(c,X+dx,b-4,7,1,FE.k);R(c,X+dx+1,b-17,5,3,FE.k);R(c,X+dx+2,b-17,3,1,FE.l);}};
+  LIB.melancias=function(c,X,Y){const b=Y+16;SH(c,X,b,16);
+    for(const [dx,dy,r] of [[4,6,5],[11,6,5],[8,11,5.5]]){el(c,X+dx,b-dy,r+.5,r-.5,'#1e4a24');el(c,X+dx,b-dy,r,r-1,'#3e8a3a');for(let k=-3;k<=3;k+=3)R(c,X+dx+k-.5,b-dy-3,1,6,'#2a6a2e');R(c,X+dx-3,b-dy-2,2,1,'#7ab058');}};
+  LIB.cachos=function(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+7,b-26,2,24,MW.k);R(c,X+2,b-26,12,2,MW.k);R(c,X+3,b-3,10,3,MW.k);
+    for(const [dx,dy] of [[3,24],[10,22],[4,15],[9,13]]){R(c,X+dx,b-dy,1,3,MW.d);for(let k=0;k<4;k++){R(c,X+dx-1+(k>>1),b-dy+3+k*2,3,2,'#e8c030');R(c,X+dx-1+(k>>1),b-dy+3+k*2,1,2,'#f4e060');}R(c,X+dx,b-dy+11,1,1,MW.k);}};
+  LIB.cestaria=function(c,X,Y){const b=Y+16;SH(c,X+1,b,14);
+    for(const [dx,dy,w] of [[1,0,14],[3,7,11]]){R(c,X+dx,b-dy-8,w,8,'#6a4a1e');R(c,X+dx+1,b-dy-7,w-2,6,'#c8a058');for(let i=1;i<w-2;i+=3)R(c,X+dx+1+i,b-dy-7,1,6,'#a07e3a');R(c,X+dx+1,b-dy-5,w-2,1,'#e2c27c');R(c,X+dx+1,b-dy-2,w-2,1,'#a07e3a');}};
+  LIB.carrinho=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X,b,w);R(c,X+2,b-9,w-4,7,MW.k);R(c,X+3,b-8,w-6,5,MW.l);R(c,X+3,b-8,w-6,1,MW.h);
+    ci(c,X+6,b-3,3,MW.k);ci(c,X+6,b-3,1.4,FE.l);ci(c,X+w-7,b-3,3,MW.k);ci(c,X+w-7,b-3,1.4,FE.l);R(c,X+w-3,b-14,2,6,MW.k);
+    for(let i=0;i<w-8;i+=6){ci(c,X+6+i,b-11,3,'#e88a2a');ci(c,X+5+i,b-12,1,'#f4b04a');}};
+
+  /* ---------- doces ---------- */
+  LIB.vitrinedoce=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X,b,w);R(c,X,b-22,w,22,MW.k);R(c,X+1,b-21,w-2,14,'#cfe4ec');R(c,X+1,b-21,w-2,1,'#f4fafc');
+    for(const dy of [20,13]){R(c,X+1,b-dy+6,w-2,1,'#9ccbe0');}
+    const dc=['#e88aa0','#6e3a28','#f4ead0','#e8b030','#c8404a','#f0a0b0'];
+    for(let i=0;i<(w-6)/6;i++){const x=X+3+i*6;const cc=dc[i%6];R(c,x,b-26+6,4,3,cc);R(c,x,b-26+6,4,1,'rgba(255,255,255,.45)');R(c,x+1,b-19,2,1,PB.l);
+      R(c,x,b-14+1,4,3,dc[(i+3)%6]);R(c,x,b-14+1,4,1,'rgba(255,255,255,.4)');}
+    R(c,X+3,b-20,3,6,'rgba(255,255,255,.35)');R(c,X+1,b-7,w-2,6,MW.m);R(c,X+1,b-7,w-2,1,MW.h);R(c,X+1,b-3,w-2,1,MW.d);R(c,X+1,b-1,2,1,MW.k);R(c,X+w-3,b-1,2,1,MW.k);};
+  LIB.tabuleiro=function(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+3,b-9,2,9,MW.k);R(c,X+11,b-9,2,9,MW.k);R(c,X+3,b-5,10,1,MW.d);
+    R(c,X+1,b-13,14,5,MW.k);R(c,X+2,b-12,12,3,PB.d);R(c,X+2,b-12,12,1,PB.l);for(let i=2;i<14;i+=2)R(c,X+i,b-9,1,2,PB.k);
+    const dc=['#e88aa0','#d8a030','#f4ead0','#8a5a38','#c8404a','#e8b030'];for(let i=0;i<4;i++){el(c,X+4+i*3,b-14,1.8,1.6,dc[i]);el(c,X+4+i*3,b-14.4,1.2,.8,'rgba(255,255,255,.4)');}
+    R(c,X+4,b-17,8,3,'#efe8dc');R(c,X+4,b-17,8,1,PB.l);R(c,X+5,b-16,1,1,PB.k);R(c,X+9,b-16,1,1,PB.k);};
+  LIB.bolo=function(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+7,b-6,2,6,MW.k);R(c,X+3,b-3,10,3,MW.k);R(c,X+4,b-3,8,1,MW.l);
+    R(c,X+2,b-8,12,3,OU.k);R(c,X+3,b-8,10,2,OU.m);R(c,X+3,b-14,10,6,'#6e3a28');R(c,X+4,b-13,8,5,'#a86a3a');R(c,X+4,b-15,8,3,'#f4d0dc');R(c,X+4,b-15,8,1,'#fbe8ee');ci(c,X+8,b-17,1.4,'#c8302a');R(c,X+2,b-20,12,1,'rgba(255,255,255,.5)');R(c,X+2,b-21,12,1,'rgba(180,214,228,.6)');R(c,X+3,b-20,1,12,'rgba(255,255,255,.3)');};
+  LIB.potes=function(c,X,Y,o){const w=(o.w||1)*16,b=Y+16;SH(c,X+1,b,w-2);
+    R(c,X+1,b-28,w-2,28,MW.k);R(c,X+2,b-27,w-4,26,MW.d);for(const dy of [20,10]){R(c,X+2,b-dy,w-4,1,MW.l);}
+    const pc=['#e8b030','#c8404a','#f0a0b0','#7ab058','#efe8dc','#a86a3a'];
+    for(const [dy,off] of [[21,0],[11,2],[2,1]]){for(let i=0;i<(w-6)/5;i++){const x=X+3+i*5,cc=pc[(i+off)%6];R(c,x,b-dy-7,4,7,'#cfe4ec');R(c,x+1,b-dy-5,2,5,cc);R(c,x,b-dy-8,4,1,OU.m);R(c,x,b-dy-7,1,6,'rgba(255,255,255,.5)');}}};
+
+  /* ---------- botequim ---------- */
+  LIB.mesataverna=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X+1,b,w-2);R(c,X+2,b-6,2,6,MW.k);R(c,X+w-4,b-6,2,6,MW.k);
+    R(c,X+1,b-14,w-2,9,MW.k);R(c,X+2,b-13,w-4,4,MW.h);R(c,X+2,b-13,w-4,1,'#e0b070');R(c,X+2,b-9,w-4,3,MW.m);R(c,X+2,b-9,w-4,1,MW.d);
+    R(c,X+4,b-13,3,2,PB.m);R(c,X+5,b-16,2,3,'#e8c870');R(c,X+5,b-16,2,1,PB.l);R(c,X+w-8,b-17,2,4,'#2e6a32');R(c,X+w-8,b-17,2,1,'#a8d0a0');R(c,X+w-12,b-14,4,2,PB.d);R(c,X+w-11,b-15,1,1,MW.k);R(c,X+w-10,b-15,1,1,MW.k);};
+  LIB.mesamarmore=function(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+7,b-8,2,7,FE.k);R(c,X+4,b-2,8,2,FE.k);R(c,X+5,b-2,6,1,FE.m);
+    el(c,X+8,b-10,7,3.2,FE.k);el(c,X+8,b-10.6,6.4,2.6,'#efe8dc');el(c,X+7,b-11,3,1,'#fff');R(c,X+4,b-14,3,3,'#e8c870');R(c,X+4,b-14,3,1,PB.l);R(c,X+9,b-13,3,2,PB.k);R(c,X+9,b-14,3,1,PB.l);};
+  LIB.garrafas=function(c,X,Y){const b=Y+16;SH(c,X+1,b,14);R(c,X+1,b-8,14,8,MW.k);R(c,X+2,b-7,12,6,MW.l);R(c,X+2,b-4,12,1,MW.d);
+    const gc=['#3e5a2a','#6a3a1a','#2e4a3a','#7a4a1e','#3e5a2a'];for(let i=0;i<5;i++){const x=X+2+i*2.6;R(c,x,b-15,2,8,gc[i]);R(c,x+.4,b-17,1,3,gc[i]);R(c,x,b-16,2,1,OU.m);R(c,x,b-14,1,5,'rgba(255,255,255,.35)');}};
+  LIB.gramofone=function(c,X,Y){const b=Y+16;SH(c,X+1,b,14);R(c,X+2,b-6,2,6,MW.k);R(c,X+12,b-6,2,6,MW.k);R(c,X+1,b-12,14,7,MW.k);R(c,X+2,b-11,12,5,MW.m);R(c,X+2,b-11,12,1,MW.h);
+    R(c,X+3,b-13,7,2,FE.k);el(c,X+6,b-13,3.5,1,'#1e1e22');R(c,X+11,b-18,1,6,FE.k);
+    c.fillStyle=OU.k;c.beginPath();c.moveTo(X+11,b-14);c.lineTo(X+15,b-26);c.lineTo(X+16,b-26);c.lineTo(X+13,b-12);c.fill();c.fillStyle=OU.m;c.beginPath();c.moveTo(X+11.5,b-14);c.lineTo(X+14,b-24);c.lineTo(X+14.5,b-24);c.lineTo(X+12.5,b-13);c.fill();el(c,X+14.5,b-25,2.2,3,OU.l);el(c,X+14.5,b-25,1,2,'#6a4a1e');};
+  LIB.chopeira=function(c,X,Y,o){const w=(o.w||1)*16,b=Y+16;SH(c,X,b,w);R(c,X,b-12,w,12,FE.k);R(c,X+1,b-11,w-2,4,FE.l);R(c,X+1,b-11,w-2,1,FE.h);R(c,X+1,b-7,w-2,6,FE.m);R(c,X+4,b-19,3,7,OU.m);R(c,X+4,b-19,3,1,OU.h);R(c,X+5,b-21,1,2,FE.k);R(c,X+9,b-19,3,7,OU.m);R(c,X+9,b-19,3,1,OU.h);R(c,X+10,b-21,1,2,FE.k);};
+
+  /* ---------- igreja ---------- */
+  LIB.castical=function(c,X,Y){const b=Y+16;SH(c,X+3,b,10);R(c,X+4,b-3,8,3,OU.k);R(c,X+5,b-3,6,2,OU.m);R(c,X+7,b-19,2,16,OU.k);R(c,X+7,b-19,1,16,OU.l);R(c,X+5,b-21,6,2,OU.k);R(c,X+6,b-21,4,1,OU.h);
+    R(c,X+7,b-25,2,5,'#f4ead0');R(c,X+7,b-26,2,1,'#fff');R(c,X+7,b-28,2,3,'#f8c040');R(c,X+7,b-29,1,2,'#fff4c0');el(c,X+8,b-26,4,5,'rgba(255,210,120,.18)');};
+  LIB.gradealtar=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X,b,w);R(c,X,b-11,w,3,'#efe8dc');R(c,X,b-11,w,1,'#fff');R(c,X,b-8,w,1,PB.k);
+    for(let i=1;i<w;i+=5){R(c,X+i,b-8,2,8,'#efe8dc');R(c,X+i,b-8,1,8,'#fff');R(c,X+i+1,b-8,1,8,PB.k);}R(c,X,b-1,w,1,PB.k);};
+  LIB.confessionario=function(c,X,Y){const b=Y+16;SH(c,X,b,16);R(c,X,b-42,16,42,MW.k);R(c,X+1,b-41,14,40,MW.d);R(c,X+1,b-41,14,3,MW.l);R(c,X+2,b-36,5,22,MW.m);R(c,X+3,b-35,3,20,'#2a1810');R(c,X+9,b-36,5,22,MW.m);R(c,X+10,b-35,3,20,'#2a1810');
+    R(c,X+7,b-36,2,22,MW.k);R(c,X+7,b-44,2,3,OU.m);R(c,X+6,b-42,4,1,OU.k);R(c,X+3,b-14,3,2,OU.m);R(c,X+10,b-14,3,2,OU.m);R(c,X+1,b-3,14,3,MW.k);};
+  LIB.prie=function(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+3,b-16,10,4,MW.k);R(c,X+4,b-15,8,2,MW.l);R(c,X+2,b-12,12,9,MW.k);R(c,X+3,b-11,10,6,VE.m);R(c,X+3,b-11,10,1,VE.h);R(c,X+3,b-3,2,3,MW.k);R(c,X+11,b-3,2,3,MW.k);};
+  /* ---------- correios ---------- */
+  LIB.caixapostal=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;R(c,X,b-38,w,38,MW.k);R(c,X+1,b-37,w-2,36,MW.d);
+    for(let j=0;j<4;j++)for(let i=0;i<(w-3)/6;i++){const x=X+2+i*6,y=b-35+j*9;R(c,x,y,5,7,MW.k);R(c,x+1,y+1,3,5,'#8a6a1e');R(c,x+1,y+1,3,1,OU.l);R(c,x+2,y+3,1,1,'#2a1810');}};
+  LIB.marcocorreio=function(c,X,Y){const b=Y+16;SH(c,X+2,b,12);R(c,X+3,b-3,10,3,'#5a1418');R(c,X+4,b-26,8,24,'#5a1418');R(c,X+5,b-25,6,22,'#c0302a');R(c,X+5,b-25,2,22,'#e0504a');R(c,X+3,b-28,10,3,'#5a1418');R(c,X+4,b-27,8,1,'#d8403a');
+    R(c,X+5,b-20,6,2,'#1e1e22');R(c,X+6,b-12,4,4,OU.m);R(c,X+7,b-11,2,2,OU.k);};
+  LIB.malacorreio=function(c,X,Y){const b=Y+16;SH(c,X+1,b,14);R(c,X+1,b-12,14,12,'#3a3a40');R(c,X+2,b-11,12,10,'#6a7a8a');R(c,X+2,b-11,4,10,'#8a9aaa');R(c,X+2,b-4,12,2,'#4a5a6a');R(c,X+4,b-15,8,4,'#3a3a40');R(c,X+5,b-14,6,2,'#6a7a8a');R(c,X+5,b-9,6,4,'#efe8dc');R(c,X+6,b-8,4,1,'#c0302a');R(c,X+6,b-6,3,1,'#5a5e66');};
+  /* ---------- estúdio de fotografia ---------- */
+  LIB.biombo=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X,b,w);R(c,X,b-38,w,38,MW.k);R(c,X+1,b-37,w-2,35,'#cfe4ec');R(c,X+1,b-37,w-2,18,'#a8d0e4');el(c,X+7,b-30,5,2,'#f4fafc');el(c,X+w-9,b-27,4,1.6,'#f4fafc');
+    R(c,X+1,b-19,w-2,17,'#6a9a58');R(c,X+1,b-19,w-2,2,'#8aba70');for(let i=3;i<w-4;i+=7){ci(c,X+i,b-14,3,'#4e8a40');R(c,X+i,b-11,1,5,MW.k);ci(c,X+i+1,b-15,1.4,'#e07090');}R(c,X+w>>1,b-37,0,0,MW.k);R(c,X,b-3,w,3,MW.k);};
+  LIB.refletor=function(c,X,Y){const b=Y+16;SH(c,X+3,b,10);R(c,X+7,b-24,2,22,FE.k);R(c,X+4,b-3,8,3,FE.k);R(c,X+5,b-3,6,1,FE.m);R(c,X+3,b-32,10,9,FE.k);R(c,X+4,b-31,8,7,FE.m);R(c,X+5,b-30,6,5,'#fdf0b0');R(c,X+6,b-29,4,3,'#fff8d8');el(c,X+8,b-27,7,8,'rgba(255,240,170,.15)');};
+  /* ---------- oficina mecânica ---------- */
+  LIB.motor=function(c,X,Y){const b=Y+16;SH(c,X+1,b,14);R(c,X+2,b-6,2,6,MW.k);R(c,X+12,b-6,2,6,MW.k);R(c,X+1,b-8,14,3,MW.d);R(c,X+2,b-18,12,11,FE.k);R(c,X+3,b-17,10,9,FE.m);R(c,X+3,b-17,10,2,FE.l);
+    for(let i=0;i<3;i++){R(c,X+4+i*3,b-22,2,5,FE.k);R(c,X+4+i*3,b-22,2,1,FE.h);}R(c,X+3,b-12,10,1,FE.k);R(c,X+13,b-14,3,2,FE.k);R(c,X+1,b-14,2,4,'#c8a040');};
+  LIB.bancadaferr=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X,b,w);R(c,X+1,b-4,3,4,MW.k);R(c,X+w-4,b-4,3,4,MW.k);R(c,X,b-15,w,12,MW.k);R(c,X+1,b-14,w-2,3,MW.l);R(c,X+1,b-14,w-2,1,MW.h);R(c,X+1,b-11,w-2,7,MW.m);R(c,X+(w>>1),b-11,1,7,MW.k);
+    R(c,X+3,b-19,2,5,FE.m);R(c,X+3,b-19,2,1,FE.h);R(c,X+7,b-17,7,2,FE.l);R(c,X+7,b-17,7,1,FE.h);R(c,X+w-9,b-22,5,8,FE.k);R(c,X+w-8,b-21,3,3,FE.m);R(c,X+w-7,b-13,1,3,FE.k);R(c,X+w-12,b-18,2,3,'#c0302a');};
+  LIB.painelferr=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;R(c,X,b-34,w,30,MW.k);R(c,X+1,b-33,w-2,28,MW.d);
+    for(let i=0;i<(w-4)/6;i++){const x=X+3+i*6;R(c,x,b-31,2,12,FE.m);R(c,x,b-31,2,2,FE.h);R(c,x+3,b-27,2,9,FE.l);R(c,x+3,b-27,2,2,FE.h);R(c,x,b-15,5,2,FE.k);R(c,x+1,b-13,3,6,FE.m);}};
+  /* ---------- tipografia ---------- */
+  LIB.guilhotina=function(c,X,Y){const b=Y+16;SH(c,X+1,b,14);R(c,X+2,b-4,2,4,MW.k);R(c,X+12,b-4,2,4,MW.k);R(c,X+1,b-12,14,9,MW.k);R(c,X+2,b-11,12,7,MW.m);R(c,X+2,b-11,12,2,MW.h);R(c,X+3,b-14,10,3,PB.d);R(c,X+3,b-14,10,1,PB.l);
+    R(c,X+11,b-24,2,12,FE.k);R(c,X+2,b-25,10,3,FE.m);R(c,X+2,b-25,10,1,FE.h);R(c,X+0,b-27,3,3,'#3a2414');R(c,X+0,b-27,3,1,MW.l);};
+  LIB.estanteletras=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;R(c,X,b-40,w,40,MW.k);R(c,X+1,b-39,w-2,38,MW.d);
+    for(let j=0;j<4;j++){const y=b-37+j*9;R(c,X+1,y+8,w-2,1,MW.l);for(let i=0;i<(w-3)/7;i++){const x=X+2+i*7;R(c,x,y+1,6,7,MW.k);R(c,x+1,y+2,4,5,'#2a2a2e');for(let k=0;k<3;k++)R(c,x+1+k+(k&1),y+3+(k&1),1,2,'#9ca2aa');}}};
+  /* ---------- hotel ---------- */
+  LIB.quadrochaves=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;R(c,X+1,b-34,w-2,26,MW.k);R(c,X+2,b-33,w-4,24,MW.m);R(c,X+2,b-33,w-4,2,MW.h);
+    for(let j=0;j<3;j++)for(let i=0;i<(w-6)/5;i++){const x=X+4+i*5,y=b-29+j*7;R(c,x,y,1,3,OU.m);R(c,x-1,y+3,3,3,OU.l);R(c,x,y+4,1,1,OU.k);}};
+  /* ---------- sapataria e barbearia ---------- */
+  LIB.bancasapateiro=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X,b,w);R(c,X+1,b-8,2,8,MW.k);R(c,X+w-3,b-8,2,8,MW.k);R(c,X,b-14,w,8,MW.k);R(c,X+1,b-13,w-2,2,MW.h);R(c,X+1,b-11,w-2,4,MW.m);
+    R(c,X+3,b-19,6,5,'#6a3a1a');R(c,X+3,b-20,6,1,'#8a5a2a');R(c,X+4,b-18,4,1,'#2a140c');R(c,X+11,b-19,2,5,FE.m);R(c,X+11,b-20,3,2,FE.k);R(c,X+w-9,b-17,5,3,'#a8723f');R(c,X+w-8,b-16,3,1,PB.d);R(c,X+w-11,b-16,2,2,OU.m);};
+  LIB.cadeirabarbeiro=function(c,X,Y){const b=Y+16;SH(c,X+1,b,14);R(c,X+5,b-4,6,4,FE.k);R(c,X+6,b-6,4,3,FE.m);R(c,X+7,b-9,2,4,FE.l);
+    R(c,X+2,b-13,12,6,VE.k);R(c,X+3,b-12,10,4,VE.m);R(c,X+3,b-12,10,1,VE.h);R(c,X+1,b-12,2,7,MW.k);R(c,X+13,b-12,2,7,MW.k);R(c,X+3,b-26,10,14,VE.k);R(c,X+4,b-25,8,12,VE.l);R(c,X+4,b-25,8,1,VE.h);R(c,X+5,b-29,6,4,VE.k);R(c,X+6,b-28,4,2,VE.m);R(c,X+4,b-3,8,1,FE.m);};
+  LIB.toalheiro=function(c,X,Y){const b=Y+16;SH(c,X+3,b,10);R(c,X+7,b-26,2,24,MW.k);R(c,X+3,b-3,10,3,MW.k);R(c,X+2,b-28,12,2,MW.k);R(c,X+2,b-28,12,1,MW.h);
+    R(c,X+3,b-26,4,12,PB.d);R(c,X+3,b-26,1,12,PB.l);R(c,X+9,b-26,4,10,PB.m);R(c,X+9,b-26,1,10,PB.l);R(c,X+3,b-16,4,1,'#9ccbe0');R(c,X+9,b-17,4,1,'#9ccbe0');};
+  LIB.bancoigreja=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X,b,w);R(c,X+1,b-3,2,3,MW.k);R(c,X+w-3,b-3,2,3,MW.k);
+    R(c,X,b-16,w,9,MW.k);R(c,X+1,b-15,w-2,7,MW.d);R(c,X+1,b-15,w-2,1,MW.l);R(c,X+1,b-12,w-2,1,MW.k);R(c,X,b-18,2,13,MW.k);R(c,X+w-2,b-18,2,13,MW.k);R(c,X,b-18,2,1,MW.l);R(c,X+w-2,b-18,2,1,MW.l);
+    R(c,X,b-8,w,5,MW.k);R(c,X+1,b-7,w-2,3,MW.l);R(c,X+1,b-7,w-2,1,MW.h);};
+  /* ---------- as peças que o jogo antigo desenhava passam a usar as novas ---------- */
+  const RESTILO={
+    m_t_teatro:[[/bancoIgreja/,'filaV']],
+    m_municipal:[],
+    m_taverna:[[/^mt\d$/,'mesataverna'],[/^mesamarmore/,'mesamarmore'],[/^garrafas/,'garrafas']],
+    m_t_cafe:[[/mesaCafe/,'mesamarmore']],
+    m_t_mercado:[],
+    m_ig_rosario:[[/bancoIgreja/,'bancoigreja']],m_ig_boamorte:[[/bancoIgreja/,'bancoigreja']],m_ig_saogoncalo:[[/bancoIgreja/,'bancoigreja']],m_ig_santaifigenia:[[/bancoIgreja/,'bancoigreja']],m_ig_saofrancisco:[[/bancoIgreja/,'bancoigreja']]
+  };
+
+  /* ---------- o que entra em cada sala: [tipo, x, y, largura, 1, nome, texto] ---------- */
+  const P=(t,x,y,w,nome,txt)=>[t,x,y,w,1,nome||null,txt||null];
+  const fileiras=(tipo,ys,xs)=>{const L=[];for(const y of ys)for(const [x,w] of xs)L.push(P(tipo,x,y,w));return L;};
+  const CINE=tipo=>({tema:null,encher:[
+    ...fileiras(tipo,[4],[[1,5],[8,5]]),...fileiras(tipo,[9],[[1,4],[9,4]]),
+    P(tipo,1,5,1),P(tipo,5,5,1),P(tipo,11,5,2),P(tipo,1,7,1),P(tipo,5,7,1),P(tipo,11,7,2)]});
+  SALAS.m_cinema=CINE('filaV');SALAS.m_cine3=CINE('filaV');SALAS.m_cine5=CINE('filaV');
+  SALAS.m_cine2=CINE('filaM');
+  SALAS.m_cine4=CINE('filaB');
+
+  Object.assign(SALAS.m_t_teatro,{auto:[['samambaia',1,null,null],['cartaz',1,'Cartaz','HOJE: COMÉDIA EM TRÊS ATOS.']],encher:[
+    ...fileiras('filaV',[4],[[2,3],[6,3],[10,3],[14,3]]),
+    P('filaV',1,6,1),P('filaV',5,6,1),P('filaV',9,6,1),P('filaV',13,6,1),P('filaV',1,8,1),P('filaV',5,8,1),P('filaV',9,8,1),P('filaV',13,8,1),
+    ...fileiras('filaV',[10],[[2,3],[6,2],[10,3],[14,3]])]});
+
+  SALAS.m_municipal={tema:null,encher:[
+    P('filaV',2,10,3),P('filaV',6,10,2),P('filaV',12,10,3),
+    P('filaV',2,11,3),P('filaV',5,11,3),P('filaV',10,11,3),P('filaV',13,11,3)]};
+
+  Object.assign(SALAS.m_t_mercado,{auto:[],encher:[
+    P('cestaria',3,4,1,'Cestos de vime','Os cestos de vime vêm do interior, amarrados em carroça.'),
+    P('bancaqueijo',6,4,2,'Queijos e ovos','Queijo de Minas, ovos de chácara e manteiga em lata.'),
+    P('bancapeixe',10,4,2,'Peixe no gelo','O peixe chega de trem do litoral, no gelo. Na sexta-feira, todo mundo quer bacalhau.'),
+    P('balanca',14,4,1,'Balança de pratos','A balança de pratos pesa tudo: o freguês confere o peso com os olhos.'),
+    P('cartaz',3,2,1,'Cartaz','FRUTAS, VERDURAS E PEIXE FRESCO TODO DIA.'),P('relparede',8,2,1,'Relógio',null),P('cartaz',13,2,1,'Cartaz','QUEIJO, OVOS E MANTEIGA DA ROÇA.'),
+    P('bancaverdura',5,8,2,'Verduras','Couve, repolho, cenoura e tomate: tudo colhido nas chácaras de manhã cedo.'),
+    P('melancias',12,8,1,'Melancias','Melancia gelada no verão: uma fatia custa um tostão.'),
+    P('latao',13,8,1,'Latões de leite','O leiteiro entrega de madrugada, em latões de ferro.'),
+    P('cachos',1,6,1,'Cachos de banana','Banana-prata e banana-nanica, direto de Santos.'),
+    P('carrinho',1,9,2,'Carrinho de mão','O carrinho de mão leva as compras até a casa da freguesa.'),
+    P('bancapeixe',5,6,2,'Peixe no gelo',null),P('bancaverdura',11,6,2,null),P('bancaqueijo',2,10,2,null),P('bancaverdura',11,10,2,null),P('cestaria',15,6,1,null),P('latao',16,6,1,null),P('melancias',15,10,1,null),P('cestaria',4,10,1,null),P('barril',16,9,1,'Barril de azeitona','Azeitonas e bacalhau vêm em barril, da loja dos portugueses.'),P('barril',5,10,1,null)],
+    gente:[['merc22_a','h22_x|quitandeira|0',7,6,'Freguesa com o cesto','Estou vendo o preço do peixe. Hoje está pela hora da morte!'],['merc22_b','h22_n|pop_33|2',11,6,'Menino da carroça','Meu pai me manda buscar couve. Se eu demorar, ele reclama.']]});
+
+  Object.assign(SALAS.m_t_padaria,{auto:[],encher:[
+    P('prateleira',1,2,3,'Potes de bala e doce','Bala de coco, pé-de-moleque, goiabada e doce de leite em potes de vidro.'),P('potes',8,2,1,'Estante de doces',null),
+    P('vitrinedoce',9,6,2,'Vitrine de doces','Quindim, cocada, brigadeiro... E o preço vai escrito num papelzinho.'),
+    P('tabuleiro',12,5,1,'Tabuleiro de cocada','O tabuleiro de cocada sai pelas ruas na cabeça do doceiro.'),P('tabuleiro',12,6,1,null),
+    P('bolo',3,4,1,'Bolo na redoma','O bolo de aniversário sempre fica na redoma, longe das moscas.'),P('bolo',8,4,1,null),
+    P('vitrinedoce',4,7,2,'Vitrine de frutas cristalizadas','Figo, abóbora e laranja em calda, cristalizados em açúcar.'),
+    P('mesamarmore',2,6,1,'Mesinha de mármore','Quem não leva para casa come aqui mesmo, com um copo de água.'),P('cadeira',3,6,1,null),P('mesamarmore',10,7,1,null),P('cadeira',9,7,1,null),P('cadeira',11,6,1,null),P('latas',12,8,1,'Latas de goiabada','A goiabada cascão vem em latas de Minas.'),P('latas',1,8,1,null),P('saco',9,8,1,'Saco de açúcar',null)],
+    gente:[['doce22_a','h22_x|parteira|0',5,6,'Freguesa dos doces','Vim buscar quindim para a visita de domingo. Aqui o quindim é o mais amarelinho.'],['doce22_b','h22_n|pop_33|3',8,7,'Menino com a moeda','Tenho um tostão. Dá para uma cocada ou duas balas. Ainda não decidi.']]});
+
+  SALAS.m_taverna={tema:null,encher:[
+    P('mesataverna',4,5,2),P('mesataverna',13,5,2,null),P('mesataverna',12,7,2),
+    P('cadeira',3,5,1),P('cadeira',6,5,1),P('cadeira',9,5,1),P('cadeira',12,5,1),P('cadeira',11,7,1),P('cadeira',14,7,1),P('cadeira',3,7,1),P('cadeira',6,7,1),P('cadeira',9,8,1),P('cadeira',12,8,1),
+    P('gramofone',6,9,1,'Gramofone','O gramofone toca samba e modinha. Cada disco gira a 78 rotações e o som sai pela corneta.'),P('chopeira',1,5,1,'Chopeira',null),
+    P('garrafas',9,3,1,'Caixote de garrafas',null),P('garrafas',3,9,1,'Caixote de garrafas','Cerveja e guaraná vêm em garrafa de vidro, que o botequim devolve à fábrica.'),
+    P('mesamarmore',12,9,1,null),P('cartaz',12,2,2,'Cartaz','CERVEJA GELADA. MODA DA CASA: PASTEL E MORTADELA.')],
+    gente:[['bot22_a','h22_x|vendedor_de_charutos|0',5,6,'Freguês do botequim','Todo dia depois do serviço eu paro aqui. Uma cerveja e dois dedos de prosa.'],['bot22_b','h22_x|floricultor|1',11,6,'Jogador de damas','Mexeu a peça, não volta atrás. Essa é a regra da casa.'],['bot22_c','h22_n|pop_33|4',13,8,'Moço do violão','Sou do Brás. Vim para ouvir o choro e ver se alguém me chama para tocar.']]};
+
+  Object.assign(SALAS.m_t_cafe,{auto:[['cartaz',1,'Cartaz','CAFÉ, MEDIA E PÃO COM MANTEIGA.'],['relparede',1,null,null]],encher:[
+    P('mesamarmore',4,7,1),P('mesamarmore',13,8,1),P('mesamarmore',3,9,1),P('mesamarmore',9,8,1),
+    P('cadeira',5,5,1),P('cadeira',8,5,1),P('cadeira',11,5,1),P('cadeira',14,5,1),P('cadeira',5,8,1),P('cadeira',7,8,1),P('cadeira',10,8,1),P('cadeira',12,8,1),P('cadeira',3,7,1),P('cadeira',5,7,1),P('cadeira',14,8,1),P('cadeira',4,9,1),P('cadeira',10,8,1),
+    P('vitrinedoce',1,6,2,'Vitrine de doces','Doce para acompanhar o café: pão de ló, sonho e rosquinha.')]});
+
+  /* ---------- as 12 salas que estavam quase vazias ---------- */
+  const IGREJA=(santo,padre,sac,fieis)=>({tema:null,encher:[
+    P('gradealtar',7,5,4,'Grade do altar','A grade separa o altar da nave. Na hora da comunhão, os fiéis se ajoelham aqui.'),P('castical',6,3,1,'Castiçal',null),P('castical',10,3,1,null),P('castical',2,3,1,null),P('castical',15,3,1,null),
+    P('bancoigreja',1,6,2),P('bancoigreja',6,6,2),P('bancoigreja',13,6,4),P('bancoigreja',1,8,2),P('bancoigreja',6,8,2),P('bancoigreja',13,8,4),P('bancoigreja',1,10,6),P('bancoigreja',11,10,5),
+    P('confessionario',1,4,1,'Confessionário','No confessionário, o fiel conta seus pecados ao padre, atrás de uma grade de madeira.'),P('confessionario',16,4,1,null),
+    P('bau',15,5,1,'Caixa de esmolas','A caixa de esmolas ajuda a manter a igreja e a dar de comer a quem não tem.')],
+    gente:[['ig22_p_'+santo,'h22_n|padreSe88|0',8,4,'Padre',padre],['ig22_s_'+santo,'h22_n|sineiro30|1',5,4,'Sacristão',sac],...fieis.map((f,i)=>['ig22_f'+i+'_'+santo,f[0],f[1],f[2],f[3],f[4]])]});
+  const FIEL=(santo)=>[
+    ['h22_n|senhoraRica22|2',4,7,'Senhora rezando','Venho rezar todo dia de manhã, antes de ir ao mercado.'],
+    ['h22_n|velhoN|0',11,7,'Senhor idoso','Rezo aqui desde menino. A igreja mudou pouco; a cidade, muito.'],
+    ['h22_n|pop_12|3',5,9,'Moça de véu','Vim pedir pela saúde da minha mãe.'],
+    ['h22_n|dona88|1',12,9,'Mulher com o terço','Na missa de domingo isto aqui fica cheio até a porta.']];
+  SALAS.m_ig_rosario=IGREJA('rosario','Esta é a igreja da Irmandade do Rosário dos Homens Pretos. A irmandade existe em São Paulo há mais de dois séculos e é cuidada por gente negra.','Durante o ano a irmandade faz reza e festa, com música e gente de toda a cidade.',FIEL());
+  SALAS.m_ig_boamorte=IGREJA('boamorte','Aqui se reza pelos que partiram. Em 1922 ainda se velam os mortos em casa e se rezam muitas missas por eles.','Eu acendo as velas e cuido do altar. Quando não tem missa, a igreja fica bem silenciosa.',FIEL());
+  SALAS.m_ig_saogoncalo=IGREJA('saogoncalo','São Gonçalo é o santo dos violeiros e dos casamenteiros, diz a tradição. Muita moça vem pedir marido, e muito violeiro vem pedir sorte.','Todo ano tem festa de São Gonçalo, com violeiros e dança. A igreja fica enfeitada de flores.',FIEL());
+  SALAS.m_ig_santaifigenia=IGREJA('santaifigenia','Esta igreja fica perto da Estação da Luz. Muita gente que chega de trem passa por aqui para agradecer a viagem.','Quem desce do trem com mala na mão às vezes entra só para rezar um pouquinho.',FIEL());
+  SALAS.m_ig_saofrancisco=IGREJA('saofrancisco','A igreja é do convento franciscano e fica ao lado da Faculdade de Direito. Os estudantes passam por aqui todo dia, uns para rezar, outros para atalhar caminho.','Em época de prova, a igreja enche de estudante pedindo ajuda ao santo.',[
+    ['h22_n|estudante88|2',4,7,'Estudante de Direito','Tenho prova de Direito Civil amanhã. Vim pedir uma ajudinha lá de cima.'],['h22_n|velhoN|0',11,7,'Senhor idoso','Rezo aqui desde menino. A igreja mudou pouco; a cidade, muito.'],['h22_n|pop_12|3',5,9,'Moça de véu','Vim pedir pela saúde da minha mãe.'],['h22_n|senhoraRica22|2',12,9,'Senhora rezando','A missa das dez é a mais cheia.']]);
+
+  Object.assign(SALAS.m_t_fotografo,{encher:[
+    P('biombo',8,3,2,'Fundo de estúdio','Um pano pintado com paisagem. Na foto, parece que a família está no jardim.'),P('refletor',4,4,1,'Refletor de estúdio','A luz forte ajuda a foto: a chapa precisa de muita luz para ficar nítida.'),P('refletor',10,5,1,null),
+    P('vitrine',9,7,2,'Vitrine de retratos','Retratos em moldura: noivas, formandos e famílias de gravata e vestido de domingo.'),
+    P('estante',1,4,1,'Estante de chapas',null),P('samambaia',1,3,1,null),P('samambaia',12,6,1,null),P('mesinha',2,7,1,'Mesa dos álbuns',null),P('retrato',7,2,1,'Retratos',null),P('retrato',8,2,1,null),P('cadeira',10,3,1,null)],
+    gente:[['foto22_a','h22_n|senhoraRica22|1',3,6,'Noiva posando','Fique parada, disse ele! A foto demora e eu não posso nem piscar.'],['foto22_b','h22_n|rapazTerno22|0',4,6,'Noivo','De gravata nova e sapato apertado. Mas o retrato vai ficar para a vida toda.'],['foto22_c','h22_n|meninoN|0',10,6,'Aprendiz do fotógrafo','Eu carrego as chapas e limpo as lentes. Um dia vou ter o meu estúdio.']]});
+
+  Object.assign(SALAS.m_t_reparticao,{encher:[
+    P('estante',1,3,1,'Estante de processos','Processos amarrados com barbante, empilhados por data.'),P('escriv',8,6,2,'Mesa de escrivão','O escrivão copia os requerimentos à mão, letra por letra.'),P('escriv',11,7,2,'Mesa de protocolo','Todo papel que entra aqui ganha um número e um carimbo.'),
+    P('banco',10,8,3),P('samambaia',14,5,1,null),P('relogiope',1,6,1,'Relógio de pé',null),P('cadeira',2,7,1,null),P('cadeira',13,6,1,null),P('mesinha',5,6,1,null)],
+    gente:[['rep22_a','h22_n|funcPaulista|0',11,5,'Chefe de seção','Aqui nada anda sem carimbo. Quem quer pressa precisa de paciência.'],['rep22_b','h22_n|escrivao22|0',9,7,'Escrivão','Escrevo o dia inteiro, com pena e tinteiro. A letra bonita é obrigação do ofício.'],['rep22_c','h22_x|soldado_da_forca_publica|0',6,9,'Guarda','Eu cuido da porta e da fila. Sem briga, por favor.']]});
+
+  Object.assign(SALAS.m_t_camara,{encher:[
+    P('estante',1,3,2,'Estante de leis','As leis do município, em volumes grossos, encadernados em couro.'),P('retrato',3,2,1,'Retrato',null),P('retrato',6,2,1,null),P('escriv',1,5,2,'Mesa do secretário','O secretário anota tudo o que o prefeito decide.'),
+    P('banco',3,9,3),P('banco',13,9,3),P('samambaia',1,9,1,null),P('samambaia',16,9,1,null),P('relogiope',16,6,1,'Relógio de pé',null),P('poltrona',12,3,1,'Poltrona do prefeito','A poltrona de couro do prefeito, ao lado da mesa longa.'),P('cadeira',5,3,1,null),P('cadeira',10,3,1,null)],
+    gente:[['cam22_a','h22_n|escrivao22|2',3,4,'Secretário do prefeito','O prefeito Firmiano Pinto despacha toda manhã. Eu anoto cada ordem dele.'],['cam22_b','h22_n|datilografa22|0',14,4,'Datilógrafa','Bato à máquina o dia inteiro: ofícios, decretos e cartas. Dói o pulso, mas gosto do trabalho.'],['cam22_c','h22_n|guardalivros22|0',15,5,'Arquivista','Eu guardo as leis do município. Se alguém precisa de uma lei antiga, vem falar comigo.'],['cam22_d','h22_n|fiscal22|1',4,9,'Fiscal da Prefeitura','Eu fiscalizo obra e comércio. Sem licença, nada de abrir porta.'],['cam22_e','h22_n|pop_20|2',9,8,'Cidadão com requerimento','Vim pedir luz para a minha rua. Já é a terceira vez.']]});
+
+  SALAS.m_correios={tema:null,encher:[
+    P('caixapostal',4,2,2,'Caixas postais','Quem tem caixa postal recebe as cartas aqui, sem esperar o carteiro.'),P('caixapostal',9,2,2,null),P('marcocorreio',1,5,1,'Caixa de cartas','A gente põe a carta aqui e o carteiro recolhe.'),
+    P('balanca',9,5,1,'Balança de cartas','A carta é pesada: quanto mais pesada, mais selo.'),P('escriv',6,3,2,'Mesa do chefe da agência',null),P('malacorreio',11,5,1,'Mala de correspondência','As malas do correio vão e vêm de trem, lacradas.'),P('malacorreio',12,6,1,null),
+    P('malacorreio',1,8,1,null),P('malacorreio',12,8,1,null),P('malacorreio',2,6,1,null),P('cadeira',4,6,1,null),P('mesinha',7,7,1,'Mesinha de escrever','Aqui o freguês escreve o endereço antes de pôr a carta.'),P('samambaia',1,3,1,null)],
+    gente:[['cor22_a','h22_n|carteiro22|0',3,6,'Carteiro','Entrego carta a pé, com a bolsa a tiracolo. Conheço todo mundo da rua e todo cachorro também.'],['cor22_b','h22_n|telefonista|1',10,5,'Telegrafista','O telegrama chega em minutos. Por isso custa caro e as palavras contam.'],['cor22_c','h22_n|datilografa22|1',7,4,'Atendente','Selo, carta registrada e vale postal: tudo se resolve neste balcão.'],['cor22_d','h22_n|pop_15|2',5,7,'Freguês escrevendo','Escrevo para meu irmão na Itália. A carta leva umas três semanas de navio.'],['cor22_e','h22_n|funcPaulista|2',7,3,'Chefe da agência','Em 1922 o prédio dos Correios ainda está em obras. Mas a correspondência não pode parar.']]};
+
+  SALAS.m_qmecanica={tema:null,encher:[
+    P('motor',5,4,1,'Motor desmontado','O motor do automóvel, aberto para conserto: pistões, velas e muita graxa.'),P('painelferr',10,2,2,'Painel de ferramentas','Chaves de fenda, alicates e martelos, cada um no seu lugar.'),P('bancadaferr',2,7,2,'Bancada de ferramentas',null),
+    P('bancadaferr',11,6,2,'Bancada com torno de bancada',null),P('latas',1,5,1,'Latas de óleo',null),P('latas',1,6,1,null),P('barril',14,6,1,'Tambor de graxa',null),P('barril',14,7,1,null),P('caixote',6,9,1,null),P('caixote',12,9,1,null)],
+    gente:[['mec22_a','h22_x|borracheiro|0',11,5,'Borracheiro','Pneu furado é comigo. A estrada de terra é cheia de pedra e fura pneu toda semana.'],['mec22_b','h22_x|instrutor_de_direcao|0',4,6,'Instrutor de direção','Ensino a dirigir, mas só sei o que o carro deixa. Carro novo dá trabalho.'],['mec22_c','h22_x|vendedor_de_gasolina|0',13,4,'Vendedor de gasolina','Vendo gasolina em lata, porque bomba de posto ainda é novidade.']]};
+
+  Object.assign(SALAS.m_t_tipografia,{encher:[
+    P('estanteletras',2,2,3,'Estante de tipos','Cada gaveta guarda um tipo de letra de chumbo, uma por uma. Compor uma página dá muito trabalho.'),P('guilhotina',13,5,1,'Guilhotina de papel','A guilhotina corta as folhas impressas na medida certa.'),
+    P('mesa',5,8,2,'Mesa de paginação','Aqui as letras de chumbo viram uma página inteira, de trás para a frente.'),P('caixote',9,8,1,null),P('cartaz',5,2,1,'Cartaz','IMPRIME-SE: CARTÕES, CONVITES E JORNAIS.'),P('samambaia',14,3,1,null)],
+    gente:[['tip22_a','h22_n|linotipista22|0',9,5,'Linotipista','A linotipo faz uma linha inteira de chumbo de uma vez. Isso é rápido, mas a máquina esquenta.'],['tip22_b','h22_x|reparador_de_maquinas_de_escrever|0',13,6,'Revisor','Procuro erro de letra antes de imprimir. Depois de impresso, não tem como apagar.'],['tip22_c','h22_n|jornaleiro88|1',5,6,'Menino entregador de jornal','Pego os jornais ainda quentinhos e saio gritando as manchetes.']]});
+
+  Object.assign(SALAS.m_t_hotel,{encher:[
+    P('quadrochaves',1,2,2,'Quadro de chaves','Cada chave tem um número de quarto.'),P('poltrona',2,6,1,null),P('poltrona',8,5,1,null),P('mesinha',3,7,1,null),P('samambaia',13,3,1,null),P('samambaia',1,9,1,null),
+    P('bau',12,6,1,'Malas dos hóspedes','Malas de couro com etiquetas de hotel de outras cidades.'),P('bau',13,6,1,null),P('relogiope',14,6,1,null),P('cadeira',9,8,1,null)],
+    gente:[['hot22_a','h22_n|hoteleiro|0',4,3,'Hoteleiro','O Hotel d\'Oeste hospeda fazendeiro do interior que vem negociar café. Todo mundo quer o quarto de frente.'],['hot22_b','h22_n|criadaN|0',11,5,'Camareira','Eu faço as camas e levo a água quente. Não é pouco trabalho.'],['hot22_c','h22_n|viajante88|2',9,7,'Viajante com a mala','Cheguei de trem esta manhã. Vou ficar três dias na cidade.']]});
+
+  SALAS.m_sapataria={tema:null,encher:[
+    P('bancasapateiro',2,5,2,'Banco do sapateiro','Martelo, sovela, pregos e cola. O sapateiro conserta o sapato até a sola acabar.'),P('prateleira',2,3,3,'Formas de sapato',null),P('couro',8,3,1,null),P('cesto',3,8,1,null),P('cadeira',4,6,1,null)],
+    gente:[['sap22_a','h22_n|sapateiroRua|0',4,6,'Sapateiro','Conserto sapato e faço sob medida. Sapato de fábrica já chegou, mas o pé de cada um é diferente.'],['sap22_b','h22_n|meninoN|1',8,6,'Aprendiz','Eu varro o chão e seguro os pregos. Daqui a dois anos já faço sola sozinho.'],['sap22_c','h22_n|senhoraN|0',3,7,'Freguesa','Trouxe o sapato do meu marido para meia-sola. Ele só tem esse.']]};
+
+  SALAS.m_barbearia={tema:null,encher:[
+    P('cadeirabarbeiro',3,5,1,'Cadeira de barbeiro','Cadeira de barbeiro, com encosto alto. Aqui se corta cabelo, faz barba e até se arranca dente.'),P('cadeirabarbeiro',8,5,1,null),P('toalheiro',3,3,1,null),P('toalheiro',8,3,1,null),
+    P('mesinha',10,6,1,null),P('banco',5,7,2,null),P('samambaia',1,3,1,null),P('cadeira',8,7,1,null)],
+    gente:[['bar22_a','h22_n|barbeiroBan|0',8,4,'Segundo barbeiro','Um corta, o outro faz a barba. Sábado é o dia mais cheio: todo mundo quer ficar bonito para o domingo.'],['bar22_b','h22_n|rapazTerno22|2',3,6,'Cliente na cadeira','Vim aparar o bigode. Quem tem bigode caprichado é respeitado.'],['bar22_c','h22_n|pop_20|4',6,8,'Cliente esperando','Espero a minha vez lendo o jornal. A barbearia é o melhor lugar para saber das novidades do bairro.']]};
+  /* o que cada sala ganha passa por um colocador que confere o caminho: nada tapa a porta nem uma pessoa */
+  const LISTA={};
+  for(const K of ['m_cinema','m_cine2','m_cine3','m_cine4','m_cine5','m_municipal','m_t_teatro','m_t_mercado','m_t_padaria','m_taverna','m_t_cafe','m_ig_rosario','m_ig_boamorte','m_ig_saogoncalo','m_ig_santaifigenia','m_ig_saofrancisco','m_t_fotografo','m_t_reparticao','m_t_camara','m_correios','m_qmecanica','m_t_tipografia','m_t_hotel','m_sapataria','m_barbearia']){
+    const cf=SALAS[K];if(!cf)continue;
+    const ord=(cf.encher||[]).slice().sort((a,b)=>(a[2]<=2?0:1)-(b[2]<=2?0:1));
+    LISTA[K]={obj:ord,gente:cf.gente||[]};delete cf.encher;delete cf.gente;}
+  const INV='[Personagem inventado para o jogo.]';
+  const IMP=(typeof __lazyArt==='function')?__lazyArt('P22_'):null;
+  const hash=s=>{let h=7;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))>>>0;return h;};
+  const SEATED={m_cinema:1,m_cine2:1,m_cine3:1,m_cine4:1,m_cine5:1,m_t_teatro:1,m_municipal:1};
+  const mk=(K,t,x,y,w,h,name,text,id)=>{const f=LIB[t];const o={id,scene:K,x,y,w,h,name,text:text?[text]:null};o.draw=function(c,X,Y){f(c,X,Y,o);};objects.push(o);return o;};
+  const colocar=K=>{const S=SCN[K],L=LISTA[K];if(!S||!L)return;
+    const M=S.map.map(r=>r.join?r.join(''):r),W=M[0].length,H=M.length;const sx=(S.__kit&&S.__kit.sx!=null)?S.__kit.sx:M[H-1].indexOf('x');
+    const analisa=()=>{const occ=new Set();for(const o of objects){if(o.scene!==K||o.y<=2)continue;for(let a=0;a<(o.w||1);a++)for(let b=0;b<(o.h||1);b++)occ.add((o.x+a)+','+(o.y+b));}
+      const seen=new Set(),q=[[sx,H-2],[sx+1,H-2]];while(q.length){const [x,y]=q.pop(),k=x+','+y;if(seen.has(k))continue;const ch=(M[y]||'')[x];if(!ch||ch==='#'||occ.has(k))continue;seen.add(k);q.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);}
+      const viz=(x,y,w,h)=>{for(let i=x;i<x+w;i++)if(seen.has(i+','+(y-1))||seen.has(i+','+(y+h)))return true;for(let j=y;j<y+h;j++)if(seen.has((x-1)+','+j)||seen.has((x+w)+','+j))return true;return false;};
+      let ruim=0;for(const o of objects)if(o.scene===K&&o.name&&!viz(o.x,o.y,o.w||1,o.h||1))ruim++;for(const n of npcs)if(n.scene===K&&!viz(n.x,n.y,1,1))ruim++;
+      return {seen,occ,ruim,porta:seen.has(sx+','+(H-2))||seen.has((sx+1)+','+(H-2)),viz};};
+    const npcEm=(x,y,w)=>npcs.some(n=>n.scene===K&&n.x>=x&&n.x<x+w&&n.y===y);
+    let base=analisa().ruim,i=0,ok=0,rej=0;
+    for(const [t,x,y,w,h,name,text] of L.obj){const id='jmenche_'+K+'_'+t+(i++);
+      if(x<1||x+w>W-1||y<2||y>H-2){rej++;continue;}
+      if(y<=2){if(!(C22.PAREDE_OBJ.test(t)||/^(prateleira|potes|painelferr|quadrochaves|estanteletras|caixapostal|estante)$/.test(t))||objects.some(o=>o.scene===K&&o.y<=2&&x<o.x+(o.w||1)&&x+w>o.x)||(M[3]||'')[x]!=='.'){rej++;continue;}const o=mk(K,t,x,2,w,1,name,text,id);const A=analisa();if(!A.porta||A.ruim>base){objects.splice(objects.indexOf(o),1);rej++;}else ok++;continue;}
+      let livre=true;const A0=analisa();for(let a=0;a<w;a++){if((M[y]||'')[x+a]!=='.'||A0.occ.has((x+a)+','+y))livre=false;}if(!livre||npcEm(x,y,w)||(x+w>sx-1&&x<=sx+2&&y>=H-3)){rej++;continue;}
+      const o=mk(K,t,x,y,w,1,name,text,id);const A=analisa();if(!A.porta||A.ruim>base){objects.splice(objects.indexOf(o),1);rej++;}else ok++;}
+    let ng=0;const A=analisa();
+    for(const [id,spr,x,y,name,fala] of L.gente){if(npcs.some(n=>n.id===id))continue;let pos=null,melhor=1e9;
+      for(let yy=3;yy<=H-3;yy++)for(let xx=1;xx<W-1;xx++){const k=xx+','+yy;if(!A.seen.has(k)||npcs.some(n=>n.scene===K&&n.x===xx&&n.y===yy)||(xx>=sx-1&&xx<=sx+2&&yy>=H-3))continue;
+        let v=0;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]])if(A.seen.has((xx+dx)+','+(yy+dy)))v++;if(v<2)continue;const d=Math.abs(xx-x)+Math.abs(yy-y);if(d<melhor){melhor=d;pos=[xx,yy];}}
+      if(pos){try{addNPCs([{id,spr,x:pos[0],y:pos[1],dir:'down',name,lines:[fala,INV]}],K);ng++;}catch(e){console.warn('enche22 gente',e);}}}
+    (window.__jmEnche=window.__jmEnche||{})[K]={objetos:ok,recusados:rej,gente:ng};};
+  const bs3=buildStatic;buildStatic=function(){bs3();try{if(window.__semCasa22)return;const K=cur,S=SCN[K];if(!S||S.__enche22)return;S.__enche22=1;
+    for(const [re,t] of (RESTILO[K]||[])){const f=LIB[t];for(const o of objects){if(o.scene!==K||!re.test(String(o.id||'').replace(/^m_[a-z0-9]+_/,'')))continue;if(o.id&&o.id.indexOf('jmcasa_')===0)continue;o.draw=function(c,X,Y){f(c,X,Y,o);};}}
+    colocar(K);
+    if(SEATED[K]&&IMP){let n=0;for(const o of objects.slice()){if(o.scene!==K||!/^jmenche_.*_fila[VMB]\d+$/.test(o.id||''))continue;
+        for(let i=0;i<(o.w||1);i++){const h=hash(o.id+'_'+i);if(h%100>=55)continue;const key='plateia_'+String(h%12+1).padStart(2,'0');const px=o.x+i,py=o.y;
+          objects.push({id:'pl22b_'+K+'_'+(n++),scene:K,x:px,y:py,w:1,h:1,name:null,text:null,draw:(g,X,Y)=>{const im=IMP[key];if(!im||!im.complete||!im.naturalWidth)return;g.drawImage(im,Math.round(X),Math.round(Y-4),16,16);}});}}}
+  }catch(e){console.warn('enche22',e);}};
+}catch(e){console.warn('enche22',e);}})();
+/* ===== v262 — 1922: OS PRÉDIOS FECHADOS DO CENTRO GANHAM PORTA E SALA POR DENTRO (pedido do professor, 22/11/2026) ===== */
+(function(){try{
+  const hash=s=>{let h=7;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))>>>0;return h;};
+  const MOLDE=[[/^Secretaria da Fazenda/,'m_t_reparticao'],[/^Palácio das Indústrias/,'m_t_reparticao'],[/^Café/,'m_t_cafe'],[/^Solar da Marquesa de Santos/,'m_palacete'],[/^Palacete da Marquesa de Itu/,'m_palaceteP'],[/^Palacete/,'m_palacete'],
+    [/^Papelaria/,'m_t_papelaria'],[/^Tecidos/,'m_t_tecidos'],[/^Calçados/,'m_t_calcados'],[/^Chácara/,'m_casa'],[/^Oficina/,'m_oficina'],[/^Cocheira/,'m_oficina'],[/^Jornal/,'m_redacao'],
+    [/^Armaz[eé]m/,'m_t_armazem'],[/^Loja de ferragens/,'m_t_armazem'],[/^Marcenaria/,'m_carpintaria'],[/^Selaria/,'m_sapataria'],[/^Casa importadora/,'m_t_escritorio'],[/^Armarinho/,'m_t_tecidos'],
+    [/^Colégio de São Bento/,'m_normal'],[/^Chapelaria/,'m_chapelaria'],[/^Casa da Bóia/,'m_t_casa']];
+  const CASA=['m_casa','m_t_casa'];
+  const PULA=/Catedral|Palácio da Justiça|Fundos d/;
+  const abre=()=>{let ok=0,puladas=0;const sem=[];
+    for(const o of objects){if(o.scene!=='m_centro22'||(o.w||1)<2||(o.h||1)<2||(o.room&&SCN[o.room])||o.__abre22)continue;const nm=o.name||'';
+      if(PULA.test(nm)){puladas++;continue;}
+      let sala=null;for(const [re,k] of MOLDE)if(re.test(nm)){sala=k;break;}
+      if(!sala&&/^(Casa|Sobrad|Imóvel)/.test(nm))sala=/^Sobrado$/.test(nm)?'m_t_casa':CASA[hash(o.id)%2];
+      if(!sala||!SCN[sala]){puladas++;continue;}
+      let d=null;const cs=[o.door,Math.floor(o.w/2),Math.floor(o.w/2)-1,1,o.w-2,2,o.w-3];for(let q=0;q<o.w;q++)cs.push(q);for(const c of cs){if(c==null||c<0||c>=o.w)continue;let f=false;try{f=freeAt('m_centro22',o.x+c,o.y+o.h);}catch(_){}if(f){d=c;break;}}
+      if(d==null){sem.push(o.id);continue;}
+      o.door=d;o.enter='kit';o.room=sala;o.__abre22=1;ok++;
+      if(o.text&&o.text.length===1&&/^Casa\.$/.test(o.text[0]))o.text=['Uma casa de moradia do centro. A porta está aberta: pode entrar e ver como vive uma família.'];}
+    const a=window.__jmAbre||{ok:0};window.__jmAbre={ok:a.ok+ok,puladas,sem};};
+  let t=0;const iv=setInterval(()=>{abre();if(++t>=14)clearInterval(iv);},1500);setTimeout(abre,0);
+}catch(e){console.warn('abre22',e);}})();
+/* ===== v262 — 1922: SALA DE AULA DA FACULDADE DE DIREITO REFEITA (sala de teste do novo jeito, pedido do professor, 22/11/2026) ===== */
+(function(){try{
+  const C22=window.__CASA22;if(!C22||!C22.LIB||!C22.SALAS)return;
+  const R=C22.R,LIB=C22.LIB,SALAS=C22.SALAS,K='m_academia';
+  const SH=(c,x,b,w)=>R(c,x,b-2,w,3,'rgba(50,25,10,.25)');
+  const MW={k:'#3e2414',d:'#5e3a1e',m:'#86562e',l:'#a8723f',h:'#cc9658'},MA={k:'#2a140c',d:'#4a2418',m:'#6e3a28',l:'#8a5a38'},OU={k:'#7a5a1e',m:'#c8a040',h:'#e0b850'};
+  /* carteira comprida de madeira escura: tampo claro, livro aberto, tinteiro e pena para cada aluno */
+  LIB.carteirafac=function(c,X,Y,o){const w=(o.w||3)*16,b=Y+16;SH(c,X+2,b+1,w-4);
+    R(c,X+2,b-3,2,4,MA.k);R(c,X+w-4,b-3,2,4,MA.k);R(c,X+(w>>1)-1,b-3,2,4,MA.k);
+    R(c,X+1,b-16,w-2,14,MA.k);R(c,X+2,b-15,w-4,6,MW.l);R(c,X+2,b-15,w-4,1,MW.h);R(c,X+2,b-9,w-4,1,MA.d);
+    R(c,X+2,b-8,w-4,5,MW.m);for(let i=0;i<w-8;i+=16){R(c,X+4+i,b-7,12,3,MW.d);R(c,X+5+i,b-7,10,1,'#6e4428');}
+    for(let i=0;i<w;i+=16){R(c,X+i+3,b-14,8,4,'#efe8dc');R(c,X+i+7,b-14,1,4,'#a89a88');R(c,X+i+4,b-13,2,1,'#a89a88');R(c,X+i+8,b-12,2,1,'#a89a88');
+      R(c,X+i+12,b-14,3,3,'#2a2a3e');R(c,X+i+13,b-14,1,1,'#9ccbe0');R(c,X+i+14,b-18,1,5,'#f4f0e6');R(c,X+i+15,b-19,1,3,'#ffffff');}};
+  /* banco dos alunos, visto de trás (os alunos sentam nele, virados para a cátedra) */
+  LIB.bancoaluno=function(c,X,Y,o){const w=(o.w||3)*16,b=Y+16;SH(c,X+2,b,w-4);
+    R(c,X+2,b-4,2,4,MA.k);R(c,X+w-4,b-4,2,4,MA.k);R(c,X+1,b-8,w-2,5,MA.k);R(c,X+2,b-7,w-4,2,MW.m);R(c,X+2,b-7,w-4,1,MW.l);
+    R(c,X+1,b-13,w-2,4,MA.k);R(c,X+2,b-12,w-4,2,MA.m);R(c,X+2,b-12,w-4,1,MA.l);};
+  /* cátedra do professor (o lente), em cima de um tablado, com pano verde no tampo */
+  LIB.catedra2=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X,b+1,w);
+    R(c,X,b-5,w,5,MA.k);R(c,X+1,b-4,w-2,2,MW.l);R(c,X+1,b-4,w-2,1,MW.h);R(c,X+1,b-2,w-2,1,MW.d);
+    R(c,X+3,b-24,w-6,19,MA.k);R(c,X+4,b-23,w-8,4,'#2e5a32');R(c,X+4,b-23,w-8,1,'#4e8a40');R(c,X+4,b-19,w-8,13,MA.d);
+    R(c,X+7,b-17,w-14,8,MA.m);R(c,X+8,b-16,w-16,6,MA.d);R(c,X+(w>>1)-1,b-14,2,2,OU.m);R(c,X+(w>>1)-1,b-14,1,1,OU.h);
+    R(c,X+6,b-27,9,4,'#7a1e28');R(c,X+6,b-27,9,1,'#c8404a');R(c,X+7,b-24,7,1,OU.m);R(c,X+18,b-26,8,3,'#efe8dc');R(c,X+22,b-26,1,3,'#a89a88');
+    R(c,X+w-8,b-28,3,5,'#c8a040');R(c,X+w-8,b-29,3,1,'#e0b850');};
+  SALAS[K]=Object.assign({},SALAS[K]||{},{tema:{tipo:'lisa',parede:'#cfd6bc',lambri:true}});
+  const INV='[Personagem inventado para o jogo.]';
+  const IMP=(typeof __lazyArt==='function')?__lazyArt('P22_'):null;
+  const mk=(t,x,y,w,name,text,id)=>{const f=LIB[t];const o={id,scene:K,x,y,w,h:1,name,text:text?[text]:null};o.draw=function(c,X,Y){f(c,X,Y,o);};objects.push(o);return o;};
+  const livre=(x,y,w)=>{for(let a=0;a<w;a++){if(objects.some(o=>o.scene===K&&o.y>2&&x+a>=o.x&&x+a<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1)))return false;if(npcs.some(n=>n.scene===K&&n.x===x+a&&n.y===y))return false;}return true;};
+  const ALUNOS=[1,2,3,5,6,7,8,9,10,11,12];
+  const monta=()=>{
+    for(const o of objects){if(o.scene!==K)continue;const id=o.id||'';
+      if(/^cart\d$/.test(id)){const f=LIB.carteirafac;o.draw=function(c,X,Y){f(c,X,Y,o);};}
+      if(id==='catedra'){const f=LIB.catedra2;o.draw=function(c,X,Y){f(c,X,Y,o);};}}
+    if(livre(3,3,2))mk('estante',3,3,2,'Estante de códigos','Códigos de leis, livros de Direito em português e em francês. Os alunos decoram artigos inteiros.','fac22_est1');
+    if(livre(11,3,2))mk('estante',11,3,2,'Estante de códigos',null,'fac22_est2');
+    const SPR=['h22_n|rapazTerno22|0','h22_n|rapazTerno22|2','h22_n|rapazTerno22|4','h22_n|rapazTerno22|1','h22_n|rapazTerno22|3'];
+    const FALA=[['Shhh! O lente está explicando. Depois a gente conversa.'],['Copio tudo o que ele fala. No fim do ano a prova é oral, na frente de três professores.'],['Moro numa república de estudantes, aqui perto do Largo de São Francisco.'],['Meu pai e meu avô estudaram nesta mesma faculdade.']];
+    let n=0;
+    for(const [x,y] of [[3,7],[10,7],[3,9],[10,9]])for(let i=0;i<3;i++){if((x+y+i)%4===0)continue;const id='fac22_aluno_'+x+'_'+y+'_'+i;if(npcs.some(q=>q.id===id)||!livre(x+i,y,1))continue;
+      try{addNPCs([{id,spr:SPR[n%SPR.length],x:x+i,y,dir:'up',name:'Estudante na aula',lines:FALA[n%FALA.length].concat([INV])}],K);const q=npcs.find(q=>q.id===id);q.dir='up';q.nextTurn=1e9;q.__semBalao=1;n++;}catch(e){console.warn('fac22',e);}}
+    if(0)for(const [x,y] of [[3,7],[10,7],[3,9],[10,9]]){if(!livre(x,y,3))continue;mk('bancoaluno',x,y,3,null,null,'fac22_banco_'+x+'_'+y);
+      for(let i=0;i<3;i++){if((x+y+i)%5===0)continue;const key='plateia_'+String(ALUNOS[(n++)%ALUNOS.length]).padStart(2,'0');
+        objects.push({id:'fac22_aluno_'+x+'_'+y+'_'+i,scene:K,x:x+i,y,w:1,h:1,name:null,text:null,draw:(g,X,Y)=>{const im=IMP&&IMP[key];if(!im||!im.complete||!im.naturalWidth)return;g.drawImage(im,Math.round(X),Math.round(Y-5),16,16);}});}}
+    const G=[['fac22_lente','h22_n|velhoN|2',9,4,'down','Professor (o lente)',['Silêncio, senhores! Hoje a lição é a Constituição de 1891, a da República.','Aqui o professor se chama lente. O aluno escuta, copia e decora. Quem conversa vai para fora.']],
+      ['fac22_al1','h22_n|rapazTerno22|1',13,7,'left','Estudante de Direito',['Daqui saíram muitos deputados, juízes e até presidentes da República.','Quase todo mundo aqui é filho de fazendeiro ou de família rica da cidade.']],
+      ['fac22_al2','h22_n|rapazTerno22|3',1,8,'right','Estudante atrasado',['Cheguei atrasado e o lente já começou. Vou ficar aqui no canto, quietinho.','No ano do Centenário da Independência, a gente discute política no pátio, nos cafés do Largo e até na aula.']]];
+    for(const [id,spr,x,y,dir,name,lines] of G){if(npcs.some(q=>q.id===id)||!livre(x,y,1))continue;try{addNPCs([{id,spr,x,y,dir,name,lines:lines.concat([INV])}],K);const q=npcs.find(q=>q.id===id);if(q&&id==='fac22_lente'){q.__fixo='down';q.nextTurn=1e9;}}catch(e){console.warn('fac22',e);}}};
+  /* passadeira vermelha da porta até a cátedra (pintada no chão) */
+  const tapete=()=>{const c=sc,x0=7*16,y0=4*16,y1=11*16-2,w=32;R(c,x0+1,y0,w-2,y1-y0,'#5a1418');R(c,x0+2,y0,w-4,y1-y0,'#c8a040');R(c,x0+4,y0,w-8,y1-y0,'#8a2028');R(c,x0+5,y0,w-10,y1-y0,'#a8303a');
+    for(let y=y0+6;y<y1-4;y+=12){R(c,x0+14,y,4,1,'#e0b850');R(c,x0+12,y+1,8,1,'#e0b850');R(c,x0+14,y+2,4,1,'#e0b850');}R(c,x0+2,y0,w-4,1,'rgba(255,255,255,.2)');};
+  if(typeof render==='function'){const r0=render;render=function(){const vir=[];for(const q of npcs)if(q.__semBalao&&!q.talked){q.talked=true;vir.push(q);}try{return r0.apply(this,arguments);}finally{for(const q of vir)q.talked=false;}};}
+  const bs=buildStatic;buildStatic=function(){bs();try{if(window.__semCasa22||cur!==K)return;const S=SCN[K];sc.imageSmoothingEnabled=false;tapete();if(S.__fac22)return;S.__fac22=1;monta();}catch(e){console.warn('fac22',e);}};
+}catch(e){console.warn('fac22',e);}})();
+/* ===== v262 — 1922: MARCENARIA, LIVRARIA, TIPOGRAFIA, HOTEL E BILHAR REFEITOS POR DENTRO + BALCÃO COM VITRINE NAS LOJAS (pedido do professor, 22/11/2026) ===== */
+(function(){try{
+  const C22=window.__CASA22;if(!C22||!C22.LIB||!C22.SALAS)return;
+  const R=C22.R,LIB=C22.LIB,SALAS=C22.SALAS;
+  const SH=(c,x,b,w)=>R(c,x,b-2,w,3,'rgba(50,25,10,.25)');
+  const ci=(c,x,y,r,col)=>{c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();};
+  const MW={k:'#3e2414',d:'#5e3a1e',m:'#86562e',l:'#a8723f',h:'#cc9658'},MA={k:'#2a140c',d:'#4a2418',m:'#6e3a28',l:'#8a5a38'};
+  const CR={k:'#7a5a30',d:'#b08850',m:'#c8a068',l:'#dcb880',h:'#ecd09a'};/* madeira crua, ainda sem verniz */
+  const FE={k:'#1e1e22',d:'#2a2a2e',m:'#5a5e66',l:'#9ca2aa',h:'#c8ccd4'},OU={k:'#7a5a1e',m:'#c8a040',h:'#e0b850'},PB={k:'#a89a88',d:'#efe8dc',m:'#f4f0e6',l:'#ffffff'};
+  const LIV=['#7a1e28','#2e5a32','#3a4a6a','#86562e','#a8303a','#4e6a8a','#6a4a2a','#c8a040'];
+  /* ---------------- marcenaria ---------------- */
+  LIB.bancadamarc=function(c,X,Y,o){const w=(o.w||3)*16,b=Y+16;SH(c,X+1,b+1,w-2);
+    R(c,X+2,b-10,4,10,MW.k);R(c,X+w-6,b-10,4,10,MW.k);R(c,X+3,b-10,2,9,MW.m);R(c,X+w-5,b-10,2,9,MW.m);
+    R(c,X+4,b-5,w-8,3,MW.k);R(c,X+5,b-5,w-10,1,MW.l);for(let i=8;i<w-10;i+=7)R(c,X+i,b-4,5,1,CR.l);
+    R(c,X,b-17,w,8,MW.k);R(c,X+1,b-16,w-2,4,MW.l);R(c,X+1,b-16,w-2,1,MW.h);R(c,X+1,b-12,w-2,2,MW.m);R(c,X+1,b-10,w-2,1,MW.d);
+    R(c,X-1,b-17,7,7,FE.k);R(c,X,b-16,5,5,FE.m);R(c,X,b-16,5,1,FE.l);R(c,X-3,b-14,4,1,FE.l);
+    R(c,X+12,b-21,10,4,MW.k);R(c,X+13,b-20,8,2,CR.l);R(c,X+15,b-22,3,1,MW.d);R(c,X+19,b-21,2,1,FE.l);
+    R(c,X+27,b-19,11,2,FE.l);R(c,X+27,b-19,11,1,FE.h);for(let i=0;i<11;i+=2)R(c,X+27+i,b-17,1,1,FE.m);R(c,X+37,b-21,4,5,MW.m);R(c,X+38,b-20,2,2,MW.k);
+    for(const [dx,dy] of [[8,-18],[24,-18],[30,-16],[42,-18],[6,-1],[20,0],[34,1]]){R(c,X+dx,b+dy,3,1,'#ecd09a');R(c,X+dx+1,b+dy-1,1,1,'#ecd09a');}};
+  LIB.armarioinac=function(c,X,Y,o){const b=Y+16;SH(c,X+1,b,14);
+    R(c,X+1,b-34,14,34,CR.k);R(c,X+2,b-33,12,32,CR.d);R(c,X+3,b-31,10,28,'#6a4a2a');R(c,X+3,b-21,10,2,CR.m);R(c,X+3,b-11,10,2,CR.m);
+    R(c,X+2,b-33,12,2,CR.l);R(c,X+2,b-33,12,1,CR.h);R(c,X+2,b-33,1,32,CR.l);R(c,X+13,b-33,1,32,CR.m);};
+  LIB.cadeirainac=function(c,X,Y,o){const b=Y+16;SH(c,X+2,b,12);
+    R(c,X+3,b-18,2,18,CR.k);R(c,X+11,b-18,2,18,CR.k);R(c,X+3,b-18,1,17,CR.l);R(c,X+11,b-18,1,17,CR.l);
+    R(c,X+3,b-16,10,2,CR.m);R(c,X+3,b-16,10,1,CR.h);R(c,X+3,b-9,10,2,CR.d);R(c,X+5,b-6,2,6,CR.k);R(c,X+9,b-6,2,6,CR.k);};
+  LIB.cavalete=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X+1,b,w-2);
+    for(const x of [X+4,X+w-8]){R(c,x,b-10,2,10,MW.k);R(c,x+3,b-10,2,10,MW.k);R(c,x,b-10,5,2,MW.m);}
+    R(c,X,b-13,w,4,CR.k);R(c,X+1,b-12,w-2,2,CR.l);R(c,X+1,b-12,w-2,1,CR.h);
+    R(c,X+8,b-16,14,2,FE.l);R(c,X+8,b-16,14,1,FE.h);R(c,X+21,b-18,4,5,MW.m);};
+  /* ---------------- livraria ---------------- */
+  LIB.estantedupla=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X+1,b,w-2);
+    R(c,X+1,b-32,w-2,32,MW.k);R(c,X+2,b-31,w-4,30,MW.d);R(c,X+1,b-33,w-2,2,MW.l);R(c,X+1,b-33,w-2,1,MW.h);
+    let s=(X*7+Y*3)|0;for(const y of [b-30,b-21,b-12]){R(c,X+2,y+8,w-4,1,MW.l);for(let x=X+3;x<X+w-3;){const bw=2+(s%2),bh=6+(s%3);R(c,x,y+8-bh,bw,bh,LIV[s%LIV.length]);R(c,x,y+8-bh,bw,1,'rgba(255,255,255,.25)');if(s%5===0)R(c,x,y+5-bh+3,bw,1,OU.m);x+=bw+((s%7===0)?2:0);s=(s*13+7)%97;}}
+    R(c,X+2,b-3,w-4,2,MW.m);};
+  /* ---------------- balcão de loja com vitrine (a "bancada") ---------------- */
+  const BENS={
+    tecidos:(c,x,y)=>{R(c,x,y+1,3,6,'#a8303a');R(c,x+3,y+1,3,6,'#4e6a8a');R(c,x+6,y+1,2,6,'#e2c27c');R(c,x,y+1,8,1,'rgba(255,255,255,.3)');},
+    calcados:(c,x,y)=>{R(c,x,y+4,6,3,'#4a2418');R(c,x,y+4,3,2,'#6e3a28');R(c,x+5,y+6,1,1,'#2a140c');R(c,x+1,y+1,5,2,'#2a2a2e');R(c,x+1,y+1,2,1,'#5a5e66');},
+    chapeus:(c,x,y)=>{R(c,x,y+5,8,2,'#5e3a1e');R(c,x+2,y+2,4,3,'#6e3a28');R(c,x+2,y+4,4,1,'#2a140c');R(c,x+2,y+2,4,1,'#8a5a38');},
+    papel:(c,x,y)=>{R(c,x,y+2,5,5,'#3a4a6a');R(c,x+1,y+3,3,1,'#efe8dc');R(c,x+5,y+4,3,3,'#a8303a');R(c,x+5,y+4,3,1,'#c8404a');},
+    livros:(c,x,y)=>{R(c,x,y+2,2,5,'#7a1e28');R(c,x+2,y+3,2,4,'#2e5a32');R(c,x+4,y+2,2,5,'#3a4a6a');R(c,x+6,y+4,2,3,'#c8a040');},
+    graos:(c,x,y)=>{R(c,x,y+1,6,6,'#5e4a3a');R(c,x+1,y+2,4,4,'#d4ecf6');R(c,x+1,y+4,4,2,['#e2c27c','#7a3418','#3e2414'][(x>>3)%3]);R(c,x+1,y+2,1,2,'#ffffff');},
+    relogios:(c,x,y)=>{ci(c,x+3,y+4,3,OU.m);ci(c,x+3,y+4,2,'#f4f0e6');R(c,x+3,y+3,1,2,'#2a2a2e');},
+    doces:(c,x,y)=>{ci(c,x+2,y+5,2,'#e0606a');ci(c,x+6,y+5,2,'#e2c27c');ci(c,x+4,y+3,2,'#c8404a');},
+    geral:(c,x,y)=>{R(c,x,y+3,4,4,'#c8a040');R(c,x+4,y+2,3,5,'#4e6a8a');}};
+  LIB.balcaoloja=function(c,X,Y,o){const w=(o.w||4)*16,b=Y+16,bem=BENS[o.__bens]||BENS.geral;SH(c,X+1,b+1,w-2);
+    R(c,X,b-16,w,16,MW.k);R(c,X+1,b-15,w-2,4,MW.l);R(c,X+1,b-15,w-2,1,MW.h);R(c,X+1,b-11,w-2,1,MW.d);
+    R(c,X+2,b-10,w-4,7,'#5e4a3a');R(c,X+3,b-10,w-6,6,'#9ccbe0');for(let x=X+4;x<X+w-10;x+=10)bem(c,x,b-11);
+    R(c,X+3,b-10,w-6,1,'#d4ecf6');for(let x=X+6;x<X+w-6;x+=14){R(c,x,b-9,1,4,'rgba(255,255,255,.55)');R(c,x+1,b-9,1,2,'rgba(255,255,255,.35)');}
+    for(let x=X+(w>>2);x<X+w-4;x+=(w>>2))R(c,x,b-10,1,7,MW.k);R(c,X+1,b-3,w-2,2,MW.m);
+    const rx=X+w-15;R(c,rx,b-25,12,10,OU.k);R(c,rx+1,b-24,10,8,OU.m);R(c,rx+1,b-24,10,1,OU.h);R(c,rx+2,b-23,8,2,'#f4f0e6');for(let i=0;i<4;i++)R(c,rx+2+i*2,b-20,1,1,'#7a5a1e');R(c,rx+3,b-27,6,2,OU.k);R(c,rx+4,b-26,4,1,'#f4f0e6');
+    if(o.__bens==='graos'){R(c,X+5,b-23,10,1,FE.k);R(c,X+9,b-22,2,6,FE.m);R(c,X+4,b-19,6,2,'#c8a040');R(c,X+11,b-19,5,2,'#c8a040');R(c,X+7,b-17,6,1,FE.k);}
+    else{R(c,X+5,b-17,9,2,PB.d);R(c,X+5,b-17,9,1,PB.l);R(c,X+9,b-17,1,2,PB.k);}};
+  /* ---------------- tipografia ---------------- */
+  LIB.prensaplana=function(c,X,Y,o){const b=Y+32;SH(c,X+1,b+1,30);
+    R(c,X+1,b-7,30,7,FE.k);R(c,X+2,b-6,28,4,FE.d);R(c,X+2,b-6,28,1,FE.m);
+    R(c,X+3,b-25,22,18,FE.k);R(c,X+4,b-24,20,16,'#3a3e46');R(c,X+4,b-24,20,2,FE.m);R(c,X+4,b-24,20,1,FE.l);R(c,X+7,b-18,14,6,'#2a2a2e');R(c,X+8,b-17,12,1,FE.m);
+    R(c,X+5,b-31,17,6,PB.k);R(c,X+6,b-30,15,4,PB.m);for(let i=0;i<3;i++)R(c,X+8,b-29+i,11,1,i%2?PB.d:'#8a8a8a');
+    R(c,X+6,b-11,16,3,'#1e1e2a');R(c,X+6,b-11,16,1,'#5a5e76');
+    ci(c,X+26,b-17,7,FE.k);ci(c,X+26,b-17,5,FE.m);ci(c,X+26,b-17,2,FE.k);for(const [dx,dy] of [[0,-4],[0,4],[-4,0],[4,0]])R(c,X+26+(dx>0?1:dx<0?-4:0),b-17+(dy>0?1:dy<0?-4:0),dx?3:1,dy?3:1,FE.k);R(c,X+24,b-23,3,1,FE.h);};
+  LIB.caixatipos=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X+1,b,w-2);
+    R(c,X+1,b-24,w-2,24,MW.k);R(c,X+2,b-23,w-4,10,MW.m);R(c,X+2,b-23,w-4,1,MW.h);
+    for(let y=b-22;y<b-14;y+=3)for(let x=X+3;x<X+w-3;x+=3){R(c,x,y,2,2,'#4a3a2a');if(((x+y)>>1)%3)R(c,x,y+1,2,1,FE.l);}
+    for(const y of [b-12,b-7]){R(c,X+2,y,w-4,4,MW.d);R(c,X+2,y,w-4,1,MW.l);R(c,X+(w>>1)-1,y+1,2,2,OU.m);}};
+  LIB.linotipo=function(c,X,Y,o){const b=Y+16;SH(c,X,b,16);
+    R(c,X+1,b-38,14,36,FE.k);R(c,X+2,b-37,12,34,'#3a3e46');R(c,X+2,b-37,12,1,FE.l);
+    R(c,X+3,b-36,10,10,FE.m);for(let i=0;i<4;i++)R(c,X+4,b-35+i*2,8,1,FE.d);R(c,X+3,b-36,10,1,FE.h);
+    R(c,X+11,b-22,3,3,'#a8303a');R(c,X+12,b-21,1,1,'#ffb060');
+    R(c,X-1,b-14,18,5,FE.k);R(c,X,b-13,16,3,'#2a2a2e');for(let i=0;i<7;i++)R(c,X+1+i*2,b-13+(i%2),1,1,PB.d);};
+  LIB.mesapagina=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X+1,b,w-2);
+    R(c,X+3,b-7,3,7,MW.k);R(c,X+w-6,b-7,3,7,MW.k);R(c,X+1,b-15,w-2,8,'#6a665e');R(c,X+2,b-14,w-4,5,'#bcb8ac');R(c,X+2,b-14,w-4,1,'#dedad0');
+    for(const x of [X+4,X+w/2+1]){R(c,x,b-14,w/2-6,5,FE.k);R(c,x+1,b-13,w/2-8,3,FE.l);for(let i=0;i<3;i++)R(c,x+2,b-13+i,w/2-10,1,i%2?FE.m:'#4a4a4a');}};
+  LIB.resmas=function(c,X,Y,o){const b=Y+16;SH(c,X+1,b,14);
+    for(let i=0;i<4;i++){const y=b-4-i*4;R(c,X+2+(i%2),y,12,4,PB.k);R(c,X+3+(i%2),y,10,3,i%2?PB.d:PB.m);R(c,X+7+(i%2),y,1,4,'#a8303a');}};
+  /* ---------------- hotel ---------------- */
+  LIB.balcaorecep=function(c,X,Y,o){const w=(o.w||4)*16,b=Y+16;SH(c,X+1,b+1,w-2);
+    R(c,X,b-17,w,17,MA.k);R(c,X+1,b-16,w-2,4,MA.l);R(c,X+1,b-16,w-2,1,'#a8723f');R(c,X+1,b-12,w-2,1,MA.k);
+    R(c,X+1,b-11,w-2,9,MA.d);for(let x=X+3;x<X+w-12;x+=16){R(c,x,b-10,13,7,MA.m);R(c,x+1,b-9,11,5,MA.d);R(c,x+6,b-7,1,1,OU.m);}
+    R(c,X+1,b-2,w-2,1,OU.m);
+    R(c,X+6,b-19,12,3,PB.k);R(c,X+7,b-19,5,2,PB.l);R(c,X+12,b-19,5,2,PB.m);R(c,X+8,b-18,3,1,'#8a8a8a');R(c,X+13,b-18,3,1,'#8a8a8a');R(c,X+19,b-18,2,2,'#2a2a3e');
+    R(c,X+w-14,b-18,6,2,OU.k);R(c,X+w-13,b-20,4,2,OU.m);R(c,X+w-12,b-21,2,1,OU.h);
+    R(c,X+w-28,b-22,4,5,'#86b6cc');R(c,X+w-29,b-25,2,3,'#c8404a');R(c,X+w-26,b-26,2,3,'#e2c27c');R(c,X+w-27,b-24,1,3,'#3e7a3a');};
+  LIB.biombo=function(c,X,Y,o){const b=Y+16;SH(c,X+1,b,14);
+    for(let i=0;i<3;i++){const x=X+1+i*5;R(c,x,b-30,5,29,MW.k);R(c,x+1,b-29,3,27,i%2?'#b8c8d8':'#c8d4e0');R(c,x+1,b-29,3,1,MW.l);R(c,x+2,b-22+i*3,1,2,'#c8404a');R(c,x+1,b-18+i*2,2,1,'#4e8a40');}
+    R(c,X+1,b-2,15,1,MW.k);};
+  /* ---------------- bilhar ---------------- */
+  LIB.bilhar2=function(c,X,Y,o){const w=(o.w||3)*16,h=(o.h||2)*16,b=Y+h;SH(c,X+1,b+1,w-2);
+    for(const x of [X+3,X+w-7,X+(w>>1)-2])R(c,x,b-8,4,8,MA.k);for(const x of [X+4,X+w-6])R(c,x,b-8,2,7,MA.m);
+    R(c,X,b-h+2,w,h-9,MA.k);R(c,X+1,b-h+3,w-2,h-11,MA.m);R(c,X+1,b-h+3,w-2,1,MA.l);
+    R(c,X+5,b-h+7,w-10,h-19,'#2e7a3a');R(c,X+5,b-h+7,w-10,1,'#1e5a2a');R(c,X+6,b-h+8,w-12,2,'#3e8a46');
+    R(c,X+1,b-9,w-2,3,MA.d);R(c,X+1,b-9,w-2,1,MA.l);
+    for(const [px,py] of [[X+3,b-h+5],[X+w-6,b-h+5],[X+(w>>1)-1,b-h+4],[X+3,b-13],[X+w-6,b-13],[X+(w>>1)-1,b-13]]){R(c,px,py,3,3,'#1e1712');}
+    for(const [bx,by,col] of [[X+14,b-h+13,'#f4f0e6'],[X+28,b-h+11,'#c8404a'],[X+33,b-h+16,'#e2c27c']]){R(c,bx,by,3,3,col);R(c,bx,by,1,1,'#ffffff');}
+    for(let i=0;i<16;i++)R(c,X+8+i,b-h+18-(i>>1),1,1,i<12?'#d8b060':'#2a140c');
+    R(c,X+(w>>1)-9,b-h-12,18,4,'#2e5a32');R(c,X+(w>>1)-7,b-h-14,14,2,'#3e7a3a');R(c,X+(w>>1)-1,b-h-22,1,8,FE.m);R(c,X+(w>>1)-8,b-h-8,16,1,'rgba(255,220,140,.6)');
+    c.fillStyle='rgba(255,220,140,.10)';c.fillRect(X+4,b-h+5,w-8,h-14);};
+  LIB.suportetacos=function(c,X,Y,o){
+    R(c,X+2,Y-20,12,3,MW.k);R(c,X+3,Y-19,10,1,MW.l);R(c,X+2,Y+8,12,4,MW.k);R(c,X+3,Y+9,10,2,MW.m);
+    for(let i=0;i<4;i++){const x=X+4+i*2.5|0;R(c,x,Y-22,1,31,i%2?'#d8b060':'#c8a068');R(c,x,Y-22,1,2,'#86b6cc');}};
+  LIB.placar=function(c,X,Y,o){
+    R(c,X+1,Y-18,14,14,MW.k);R(c,X+2,Y-17,12,12,'#efe6d2');for(const y of [Y-14,Y-9]){R(c,X+2,y,12,1,FE.m);for(let i=0;i<5;i++)R(c,X+3+i*2+(y%3?1:0),y-1,2,3,i%2?'#a8303a':'#3e2414');}};
+  /* ---------------- como cada sala muda ---------------- */
+  const PAREDE=/^(suportetacos|placar|quadrochaves)$/;
+  const CFG={
+    m_carpintaria:{
+      restilo:[[/^bancada$/,'bancadamarc']],
+      add:[['armarioinac',1,'Guarda-roupa sem portas','Um guarda-roupa de imbuia pela metade. Ainda faltam as portas, o espelho e o verniz.',[[12,4],[12,5]]],
+        ['cadeirainac',1,'Cadeira por fazer','Cadeira sem assento. Depois o empalhador faz o assento de palhinha.',[[9,3],[10,3],[8,4]]],
+        ['cadeirainac',1,null,null,[[10,3],[9,4],[7,3]]],
+        ['cavalete',2,'Cavalete com tábua','A tábua é serrada à mão, no serrote, em cima do cavalete.',[[9,8],[10,8],[2,7]]]],
+      gente:[['mar22_ap','h22_n|meninoN|0',[7,6],'left','Aprendiz de marceneiro',['Eu lixo as cadeiras e varro a serragem. Comecei com doze anos, como quase todo aprendiz.','A serragem não vai para o lixo: os açougues e os botequins espalham no chão.']],
+        ['mar22_fr','h22_n|senhoraRica22|1',[11,5],'down','Freguesa',['Encomendei um guarda-roupa de imbuia para o enxoval da minha filha. Ela casa em março.']]],
+      pinta:(c,W,H)=>{let s=5;for(let i=0;i<70;i++){s=(s*73+19)%997;const x=24+s%(W*16-48),y=52+(s*7)%(H*16-72);R(c,x,y,2,1,'#ecd09a');if(i%3===0)R(c,x+1,y-1,1,1,'#dcb880');}}},
+    m_t_livraria:{add:[['estantedupla',2,'Estante de livros','Livros de escritores brasileiros, como Machado de Assis e Lima Barreto, e muitos livros franceses.',[[1,5],[1,6]]],
+        ['estantedupla',2,'Estante de livros escolares','Cartilhas, gramáticas e livros de leitura para as escolas.',[[1,7],[8,7],[9,7]]],
+        ['balcaoloja',3,'Balcão do livreiro','O balcão fica perto da porta: o livreiro vê quem entra e embrulha o livro em papel pardo.',[[9,5],[8,5]],'livros']],
+      moveNpc:[['livreiro22',10,4,'down']],
+      gente:[['liv22_est','h22_n|rapazTerno22|2',[3,5],'left','Estudante procurando livro',['Procuro o livro novo do Monteiro Lobato. Ele também é editor e vende livro até em farmácia e armazém.']],
+        ['liv22_sen','h22_n|senhoraRica22|3',[6,4],'up','Senhora',['Vim buscar a revista de modas que chega da França. Em São Paulo, quem tem dinheiro quer se vestir como em Paris.']]]},
+    m_t_tipografia:{restilo:[[/^prensa\d$/,'prensaplana'],[/^caixaTipos\d$/,'caixatipos']],
+      add:[['linotipo',1,'Linotipo','A máquina linotipo: o linotipista bate no teclado e ela derrete chumbo e solta a linha de letras prontinha.',[[9,4],[10,4],[8,7]]],
+        ['mesapagina',2,'Mesa de paginação','Na mesa de pedra se monta a página: as linhas de chumbo vão para dentro da forma de ferro.',[[10,8],[11,8],[12,9]]],
+        ['resmas',1,'Resmas de papel','Papel para o jornal de amanhã. Ele vem em resmas, amarradas com barbante.',[[1,6],[1,7],[14,4]]],
+        ['resmas',1,null,null,[[1,7],[1,8],[14,5]]]]},
+    m_t_hotel:{restilo:[[/^balcao0$/,'balcaorecep']],
+      add:[['quadrochaves',2,'Quadro das chaves','Cada chave tem o número de um quarto. Chave no quadro quer dizer hóspede na rua.',[[1,2]],null,true],
+        ['biombo',1,'Biombo','O biombo separa a sala de espera dos quartos.',[[9,3],[9,4]]],
+        ['biombo',1,null,null,[[9,4],[9,5]]]],
+      gente:[['hot22_hosp','h22_n|senhoraRica22|3',[6,5],'up','Hóspede chegando',['Chegamos de trem de Ribeirão Preto. Meu marido vem tratar de negócios do café na cidade.']]]},
+    m_t_bilhar:{restilo:[[/^bilhar\d$/,'bilhar2']],
+      add:[['suportetacos',1,'Suporte de tacos','Cada taco tem a ponta de couro. Antes de jogar, passa-se o giz azul.',[[9,2],[10,2],[12,2]],null,true],
+        ['placar',1,'Marcador de pontos','O marcador de bolinhas: cada bolinha empurrada é um ponto.',[[13,2],[14,2],[7,2]],null,true],
+        ['banco',3,'Banco de quem assiste',null,[[10,8],[11,8],[10,9]]],
+        ['mesinha',1,'Mesinha com copos',null,[[13,6],[14,5],[13,8]]]],
+      gente:[['bil22_j2','h22_n|rapazTerno22|3',[8,5],'left','Jogador de bilhar',['Valendo o café! Quem perde paga.','O bilhar fica aberto até tarde. É onde os rapazes do centro se encontram depois do trabalho.']],
+        ['bil22_ob','h22_n|velhoN|1',[11,7],'up','Senhor que assiste',['Estou só olhando. Joguei bilhar por quarenta anos e agora dou palpite de graça.']]]}};
+  const LOJAS={m_t_tecidos:'tecidos',m_t_calcados:'calcados',m_chapelaria:'chapeus',m_t_papelaria:'papel',m_t_livraria:'livros',m_t_armazem:'graos',m_t_relojoaria:'relogios',m_t_presentes:'geral',m_t_tabacaria:'geral',m_t_flores:'geral',m_t_padaria:'doces'};
+  for(const K in CFG)if(CFG[K].tema)SALAS[K]=Object.assign({},SALAS[K]||{},{tema:CFG[K].tema});
+  const INV='[Personagem inventado para o jogo.]';
+  const mk=(K,t,x,y,w,name,text,id,bens)=>{const f=LIB[t];const o={id,scene:K,x,y,w,h:1,name,text:text?[text]:null,__bens:bens};o.draw=function(c,X,Y){f(c,X,Y,o);};objects.push(o);return o;};
+  const analisa=K=>{const S=SCN[K],M=S.map.map(r=>r.join?r.join(''):r),W=M[0].length,H=M.length,sx=(S.__kit&&S.__kit.sx!=null)?S.__kit.sx:M[H-1].indexOf('x');
+    const occ=new Set();for(const o of objects){if(o.scene!==K||o.y<=2)continue;for(let a=0;a<(o.w||1);a++)for(let b=0;b<(o.h||1);b++)occ.add((o.x+a)+','+(o.y+b));}
+    const seen=new Set(),q=[[sx,H-2],[sx+1,H-2]];while(q.length){const [x,y]=q.pop(),k=x+','+y;if(seen.has(k))continue;const ch=(M[y]||'')[x];if(!ch||ch==='#'||occ.has(k))continue;seen.add(k);q.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);}
+    const viz=(x,y,w,h)=>{for(let i=x;i<x+w;i++)if(seen.has(i+','+(y-1))||seen.has(i+','+(y+h)))return true;for(let j=y;j<y+h;j++)if(seen.has((x-1)+','+j)||seen.has((x+w)+','+j))return true;return false;};
+    let ruim=0;for(const o of objects)if(o.scene===K&&o.name&&o.y>2&&!viz(o.x,o.y,o.w||1,o.h||1))ruim++;for(const n of npcs)if(n.scene===K&&!viz(n.x,n.y,1,1))ruim++;
+    return {M,W,H,sx,seen,occ,ruim,porta:seen.has(sx+','+(H-2))||seen.has((sx+1)+','+(H-2))};};
+  const monta=K=>{const cf=CFG[K];let ok=0,rej=0,ng=0;
+    for(const [re,t] of (cf.restilo||[])){const f=LIB[t];for(const o of objects){if(o.scene!==K||!re.test(String(o.id||'').replace(K+'_','')))continue;o.draw=function(c,X,Y){f(c,X,Y,o);};}}
+    for(const [id,x,y,dir] of (cf.moveNpc||[])){const q=npcs.find(q=>q.id===id&&q.scene===K);if(q&&!npcs.some(n=>n!==q&&n.scene===K&&n.x===x&&n.y===y)&&!analisa(K).occ.has(x+','+y)){q.x=x;q.y=y;q.px=x*T;q.py=y*T;q.dir=dir;}}
+    let i=0;for(const [t,w,name,text,cands,bens,parede] of (cf.add||[])){const id='s5_'+K+'_'+t+(i++);if(objects.some(o=>o.id===id))continue;let feito=false;
+      for(const [x,y] of cands){if(feito)break;const A0=analisa(K);
+        if(parede){if(objects.some(o=>o.scene===K&&o.y<=2&&x<o.x+(o.w||1)&&x+w>o.x))continue;const o=mk(K,t,x,2,w,name,text,id,bens);feito=true;break;}
+        if(x<1||x+w>A0.W-1||y<3||y>A0.H-2)continue;let livre=true;for(let a=0;a<w;a++)if(A0.M[y][x+a]!=='.'||A0.occ.has((x+a)+','+y)||npcs.some(n=>n.scene===K&&n.x===x+a&&n.y===y))livre=false;
+        if(!livre||(x+w>A0.sx-1&&x<=A0.sx+2&&y>=A0.H-3))continue;
+        const o=mk(K,t,x,y,w,name,text,id,bens);const A=analisa(K);if(!A.porta||A.ruim>A0.ruim){objects.splice(objects.indexOf(o),1);}else feito=true;}
+      feito?ok++:rej++;}
+    for(const [id,spr,[x,y],dir,name,lines] of (cf.gente||[])){if(npcs.some(n=>n.id===id))continue;const A=analisa(K);let pos=null,m=1e9;
+      for(let yy=3;yy<=A.H-2;yy++)for(let xx=1;xx<A.W-1;xx++){if(!A.seen.has(xx+','+yy)||npcs.some(n=>n.scene===K&&n.x===xx&&n.y===yy)||(xx>=A.sx-1&&xx<=A.sx+2&&yy>=A.H-3))continue;
+        let v=0;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]])if(A.seen.has((xx+dx)+','+(yy+dy)))v++;if(v<2)continue;const d=Math.abs(xx-x)+Math.abs(yy-y);if(d<m){m=d;pos=[xx,yy];}}
+      if(pos)try{addNPCs([{id,spr,x:pos[0],y:pos[1],dir,name,lines:lines.concat([INV])}],K);ng++;}catch(e){console.warn('salas5',e);}}
+    (window.__jmSalas5=window.__jmSalas5||{})[K]={objetos:ok,recusados:rej,gente:ng};};
+  const balcoes=K=>{const bens=LOJAS[K];if(!bens)return;const f=LIB.balcaoloja;for(const o of objects){if(o.scene!==K||!/^(m_[a-z_]+_)?balcao(\d+|_cp)$/.test(o.id||''))continue;o.__bens=bens;o.draw=function(c,X,Y){f(c,X,Y,o);};}};
+  /* quem está sentado na aula ou no banco fica virado para onde olha */
+  if(typeof render==='function'){const r0=render;render=function(){for(const q of npcs)if(q.__semBalao&&q.dir!=='up')q.dir='up';return r0.apply(this,arguments);};}
+  const bs=buildStatic;buildStatic=function(){bs();try{if(window.__semCasa22)return;const K=cur,S=SCN[K],cf=CFG[K];
+    if(cf&&cf.pinta){const M=S.map,W=(M[0].length||M[0].join('').length),H=M.length;sc.imageSmoothingEnabled=false;cf.pinta(sc,W,H);}
+    if(S.__salas5)return;S.__salas5=1;balcoes(K);if(cf)monta(K);}catch(e){console.warn('salas5',e);}};
+}catch(e){console.warn('salas5',e);}})();
+/* ===== v262 — 1922: TRIBUNAL, REDAÇÃO DO JORNAL E MOSTEIRO REPINTADOS; GENTE NO PALÁCIO, BANCO, PALACETE E POSTO POLICIAL (pedido do professor, 22/11/2026) ===== */
+(function(){try{
+  const C22=window.__CASA22;if(!C22||!C22.LIB||!C22.SALAS)return;
+  const R=C22.R,LIB=C22.LIB,SALAS=C22.SALAS;
+  const SH=(c,x,b,w)=>R(c,x,b-2,w,3,'rgba(50,25,10,.25)');
+  const ci=(c,x,y,r,col)=>{c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();};
+  const MW={k:'#3e2414',d:'#5e3a1e',m:'#86562e',l:'#a8723f',h:'#cc9658'},MA={k:'#2a140c',d:'#4a2418',m:'#6e3a28',l:'#8a5a38'};
+  const FE={k:'#1e1e22',d:'#2a2a2e',m:'#5a5e66',l:'#9ca2aa',h:'#c8ccd4'},OU={k:'#7a5a1e',m:'#c8a040',l:'#d8b060',h:'#e0b850'},PB={k:'#a89a88',d:'#efe8dc',m:'#f4f0e6',l:'#ffffff'};
+  const VE={k:'#3e2414',d:'#7a1e28',m:'#a8303a',l:'#c8404a'};
+  const brilho=(c,x,y,r)=>{c.fillStyle='rgba(255,210,120,.16)';c.beginPath();c.arc(x,y,r,0,7);c.fill();};
+  /* ---------- tribunal ---------- */
+  LIB.mesatribunal=function(c,X,Y,o){const w=(o.w||6)*16,b=Y+16;SH(c,X,b+1,w);
+    for(let i=0;i<3;i++){const x=X+10+i*((w-30)/2|0);R(c,x,b-36,12,16,MA.k);R(c,x+1,b-35,10,13,VE.d);R(c,x+2,b-34,8,2,VE.l);R(c,x+5,b-38,2,2,OU.m);}
+    R(c,X,b-6,w,6,MA.k);R(c,X+1,b-5,w-2,3,MW.m);R(c,X+1,b-5,w-2,1,MW.h);
+    R(c,X+2,b-22,w-4,16,MA.k);R(c,X+3,b-21,w-6,4,'#2e5a32');R(c,X+3,b-21,w-6,1,'#4e8a40');R(c,X+3,b-17,w-6,10,MA.d);
+    for(let x=X+6;x<X+w-14;x+=16){R(c,x,b-16,12,8,MA.m);R(c,x+1,b-15,10,6,MA.d);R(c,x+5,b-13,2,2,OU.m);}
+    R(c,X+3,b-17,w-6,1,OU.m);
+    R(c,X+12,b-24,8,3,PB.k);R(c,X+13,b-24,6,2,PB.m);R(c,X+(w>>1)-4,b-25,7,4,VE.d);R(c,X+(w>>1)-4,b-25,7,1,VE.l);
+    R(c,X+w-22,b-24,6,2,MW.l);R(c,X+w-20,b-26,2,3,MW.m);R(c,X+w-30,b-24,3,3,'#2a2a3e');R(c,X+w-29,b-24,1,1,'#9ccbe0');};
+  /* ---------- redação do jornal ---------- */
+  LIB.rotativa=function(c,X,Y,o){const w=(o.w||3)*16,h=(o.h||2)*16,b=Y+h;SH(c,X+1,b+1,w-2);
+    R(c,X+1,b-7,w-2,7,FE.k);R(c,X+2,b-6,w-4,4,FE.d);R(c,X+2,b-6,w-4,1,FE.m);
+    R(c,X+3,b-28,w-14,21,FE.k);R(c,X+4,b-27,w-16,19,'#3a3e46');R(c,X+4,b-27,w-16,1,FE.l);
+    for(let i=0;i<3;i++){const cx=X+11+i*10,cy=b-18+(i%2)*4;ci(c,cx,cy,5,FE.k);ci(c,cx,cy,4,FE.m);R(c,cx-3,cy-3,3,1,FE.h);ci(c,cx,cy,1,FE.k);}
+    R(c,X+5,b-26,w-18,2,PB.m);for(let x=X+6;x<X+w-14;x+=4)R(c,x,b-26,2,1,'#8a8a8a');
+    R(c,X+w-11,b-16,9,9,PB.k);for(let i=0;i<4;i++)R(c,X+w-10,b-15+i*2,7,1,i%2?PB.d:PB.l);
+    ci(c,X+w-14,b-22,5,FE.k);ci(c,X+w-14,b-22,3,FE.m);R(c,X+w-15,b-23,2,2,FE.h);};
+  LIB.mesaredator=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X+1,b,w-2);
+    R(c,X+2,b-6,3,6,MA.k);R(c,X+w-5,b-6,3,6,MA.k);R(c,X+1,b-15,w-2,9,MA.k);R(c,X+2,b-14,w-4,4,MW.l);R(c,X+2,b-14,w-4,1,MW.h);R(c,X+2,b-10,w-4,3,MW.m);R(c,X+(w>>1)-2,b-9,4,1,OU.m);
+    R(c,X+4,b-21,12,7,FE.k);R(c,X+5,b-20,10,3,FE.d);R(c,X+6,b-22,8,2,PB.m);for(let i=0;i<4;i++)R(c,X+6+i*2,b-16,1,1,PB.d);R(c,X+5,b-17,10,1,FE.m);
+    R(c,X+18,b-17,9,3,PB.k);R(c,X+19,b-18,7,3,PB.m);R(c,X+20,b-17,5,1,'#8a8a8a');
+    R(c,X+w-7,b-24,1,8,FE.m);R(c,X+w-10,b-26,7,3,'#2e5a32');R(c,X+w-9,b-27,5,1,'#4e8a40');brilho(c,X+w-7,b-20,8);};
+  LIB.telegrafo=function(c,X,Y,o){const b=Y+16;SH(c,X+1,b,14);R(c,X+2,b-6,2,6,MW.k);R(c,X+12,b-6,2,6,MW.k);R(c,X+1,b-12,14,6,MW.k);R(c,X+2,b-11,12,3,MW.l);R(c,X+2,b-11,12,1,MW.h);
+    R(c,X+3,b-15,6,3,OU.k);R(c,X+4,b-16,4,2,OU.m);R(c,X+5,b-17,2,1,OU.h);ci(c,X+11,b-14,2,'#7a3418');R(c,X+9,b-13,5,1,PB.d);};
+  LIB.bobinas=function(c,X,Y,o){const w=(o.w||2)*16,b=Y+16;SH(c,X+1,b,w-2);
+    for(let i=0;i<2;i++){const x=X+2+i*(w>>1);R(c,x,b-13,(w>>1)-4,12,PB.k);R(c,x+1,b-12,(w>>1)-6,10,PB.m);R(c,x+1,b-12,(w>>1)-6,2,PB.l);ci(c,x+((w>>1)-4)/2,b-7,3,PB.d);ci(c,x+((w>>1)-4)/2,b-7,1,MW.m);}};
+  LIB.quadrocot=function(c,X,Y,o){const b=Y+16;SH(c,X+1,b,14);R(c,X+3,b-6,2,6,MW.k);R(c,X+11,b-6,2,6,MW.k);
+    R(c,X,b-28,16,22,MW.k);R(c,X+1,b-27,14,20,'#2e4a3a');for(let i=0;i<5;i++){R(c,X+2,b-25+i*4,6,1,'#dfe8dc');R(c,X+10,b-25+i*4,3,1,i%2?'#e0b850':'#dfe8dc');}};
+  /* ---------- mosteiro ---------- */
+  LIB.altar2=function(c,X,Y,o){const w=(o.w||4)*16,b=Y+16;SH(c,X,b+1,w);
+    R(c,X+6,b-44,w-12,30,OU.k);R(c,X+7,b-43,w-14,28,OU.m);R(c,X+7,b-43,w-14,1,OU.h);R(c,X+(w>>1)-8,b-40,16,22,'#7a1e28');R(c,X+(w>>1)-6,b-38,12,18,'#a8303a');
+    R(c,X+(w>>1)-1,b-37,2,14,PB.m);R(c,X+(w>>1)-4,b-33,8,2,PB.m);for(const x of [X+10,X+w-14])R(c,x,b-41,4,26,OU.l);
+    R(c,X,b-16,w,16,'#8e8a80');R(c,X+1,b-15,w-2,14,'#dedad0');R(c,X+1,b-15,w-2,3,PB.l);R(c,X+1,b-12,w-2,1,'#c8a040');R(c,X+6,b-10,w-12,8,OU.m);R(c,X+7,b-9,w-14,6,'#d8b060');R(c,X+(w>>1)-2,b-8,4,4,VE.m);
+    for(let i=0;i<6;i++){const x=X+5+i*((w-10)/5|0);R(c,x,b-21,2,6,PB.m);R(c,x,b-23,2,2,'#ffb060');brilho(c,x+1,b-22,5);}};
+  LIB.claustro=function(c,X,Y,o){const w=(o.w||4)*16,h=(o.h||3)*16,b=Y+h;
+    R(c,X,b-h,w,h,'#8e8a80');R(c,X+2,b-h+2,w-4,h-4,'#a8a498');R(c,X+5,b-h+5,w-10,h-10,'#4e8a40');
+    for(let i=0;i<w-10;i+=3)for(let j=0;j<h-10;j+=3)if((i*7+j*3)%5===0)R(c,X+5+i,b-h+5+j,1,1,'#5a9a48');
+    R(c,X+(w>>1)-2,b-h+5,4,h-10,'#c8c4b8');R(c,X+5,b-(h>>1)-2,w-10,4,'#c8c4b8');
+    ci(c,X+(w>>1),b-(h>>1),7,'#8e8a80');ci(c,X+(w>>1),b-(h>>1),5,'#5a7aa0');ci(c,X+(w>>1)-1,b-(h>>1)-1,2,'#9ccbe0');
+    for(const [dx,dy] of [[9,9],[w-11,9],[9,h-11],[w-11,h-11]]){ci(c,X+dx,b-h+dy,4,'#2e6a32');ci(c,X+dx-1,b-h+dy-1,2,'#5a9a48');}
+    R(c,X,b-h,w,2,'#dedad0');R(c,X,b-2,w,2,'#6a665e');};
+  LIB.caixaesmola=function(c,X,Y,o){const b=Y+16;SH(c,X+3,b,10);R(c,X+6,b-8,4,8,MW.k);R(c,X+7,b-8,2,7,MW.m);R(c,X+3,b-16,10,9,MW.k);R(c,X+4,b-15,8,7,MW.m);R(c,X+4,b-15,8,1,MW.h);R(c,X+6,b-13,4,1,MW.k);R(c,X+7,b-11,2,2,OU.m);};
+  LIB.castical=function(c,X,Y,o){const b=Y+16;SH(c,X+4,b,8);R(c,X+5,b-3,6,3,OU.k);R(c,X+6,b-3,4,2,OU.m);R(c,X+7,b-22,2,20,OU.m);R(c,X+7,b-22,1,20,OU.h);R(c,X+5,b-23,6,2,OU.k);R(c,X+7,b-29,2,6,PB.m);R(c,X+7,b-31,2,2,'#ffb060');R(c,X+7,b-32,1,1,'#ffe0a0');brilho(c,X+8,b-30,10);};
+  LIB.velas=function(c,X,Y,o){const b=Y+16;SH(c,X+1,b,14);R(c,X+3,b-6,2,6,FE.k);R(c,X+11,b-6,2,6,FE.k);R(c,X+1,b-11,14,5,FE.k);R(c,X+2,b-10,12,3,FE.m);
+    for(let i=0;i<4;i++)for(let j=0;j<2;j++){const x=X+2+i*3,y=b-13-j*3;R(c,x,y,2,3,j?VE.l:PB.m);R(c,x,y-1,1,1,'#ffb060');}brilho(c,X+8,b-14,10);};
+  LIB.crucifixo2=function(c,X,Y,o){R(c,X+7,Y-20,3,26,MW.k);R(c,X+8,Y-19,1,24,MW.l);R(c,X+2,Y-14,13,3,MW.k);R(c,X+3,Y-13,11,1,MW.l);R(c,X+7,Y-14,3,3,OU.m);};
+  /* ---------- como cada sala muda ---------- */
+  const SEM=1;
+  const CFG={
+    m_tribunal:{tema:{tipo:'listrada',parede:'#e9dcc0',listra:'#dccca8',flor:'#b89a6a',lambri:true},
+      restilo:[[/^mesaLonga0$/,'mesatribunal'],[/^escriv3$/,'escriv'],[/^banco[45]$/,'bancoigreja'],[/^prateleira[789]$/,'estante'],[/^mesa10$/,'escriv']],
+      tapete:[[8,4,2,6]],
+      gente:[['tj22_escr','h22_n|escrivao22|0',[3,6],'up','Escrivão do tribunal',['Eu escrevo tudo o que se diz na sessão, à mão, com letra caprichada.','Cada processo vira um volume de papel costurado. Tem processo que dura anos.']],
+        ['tj22_p1','h22_n|rapazTerno22|1',[4,9],'up','Público',['Vim assistir à sessão. Qualquer pessoa pode entrar e ver o julgamento.'],SEM],
+        ['tj22_p2','h22_n|senhoraN|0',[6,9],'up','Público',['Meu vizinho está sendo processado por causa de uma briga de terreno. Vim ver no que dá.'],SEM],
+        ['tj22_of','h22_n|funcPaulista|0',[10,7],'left','Oficial de justiça',['Sou oficial de justiça: levo as intimações. Quem é chamado pelo tribunal tem de comparecer.']]]},
+    m_redacao:{tema:{tipo:'lisa',parede:'#d8d4c8',barra:'#5a5e66',barraLuz:'#7a7e86'},
+      restilo:[[/^tipos$/,'caixatipos'],[/^caixaTipos_v115$/,'caixatipos'],[/^prensa$/,'rotativa'],[/^prensa_v115$/,'prensaplana'],[/^editor$/,'mesaredator'],[/^diagram$/,'mesapagina'],[/^telegrafo$/,'telegrafo'],
+        [/^bobinas$/,'bobinas'],[/^tinta$/,'barril'],[/^(jornais|fardos|pilhaJornais_v115)$/,'resmas'],[/^cotacoes$/,'quadrocot']],
+      parede:[['relparede',3,'Relógio da redação','O jornal fecha à meia-noite. Quem atrasa a notícia fica para o dia seguinte.'],['folhinha',11,null],['lampada',5,null],['lampada',12,null],['retrato',1,'Retrato do fundador do jornal',null]],
+      gente:[['est22_red','h22_n|guardalivros22|1',[11,5],'up','Redator-chefe',['Escrevo o artigo de fundo, a opinião do jornal sobre a política do dia.','O Estado de S. Paulo é um dos jornais mais lidos da cidade. Sai todo dia, bem cedo.']],
+        ['est22_dat','h22_n|datilografa22|0',[13,5],'down','Datilógrafa',['Bato à máquina as notícias que os repórteres trazem escritas à mão. Letra de repórter ninguém entende!']],
+        ['est22_tel','h22_n|telefonista|0',[13,7],'left','Telegrafista',['O telégrafo traz as notícias do Rio de Janeiro e até da Europa em poucos minutos.']],
+        ['est22_rep','h22_n|rapazTerno22|0',[9,6],'down','Repórter',['Passei a manhã na Câmara Municipal. Agora corro para escrever antes do jornal fechar.']],
+        ['est22_men','h22_n|jornaleiro88|1',[7,9],'up','Menino jornaleiro',['Pego os jornais aqui e saio gritando a notícia mais forte pela rua. Quem grita mais alto vende mais!']]]},
+    m_convento:{tema:{tipo:'lisa',parede:'#ece4d0',barra:'#7a6a50',barraLuz:'#9a8a6a',chao:'pedra'},
+      restilo:[[/^altar_m$/,'altar2'],[/^claustro$/,'claustro'],[/^cela_m$/,'catre'],[/^refeitorio$/,'mesa'],[/^bancor_m$/,'bancoigreja'],[/^escrivaninha_d\d$/,'escriv'],[/^estante_m$/,'estante'],
+        [/^castical_d\d$/,'castical'],[/^velas_d\d$/,'velas'],[/^esmolas_d\d$/,'caixaesmola'],[/^crucifixo_d\d$/,'crucifixo2'],[/^lampgas_d\d$/,'lampada'],[/^or_m$/,'oratorio'],[/^janelav_d\d$/,'janela'],[/^relparede_d\d$/,'relparede']],
+      tapete:[[9,4,2,9]],
+      gente:[['sb22_m1','h22_n|padreSe88|0',[10,4],'up','Monge rezando',['Somos monges beneditinos. A nossa regra diz: reza e trabalha.'],SEM],
+        ['sb22_m2','h22_n|padreSe88|1',[3,5],'down','Monge copista',['Cuido da biblioteca do mosteiro. Tem livro aqui mais velho que a cidade nova lá fora.','A igreja nova do mosteiro ficou pronta em 1914, no lugar da antiga.']],
+        ['sb22_m3','h22_n|padreSe88|2',[16,7],'left','Monge do refeitório',['No refeitório a gente come em silêncio, ouvindo um irmão ler em voz alta.']],
+        ['sb22_m4','h22_n|padreSe88|1',[13,10],'down','Monge professor',['Os monges também dão aula no Colégio de São Bento, aberto em 1903, aqui ao lado.']],
+        ['sb22_f1','h22_n|senhoraN|1',[7,10],'up','Fiel',['Venho acender uma vela antes de ir para o trabalho. O sino do mosteiro marca as horas do centro.'],SEM]]},
+    m_palacio:{gente:[['pal22_sec','h22_n|funcPaulista|1',[9,4],'down','Secretário do governo',['Aqui despacham os papéis do governo do Estado de São Paulo. Tudo passa por carimbo e assinatura.']],
+        ['pal22_con','h22_n|meninoN|0',[12,8],'left','Contínuo',['Sou o contínuo: levo papéis de uma sala para a outra, sirvo café e abro a porta.']],
+        ['pal22_faz','h22_n|republicano|2',[5,7],'right','Fazendeiro esperando audiência',['Vim pedir ao governo uma estrada de ferro até a minha região. O café precisa chegar ao porto de Santos.']],
+        ['pal22_dat','h22_n|datilografa22|1',[3,9],'up','Datilógrafa',['Sou datilógrafa. Faz pouco tempo que as mulheres começaram a trabalhar nas repartições.']]]},
+    m_banco:{gente:[['bco22_c1','h22_n|republicano|1',[3,6],'up','Fazendeiro na fila',['Vim depositar o dinheiro da venda do café. O banco empresta para a próxima colheita.'],SEM],
+        ['bco22_c2','h22_n|senhoraRica22|2',[4,7],'up','Senhora na fila',['Estou na fila do caixa. No banco, todo mundo fala baixo, parece igreja.'],SEM],
+        ['bco22_c3','h22_n|rapazTerno22|4',[3,8],'up','Rapaz na fila',['Vim pagar uma letra para o meu patrão. Se atrasar, ele desconta do meu salário.'],SEM],
+        ['bco22_ger','h22_n|banqueiro|1',[10,5],'down','Gerente do banco',['Sou o gerente. Os bancos do centro emprestam dinheiro para o café, as fábricas e os prédios novos da cidade.']]]},
+    m_palaceteP:{gente:[['plp22_cri','h22_n|criadaN|1',[9,8],'left','Criada',['Sirvo o chá às cinco da tarde. Na casa dos ricos, quem trabalha mora no quartinho dos fundos.']],
+        ['plp22_vis','h22_n|senhoraRica22|4',[7,8],'up','Visita',['Vim visitar a dona da casa. Aqui as famílias ricas recebem as amigas para o chá.']],
+        ['plp22_pia','h22_n|rapazTerno22|3',[2,6],'up','Professor de piano',['Dou aula de piano para a filha da casa. Moça de família rica aprende piano e francês.'],SEM]]},
+    m_quartel:{gente:[['pq22_sold','h22_x|soldado_da_forca_publica|0',[10,5],'down','Soldado da Força Pública',['Sou da Força Pública, a polícia do Estado. Faço a ronda no centro, a pé.']],
+        ['pq22_esc','h22_n|escrivao22|1',[4,5],'right','Escrivão de polícia',['Eu escrevo a queixa no livro de ocorrências. Hoje já foram três carteiras roubadas no bonde.']],
+        ['pq22_quei','h22_n|senhoraN|0',[8,8],'up','Senhora dando queixa',['Roubaram a minha bolsa no bonde da Praça da Sé! Vim dar queixa ao delegado.']]]}};
+  for(const K in CFG)if(CFG[K].tema)SALAS[K]=Object.assign({},SALAS[K]||{},{tema:CFG[K].tema});
+  const INV='[Personagem inventado para o jogo.]';
+  const analisa=K=>{const S=SCN[K],M=S.map.map(r=>r.join?r.join(''):r),W=M[0].length,H=M.length,sx=(S.__kit&&S.__kit.sx!=null)?S.__kit.sx:M[H-1].indexOf('x');
+    const occ=new Set();for(const o of objects){if(o.scene!==K||o.y<=2)continue;for(let a=0;a<(o.w||1);a++)for(let b=0;b<(o.h||1);b++)occ.add((o.x+a)+','+(o.y+b));}
+    const seen=new Set(),q=[[sx,H-2],[sx+1,H-2]];while(q.length){const [x,y]=q.pop(),k=x+','+y;if(seen.has(k))continue;const ch=(M[y]||'')[x];if(!ch||ch==='#'||occ.has(k))continue;seen.add(k);q.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);}
+    return {M,W,H,sx,seen};};
+  const monta=K=>{const cf=CFG[K];let ng=0,rr=0;
+    for(const [t,x,name,text] of (cf.parede||[])){const id='s7_'+K+'_'+t+x;if(!LIB[t]||objects.some(o=>o.id===id)||objects.some(o=>o.scene===K&&o.y<=2&&x>=o.x&&x<o.x+(o.w||1)))continue;const f=LIB[t];const o={id,scene:K,x,y:2,w:1,h:1,name,text:text?[text]:null};o.draw=function(cc,X,Y){f(cc,X,Y,o);};objects.push(o);}
+    for(const [re,t] of (cf.restilo||[])){const f=LIB[t];if(!f)continue;for(const o of objects){if(o.scene!==K||!re.test(String(o.id||'').replace(K+'_','')))continue;o.draw=function(c,X,Y){f(c,X,Y,o);};rr++;}}
+    for(const [id,spr,[x,y],dir,name,lines,sem] of (cf.gente||[])){if(npcs.some(n=>n.id===id))continue;const A=analisa(K);let pos=null,m=1e9;
+      for(let yy=3;yy<=A.H-2;yy++)for(let xx=1;xx<A.W-1;xx++){if(!A.seen.has(xx+','+yy)||npcs.some(n=>n.scene===K&&n.x===xx&&n.y===yy)||(xx>=A.sx-1&&xx<=A.sx+2&&yy>=A.H-3))continue;
+        let v=0;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]])if(A.seen.has((xx+dx)+','+(yy+dy)))v++;if(v<2)continue;const d=Math.abs(xx-x)+Math.abs(yy-y);if(d<m){m=d;pos=[xx,yy];}}
+      if(pos)try{addNPCs([{id,spr,x:pos[0],y:pos[1],dir,name,lines:lines.concat([INV])}],K);const q=npcs.find(q=>q.id===id);if(q){q.dir=dir;if(sem){q.nextTurn=1e9;q.__semBalao=1;}}ng++;}catch(e){console.warn('salas7',e);}}
+    (window.__jmSalas7=window.__jmSalas7||{})[K]={restilo:rr,gente:ng};};
+  const tapete=(c,x,y,w,h)=>{const X=x*16,Y=y*16,W=w*16,H=h*16;R(c,X+1,Y,W-2,H,'#5a1418');R(c,X+2,Y,W-4,H,'#c8a040');R(c,X+4,Y,W-8,H,'#8a2028');R(c,X+5,Y,W-10,H,'#a8303a');
+    for(let yy=Y+6;yy<Y+H-4;yy+=12){R(c,X+(W>>1)-2,yy,4,1,'#e0b850');R(c,X+(W>>1)-4,yy+1,8,1,'#e0b850');R(c,X+(W>>1)-2,yy+2,4,1,'#e0b850');}};
+  if(typeof render==='function'){const r0=render;render=function(){const vir=[];for(const q of npcs)if(q.__semBalao&&!q.talked&&/^(tj22|sb22|bco22|plp22)_/.test(q.id||'')){q.talked=true;vir.push(q);}try{return r0.apply(this,arguments);}finally{for(const q of vir)q.talked=false;}};}
+  const bs=buildStatic;buildStatic=function(){bs();try{if(window.__semCasa22)return;const K=cur,S=SCN[K],cf=CFG[K];if(!cf)return;
+    sc.imageSmoothingEnabled=false;for(const t of (cf.tapete||[]))tapete(sc,...t);
+    if(S.__salas7)return;S.__salas7=1;monta(K);}catch(e){console.warn('salas7',e);}};
+}catch(e){console.warn('salas7',e);}})();
+/* ===== v262 — 1922: MAIS CAPRICHO NO TRIBUNAL, JORNAL, MOSTEIRO, PALÁCIO, BANCO, PALACETE E POSTO; BANDEIRA DA REPÚBLICA (pedido do professor, 22/11/2026) ===== */
+(function(){try{
+  const C22=window.__CASA22;if(!C22||!C22.LIB)return;
+  const R=C22.R,LIB=C22.LIB;
+  const SH=(c,x,b,w)=>R(c,x,b-2,w,3,'rgba(50,25,10,.25)');
+  const ci=(c,x,y,r,col)=>{c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();};
+  const MW={k:'#3e2414',d:'#5e3a1e',m:'#86562e',l:'#a8723f',h:'#cc9658'},MA={k:'#2a140c',d:'#4a2418',m:'#6e3a28',l:'#8a5a38'},OU={k:'#7a5a1e',m:'#c8a040',h:'#e0b850'};
+  LIB.balaustrada=function(c,X,Y,o){const w=(o.w||3)*16,b=Y+16;SH(c,X,b,w);
+    R(c,X,b-15,w,3,MA.k);R(c,X+1,b-14,w-2,1,MW.h);R(c,X,b-3,w,3,MA.k);R(c,X+1,b-3,w-2,1,MW.l);
+    for(let x=X+2;x<X+w-2;x+=4){R(c,x,b-12,3,9,MA.k);R(c,x+1,b-11,1,7,MW.l);ci(c,x+1.5,b-8,1.5,MW.m);}};
+  LIB.globo2=function(c,X,Y,o){const b=Y+16;SH(c,X+3,b,10);R(c,X+7,b-8,2,8,MW.k);R(c,X+4,b-2,8,2,MW.m);ci(c,X+8,b-15,6,'#2a4a6a');ci(c,X+8,b-15,5,'#5a8ab0');R(c,X+5,b-18,3,2,'#6a9a4a');R(c,X+9,b-14,3,3,'#6a9a4a');R(c,X+6,b-13,2,1,'#c8a058');
+    c.strokeStyle=OU.m;c.lineWidth=1;c.beginPath();c.arc(X+8,b-15,7,2.2,5.6);c.stroke();R(c,X+6,b-19,1,1,'#ffffff');};
+  LIB.quadroavisos=function(c,X,Y,o){R(c,X+1,Y-18,14,16,MW.k);R(c,X+2,Y-17,12,14,'#b88a5a');
+    R(c,X+3,Y-16,5,6,'#f4f0e6');R(c,X+9,Y-15,4,5,'#efe8dc');R(c,X+4,Y-9,6,5,'#e2d6be');R(c,X+5,Y-16,1,1,'#a8303a');R(c,X+10,Y-15,1,1,'#3a4a6a');R(c,X+6,Y-9,1,1,'#a8303a');
+    for(let i=0;i<3;i++){R(c,X+4,Y-14+i*2,3,1,'#8a8a8a');R(c,X+5,Y-7+i,4,1,'#8a8a8a');}};
+  const CFG={
+    m_tribunal:[['balaustrada',3,'Grade do tribunal','A grade separa o público dos juízes. Do lado de lá, só entra quem é chamado.',[[2,7],[1,7]]],['balaustrada',3,null,null,[[5,7],[4,7]]],
+      ['estantedupla',2,'Estante da biblioteca','Livros de leis e as coleções de decisões dos juízes, encadernadas em couro.',[[15,9],[15,10]]],
+      ['escriv',2,'Mesa de estudo','O advogado vem consultar os livros antes da sessão.',[[12,4],[13,4]]],['globo2',1,'Globo terrestre',null,[[16,7],[16,6]]],['samambaia',1,null,null,[[1,10],[10,10]]]],
+    m_redacao:[['mesaredator',2,'Mesa do repórter','Mesa de repórter: papel, lápis e a máquina de escrever. Cada notícia é batida à máquina.',[[1,6],[2,6],[1,7]]],
+      ['mesaredator',2,'Mesa do repórter',null,[[12,8],[13,8],[13,7]]]],
+    m_convento:[['bancoigreja',4,'Banco da capela','Os fiéis rezam nos bancos de madeira, de frente para o altar.',[[3,7],[4,7],[3,8]]],['bancoigreja',4,null,null,[[3,10],[4,10],[3,9]]],
+      ['bancoigreja',4,'Banco da capela',null,[[13,10],[14,10],[13,11]]],['velas',1,'Velas acesas','Cada vela é um pedido ou um agradecimento.',[[7,3],[6,3]]],['velas',1,null,null,[[12,3],[13,3]]],
+      ['samambaia',1,null,null,[[7,6],[12,6],[7,8]]],['samambaia',1,null,null,[[12,8],[12,9]]]],
+    m_palacio:[['globo2',1,'Globo terrestre',null,[[16,4],[16,5]]],['samambaia',1,null,null,[[16,8],[13,9]]]],
+    m_banco:[['banco',2,'Banco de espera','Quem espera senta aqui. No banco, ninguém tem pressa à vista do gerente.',[[9,8],[10,8]]],['samambaia',1,null,null,[[12,8],[1,8]]],['balaustrada',2,'Grade do caixa',null,[[1,6],[2,6]]]],
+    m_palaceteP:[['samambaia',1,null,null,[[16,10],[1,10]]],['mesinha',1,'Mesinha com flores',null,[[12,7],[13,7]]],['globo2',1,'Globo terrestre',null,[[3,7],[2,7]]]],
+    m_quartel:[['escriv',2,'Mesa do escrivão','Aqui fica o livro de ocorrências: tudo o que acontece no centro é anotado nele.',[[2,4],[1,4],[2,5]]],
+      ['banco',3,'Banco de espera','Quem vem dar queixa espera a vez sentado aqui.',[[2,9],[3,9]]],
+      ['biombo',1,'Biombo','O biombo esconde os catres onde os soldados descansam entre um turno e outro.',[[9,4]]],['biombo',1,null,null,[[10,4]]],['biombo',1,null,null,[[12,4]]],['biombo',1,null,null,[[13,4]]]]};
+  const PAREDE={m_quartel:[['quadroavisos',12,'Quadro de avisos','Avisos da polícia: pessoas procuradas, objetos achados e a escala da ronda.']],m_tribunal:[['relparede',2,null],['quadro',6,'Quadro',null]],m_banco:[['relparede',11,'Relógio','O banco abre às dez e fecha às três da tarde.']]};
+  const BAND=/^band(\d|_q)?$/;
+  const analisa=K=>{const S=SCN[K],M=S.map.map(r=>r.join?r.join(''):r),W=M[0].length,H=M.length,sx=(S.__kit&&S.__kit.sx!=null)?S.__kit.sx:M[H-1].indexOf('x');
+    const occ=new Set();for(const o of objects){if(o.scene!==K||o.y<=2)continue;for(let a=0;a<(o.w||1);a++)for(let b=0;b<(o.h||1);b++)occ.add((o.x+a)+','+(o.y+b));}
+    const seen=new Set(),q=[[sx,H-2],[sx+1,H-2]];while(q.length){const [x,y]=q.pop(),k=x+','+y;if(seen.has(k))continue;const ch=(M[y]||'')[x];if(!ch||ch==='#'||occ.has(k))continue;seen.add(k);q.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);}
+    const viz=(x,y,w,h)=>{for(let i=x;i<x+w;i++)if(seen.has(i+','+(y-1))||seen.has(i+','+(y+h)))return true;for(let j=y;j<y+h;j++)if(seen.has((x-1)+','+j)||seen.has((x+w)+','+j))return true;return false;};
+    let ruim=0;for(const o of objects)if(o.scene===K&&o.name&&o.y>2&&!viz(o.x,o.y,o.w||1,o.h||1))ruim++;for(const n of npcs)if(n.scene===K&&!viz(n.x,n.y,1,1))ruim++;
+    return {M,W,H,sx,occ,ruim,porta:seen.has(sx+','+(H-2))||seen.has((sx+1)+','+(H-2))};};
+  const mk=(K,t,x,y,w,name,text,id)=>{const f=LIB[t];const o={id,scene:K,x,y,w,h:1,name,text:text?[text]:null};o.draw=function(c,X,Y){f(c,X,Y,o);};objects.push(o);return o;};
+  const monta=K=>{let ok=0,rej=0,i=0;
+    for(const o of objects)if(o.scene===K&&BAND.test(String(o.id||'').replace(K+'_',''))){o.name='Bandeira do Brasil';o.text=['A bandeira da República, com o lema "Ordem e Progresso". A bandeira do Império foi trocada em 1889.'];}
+    for(const [t,x,name,text] of (PAREDE[K]||[])){const id='s7b_'+K+'_'+t+x;if(!LIB[t]||objects.some(o=>o.id===id)||objects.some(o=>o.scene===K&&o.y<=2&&x>=o.x&&x<o.x+(o.w||1)))continue;mk(K,t,x,2,1,name,text,id);}
+    for(const [t,w,name,text,cands] of (CFG[K]||[])){const id='s7b_'+K+'_'+t+(i++);if(!LIB[t]||objects.some(o=>o.id===id))continue;let feito=false;
+      for(const [x,y] of cands){const A0=analisa(K);if(x<1||x+w>A0.W-1||y<3||y>A0.H-2)continue;let livre=true;
+        for(let a=0;a<w;a++)if(A0.M[y][x+a]!=='.'||A0.occ.has((x+a)+','+y)||npcs.some(n=>n.scene===K&&n.x===x+a&&n.y===y))livre=false;
+        if(!livre||(x+w>A0.sx-1&&x<=A0.sx+2&&y>=A0.H-3))continue;const o=mk(K,t,x,y,w,name,text,id);const A=analisa(K);
+        if(!A.porta||A.ruim>A0.ruim)objects.splice(objects.indexOf(o),1);else{feito=true;break;}}
+      feito?ok++:rej++;}
+    (window.__jmSalas7b=window.__jmSalas7b||{})[K]={objetos:ok,recusados:rej};};
+  const bs=buildStatic;buildStatic=function(){bs();try{if(window.__semCasa22)return;const K=cur,S=SCN[K];if(!CFG[K]||S.__salas7b)return;S.__salas7b=1;monta(K);}catch(e){console.warn('salas7b',e);}};
+}catch(e){console.warn('salas7b',e);}})();
 let n=0;const tenta=()=>{try{if(roda()||++n>20)return;}catch(e){console.warn('quadra de teste JM',e);return;}setTimeout(tenta,700);};
   setTimeout(tenta,3600);
 }catch(e){console.warn('quadra de teste JM',e);}})();
