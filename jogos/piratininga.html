@@ -25422,6 +25422,564 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   const roda=()=>{try{tira();gente();carr();}catch(e){console.warn('v236',e);}};
   roda();for(const t of [300,1500,3500,6500])setTimeout(roda,t);
 }catch(e){console.warn('v236 1554',e);}})();
+/* ===== v252 — MODO MISSÃO E MODO LIVRE: telas com missões numeradas, prova de 10 perguntas com cronômetro, códigos por tela, mapa da viagem e diploma (pedido do professor, 22/11/2026) =====
+   Modo livre: o jogo de sempre, nada muda.
+   Modo Missão: o jogo vira uma sequência de 18 telas (1554 a 1922). Cada tela tem missões numeradas (Missão 1, 2, 3...),
+   que aparecem na caixa de cima. A última missão de cada tela só abre depois das outras: conversar com uma pessoa
+   e passar numa prova de 10 perguntas, sem errar nenhuma, com cronômetro. Depois abre o mapa da viagem e a tela seguinte.
+   Cada tela tem um código para anotar (tela inicial > "Tenho um código"). Ao terminar 1922, o diploma.
+   O portal comum fica fechado no Modo Missão: quem leva para a época seguinte é a prova da última tela da época.
+   O progresso fica em localStorage 'pira_missao_v1'; a escolha do modo em 'pira_modo'. */
+;(function(){try{
+  const KEY='pira_missao_v1',KMODO='pira_modo';
+  const ANOS={1:1554,2:1830,3:1888,4:1922};
+  const PARTE={1:'PARTE 1 – A ORIGEM',2:'PARTE 2 – A CIDADE IMPERIAL',3:'PARTE 3 – A CIDADE DO CAFÉ',4:'PARTE 4 – A CIDADE DAS FÁBRICAS'};
+  const SEG=20; /* segundos para cada pergunta da prova */
+  const PAGA={1:0,2:40,3:200,4:500},PAGA_PROVA={1:0,2:120,3:600,4:1500};
+
+  /* ---------- as telas e as missões ----------
+     t:'q' missão do jogo (Q[k]) concluída | 'qs' missão começada até a etapa 'ate' | 'falar' conversar com a pessoa n
+     'ir' chegar ao cenário sc | 'obj' pegar n objetos da tela (rel: contados a partir de agora) | 'conv' conversar com n pessoas
+     'prova' conversar com n e passar na prova (sempre a última) */
+  const TELAS=[
+   {e:1,nome:'Piratininga',code:'TIBIRICA-54',sc:['pira'],ini:null,ms:[
+     {t:'falar',n:'tibirica',tit:'O chefe da aldeia',txt:'Ache Tibiriçá, o chefe da aldeia, e converse com ele.'},
+     {t:'q',k:'pesca',tit:'Pesca no rio'},
+     {t:'q',k:'farinha',tit:'Farinha de mandioca'},
+     {t:'q',k:'escambo',tit:'A troca',txt0:'Em 1554 não se usa dinheiro aqui: troca-se. Fale com o colono de São Vicente, em Piratininga.'},
+     {t:'obj',n:5,tit:'Objetos da colina',txt:'Encontre 5 objetos de Piratininga. Eles brilham no chão.'},
+     {t:'prova',n:'anchieta',tit:'A prova de Piratininga',txt:'Fale com o irmão Anchieta e faça a prova.'}],
+    extra:[]},
+   {e:1,nome:'Serra do Mar e São Vicente',code:'CANAVIAL-27',sc:['serra','sv','j_x1engenho'],ini:['serra','guia'],ms:[
+     {t:'falar',n:'guia',tit:'Descer a serra',txt:'Desça a Serra do Mar (saída sul da colina) e converse com o guia tupiniquim.',alvo:'n:guia'},
+     {t:'falar',n:'nobrega',tit:'O padre da vila',txt:'Em São Vicente, ache o padre Manuel da Nóbrega.'},
+     {t:'q',k:'acucar',tit:'Açúcar'},
+     {t:'falar',n:'degredado54',tit:'O degredado',txt:'Ache o degredado: ele mora numa casa da vila. Entre nas casas e procure.'},
+     {t:'falar',n:'mestreAcucar',tit:'O mestre de açúcar',txt:'No Engenho dos Erasmos, fale com o mestre de açúcar.'},
+     {t:'obj',n:3,tit:'Objetos da vila',txt:'Encontre 3 objetos da Serra e de São Vicente.'},
+     {t:'prova',n:'vereador',tit:'A prova de São Vicente',txt:'Fale com o vereador da Câmara e faça a prova.'}],
+    extra:[
+     ['mestreAcucar','De onde veio o mestre de açúcar do Engenho dos Erasmos?',['Da Guiné, na África, escravizado','De Portugal, contratado com salário','Da aldeia de Tibiriçá, no planalto']],
+     ['purgador','O que é “purgar” o açúcar?',['Deixar o mel escorrer nas formas até ele branquear','Cortar a cana bem rente ao chão do canavial','Ferver o caldo da cana na fornalha bem quente']],
+     ['indigenaMoenda','Quem era a maior parte de quem trabalhava no engenho?',['Indígenas escravizados, “gente da terra”','Colonos portugueses pagos por dia','Padres jesuítas vindos de Portugal']],
+     ['degredado54','O que era um degredado?',['Um condenado mandado de Portugal como castigo','Um padre que vinha ensinar os indígenas','Um mercador rico que comprava açúcar']]]},
+   {e:1,nome:'Lisboa',code:'TEJO-31',sc:['lisboa54'],ini:['sv','mestreNau'],ms:[
+     {t:'qs',k:'viagemAcucar',ate:0,tit:'Embarcar',txt:'Fale com o mestre da nau, na praia de São Vicente, e embarque com as caixas de açúcar.'},
+     {t:'ir',sc:'lisboa54',tit:'Rumo a Lisboa',txt:'Embarque na nau ao lado do cais de São Vicente e viaje até Lisboa.',alvo:'o:sv/nauSV'},
+     {t:'qs',k:'viagemAcucar',ate:1,tit:'Na Alfândega',txt:'Leve as caixas de açúcar à Alfândega: fale com o oficial.'},
+     {t:'falar',n:'reiJoao',tit:'O rei',txt:'Ache o rei D. João III em Lisboa e converse com ele.'},
+     {t:'falar',n:'aguadeiraLx',tit:'Quem carrega a água',txt:'Converse com a mulher africana que carrega água pelas ruas.'},
+     {t:'falar',n:'varinaLx',tit:'Peixe do Tejo',txt:'Ache a vendedora de peixe e converse com ela.'},
+     {t:'prova',n:'mercadorLx',tit:'A prova de Lisboa',txt:'Fale com o mercador de Lisboa e faça a prova.'}],
+    extra:[
+     ['oficialAlf','O que acontecia com as caixas de açúcar na Alfândega de Lisboa?',['Eram pesadas, contadas e pagavam imposto ao rei','Eram refinadas até o açúcar ficar bem branco','Eram vendidas de porta em porta pelos marujos']],
+     ['mercadorLx','Para onde o mercador de Lisboa revendia o açúcar do Brasil?',['Para Antuérpia, onde ele era refinado','Para a Índia, em troca de pimenta','De volta para os engenhos de São Vicente']],
+     ['aguadeiraLx','Em Lisboa, em 1554, quantos moradores eram africanos escravizados?',['Mais ou menos um em cada dez','Quase metade de todos os moradores','Nenhum: só havia escravidão no Brasil']],
+     ['marujoLx','Como era a viagem de nau do Brasil até Lisboa?',['Longa e perigosa: muitos marinheiros adoeciam','Rápida e tranquila: levava uma semana','Confortável: havia comida fresca todo dia']],
+     ['reiJoao','O que D. João III fez com o Brasil em 1534?',['Dividiu a terra em capitanias','Fundou a vila de São Paulo','Proibiu o comércio de açúcar']],
+     ['reiJoao','Quem o rei mandou fundar a cidade de Salvador, em 1549?',['O governador-geral Tomé de Sousa','O irmão jesuíta José de Anchieta','O navegador Pedro Álvares Cabral']],
+     ['varinaLx','Quem comprava açúcar em Lisboa, segundo a vendedora de peixe?',['Quem tinha dinheiro, para fazer doce','Todo mundo, porque era bem barato','Só os padres, para as festas da igreja']]]},
+   {e:1,nome:'Antuérpia',code:'ESCALDA-48',sc:['antuerpia54'],ini:['lisboa54','mercadorLx'],ms:[
+     {t:'ir',sc:'antuerpia54',tit:'Rumo a Antuérpia',txt:'Embarque na nau do cais de Lisboa e siga para Antuérpia, no norte da Europa.',alvo:'o:lisboa54/nauLx'},
+     {t:'falar',n:'carregadorAnt',tit:'O barco de açúcar',txt:'Ache o barco de açúcar no cais: converse com o carregador que descarrega as caixas.'},
+     {t:'qs',k:'viagemAcucar',ate:3,tit:'O açúcar branco',txt:'Leve o açúcar ao refinador de Antuérpia.'},
+     {t:'falar',n:'agenteSchetz',tit:'O dono do engenho',txt:'Descubra quem é dono do engenho de São Vicente: fale com o agente da família Schetz.'},
+     {t:'q',k:'viagemAcucar',tit:'O fim da viagem',txt0:'Termine a viagem do açúcar.'},
+     {t:'falar',n:'tintureiro',tit:'Mãos vermelhas',txt:'Ache o tintureiro e descubra para que serve o pau-brasil.'},
+     {t:'prova',n:'comercianteBolsa',tit:'A prova de Antuérpia',txt:'Fale com o mercador da Bolsa e faça a prova. Passou? O portal leva você para 1830!'}],
+    extra:[
+     ['refinador','O que o refinador de Antuérpia fazia com o açúcar?',['Derretia, fervia e limpava até ficar branco','Plantava a cana em estufas aquecidas','Misturava com mel para vender mais barato']],
+     ['agenteSchetz','Quem eram os Schetz?',['Mercadores de Antuérpia donos de um engenho em São Vicente','Padres jesuítas que ajudaram a fundar Piratininga','Marinheiros que pilotavam as naus do rei de Portugal']],
+     ['comercianteBolsa','O que era a Bolsa de Antuérpia?',['Um lugar onde mercadores compravam e vendiam de tudo','Uma oficina que fazia bolsas de couro','O palácio onde morava o rei dos flamengos']],
+     ['boticarioAnt','Como o boticário usava o açúcar?',['Como remédio: xarope e pastilha','Como tinta para os tecidos','Como cola para consertar barcos']],
+     ['tintureiro','Para que o tintureiro usava o pau-brasil?',['Para tingir tecidos de vermelho','Para fazer xarope para tosse','Para construir as naus']],
+     ['carregadorAnt','Como o carregador do cais levantava as caixas?',['Andando dentro da roda de um guindaste','Com uma máquina a vapor bem forte','Puxando cordas com uma junta de bois']],
+     ['boticarioAnt','Antes do açúcar, com o que a Europa adoçava quase tudo?',['Com mel','Com rapadura','Com caldo de cana']]]},
+   {e:2,nome:'A cidade imperial',code:'TAIPA-30',sc:['sp'],ini:null,ms:[
+     {t:'q',k:'agua',tit:'Água do chafariz'},
+     {t:'q',k:'virado',tit:'Virado de feijão',txt0:'Depois da água, fale de novo com a dona da casa: ela vai mandar você às compras, com réis.'},
+     {t:'q',k:'lampioes',tit:'Os lampiões'},
+     {t:'q',k:'procissao',tit:'A procissão'},
+     {t:'obj',n:5,rel:true,tit:'Objetos da cidade',txt:'Encontre mais 5 objetos de 1830. Eles brilham no chão.'},
+     {t:'prova',n:'naturalista',tit:'A prova da cidade imperial',txt:'Fale com o naturalista francês, no Largo de São Bento, e faça a prova.'}],
+    extra:[]},
+   {e:2,nome:'Gente que trabalha',code:'TROPEIRO-62',sc:['sp'],ini:null,ms:[
+     {t:'q',k:'ferradura',tit:'A ferradura'},
+     {t:'q',k:'roupa',tit:'Roupa lavada'},
+     {t:'q',k:'tebas30',tit:'A água do Tebas'},
+     {t:'q',k:'ganho',tit:'A encomenda da quitandeira'},
+     {t:'q',k:'memoria',tit:'Memória da escravidão'},
+     {t:'conv',n:4,tit:'Mais conversas',txt:'Converse com mais 4 pessoas da cidade.'},
+     {t:'prova',n:'velhoPiques30',tit:'A prova do trabalho',txt:'Fale com o velho liberto do Piques e faça a prova.'}],
+    extra:[]},
+   {e:2,nome:'Letras e leis',code:'ARCADAS-28',sc:['sp'],ini:null,ms:[
+     {t:'q',k:'aula',tit:'Aula de Direito'},
+     {t:'q',k:'escola',tit:'Primeiras letras'},
+     {t:'q',k:'jornal',tit:'O jornal'},
+     {t:'q',k:'tinteiro',tit:'Tinta para o estudante'},
+     {t:'q',k:'carta30',tit:'A carta'},
+     {t:'obj',n:4,rel:true,tit:'Mais objetos',txt:'Encontre mais 4 objetos de 1830.'},
+     {t:'prova',n:'badaro',tit:'A prova das letras',txt:'Fale com o jornalista Líbero Badaró e faça a prova.'}],
+    extra:[]},
+   {e:2,nome:'Arredores de São Paulo',code:'IPIRANGA-22',sc:['arr'],ini:['arr','mIpiranga'],ms:[
+     {t:'ir',sc:'arr',tit:'Sair da cidade',txt:'Saia da cidade por uma das pontas do mapa e chegue aos arredores.',alvo:'n:mIpiranga'},
+     {t:'q',k:'ipiranga',tit:'Pouso no Ipiranga'},
+     {t:'q',k:'romaria',tit:'Romaria da Penha'},
+     {t:'falar',n:'mSantana',tit:'Santana',txt:'Ache o morador de Santana, do outro lado do Tietê.'},
+     {t:'falar',n:'mPinheiros',tit:'Pinheiros',txt:'Ache o morador de Pinheiros, a antiga aldeia.'},
+     {t:'prova',n:'mSantoAmaro',tit:'A prova dos arredores',txt:'Fale com o colono alemão de Santo Amaro e faça a prova. Passou? O portal leva você para 1888!'}],
+    extra:[]},
+   {e:3,nome:'A cidade do café',code:'CAFEZAL-88',sc:['sp88'],ini:null,ms:[
+     {t:'q',k:'cafe',tit:'O caminho do café'},
+     {t:'q',k:'bonde',tit:'De bonde',txt0:'Fale com o condutor, no ponto do Largo da Sé. A passagem custa 200 réis.'},
+     {t:'q',k:'imigrantes',tit:'Recém-chegados'},
+     {t:'q',k:'noticia',tit:'A notícia'},
+     {t:'q',k:'chocolate',tit:'Chocolate de São Paulo'},
+     {t:'obj',n:3,rel:true,tit:'Objetos da cidade',txt:'Encontre 3 objetos de 1888.'},
+     {t:'prova',n:'fotografo',tit:'A prova da cidade do café',txt:'Fale com Militão, o fotógrafo, e faça a prova.'}],
+    extra:[]},
+   {e:3,nome:'Liberdade!',code:'CAIFAZES-13',sc:['sp88'],ini:null,ms:[
+     {t:'q',k:'gama88',tit:'Quem foi Luiz Gama?'},
+     {t:'q',k:'liberdade',tit:'Luiz Gama'},
+     {t:'q',k:'peticao88',tit:'A petição das quitandeiras'},
+     {t:'q',k:'dia13',tit:'O dia 13 de maio'},
+     {t:'falar',n:'bento88',tit:'Antônio Bento',txt:'Ache Antônio Bento, o líder dos caifazes, e converse com ele.'},
+     {t:'prova',n:'caifaz',tit:'A prova da liberdade',txt:'Fale com o abolicionista caifaz e faça a prova.'}],
+    extra:[]},
+   {e:3,nome:'Fazenda de café',code:'COLONATO-47',sc:['faz'],ini:['faz','colona'],ms:[
+     {t:'ir',sc:'faz',tit:'De trem para o interior',txt:'Pegue o trem na Estação da Luz até a fazenda de café.',alvo:'o:k_estacao/bilheteria'},
+     {t:'q',k:'colheita',tit:'A colheita'},
+     {t:'falar',n:'exesc',tit:'O trabalhador liberto',txt:'Converse com o trabalhador liberto da fazenda.'},
+     {t:'falar',n:'imiCaderneta88',tit:'A caderneta',txt:'Ache a colona recém-chegada e descubra o que é a caderneta.'},
+     {t:'obj',n:2,tit:'Objetos da fazenda',txt:'Encontre os 2 objetos da fazenda.'},
+     {t:'prova',n:'fazendeiroF',tit:'A prova da fazenda',txt:'Fale com o fazendeiro e faça a prova.'}],
+    extra:[
+     ['fazendeiroF','Por que a terra do Oeste Paulista era boa para o café?',['Era terra roxa, muito fértil','Era terra de areia, perto do mar','Era terra fria, no alto da serra']],
+     ['fazendeiroF','Com o trem, em quanto tempo o café da fazenda chegava a Santos?',['Em um dia','Em três semanas','Em dois meses']],
+     ['imiCaderneta88','Para que servia a caderneta do armazém da fazenda?',['Para anotar o que a família comprava fiado','Para guardar as notas dos filhos na escola','Para contar os pés de café de cada família']],
+     ['imiPai88','Quem pagou a passagem de navio da família italiana?',['O governo da província de São Paulo','O próprio fazendeiro, de presente','A própria família, com o que tinha juntado']],
+     ['imiNonna88','Por que a família da nonna deixou o Vêneto?',['Não havia terra nem pão para todos','Fugia de uma guerra contra o Brasil','Queria trabalhar nas fábricas do Brás']]]},
+   {e:3,nome:'Porto de Santos',code:'JABAQUARA-86',sc:['santos'],ini:['santos','estivador'],ms:[
+     {t:'ir',sc:'santos',tit:'De trem até o mar',txt:'Pegue o trem na Estação da Luz até Santos.',alvo:'o:k_estacao/bilheteria'},
+     {t:'q',k:'porto',tit:'No porto de Santos'},
+     {t:'falar',n:'quintino',tit:'O quilombo',txt:'Vá ao Quilombo do Jabaquara e converse com Quintino de Lacerda.'},
+     {t:'falar',n:'beneditoZago88',tit:'Os recém-chegados',txt:'Ache Benedito e Cândida Zago, que acabaram de descer do navio.'},
+     {t:'falar',n:'exportador',tit:'Para onde vai o café?',txt:'Converse com o exportador inglês.'},
+     {t:'prova',n:'fugida',tit:'A prova de Santos',txt:'Fale com a moradora do quilombo e faça a prova.'}],
+    extra:[
+     ['estivador','Quanto pesava cada saca de café carregada no porto?',['Sessenta quilos','Seis quilos','Vinte quilos']],
+     ['exportador','Para onde o exportador inglês mandava o café?',['Para a Europa e os Estados Unidos','Para o interior de São Paulo','Para a África e a Índia']],
+     ['beneditoZago88','De onde vinham Benedito e Cândida Zago?',['Do Vêneto, na Itália','Da Andaluzia, na Espanha','Do Minho, em Portugal']],
+     ['candidaZago88','Por que tantas famílias italianas vinham para São Paulo?',['Os fazendeiros de café precisavam de muitos braços','O governo dava uma fazenda a cada família','Havia ouro para garimpar perto de Santos']],
+     ['quintino','Como as pessoas fugidas das fazendas chegavam ao Jabaquara?',['Descendo a serra a pé, de noite','De trem, com passagem paga','De navio, vindas do Rio de Janeiro']]]},
+   {e:3,nome:'Bananal',code:'BANANAL-71',sc:['k_bananal'],ini:['k_bananal','barbeiroBan'],ms:[
+     {t:'ir',sc:'k_bananal',tit:'O Vale do Paraíba',txt:'Vá à Estação do Norte, no Brás, e pegue o trem para Bananal.',alvo:'n:ferroviario2'},
+     {t:'q',k:'abolicaoBan',tit:'A notícia chega a Bananal'},
+     {t:'falar',n:'beneditaRes',tit:'Tia Benedita',txt:'Na Fazenda Resgate, ache Tia Benedita e converse com ela.'},
+     {t:'falar',n:'baraoBan',tit:'O fazendeiro',txt:'Converse com o fazendeiro de Bananal.'},
+     {t:'prova',n:'tropeiroBan',tit:'A prova de Bananal',txt:'Fale com o tropeiro e faça a prova. Passou? O portal leva você para 1922!'}],
+    extra:[
+     ['tropeiroBan','Como o café de Bananal ia para o litoral antes do trem?',['Em lombo de burro, serra abaixo','Em barcos pelo rio Tietê','Em carroças por uma estrada calçada']],
+     ['baraoBan','Por que o fazendeiro de Bananal tinha medo da abolição?',['Cafezais velhos, dívidas e nada para pagar salários','Achava que ninguém mais ia querer beber café','Queria vender a fazenda para os ingleses']],
+     ['beneditaRes','Quando Tia Benedita foi trazida de Angola, o tráfico de pessoas...',['Já era proibido por lei, mas continuava','Era permitido e incentivado pelo imperador','Já tinha acabado em todo o mundo']],
+     ['molequeRes','O menino da senzala nasceu depois de qual lei?',['A Lei do Ventre Livre, de 1871','A Lei Áurea, de 1888','A Lei de Terras, de 1850']],
+     ['colhedorRes','Por que o café novo não crescia bem em Bananal?',['A terra já estava cansada','Fazia frio demais no Vale','Faltava chuva o ano inteiro']]]},
+   {e:4,nome:'O centro de 1922',code:'MUNICIPAL-19',sc:['m_centro22'],ini:['m_centro22','condutor22'],ms:[
+     {t:'ir',sc:'m_centro22',tit:'Ir ao centro',txt:'Vá ao centro da cidade: a Sé, o Triângulo e o Theatro Municipal.',alvo:'n:condutor22'},
+     {t:'q',k:'semana',tit:'Semana de 22'},
+     {t:'q',k:'bondeE',tit:'De bonde elétrico',txt0:'Fale com o condutor da Light, no ponto do Largo da Sé. A passagem custa 200 réis.'},
+     {t:'q',k:'vozesMulheres22',tit:'As vozes das mulheres'},
+     {t:'q',k:'brBeirute',tit:'Achei que estava em Beirute'},
+     {t:'obj',n:5,rel:true,tit:'Objetos do centro',txt:'Encontre 5 objetos de 1922.'},
+     {t:'prova',n:'modernista',tit:'A prova do centro',txt:'Fale com o poeta modernista e faça a prova.'}],
+    extra:[]},
+   {e:4,nome:'As fábricas',code:'CRESPI-17',sc:['m_leste22'],ini:['m_leste22','operaria22'],ms:[
+     {t:'ir',sc:'m_leste22',tit:'O bairro das fábricas',txt:'Vá ao Brás e à Mooca, o leste industrial da cidade.',alvo:'n:operaria22'},
+     {t:'q',k:'apito',tit:'O apito da fábrica'},
+     {t:'q',k:'marmita22',tit:'A marmita'},
+     {t:'q',k:'compras22',tit:'Compra no armazém'},
+     {t:'q',k:'greve',tit:'A greve de 1917'},
+     {t:'prova',n:'lideranca',tit:'A prova das fábricas',txt:'Fale com o operário da greve de 1917 e faça a prova.'}],
+    extra:[]},
+   {e:4,nome:'Os bairros',code:'VARZEA-35',sc:['sp22'],ini:null,ms:[
+     {t:'q',k:'penalti22',tit:'Pênaltis na várzea'},
+     {t:'q',k:'regata22',tit:'Regata no Tietê'},
+     {t:'q',k:'vizinhos22',tit:'Ajuda entre vizinhos'},
+     {t:'q',k:'telefone22',tit:'Alô, central!'},
+     {t:'conv',n:4,tit:'Gente dos bairros',txt:'Converse com mais 4 pessoas dos bairros.'},
+     {t:'prova',n:'lambelambe',tit:'A prova dos bairros',txt:'Fale com o fotógrafo lambe-lambe e faça a prova.'}],
+    extra:[]},
+   {e:4,nome:'O café no interior',code:'MOGIANA-64',sc:['m_campinas','m_ribeirao'],ini:['m_campinas','chefeCps'],ms:[
+     {t:'ir',sc:'m_campinas',tit:'De trem para o interior',txt:'Na Estação da Luz, compre a passagem para Ribeirão Preto. A primeira parada é Campinas.',alvo:'n:bilheteiro22'},
+     {t:'falar',n:'chefeCps',tit:'A baldeação',txt:'Em Campinas, descubra com o chefe da estação por que é preciso trocar de trem.'},
+     {t:'ir',sc:'m_ribeirao',tit:'Ribeirão Preto',txt:'Pegue o trem da Mogiana e chegue a Ribeirão Preto.',alvo:'n:chefeCps'},
+     {t:'q',k:'colheita22',tit:'A colheita do café'},
+     {t:'q',k:'caderneta22',tit:'A caderneta'},
+     {t:'q',k:'carvao22',tit:'Fogo na caldeira'},
+     {t:'prova',n:'comissarioRP',tit:'A prova do interior',txt:'Fale com o comissário de café e faça a prova.'}],
+    extra:[
+     ['chefeCps','Por que era preciso trocar de trem em Campinas?',['A Paulista e a Mogiana tinham trilhos de larguras diferentes','O trem da Paulista não tinha mais carvão para seguir','Os passageiros tinham de pagar outra passagem ali']],
+     ['fazCps','Por que o café foi saindo de Campinas para o oeste?',['As terras de Campinas ficaram cansadas','Os ingleses compraram as terras de Campinas','O governo proibiu café perto da capital']],
+     ['colonoJP','Em que ano chegaram os primeiros japoneses, no navio Kasato Maru?',['1908','1888','1922']],
+     ['vendeiroRP','O que acontecia com a conta da caderneta no fim do ano?',['O administrador descontava do pagamento','O fazendeiro perdoava todas as dívidas','A família recebia de volta em dinheiro']],
+     ['camaradaRP','Qual a diferença entre o camarada e o colono?',['O camarada trabalha por dia, no serviço avulso','O camarada é o dono de um sítio vizinho','O camarada só trabalha na estação de trem']],
+     ['foguistaRP','O que faz o foguista da locomotiva?',['Põe carvão e lenha no fogo da caldeira','Dirige o trem e toca o apito','Vende as passagens na plataforma']],
+     ['comissarioRP','Qual era o perigo de o Brasil depender do café?',['Quando o preço cai, cai junto o Brasil inteiro','O café estraga em poucos dias no armazém','Só Portugal podia comprar o café do Brasil']]]},
+   {e:4,nome:'A serra e o porto',code:'LOCOBREQUE-92',sc:['m_serra22','m_santos22'],ini:['m_serra22','chefeAS'],ms:[
+     {t:'ir',sc:'m_serra22',tit:'Descer a serra',txt:'Na Estação da Luz, compre a passagem para Santos. O trem para no Alto da Serra.',alvo:'n:bilheteiro22'},
+     {t:'q',k:'neblina22',tit:'Recado na neblina'},
+     {t:'ir',sc:'m_santos22',tit:'Até o porto',txt:'Desça a serra no locobreque e chegue ao porto de Santos.',alvo:'n:maquinistaLoco'},
+     {t:'q',k:'embarque22',tit:'Embarque do café'},
+     {t:'q',k:'amostra22',tit:'A amostra de café'},
+     {t:'falar',n:'netoJabaquara',tit:'O neto do quilombo',txt:'Converse com o carregador do porto cujo avô viveu no Jabaquara.'},
+     {t:'prova',n:'classificador',tit:'A prova final',txt:'Fale com o classificador de café e faça a última prova do jogo!'}],
+    extra:[
+     ['chefeAS','De onde vinham os engenheiros e as regras da São Paulo Railway?',['Da Inglaterra','Da Itália','Dos Estados Unidos']],
+     ['operarioAS','Como os trens desciam a serra nos planos inclinados?',['Presos a cabos de aço puxados por máquinas fixas','Sozinhos, segurados só pelo freio da locomotiva','Pendurados em guindastes, um vagão de cada vez']],
+     ['meninaAS','Por que o lugar vai se chamar Paranapiacaba?',['Quando a neblina some, do morro se vê o mar','Porque ali nasce o rio Tietê','Porque ali chove quase o ano inteiro']],
+     ['futebolAS','Quem trouxe o futebol, segundo o jogador da vila?',['Os ingleses da ferrovia','Os imigrantes japoneses','Os estudantes de Direito']],
+     ['classificador','Como o classificador prova o café?',['Torra, mói, põe água quente e prova sem engolir','Conta um por um os grãos de cada saca','Pesa a saca para ver se tem sessenta quilos']],
+     ['sanitaristaS','Por que Santos já foi chamada de “porto maldito”?',['A febre amarela matava marinheiros e moradores','Os navios afundavam na entrada do porto','O café de Santos era o mais barato do mundo']],
+     ['netoJabaquara','O que o carregador do porto conta sobre o avô?',['Fugiu de uma fazenda e foi para o Jabaquara','Veio da Inglaterra para construir a ferrovia','Era dono de um navio que levava café']]]},
+  ];
+  const NT=TELAS.length;
+  let NMIS=0;TELAS.forEach((t,i)=>{t.i=i;t.ms.forEach((m,j)=>{m.num=++NMIS;m.j=j;});});
+  window.__MM_TELAS=TELAS;
+
+  /* ---------- estado ---------- */
+  const novo=(f)=>({on:true,f:f||0,j:0,falou:{},base:null,tAt:0,feitas:{},provas:{},jump:false,allow:false,zerou:false,mapa:false,visto:{}});
+  let MM=null;try{MM=JSON.parse(localStorage.getItem(KEY)||'null');}catch(_){}
+  let modo='missao';try{modo=localStorage.getItem(KMODO)||'missao';}catch(_){}
+  const grava=()=>{try{if(MM)localStorage.setItem(KEY,JSON.stringify(MM));}catch(_){}};
+  const ligado=()=>!!(MM&&MM.on&&modo==='missao');
+  window.__MM=()=>MM;window.__MMligado=ligado;
+
+  const pai=s=>{let x=s||'pira';for(let i=0;i<5;i++){const S=SCN[x];if(S&&S.parent&&S.parent!==x)x=S.parent;else break;}return x;};
+  const naTela=(T,s)=>{s=s||'pira';return T.sc.includes(s)||T.sc.includes(pai(s));};
+  const tela=()=>TELAS[MM.f];
+  const missao=()=>{const T=tela();return T&&T.ms[MM.j];};
+  const npc=id=>npcs.find(n=>n.id===id);
+  const itensTela=T=>ITEMS.filter(it=>naTela(T,it.scene||'pira'));
+  const conversasTela=T=>Object.keys(MM.falou).filter(id=>{const n=npc(id);return n&&!n.piada&&naTela(T,n.scene||'pira');}).length;
+  const dinheiro=v=>{v=Math.max(0,v|0);if(era>=4&&v>=1000){const m=Math.floor(v/1000),r=v%1000;return m+'$'+String(r).padStart(3,'0');}return v+' réis';};
+  const pausado=()=>{try{return !started||!!dialog||mcqOpen||isPaused()||!!document.querySelector('.ov:not([hidden])')||!ovQuiz.hidden||!ovStart.hidden||!ovDiario.hidden||(typeof ovMapa!=='undefined'&&!ovMapa.hidden)||!!sceneFade||!!ride||!!document.getElementById('pacTela')||(document.getElementById('ov')&&!document.getElementById('ov').hidden)||(document.getElementById('ovIntro')&&!document.getElementById('ovIntro').hidden)||!ovM.hidden;}catch(_){return true;}};
+
+  /* ---------- quando uma missão fica ativa: guarda o ponto de partida ---------- */
+  function ativa(){const m=missao();if(!m)return;MM.tAt=0;const T=tela();
+    MM.base={obj:itensTela(T).filter(i=>i.got).length,conv:conversasTela(T),talked:m.n&&npc(m.n)?!!npc(m.n).talked:false};grava();}
+  function feita(m){const T=tela();if(!m)return false;
+    if(m.t==='q'){const q=Q[m.k];return !!(q&&q.done);}
+    if(m.t==='qs'){const q=Q[m.k];return !!(q&&(q.done||(q.step!==null&&q.step>=m.ate)));}
+    if(m.t==='falar'){if(MM.falou[m.n])return true;const n=npc(m.n);return !!(n&&n.talked&&MM.base&&!MM.base.talked);}
+    if(m.t==='ir')return cur===m.sc||pai(cur)===m.sc;
+    if(m.t==='obj'){const tem=itensTela(T).filter(i=>i.got).length,tot=itensTela(T).length;return m.rel?(tem-(MM.base?MM.base.obj:0))>=Math.min(m.n,Math.max(1,tot-(MM.base?MM.base.obj:0))):tem>=Math.min(m.n,tot);}
+    if(m.t==='conv')return conversasTela(T)-(MM.base?MM.base.conv:0)>=m.n;
+    if(m.t==='prova')return !!MM.provas[MM.f];
+    return false;}
+  function progresso(m){const T=tela();
+    if(m.t==='obj'){const tem=itensTela(T).filter(i=>i.got).length,tot=itensTela(T).length;if(m.rel){const b=MM.base?MM.base.obj:0;return ` (${Math.max(0,tem-b)}/${Math.min(m.n,Math.max(1,tot-b))})`;}return ` (${Math.min(tem,m.n)}/${Math.min(m.n,tot)})`;}
+    if(m.t==='conv')return ` (${Math.max(0,conversasTela(T)-(MM.base?MM.base.conv:0))}/${m.n})`;
+    return '';}
+  function texto(m){
+    if(m.t==='q'||m.t==='qs'){const q=Q[m.k];if(!q)return m.txt||m.tit;
+      if(q.done)return m.tit+' ✓';      if(q.step===null&&!q.done)return m.txt0||m.txt||q.where||'';if(m.t==='qs'&&m.txt)return m.txt;try{return qText(m.k);}catch(_){return q.where||'';}}
+    return (m.txt||m.tit)+progresso(m);}
+
+  /* ---------- caixa de cima ---------- */
+  const st=document.createElement('style');st.textContent=`
+  #quest.mm{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;height:auto!important;max-width:min(60%,420px)!important;padding:5px 9px!important;line-height:1.28!important;cursor:pointer;pointer-events:auto}
+  #quest.mm::after{content:''!important}
+  #quest.mm .mmK{display:block;font-size:.72em;font-weight:700;color:#7a3a1e;letter-spacing:.02em}
+  #quest.mm .mmT{display:block;font-weight:700}
+  #quest.mm .mmS{display:block;font-size:.72em;opacity:.8;margin-top:2px}
+  #quest.mm.ok{animation:mmPisca .9s ease 2}
+  @keyframes mmPisca{50%{background:#f8e08a}}
+  #ovMM{position:fixed;inset:0;z-index:70;background:rgba(10,14,14,.72);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:max(10px,env(safe-area-inset-top)) 8px 16px}
+  #ovMM[hidden]{display:none}
+  #mmBox{background:#f3e6c8;color:#2a1a12;border:3px solid #141b1b;box-shadow:0 0 0 3px #b8864a inset,0 10px 30px rgba(0,0,0,.5);border-radius:6px;width:min(640px,100%);margin:auto 0;padding:16px 16px 14px;font-family:system-ui,-apple-system,Roboto,Arial,sans-serif}
+  #mmBox h2{margin:0 0 6px;font-size:clamp(20px,5.2vw,26px);color:#7a3a1e;line-height:1.15}
+  #mmBox .k{font-size:13px;font-weight:700;letter-spacing:.06em;color:#9a5d32;text-transform:uppercase;margin-bottom:4px}
+  #mmBox p{margin:0 0 10px;font-size:clamp(16px,4.2vw,18px);line-height:1.42}
+  #mmBox .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  #mmBox .btn{font-size:17px}
+  #mmBox ol.mmL{margin:6px 0 8px;padding-left:0;list-style:none}
+  #mmBox ol.mmL li{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:4px;margin-bottom:3px;font-size:clamp(15px,4vw,17px);line-height:1.3;background:rgba(255,255,255,.35)}
+  #mmBox ol.mmL li b{min-width:28px;text-align:center;border-radius:3px;background:#d8c49a;padding:1px 3px}
+  #mmBox ol.mmL li.ok{opacity:.65}#mmBox ol.mmL li.ok b{background:#2e6a4a;color:#fff}
+  #mmBox ol.mmL li.ag{background:#fff6d8;outline:2px solid #d9a020}#mmBox ol.mmL li.ag b{background:#d9a020;color:#2a1a12}
+  #mmBox ol.mmL li.tr{opacity:.55}
+  #mmBox .cod{display:inline-block;font:700 clamp(22px,6vw,30px)/1.1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;background:#141b1b;color:#f1c471;padding:6px 12px;border-radius:4px;margin:2px 0 8px}
+  #mmBox .pq{font-size:clamp(18px,4.8vw,22px);font-weight:700;line-height:1.3;margin:4px 0 10px}
+  #mmBox .ops{display:flex;flex-direction:column;gap:8px}
+  #mmBox .ops button{text-align:left;font:500 clamp(16px,4.3vw,18px)/1.3 system-ui,sans-serif;padding:11px 12px;border:2px solid #141b1b;border-radius:5px;background:#fffaf0;color:#2a1a12;cursor:pointer}
+  #mmBox .ops button:disabled{cursor:default}
+  #mmBox .ops button.certa{background:#d6f0dc;border-color:#2e6a4a}
+  #mmBox .ops button.errada{background:#f6d4cc;border-color:#b0553a}
+  #mmBox .bar{height:12px;border:2px solid #141b1b;border-radius:4px;overflow:hidden;background:#fffaf0;margin:6px 0 4px}
+  #mmBox .bar i{display:block;height:100%;background:linear-gradient(90deg,#2e6a4a,#d9a020 60%,#b0553a);transform-origin:left;width:100%}
+  #mmBox .topo{display:flex;justify-content:space-between;gap:8px;font-weight:700;font-size:15px;color:#5e3428}
+  #mmBox .pontos{display:flex;gap:4px;flex-wrap:wrap;margin:2px 0 6px}#mmBox .pontos span{width:16px;height:16px;border-radius:50%;border:2px solid #141b1b;background:#fffaf0}#mmBox .pontos span.f{background:#2e6a4a}#mmBox .pontos span.a{background:#d9a020}
+  .mmMapa{display:flex;flex-direction:column;gap:10px;margin:6px 0 4px}
+  .mmParte{border:2px solid #141b1b;border-radius:6px;padding:8px;background:rgba(255,255,255,.4)}
+  .mmParte h3{margin:0 0 6px;font-size:14px;letter-spacing:.04em;color:#5e3428}
+  .mmTrilha{display:flex;flex-wrap:wrap;gap:6px 4px;align-items:flex-start}
+  .mmNo{display:flex;flex-direction:column;align-items:center;width:64px;text-align:center;font-size:11.5px;line-height:1.15;color:#2a1a12;position:relative}
+  .mmNo i{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:3px solid #141b1b;background:#cfc3a8;font:700 15px/1 system-ui,sans-serif;font-style:normal;color:#5a4a3a;margin-bottom:3px}
+  .mmNo.ok i{background:#2e6a4a;color:#fff}
+  .mmNo.ag i{background:#f1c471;color:#2a1a12;animation:mmPulsa 1.1s ease-in-out infinite;box-shadow:0 0 0 0 rgba(217,160,32,.7)}
+  @keyframes mmPulsa{50%{transform:scale(1.12);box-shadow:0 0 0 6px rgba(217,160,32,0)}}
+  #modoBox{margin:6px 0 2px}#modoBox .lab{font:600 15px/1.3 Inter,system-ui,sans-serif;color:#141b1b;margin:0 0 4px}
+  #modoBox .mr{display:flex;gap:8px;flex-wrap:wrap}#modoBox button{flex:1 1 180px;text-align:left;line-height:1.25}
+  #modoBox button small{display:block;font-size:12.5px;font-weight:400;opacity:.85}
+  #modoBox button.on{outline:3px solid #d9a020;outline-offset:1px}
+  @media (max-width:560px){#quest.mm .mmS{display:none}#quest.mm{max-width:68%!important}}
+  #mmDip{width:100%;height:auto;border:2px solid #141b1b;border-radius:4px;display:block;margin:6px 0}
+  `;document.head.appendChild(st);
+
+  /* janela própria do Modo Missão */
+  const ovM=document.createElement('div');ovM.id='ovMM';ovM.hidden=true;const box=document.createElement('div');box.id='mmBox';ovM.appendChild(box);document.body.appendChild(ovM);
+  ovM.addEventListener('keydown',ev=>ev.stopPropagation());ovM.addEventListener('keyup',ev=>ev.stopPropagation());
+  let fechaCb=null;
+  const abre=()=>{ovM.hidden=false;mcqOpen=true;box.innerHTML='';ovM.scrollTop=0;return box;};
+  const fecha=()=>{ovM.hidden=true;mcqOpen=false;const cb=fechaCb;fechaCb=null;if(cb)cb();};
+  const el=(t,c,tx)=>{const e=document.createElement(t);if(c)e.className=c;if(tx!=null)e.textContent=tx;return e;};
+  const botao=(tx,fn,alt)=>{const b=el('button','btn'+(alt?' alt':''),tx);b.type='button';b.onclick=fn;return b;};
+  {const ip=isPaused;isPaused=function(){return ip()||!ovM.hidden;};}
+
+  function caixa(){const q=$('quest');if(!q)return;
+    if(!ligado()||!started){q.classList.remove('mm');return false;}
+    const T=tela(),m=missao();q.classList.add('mm');q.innerHTML='';
+    if(!T){q.hidden=true;return true;}
+    const k=el('span','mmK');k.textContent=`${ANOS[T.e]} · Tela ${T.i+1} de ${NT}: ${T.nome}`;
+    const t=el('span','mmT');const s=el('span','mmS');
+    if(MM.zerou){t.textContent='Você zerou o jogo!';s.textContent='Toque aqui para ver o diploma.';}
+    else if(m){t.textContent=`Missão ${m.num} · ${m.tit}`;const d=document.createTextNode(texto(m));
+      const tot=itensTela(T).length;const ob=tot?`Objetos desta tela: ${itensTela(T).filter(i=>i.got).length}/${tot}`:'';
+      s.textContent=[ob,T.e>=2?`Bolsa: ${dinheiro(reis)}`:'Sem dinheiro: em 1554 se troca'].filter(Boolean).join(' · ');q.append(k,t,d,s);q.hidden=false;return true;}
+    q.append(k,t,s);q.hidden=false;return true;}
+  setTimeout(function(){try{
+  {const uq=updQuest;updQuest=function(){if(ligado()&&started){try{if(caixa()!==false)return;}catch(e){console.warn('mm caixa',e);}}const q=$('quest');if(q)q.classList.remove('mm');return uq.apply(this,arguments);};}
+  {const q=$('quest');if(q)q.addEventListener('click',ev=>{if(!ligado())return;ev.stopImmediatePropagation();ev.preventDefault();if(MM.zerou)diploma();else painel();},true);}
+
+  /* ---------- a seta amarela aponta para a missão ---------- */
+  {const at=activeTarget;activeTarget=function(){if(ligado()&&started&&!MM.zerou){const m=missao();if(!m)return null;let tg=null;
+      if(m.t==='q'||m.t==='qs'){const q=Q[m.k],qt=QT[m.k];if(q&&qt){if(q.step===null&&!q.done)tg=qt.giver;else if(q.step!==null&&qt.steps)tg=qt.steps[q.step];}}
+      else if(m.t==='falar'||m.t==='prova')tg='n:'+m.n;
+      else if(m.t==='ir')tg=m.alvo||null;
+      if(!tg)return null;try{return resolveTarget(tg);}catch(_){return null;}}
+    return at.apply(this,arguments);};}
+
+  /* ---------- conversas: anota quem já falou; a pessoa da prova abre a prova ---------- */
+  {const tt=talkTo;talkTo=function(n){
+    try{if(ligado()&&n&&!MM.zerou){const m=missao();if(m&&m.t==='prova'&&n.id===m.n){convidaProva(n);return;}}}catch(e){console.warn('mm prova',e);}
+    const r=tt.apply(this,arguments);try{if(MM&&n&&n.id){MM.falou[n.id]=1;grava();}}catch(_){}return r;};}
+
+  /* ---------- o portal comum fica fechado no Modo Missão ---------- */
+  const fechado=()=>say('Portal',['No Modo Missão, o portal só abre quando você passa na prova da última tela desta época.','Toque na caixa de missão, lá em cima, para ver o que falta.'],null,'player');
+  {const w=(f)=>function(){if(ligado()&&!MM.allow){fechado();return;}return f.apply(this,arguments);};
+   startEra2=w(startEra2);startEra3=w(startEra3);startEra4=w(startEra4);}
+
+  }catch(e){console.warn('mm ganchos',e);}},2500);
+
+  /* ---------- painel com a lista da tela ---------- */
+  function painel(){const T=tela();if(!T)return;const b=abre();
+    b.append(el('div','k',`${PARTE[T.e]} · Tela ${T.i+1} de ${NT}`),el('h2',null,T.nome));
+    const ol=el('ol','mmL');T.ms.forEach((m,j)=>{const li=el('li',j<MM.j?'ok':j===MM.j?'ag':'tr');const n=el('b',null,j<MM.j?'✓':String(m.num));
+      const tx=el('span');tx.textContent=j===MM.j?`${m.tit}: ${texto(m)}`:j<MM.j?m.tit:(m.t==='prova'?m.tit+' (abre no fim)':m.tit);li.append(n,tx);ol.appendChild(li);});
+    b.appendChild(ol);
+    b.appendChild(el('p',null,'Código desta tela (anote no caderno para começar daqui em outro dia ou aparelho):'));b.appendChild(el('div','cod',T.code));
+    const row=el('div','row');row.append(botao('Continuar',fecha),botao('Mapa da viagem',()=>{fecha();mapaViagem(false);},true));
+    if(MM.tAt>600&&missao()&&missao().t!=='prova'){row.appendChild(botao('Pular esta missão',()=>{concluiMissao(true);fecha();},true));}
+    b.appendChild(row);}
+
+  /* ---------- mapa da viagem ---------- */
+  function mapaViagem(passou,onGo){const b=abre();
+    b.append(el('div','k','Modo Missão'),el('h2',null,passou?'Você passou de fase!':'Mapa da viagem'));
+    if(passou){const T=TELAS[MM.f];if(T)b.appendChild(el('p',null,`Agora você vai para a Tela ${T.i+1}: ${T.nome} (${ANOS[T.e]}).`));}
+    const mp=el('div','mmMapa');
+    for(const e of [1,2,3,4]){const p=el('div','mmParte');p.appendChild(el('h3',null,`${PARTE[e]} (${ANOS[e]})`));const tr=el('div','mmTrilha');
+      TELAS.filter(t=>t.e===e).forEach(t=>{const ok=t.i<MM.f||MM.zerou,ag=t.i===MM.f&&!MM.zerou;const no=el('div','mmNo'+(ok?' ok':ag?' ag':''));const c=el('i',null,ok?'✓':String(t.i+1));no.append(c,document.createTextNode(t.nome));tr.appendChild(no);});
+      p.appendChild(tr);mp.appendChild(p);}
+    b.appendChild(mp);
+    if(passou&&TELAS[MM.f]){b.appendChild(el('p',null,'Código da nova tela (anote no caderno!):'));b.appendChild(el('div','cod',TELAS[MM.f].code));}
+    const row=el('div','row');row.appendChild(botao(passou?`Seguir para a Tela ${MM.f+1}`:'Fechar',()=>{fecha();if(onGo)onGo();}));b.appendChild(row);}
+
+  /* ---------- a prova ---------- */
+  function banco(T){const ids=new Set(),out=[],vistas=new Set();
+    const add=(q,o,a,ex,pri)=>{if(!q||!Array.isArray(o)||o.length<2||vistas.has(q))return;vistas.add(q);out.push({q,o,a:a|0,ex:ex||'',pri});};
+    /* 1. o que as pessoas desta tela ensinaram nas conversas (primeiro quem já conversou com você) */
+    const gente=npcs.filter(n=>!n.piada&&naTela(T,n.scene||'pira'));
+    for(const n of gente){const C=typeof CHECK!=='undefined'&&CHECK[n.id];if(C)add(C[0],C[1],C[2],'',(MM.falou[n.id]||n.talked)?3:1);}
+    for(const m of T.ms)if((m.t==='falar'||m.t==='prova')&&typeof CHECK!=='undefined'&&CHECK[m.n]){const C=CHECK[m.n];add(C[0],C[1],C[2],'',3);}
+    /* 2. as perguntas das missões desta tela */
+    for(const m of T.ms)if(m.t==='q'||m.t==='qs'){try{const E=ENT.find(x=>x.k===m.k&&x.mc);if(E)add(E.mc[0],E.mc[1],E.mc[2],E.mc[3],3);}catch(_){}}
+    /* 3. perguntas feitas para esta tela */
+    for(const [id,q,o] of (T.extra||[]))add(q,o,0,'',(MM.falou[id]||(npc(id)&&npc(id).talked))?3:2);
+    /* 4. se faltar, perguntas gerais da época */
+    if(out.length<14){try{const arr=T.e===1?quiz:T.e===2?quiz2:T.e===3?quiz3:quiz4;for(const x of arr)add(x.q,x.o,x.a,x.e,0);}catch(_){}}
+    if(out.length<10){for(const n of npcs){if(eraOf(n.scene||'pira')!==T.e||n.piada)continue;const C=typeof CHECK!=='undefined'&&CHECK[n.id];if(C&&(MM.falou[n.id]||n.talked))add(C[0],C[1],C[2],'',0);}}
+    return out;}
+  if(location.hash==='#teste')window.__MMbanco=i=>{if(!MM)MM=novo(0);return banco(TELAS[i]).map(b=>b.pri+'|'+b.q);};
+  function sorteia(T){const B=banco(T);B.forEach(b=>b.r=b.pri*10+Math.random()*12);B.sort((x,y)=>y.r-x.r);return B.slice(0,10).sort(()=>Math.random()-.5);}
+
+  function convidaProva(n){const T=tela();
+    say(n.name,[`Você cumpriu todas as missões da tela “${T.nome}”. Agora é a prova!`,`São 10 perguntas sobre o que você viu e ouviu aqui. Para passar, não pode errar nenhuma. Você tem ${SEG} segundos para cada uma.`,'Se errar, não tem problema: é só tentar de novo. As perguntas mudam de lugar.'],
+      ()=>askChoice('A prova de '+T.nome,'Pronto para as 10 perguntas?',['Começar a prova','Ainda não: quero conversar mais'],i=>{if(i===0)prova();}),n.id);}
+
+  let timer=0;
+  function prova(){const T=tela();const qs=sorteia(T);let i=0;const tot=qs.length;
+    const tela1=()=>{const b=abre();const q=qs[i];
+      const topo=el('div','topo');topo.append(el('span',null,`Prova · ${T.nome}`),el('span',null,`Pergunta ${i+1} de ${tot}`));
+      const pts=el('div','pontos');for(let k=0;k<tot;k++)pts.appendChild(el('span',k<i?'f':k===i?'a':''));
+      const bar=el('div','bar');const bi=el('i');bar.appendChild(bi);const seg=el('div','topo');const sTx=el('span',null,'');seg.append(el('span',null,'Cronômetro'),sTx);
+      const h=el('div','pq',q.q);const ops=el('div','ops');
+      const ord=q.o.map((t,j)=>[t,j]).sort(()=>Math.random()-.5);let resp=false;const t0=performance.now();if(location.hash==='#teste')window.__mmResp=q.o[q.a];
+      const fim=(ok,btn)=>{if(resp)return;resp=true;clearInterval(timer);[...ops.children].forEach((c,n)=>{c.disabled=true;if(ord[n][1]===q.a)c.classList.add('certa');});if(btn&&!ok)btn.classList.add('errada');
+        try{sfx(ok?'blip':'bump');}catch(_){}
+        setTimeout(()=>{if(ok){i++;if(i>=tot)passou();else tela1();}else errou(q,btn?'':'O tempo acabou!');},ok?650:1200);};
+      ord.forEach(([t,j])=>{const bt=el('button',null,t);bt.type='button';bt.onclick=()=>fim(j===q.a,bt);ops.appendChild(bt);});
+      b.append(topo,pts,seg,bar,h,ops);
+      clearInterval(timer);timer=setInterval(()=>{const r=Math.max(0,SEG-(performance.now()-t0)/1000);bi.style.width=(100*r/SEG)+'%';sTx.textContent=Math.ceil(r)+' s';if(r<=0)fim(false,null);},100);};
+    const errou=(q,msg)=>{const b=abre();b.append(el('div','k','Prova · '+T.nome),el('h2',null,msg||'Quase!'));
+      b.appendChild(el('p',null,`Você acertou ${i} de ${tot}. Na prova não pode errar nenhuma.`));
+      const p=el('p');p.append(document.createTextNode('A resposta certa era: '));const bb=el('b',null,q.o[q.a]);p.appendChild(bb);b.appendChild(p);
+      if(q.ex)b.appendChild(el('p',null,q.ex));
+      b.appendChild(el('p',null,'Dica: as respostas estão nas conversas desta tela. Se quiser, converse de novo com as pessoas e depois volte.'));
+      const row=el('div','row');row.append(botao('Tentar de novo agora',()=>prova()),botao('Voltar ao jogo',fecha,true));b.appendChild(row);};
+    const passou=()=>{clearInterval(timer);MM.provas[MM.f]=1;grava();const b=abre();
+      b.append(el('div','k','Prova · '+T.nome),el('h2',null,'10 de 10! Você passou!'));
+      b.appendChild(el('div','pontos'));for(let k=0;k<tot;k++)b.lastChild.appendChild(el('span','f'));
+      if(T.e>=2&&PAGA_PROVA[T.e]){reis+=PAGA_PROVA[T.e];try{updClockHUD();}catch(_){}b.appendChild(el('p',null,`Prêmio: ${dinheiro(PAGA_PROVA[T.e])} para a sua bolsa.`));}
+      try{addDiary('Missão',`Modo Missão: você passou na prova da tela “${T.nome}” (${ANOS[T.e]}).`);}catch(_){}
+      const row=el('div','row');row.appendChild(botao('Continuar',()=>{fecha();proximaTela();}));b.appendChild(row);};
+    tela1();}
+
+  /* ---------- concluir missão / tela ---------- */
+  function concluiMissao(pulou){const T=tela(),m=missao();if(!m)return;MM.feitas[m.num]=pulou?2:1;
+    if(T.e>=2&&PAGA[T.e]&&m.t!=='prova'&&!pulou){reis+=PAGA[T.e];try{updClockHUD();}catch(_){}}
+    MM.j++;grava();
+    const q=$('quest');if(q){q.classList.remove('ok');void q.offsetWidth;q.classList.add('ok');}
+    try{sfx('blip');}catch(_){}
+    const prox=missao();
+    if(m.t!=='prova'){const pago=T.e>=2&&PAGA[T.e]&&!pulou?` +${dinheiro(PAGA[T.e])}`:'';
+      toast(`Missão ${m.num} concluída!${pago}`+(prox?(prox.t==='prova'?' A prova abriu!':''):''));}
+    ativa();try{updQuest();}catch(_){}
+    if(prox&&prox.t==='prova')setTimeout(()=>{if(ligado()&&missao()===prox&&!pausado())say('',[`Você fez todas as missões da tela “${T.nome}”!`,'Agora abriu a última: '+prox.txt],null,'player');},1800);}
+  function proximaTela(){const T=tela();const ultima=T.i===NT-1;
+    if(ultima){MM.zerou=true;MM.f=NT;grava();try{updQuest();}catch(_){}diploma();return;}
+    const mudaEra=TELAS[T.i+1].e!==T.e;MM.f=T.i+1;MM.j=0;MM.mapa=false;grava();ativa();
+    mapaViagem(true,()=>{if(mudaEra){MM.allow=true;grava();const go={2:startEra2,3:startEra3,4:startEra4}[TELAS[MM.f].e];try{go();}catch(e){console.warn('mm portal',e);MM.allow=false;grava();}}
+      else{try{updQuest();}catch(_){}abreTela();}});}
+  function abreTela(){const T=tela();if(!T)return;MM.visto[T.i]=1;grava();
+    const b=abre();b.append(el('div','k',`${PARTE[T.e]} · Modo Missão`),el('h2',null,`Tela ${T.i+1} de ${NT}: ${T.nome}`));
+    b.appendChild(el('p',null,`Nesta tela há ${T.ms.length} missões. Elas aparecem uma de cada vez na caixa lá em cima. A seta amarela mostra o caminho. A última é a prova: 10 perguntas, sem errar, com cronômetro.`));
+    const ol=el('ol','mmL');T.ms.forEach((m,j)=>{const li=el('li',j===MM.j?'ag':j<MM.j?'ok':'');li.append(el('b',null,j<MM.j?'✓':String(m.num)),el('span',null,m.tit+(m.t==='prova'?' (abre no fim)':'')));ol.appendChild(li);});b.appendChild(ol);
+    b.appendChild(el('p',null,'Código desta tela:'));b.appendChild(el('div','cod',T.code));
+    const row=el('div','row');row.appendChild(botao('Vamos lá!',fecha));b.appendChild(row);}
+
+  /* ---------- diploma ---------- */
+  function desenhaDip(cv,nome){const g=cv.getContext('2d');const W=cv.width,H=cv.height;
+    g.fillStyle='#f6ecd2';g.fillRect(0,0,W,H);
+    const gr=g.createRadialGradient(W/2,H/2,H*.2,W/2,H/2,W*.7);gr.addColorStop(0,'rgba(255,255,255,.35)');gr.addColorStop(1,'rgba(150,110,60,.25)');g.fillStyle=gr;g.fillRect(0,0,W,H);
+    g.strokeStyle='#7a3a1e';g.lineWidth=14;g.strokeRect(22,22,W-44,H-44);g.strokeStyle='#c98a4b';g.lineWidth=4;g.strokeRect(44,44,W-88,H-88);
+    for(const [x,y] of [[44,44],[W-44,44],[44,H-44],[W-44,H-44]]){g.fillStyle='#7a3a1e';g.beginPath();g.arc(x,y,14,0,Math.PI*2);g.fill();g.fillStyle='#f1c471';g.beginPath();g.arc(x,y,7,0,Math.PI*2);g.fill();}
+    g.textAlign='center';g.fillStyle='#7a3a1e';g.font='700 26px Georgia,serif';g.fillText('PIRATININGA · O JOGO DA HISTÓRIA DE SÃO PAULO',W/2,110);
+    g.fillStyle='#2a1a12';g.font='700 66px Georgia,serif';g.fillText('Diploma de Viajante do Tempo',W/2,190);
+    g.font='26px Georgia,serif';g.fillStyle='#3a2418';g.fillText('Certificamos que',W/2,255);
+    g.font='italic 700 64px Georgia,serif';g.fillStyle='#7a3a1e';g.fillText(nome||'Viajante do Tempo',W/2,330);
+    g.strokeStyle='#c98a4b';g.lineWidth=2;g.beginPath();g.moveTo(W/2-300,348);g.lineTo(W/2+300,348);g.stroke();
+    g.font='26px Georgia,serif';g.fillStyle='#3a2418';
+    g.fillText(`atravessou 368 anos da história de São Paulo, de 1554 a 1922,`,W/2,395);
+    g.fillText(`cumpriu as ${NMIS-NT} missões e passou, sem errar, nas ${NT} provas do jogo.`,W/2,433);
+    g.font='700 40px Georgia,serif';g.fillStyle='#2e5a3a';g.fillText('Você agora é um verdadeiro paulistano da gema!',W/2,505);
+    g.save();g.translate(W/2+250,560);g.rotate(-.05);g.font='italic 700 27px "Comic Sans MS","Segoe Print",cursive';g.fillStyle='#b0302a';g.fillText('OPS... “da gema”? Isso não é do Rio de Janeiro?',-120,0);g.restore();
+    /* selo */
+    g.save();g.translate(190,H-170);g.fillStyle='#b0302a';g.beginPath();for(let k=0;k<24;k++){const a=k/24*Math.PI*2,r=k%2?58:70;g.lineTo(Math.cos(a)*r,Math.sin(a)*r);}g.closePath();g.fill();
+    g.fillStyle='#f1c471';g.beginPath();g.arc(0,0,46,0,Math.PI*2);g.fill();g.fillStyle='#7a3a1e';g.font='700 16px Georgia,serif';g.fillText('1554',0,-10);g.font='700 22px Georgia,serif';g.fillText('➜',0,12);g.font='700 16px Georgia,serif';g.fillText('1922',0,32);g.restore();
+    /* assinatura */
+    g.font='italic 46px "Brush Script MT","Segoe Script","Lucida Handwriting",cursive';g.fillStyle='#1d2a5a';g.fillText('José Guilherme Zago',W-330,H-150);
+    g.strokeStyle='#2a1a12';g.lineWidth=2;g.beginPath();g.moveTo(W-520,H-132);g.lineTo(W-140,H-132);g.stroke();
+    g.font='20px Georgia,serif';g.fillStyle='#3a2418';g.fillText('Prof. José Guilherme Zago',W-330,H-104);g.font='16px Georgia,serif';g.fillText('autor do jogo Piratininga',W-330,H-80);
+    const d=new Date();g.font='18px Georgia,serif';g.fillText('São Paulo, '+d.toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'}),W/2,H-80);}
+  function diploma(){const b=abre();b.append(el('div','k','Modo Missão · fim de jogo'),el('h2',null,'Você zerou o jogo!'));
+    b.appendChild(el('p',null,'Você viajou de 1554 a 1922 e passou em todas as provas. Aqui está o seu diploma, assinado pelo professor.'));
+    let nome='';try{nome=(window.__nomeViajante&&window.__nomeViajante())||'';}catch(_){}
+    const lab=el('p',null,'Nome no diploma (apelido ou primeiro nome):');const inp=el('input');inp.type='text';inp.maxLength=24;inp.value=nome;inp.style.cssText='font:600 18px system-ui,sans-serif;padding:8px 10px;border:2px solid #8a6a3a;border-radius:4px;width:min(320px,100%)';
+    const cv=el('canvas');cv.id='mmDip';cv.width=1400;cv.height=990;
+    const re=()=>desenhaDip(cv,inp.value.trim());inp.addEventListener('input',re);inp.addEventListener('keydown',ev=>ev.stopPropagation());
+    b.append(lab,inp,cv);re();
+    const row=el('div','row');
+    row.appendChild(botao('Baixar o diploma',()=>{try{const a=document.createElement('a');a.download='diploma-piratininga.png';a.href=cv.toDataURL('image/png');document.body.appendChild(a);a.click();a.remove();}catch(e){toast('Não deu para baixar aqui. Tire um print da tela!');}}));
+    row.appendChild(botao('Imprimir',()=>{try{const w=window.open('');w.document.write('<title>Diploma</title><img src="'+cv.toDataURL('image/png')+'" style="width:100%" onload="print()">');w.document.close();}catch(_){toast('Não deu para imprimir aqui. Baixe o diploma.');}},true));
+    row.appendChild(botao('Passear no Modo livre',()=>{modo='livre';try{localStorage.setItem(KMODO,'livre');}catch(_){}fecha();try{updQuest();}catch(_){}toast('Modo livre: passeie à vontade!');},true));
+    row.appendChild(botao('Fechar',fecha,true));b.appendChild(row);}
+  window.__MMdiploma=diploma;
+
+  /* ---------- tela inicial: escolher o modo ---------- */
+  function poeModo(){try{if(document.getElementById('modoBox'))return true;const card=ovStart.querySelector('.card');if(!card)return false;
+    const alvo=[...card.querySelectorAll('p,div,label,h3,b,strong')].find(e=>/Escolha a parte da viagem/.test(e.textContent)&&e.children.length===0)||card.querySelector('.row');if(!alvo)return false;
+    const mb=el('div');mb.id='modoBox';mb.appendChild(el('p','lab','Escolha o modo de jogo:'));const mr=el('div','mr');
+    const bM=el('button','btn');bM.type='button';bM.innerHTML='🎯 Modo Missão<small>Zere cada tela: missões, prova e diploma no fim</small>';
+    const bL=el('button','btn alt');bL.type='button';bL.innerHTML='🗺️ Modo livre<small>Passeie pela cidade como quiser</small>';
+    const marca=()=>{bM.classList.toggle('on',modo==='missao');bL.classList.toggle('on',modo==='livre');bM.classList.toggle('alt',modo!=='missao');bL.classList.toggle('alt',modo!=='livre');};
+    bM.onclick=()=>{modo='missao';try{localStorage.setItem(KMODO,modo);}catch(_){}marca();};bL.onclick=()=>{modo='livre';try{localStorage.setItem(KMODO,modo);}catch(_){}marca();};
+    mr.append(bM,bL);mb.appendChild(mr);marca();alvo.parentElement.insertBefore(mb,alvo);return true;}catch(e){console.warn('mm modo',e);return true;}}
+  if(!poeModo()){let n=0;const iv=setInterval(()=>{if(poeModo()||++n>40)clearInterval(iv);},250);}
+
+  /* começar uma parte no Modo Missão: começa na primeira tela daquela época */
+  const BTE={btnStart:1,btn1830:2,btn1888:3,btn1922:4};
+  document.addEventListener('click',ev=>{const b=ev.target&&ev.target.closest&&ev.target.closest('#btnStart,#btn1830,#btn1888,#btn1922');if(!b)return;
+    if(modo!=='missao'){if(MM){MM.on=false;grava();}return;}
+    const e=BTE[b.id];if(MM&&MM.jump&&TELAS[MM.f]&&TELAS[MM.f].e===e)return;
+    if(MM&&MM.stamp&&Date.now()-MM.stamp<120000&&TELAS[MM.f]&&TELAS[MM.f].e===e&&MM.j===0)return;
+    MM=novo(TELAS.findIndex(t=>t.e===e));MM.stamp=Date.now();grava();},true);
+  document.addEventListener('click',ev=>{const b=ev.target&&ev.target.closest&&ev.target.closest('#btnCont');if(!b)return;
+    if(modo!=='missao'){if(MM){MM.on=false;grava();}return;}
+    if(!MM)MM=novo(-1);MM.on=true;grava();},true);
+
+  /* códigos das telas, na mesma caixa do "Tenho um código" */
+  const limpa=s=>String(s||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9]/g,'');
+  function tentaCodigo(v){const c=limpa(v);if(!c)return false;const T=TELAS.find(t=>limpa(t.code)===c);if(!T)return false;
+    modo='missao';try{localStorage.setItem(KMODO,modo);}catch(_){}
+    MM=novo(T.i);MM.jump=true;MM.stamp=Date.now();grava();
+    const msg=document.getElementById('codMsg');if(msg)msg.textContent=`Código da Tela ${T.i+1}: ${T.nome}. Vamos lá!`;
+    const id={1:'btnStart',2:'btn1830',3:'btn1888',4:'btn1922'}[T.e];setTimeout(()=>{const b=$(id);if(b)b.click();},300);return true;}
+  window.__MMcodigo=tentaCodigo;
+  {let n=0;const iv=setInterval(()=>{const cr=document.getElementById('codRow'),ok=document.getElementById('codOk'),inp=document.getElementById('codIn');if(!cr||!ok||!inp){if(++n>60)clearInterval(iv);return;}clearInterval(iv);
+    inp.maxLength=20;inp.placeholder='XXXX-XXXX-XXX ou PALAVRA-00';
+    cr.addEventListener('click',ev=>{if(ev.target===ok&&tentaCodigo(inp.value)){ev.stopImmediatePropagation();ev.preventDefault();}},true);
+    cr.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target===inp&&tentaCodigo(inp.value)){ev.stopImmediatePropagation();ev.preventDefault();}},true);},250);}
+
+  /* ---------- o vigia: a cada meio segundo confere a missão ---------- */
+  let ultimo=0;
+  setInterval(()=>{try{
+    if(!MM)return;
+    if(!ligado()){const q=$('quest');if(q&&q.classList.contains('mm')){q.classList.remove('mm');try{updQuest();}catch(_){}}return;}
+    if(!started)return;
+    if(MM.zerou){caixa();return;}
+    /* começou por "Continuar" sem tela marcada: começa na primeira tela da época */
+    if(MM.f<0||!TELAS[MM.f]){MM.f=TELAS.findIndex(t=>t.e===era);MM.j=0;grava();ativa();}
+    const T=tela();
+    /* chegou na época certa depois do portal */
+    if(MM.allow&&era===T.e){MM.allow=false;grava();}
+    if(portal&&!MM.allow)portal=null;
+    if(era!==T.e){caixa();return;}
+    /* veio de um código: leva para o começo da tela */
+    if(MM.jump){if(pausado())return;MM.jump=false;grava();
+      if(T.ini){const [sc,id]=T.ini;const n=npc(id);let p=null;try{p=n&&(n.scene||'pira')===sc?findFree(sc,n.x,n.y+1,5):null;}catch(_){}
+        if(!p&&sc==='serra')p=[18,1];if(!p){try{p=findFree(sc,Math.floor(SCN[sc].map[0].length/2),Math.floor(SCN[sc].map.length/2),20);}catch(_){}}
+        if(T.i===3&&Q.viagemAcucar&&!Q.viagemAcucar.done&&(Q.viagemAcucar.step===null||Q.viagemAcucar.step<2)){Q.viagemAcucar.step=2;Q.viagemAcucar.count=0;}
+        if(p&&SCN[sc]){goScene(sc,p[0],p[1],'down',()=>{ativa();abreTela();});return;}}
+      ativa();abreTela();return;}
+    if(!MM.base)ativa();
+    if(!MM.visto[T.i]&&!pausado()){abreTela();return;}
+    if(!pausado())MM.tAt+=.5;
+    const m=missao();
+    if(m&&m.t!=='prova'&&feita(m)&&!pausado()){concluiMissao(false);return;}
+    const agora=performance.now();if(agora-ultimo>1500){ultimo=agora;caixa();if(MM.tAt%30<.6)grava();}
+  }catch(e){console.warn('mm vigia',e);}},500);
+}catch(e){console.warn('modo missão',e);}})();
+
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
