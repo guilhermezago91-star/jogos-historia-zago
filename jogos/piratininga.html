@@ -371,7 +371,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cf25be29","kb":281,"m":2},{"f":"pac_e23.js?v=0a1eee97","kb":425,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=f4ea5e07","kb":1592,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=f39b8c3d","kb":7162,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cf25be29","kb":281,"m":2},{"f":"pac_e23.js?v=0a1eee97","kb":425,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=f4ea5e07","kb":1592,"m":4},{"f":"pac_e34.js?v=909f6bf6","kb":1031,"m":12},{"f":"pac_e4.js?v=2f8d21d3","kb":7424,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -21287,7 +21287,7 @@ report.applied=true;
 window.__paulista82Ready=Promise.all(ready);
 })();
 /* =========================================================
-   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v242) (pedido do professor, 19/11/2026)
+   v130 — CENTRO DE 1922 REFEITO EM VOLTA DA SÉ E DA PRAÇA JOÃO MENDES (atualizado na v245) (pedido do professor, 19/11/2026)
    Só nesta quadra do centro ampliado de 1922 (cena m_centro22). O resto do centro fica como está.
    1) Fachadas no TAMANHO CHEIO do desenho (o dobro de antes), sem esticar: o sobrado deixa de parecer casinha de boneca.
    2) Telhado só como faixa curta atrás da fachada (cenário).
@@ -22247,6 +22247,108 @@ window.__paulista82Ready=Promise.all(ready);
           const B=cr.y+(cr.h||1);for(const c of [[cr.x-1,B],[cr.x+(cr.w||1),B],[cr.x-1,B+1],[cr.x+(cr.w||1),B+1]]){if(M[c[1]]&&/[pD]/.test(M[c[1]][c[0]]||'')&&!ocp(c[0],c[1])&&!porta(c[0],c[1])){p=c;break;}}}
         if(p){FONTES.fotoProg22.xy=p;objects.push({id:'fotoProg22',scene:S,x:p[0],y:p[1],w:1,h:1,draw:drawSign,name:'Fonte histórica',text:['Uma fonte histórica. Aperte A para ver.']});rel.fotoProg=p;}}
     }catch(e){console.warn('programacao 1922 JM',e);}
+    /* ===== v245 — CENTRO DE 1922: TRÂNSITO E OBJETOS — bicicletas, carroças e caminhões passando pelas ruas do centro, e mais 18 objetos da época para achar, cada um perto do lugar a que pertence (pedido do professor, 21/11/2026) ===== */
+    try{if(typeof addWalkers==='function'&&!walkers.some(w=>w.id==='jmv_bike0')){
+      const runs=[];for(let y=0;y<M.length;y++){let x=0;while(x<M[0].length){if(M[y][x]==='D'){const a0=x;while(x<M[0].length&&M[y][x]==='D')x++;if(x-a0>=12&&!objects.some(o=>o.scene===S&&o.y<=y&&o.y+(o.h||1)>y&&o.x<x&&o.x+(o.w||1)>a0&&(o.w||1)*(o.h||1)>1))runs.push({y,a:a0,b:x-1});}else x++;}}
+      const usados=new Set();const toma=(f,i)=>{const c=runs.filter(r=>f(r)&&!usados.has(r.y));if(!c.length)return null;const r=c[(i*7)%c.length];usados.add(r.y);usados.add(r.y-1);usados.add(r.y+1);return r;};
+      const out=[];const oeste=r=>r.a<66,meio=r=>r.a>=50&&r.a<128,leste=r=>r.b>=100;
+      [['crianca',1,"Entrego remédio da farmácia de bicicleta. Gorjeta, doutor?",meio],['caixeiro',1,"Entregas da Mappin! Os fregueses ricos não carregam pacote.",meio],['crianca',1,"Telegrama! Sou mensageiro dos Correios, corro a cidade inteira.",oeste],['tipografo',0,"Vou de bicicleta para a oficina do jornal: economizo os 200 réis do bonde.",leste],['colono',0,"Bicicleta é coisa nova. Ainda tem gente que acha perigoso andar no meio dos bondes.",oeste],['caixeiro',1,"Levo encomenda das lojas da 25 de Março para a freguesia dos bairros.",leste]].forEach(([sp,ce,l,f],i)=>{const r=toma(f,i);if(r)out.push({id:'jmv_bike'+i,spr:'bike',rider:sp,cesta:!!ce,name:'Ciclista',path:[[r.a,r.y],[r.b,r.y]],speed:2.6,lines:[l]});});
+      [['leite','Carroça de leite',"Leite em latão, de porta em porta. A prefeitura agora quer leite fervido, por causa das doenças.",meio],['pao','Carroça do padeiro',"Pão quentinho! A freguesia deixa a sacola pendurada na janela.",oeste],['lenha','Carroça de lenha',"Lenha para o fogão. Gás e luz elétrica na cozinha são para quem pode pagar.",leste],['leite','Carroça de leite',"No centro o burro tem de dividir a rua com o bonde e o automóvel. Haja paciência!",leste],['pao','Carroça do padeiro',"Sou italiano, como quase todo padeiro desta cidade.",meio]].forEach(([c,n,l,f],i)=>{const r=toma(f,i+3);if(r)out.push({id:'jmv_carroca'+i,spr:'carrocacafe',carga:c,name:n,path:[[r.a,r.y],[r.b,r.y]],speed:.9,lines:[l]});});
+      [["Entrega da fábrica: tecido para as lojas da 25 de Março.",leste],["Caminhão Ford do moinho: farinha para as padarias do centro.",meio],["Garrafas de cerveja e guaraná para os botequins e cafés.",oeste],["Sacas de café da estação para os armazéns e corretores.",meio]].forEach(([l,f],i)=>{const r=toma(f,i+5);if(r)out.push({id:'jmv_truck'+i,spr:'auto',truck:true,cor:'preto',name:'Caminhão de entrega',path:[[r.a,r.y],[r.b,r.y]],speed:2.4,lines:[l]});});
+      addWalkers(S,out);rel.veiculos=out.length;}
+    }catch(e){console.warn('veiculos centro JM',e);}
+    try{if(typeof ITEMS!=='undefined'&&!ITEMS.some(i=>i.id==='jm22_bola')){
+      const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
+      const porta=(x,y)=>objects.some(o=>o.scene===S&&o.enter&&Math.abs(x-(o.x+(o.door!=null?o.door:((o.w||1)>>1))))<=1&&y>=o.y+(o.h||1)&&y<=o.y+(o.h||1)+1);
+      const bloq=(x,y)=>objects.some(o=>o.scene===S&&!o.enter&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||objects.some(o=>o.scene===S&&o.enter&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+      const perto=(re,dx)=>{const o=objects.find(q=>q.scene===S&&o0(q)&&re.test(q.name||''));if(!o)return null;const sx=o.x+(o.door!=null?o.door:((o.w||1)>>1)),sy=o.y+(o.h||1);
+        const seen=new Set([sx+','+sy]),Q=[[sx,sy,0]];let best=null;
+        while(Q.length){const [x,y,d]=Q.shift();if(d>14)break;
+          if(d>=2&&x>=2&&x<=M[0].length-3&&!ocp(x,y)&&!porta(x,y)){if(M[y][x]==='p'){if(!dx||Math.sign(x-sx)===Math.sign(dx))return [x,y];if(!best||best.ch!=='p')best=Object.assign([x,y],{ch:'p'});}else if(M[y][x]==='D'&&!best&&d>=3)best=Object.assign([x,y],{ch:'D'});}
+          for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=x+a,Y=y+b,k=X+','+Y;if(seen.has(k)||!M[Y]||!/[pDdeSR.,f]/.test(M[Y][X]||'')||bloq(X,Y))continue;seen.add(k);Q.push([X,Y,d+1]);}}
+        return best?[best[0],best[1]]:null;};
+      const o0=q=>true;
+      const L=[['bola',56,/Mosteiro de S/,4,'Bola de futebol','Uma bola de couro costurado, com câmara de ar. Em 1922 o futebol enche os campos de várzea e os estádios dos clubes: Paulistano, Corinthians, Palestra Italia.'],
+        ['medalha',55,/Pal[áa]cio do Governo/,0,'Medalha do Centenário','“1822–1922”. Medalha do Centenário da Independência, festejado em 7 de setembro com desfiles, enfeites nas ruas e a inauguração do monumento do Ipiranga.'],
+        ['disco',54,/discos e gramofones/,0,'Disco de gramofone','Um disco de 78 rotações. Toca sambas, tangos, óperas e foxtrotes americanos no gramofone de corda, sem eletricidade.'],
+        ['filme',59,/^Cine Rep/,2,'Rolo de filme','Um rolo de filme mudo. Na sala, um pianista toca enquanto as letras aparecem na tela. O som no cinema só chega no fim da década.'],
+        ['lampada',53,/Casa Martinico/,0,'Lâmpada elétrica','Uma lâmpada da Light, a companhia canadense que fornece luz elétrica e faz andar os bondes de São Paulo.'],
+        ['telegrama',42,/Pal[áa]cio dos Correios/,0,'Telegrama','“Chego sábado trem Santos stop”. Telegrama se paga por palavra, por isso se escreve curto, sem artigo.'],
+        ['milreis',45,/^Banco/,0,'Nota de mil-réis','Uma nota de mil-réis (1$000). Dá para cinco passagens de bonde, de 200 réis cada uma.'],
+        ['foto',44,/Fot[óo]grafo/,0,'Fotografia de estúdio','Retrato de família tirado em estúdio, com roupa de domingo e fundo pintado. Muita foto assim ia por carta para os parentes do outro lado do mar.'],
+        ['carretel',63,/Tawfiq Qasma/,0,'Carretel de linha','Linha de armarinho, vendida às dúzias para os mascates, que a revendem de porta em porta nos bairros.'],
+        ['tesoura',33,/^Alfaiat/,0,'Tesoura de alfaiate','Tesoura grande de alfaiate. Terno feito sob medida ainda é o comum; roupa pronta, de loja, está começando.'],
+        ['cafe',40,/Corretores de caf/,0,'Grãos de café','Café de exportação. É ele que paga os palacetes, os bancos e os prédios novos do centro.'],
+        ['tinteiro',20,/Faculdade de Direito/,0,'Pena e tinteiro','Pena de aço e tinteiro de estudante de Direito. A Faculdade do Largo de São Francisco forma advogados, juízes e políticos.'],
+        ['marmita',52,/^Mercado Velho/,-3,'Marmita de operário','Marmita de folha, com feijão, arroz e um pedaço de carne quando dá. Almoço frio, comido na porta da fábrica ou da obra.'],
+        ['carta',57,/P[áa]tio do Col[ée]gio/,0,'Carta de chamada','“Venha, aqui tem trabalho.” Carta de um imigrante chamando o irmão que ficou na Itália, em Portugal ou na Síria.'],
+        ['trem',41,/Hotel d.Oeste/,0,'Bilhete de trem','Bilhete da São Paulo Railway, a “Inglesa”: sobe a serra de Santos com o café e desce com os imigrantes.'],
+        ['jornal',19,/Estado de S/,0,'Jornal do dia','O Estado de S. Paulo do dia: telegramas do mundo, preço do café, programa dos cinemas e anúncios de remédio.'],
+        ['caneca',31,/Ponto Chic/,0,'Xícara de café','Um cafezinho de balcão. Nos cafés do centro se fecha negócio, se discute política e se espera o bonde.'],
+        ['ferro',64,/Casa de porta e janela/,0,'Ferro de passar','Ferro de passar a brasa. Muitas mulheres do Bexiga ganham a vida lavando e passando roupa para as famílias ricas.']];
+      let n=0;for(const [k,ic,re,dx,nm,tx] of L){const p=perto(re,dx);if(!p)continue;ITEMS.push({id:'jm22_'+k,i:ic,scene:S,x:p[0],y:p[1],name:nm,text:tx,got:false});n++;}
+      rel.objetos22=n;}
+    }catch(e){console.warn('objetos centro JM',e);}
+    /* ===== v245 — CENTRO DE 1922: ILUMINAÇÃO PÚBLICA — postes de luz elétrica ao longo das calçadas das ruas principais; à noite, todos os postes do centro acendem (pedido do professor, 21/11/2026) ===== */
+    try{if(!rel.luz22&&A.ANH_poste_dois_globos_A){
+      const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)||(typeof ITEMS!=='undefined'&&ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y));
+      const porta=(x,y)=>objects.some(o=>o.scene===S&&o.enter&&Math.abs(x-(o.x+(o.door!=null?o.door:((o.w||1)>>1))))<=1&&y>=o.y+(o.h||1)&&y<=o.y+(o.h||1)+1);
+      const ehPoste=o=>/poste|lampi[ãa]o/i.test(o.name||'')||/poste/i.test(o.id||'');
+      const postes=objects.filter(o=>o.scene===S&&ehPoste(o)).map(o=>[o.x,o.y]);
+      const im=new Image();im.src=A.ANH_poste_dois_globos_A;let n=0;
+      const TX=['Poste de luz elétrica da Light. O centro já é todo iluminado à noite; em muitos bairros operários a rua ainda fica no escuro.'];
+      for(let y=1;y<M.length-1;y++){let ult=-99;for(let x=2;x<M[0].length-2;x++){
+        if(M[y][x]!=='p'||!(M[y+1][x]==='D'||M[y-1][x]==='D'))continue;if(x-ult<9)continue;
+        if(postes.some(q=>Math.abs(q[0]-x)<6&&Math.abs(q[1]-y)<3))continue;if(ocp(x,y)||porta(x,y))continue;if(M[y][x-1]!=='p'||M[y][x+1]!=='p'||ocp(x-1,y)||ocp(x+1,y))continue;
+        objects.push({id:'jm_luz_'+x+'_'+y,scene:S,x,y,w:1,h:1,name:'Poste de luz elétrica',text:TX,__jm:1,lamp:true,
+          draw(c,X,Y){if(!im.complete||!im.naturalWidth)return;const w=im.naturalWidth,h=im.naturalHeight;c.fillStyle='rgba(20,16,24,.22)';c.fillRect(Math.round(X+8-w*.3),Y+13,Math.round(w*.6),3);c.drawImage(im,Math.round(X+8-w/2),Y+16-h);}});
+        postes.push([x,y]);ult=x;n++;}}
+      for(const o of objects)if(o.scene===S&&ehPoste(o))o.lamp=true;
+      rel.luz22=[n,objects.filter(o=>o.scene===S&&o.lamp).length];}
+    }catch(e){console.warn('iluminacao centro JM',e);}
+    /* ===== v245 — CENTRO DE 1922: RECORTE DA CASA RODOVALHO — anúncio de jornal da Casa Rodovalho (Largo de São Francisco, nº 5) para achar perto do largo (pedido do professor, 21/11/2026) ===== */
+    try{if(typeof ITEMS!=='undefined'&&A.REC_rodovalho&&!ITEMS.some(i=>i.id==='jm22_rodovalho')){
+      const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
+      const sf=objects.find(o=>o.scene===S&&/Igreja de S[ãa]o Francisco/.test(o.name||''))||objects.find(o=>o.scene===S&&/Faculdade de Direito/.test(o.name||''));
+      if(sf){let p=null;const sx=sf.x+((sf.w||1)>>1),sy=sf.y+(sf.h||1);
+        for(let r=1;r<12&&!p;r++)for(let dy=0;dy<=r&&!p;dy++)for(const dx of [r,-r,0,r-1,1-r]){const x=sx+dx,y=sy+dy;if(M[y]&&/[pD]/.test(M[y][x]||'')&&!ocp(x,y)){p=[x,y];break;}}
+        if(p){ITEMS.push({id:'jm22_rodovalho',i:60,scene:S,x:p[0],y:p[1],name:'Recorte: Casa Rodovalho',text:'Anúncio da Casa Rodovalho, no Largo de São Francisco, nº 5: carruagens de luxo para casamentos, batizados e passeios, coroas importadas e flores naturais. Em 1922 o automóvel já disputa a rua, mas para casar com pompa ainda se aluga carruagem.',rec:{img:'REC_rodovalho',kick:'Fonte histórica: anúncio de jornal',title:'Casa Rodovalho: carruagens de luxo',cap:'Anúncio de jornal da Casa Rodovalho, Largo de São Francisco, nº 5, telefone 348 Central: carruagens de luxo para casamentos, batizados e passeios; importação direta de coroas de biscuit e seção especial de coroas e flores naturais.'},got:false});rel.rodovalho=p;}}}
+    }catch(e){console.warn('Casa Rodovalho JM',e);}
+    /* ===== v245 — CENTRO DE 1922: MAIS RECORTES DE JORNAL — 7 anúncios e notícias da época (Rua São Bento, Ladeira Porto Geral, bancas e farmácia) para achar pela cidade (pedido do professor, 21/11/2026) ===== */
+    try{if(typeof ITEMS!=='undefined'){
+      const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
+      const naFrente=(x,y)=>objects.some(o=>o.scene===S&&o.door!=null&&y===o.y+(o.h||1)&&x===o.x+o.door);
+      const perto=(re,dx,dy,fx,fy)=>{const o=re?objects.find(o=>o.scene===S&&re.test(o.name||'')):null;return o?[o.x+((o.w||1)>>1)+dx,o.y+(o.h||1)+dy]:[fx,fy];};
+      const placa=(re,fx,fy)=>{const q=(C.P||[]).find(q=>re.test(q.t||''));return q?[Math.round(q.x/16),Math.round(q.y/16)]:[fx,fy];};
+      const acha=(c)=>{const vis=new Set();let fila=[c];vis.add(c+'');for(let k=0;k<1200&&fila.length;k++){const [x,y]=fila.shift();if(M[y]&&/[pD]/.test(M[y][x]||'')&&!ocp(x,y)&&!naFrente(x,y))return [x,y];for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const n=[x+a,y+b];if(n[1]>=0&&n[1]<98&&n[0]>=0&&n[0]<150&&!vis.has(n+'')){vis.add(n+'');fila.push(n);}}}return null;};
+      const sb=perto(/^Largo de S[ãa]o Bento/,0,2,100,24);
+      const L=[
+       ['loja_japao',[sb[0],sb[1]+1],'Recorte: Loja do Japão','Anúncio de Carnaval da Loja do Japão (Garcia da Silva & Cia.), na Rua de São Bento, nº 46: lança-perfume, serpentinas, confete colorido e dourado e máscaras. No Carnaval, o centro se enchia de corsos e bailes, e a Rua São Bento era onde se fazia a compra.','Fonte histórica: anúncio de revista','Loja do Japão: tudo para o Carnaval','Anúncio da Loja do Japão, de Garcia da Silva & Cia., Rua de São Bento, nº 46, São Paulo, na revista A Cigarra: lança-perfume "Rodo", serpentinas "Iris", "Anakonda" e "Condor", confete de cores variadas e de ouro, máscaras. "Fazemos os melhores preços do mercado."'],
+       ['casa_odeon',[sb[0],sb[1]+7],'Recorte: Casa Odeon','Anúncio da Casa Odeon, na Rua São Bento, nº 62, para o Carnaval de 1922: "Quereis dançar?". Vendia discos Odeon, Victor e Fonotipia e gramofones de todos os preços. Em 1922 ainda não havia rádio em casa: a dança moderna chegava pelo disco de gramofone.','Fonte histórica: anúncio de revista','Casa Odeon: discos para o Carnaval de 1922','Anúncio da Casa Odeon, Rua São Bento, nº 62, na revista A Cigarra: "Carnaval 1922. Quereis dançar? Procurae a Casa Odeon, que tem o maior e melhor sortimento em danças modernas gravadas em discos Odeon, Victor, Fonotipia. Grammophones a todos os preços."'],
+       ['fujisaky',[sb[0],sb[1]+12],'Recorte: O Japão em S. Paulo','Anúncio da loja Fujisaky & Cia., "O Japão em S. Paulo", na Rua de São Bento, nº 68-A: fantasias de Carnaval, quimonos, guarda-sóis, zori (sandálias japonesas) e leques. Os primeiros imigrantes japoneses chegaram a São Paulo em 1908, e em 1922 já tinham comércio no centro.','Fonte histórica: anúncio de revista','Fujisaky & Cia.: O Japão em S. Paulo','Anúncio de Fujisaky & Cia., Rua de São Bento, nº 68-A, telefone Central 2788, na revista A Cigarra: artigos para o Carnaval, fantasias para senhoras, cavalheiros e crianças; quimonos, guarda-sóis, chapéus, zori, leques; lança-perfumes "Rodo", serpentinas e confetes; enfeites para salões.'],
+       ['festival_plebe',placa(/PORTO GERAL/,112,40),'Recorte: festival operário','Anúncio do jornal operário A Plebe: um festival no Salão Celso Garcia, na Rua do Carmo, com orquestra, conferência sobre a "questão social", teatro e baile. Os trabalhadores se organizavam também com festas, e as prendas da quermesse eram entregues aqui, na Ladeira Porto Geral, nº 9.','Fonte histórica: jornal operário','Festival pró-"A Plebe"','Anúncio no jornal operário A Plebe (1920): "Grande festival pró-A Plebe, promovido pelo Grupo Dramático Emílio Zola, no Salão Celso Garcia, à Rua do Carmo, 23. Sábado, 20 de março, às 20 horas." Programa: orquestra; conferência sobre a questão social; o drama em 3 atos "Santa Inquisição"; quermesse e baile familiar. Prendas na Ladeira Porto Geral, 9.'],
+       ['cortume_dick',perto(/^Banca de jornais/,0,1,88,79),'Recorte: a jornada de 8 horas','Notícia do jornal operário A Plebe: depois de muita luta, quase todos os trabalhadores de São Paulo tinham conquistado a jornada de 8 horas. Mas no Cortume Dick, na Água Branca, ainda se trabalhava 9 horas por salários baixos. A greve geral de 1917 tinha feito dessa luta assunto de toda a cidade.','Fonte histórica: jornal operário','"Nos ergástulos industriais"','Notícia do jornal operário A Plebe: "No Cortume Dick, de Água Branca, ainda se trabalha 9 horas. O proletariado de S. Paulo, após viva luta de longo tempo, conseguiu conquistar, para a quase generalidade das classes, a jornada de 8 horas de trabalho." (Ergástulo: prisão onde se trancavam escravos na Roma antiga.)'],
+       ['anesia',[102,56],'Recorte: uma aviadora paulista','Foto da revista A Cigarra: Anésia Pinheiro Machado, uma das primeiras mulheres a pilotar avião no Brasil, ao lado do seu instrutor, o tenente Reynaldo Gonçalves, na Escola de Aviação Curtiss, no campo de Indianópolis, em São Paulo. Avião ainda era novidade, e mulher pilotando, mais ainda.','Fonte histórica: foto de revista','Uma aviadora paulista','Foto da revista A Cigarra: "A aviadora paulista senhorita Anésia Pinheiro Machado, sobrinha do General Pinheiro Machado, aluna do tenente Reynaldo Gonçalves, que se vê ao seu lado, na Escola de Aviação Curtiss, no aeródromo de Indianópolis. A senhorita já tem realizado vários voos, esperando poder tirar o brevê ainda este mês."'],
+       ['po_hebe',perto(/^Farm[áa]cia/,0,1,71,20),'Recorte: pó de arroz Hebe','Anúncio do pó de arroz Hebe: "o único igual às melhores marcas francesas". A caixa custava 2$500 (dois mil e quinhentos réis) e era vendida nas drogarias. A propaganda promete devolver o dinheiro a quem achar marca melhor: um jeito de vender produto nacional disputando com o importado.','Fonte histórica: anúncio de revista','Pó de arroz Hebe','Anúncio na revista A Cigarra: "O melhor pó de arroz, o mais fino, aderente e perfumado. O único igual às melhores marcas francesas. HEBE." Caixa 2$500, nas casas Baruel, Lebre, Fachada e nas drogarias Amarante, J. Santos e S. Bento.']];
+      let n=0;for(const [k,c,nome,tx,kick,tit,cap] of L){const id='jm22_rec_'+k,img='REC_'+k;if(!A[img]||ITEMS.some(i=>i.id===id))continue;const p=acha(c);if(!p)continue;
+        ITEMS.push({id,i:60,scene:S,x:p[0],y:p[1],name:nome,text:tx,rec:{img,kick,title:tit,cap},got:false});n++;rel['rec_'+k]=p;}
+      rel.recortes22=n;}
+    }catch(e){console.warn('recortes de jornal JM',e);}
+    /* ===== v245 — CENTRO DE 1922: OBJETOS DENTRO DOS PRÉDIOS — objetos que pertencem a um prédio com sala própria passam para dentro dele (Palácio do Governo, Correios, Faculdade de Direito, redação do Estado, casa de discos) (pedido do professor, 21/11/2026) ===== */
+    try{if(typeof ITEMS!=='undefined'){
+      const usaSo=(k)=>objects.filter(q=>q.enter&&(q.room||('i_'+q.enter))===k).length===1;
+      const dentro=(k,id,lado)=>{const it=ITEMS.find(i=>i.id===id);const sc=SCN[k];if(!it||!sc||!sc.map||it.scene!==S||!usaSo(k))return 0;
+        const m=sc.map,H=m.length,W=m[0].length,ch=(x,y)=>(m[y]&&m[y][x])||'#';
+        const ocp=(x,y)=>objects.some(o=>o.scene===k&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===k&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===k&&i.x===x&&i.y===y);
+        const Q=[];const vis=new Set();for(let x=0;x<W;x++)if(ch(x,H-1)==='x'){Q.push([x,H-2,0]);vis.add(x+','+(H-2));}
+        let best=null;while(Q.length){const [x,y,d]=Q.shift();if(ch(x,y)!=='.'||ocp(x,y)&&d>0)continue;
+          if(d>=4&&!ocp(x,y)){const nota=(lado>0?x:W-x)+d*0.1;if(!best||nota>best[2])best=[x,y,nota];}
+          for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=x+a,Y=y+b,kk=X+','+Y;if(!vis.has(kk)&&ch(X,Y)==='.'&&!ocp(X,Y)){vis.add(kk);Q.push([X,Y,d+1]);}}}
+        if(!best)return 0;it.scene=k;it.x=best[0];it.y=best[1];(rel.dentro=rel.dentro||[]).push(id+'>'+k);return 1;};
+      const L=[['m_palacio','jm22_medalha',1],['m_correios','jm22_telegrama',1],['m_academia','jm22_tinteiro',1],['m_redacao','jm22_jornal',1],['m_discos','jm22_disco',1],['m_discos','jm22_rec_casa_odeon',-1]];
+      for(const [k,id,l] of L)dentro(k,id,l);}
+    }catch(e){console.warn('objetos dentro JM',e);}
+
     /* a faixa do trilho antigo (x130-131), reservada durante a montagem do centro, volta a ser o chão que a versão das ferrovias largas definiu */
     try{if(C.__faixa){for(const q of C.__faixa)M[q[1]][q[0]]=q[2];C.__faixa=[];rel.faixa=1;}}catch(_){}
     rel.ok=true;try{if(cur===S){buildStatic();buildOcc();mmDirty=true;}}catch(_){}
