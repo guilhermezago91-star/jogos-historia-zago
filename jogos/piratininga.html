@@ -27665,6 +27665,11 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   #modoBox button small{display:block;font-size:12.5px;font-weight:400;opacity:.85}
   #modoBox button.on{outline:3px solid #d9a020;outline-offset:1px}
   @media (max-width:560px){#quest.mm .mmS{display:none}#quest.mm{max-width:68%!important}}
+  /* ===== v259 — CAIXA DA MISSÃO MENOR NO COMPUTADOR (pedido do professor, 22/11/2026) ===== */
+  #quest.mm{max-width:min(34%,300px)!important;padding:4px 8px!important;font-size:.88em!important;background:rgba(255,250,235,.88)!important}
+  #quest.mm .mmS{display:none}
+  #quest.mm .mmK{font-size:.68em}
+  @media (max-width:560px){#quest.mm{max-width:68%!important}}
   #mmDip{width:100%;height:auto;border:2px solid #141b1b;border-radius:4px;display:block;margin:6px 0}
   `;document.head.appendChild(st);
 
