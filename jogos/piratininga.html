@@ -231,6 +231,68 @@ toque(a);
 try{new MutationObserver(function(){var t=document.getElementById('pacTela');if(t&&!document.getElementById('vcSabia2')){var d=document.createElement('div');d.id='vcSabia2';d.setAttribute('aria-live','polite');d.style.cssText='max-width:360px;padding:10px 14px;border:2px solid #f1c471;border-radius:8px;color:#f6f0e4;font-size:15px;line-height:1.4;text-align:center;font-weight:500';d.textContent=txt();t.appendChild(d);toque(d);clearTimeout(tm);tm=setTimeout(proxima,tempoLer(d.textContent));}}).observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
 })();</script>
 </div>
+<script>/* ===== v256 — MINIJOGOS NA TELA DE CARREGAMENTO (pedido do professor, 22/11/2026) =====
+   Se o jogo passa de 1 minuto carregando, aparece o botão "Jogar enquanto espera".
+   Três minijogos de 20 segundos, de toque (celular) ou clique: chapéus na ventania (1922),
+   o burro do bonde (1888) e a galinha fugida (1830). Sem som. Quando o jogo termina de carregar,
+   a tela some como antes. */
+(function(){try{
+ var C=document.getElementById('carregando');if(!C)return;
+ var bt=document.createElement('button');bt.type='button';bt.textContent='Está demorando? Jogar enquanto espera';
+ bt.style.cssText='display:none;margin-top:6px;padding:10px 16px;border:3px solid #f1c471;border-radius:8px;background:#2a3330;color:#f6f0e4;font:700 15px system-ui,sans-serif;cursor:pointer';
+ C.appendChild(bt);
+ var box=document.createElement('div');box.style.cssText='display:none;flex-direction:column;align-items:center;gap:8px';
+ box.innerHTML='<div id="mjTit" style="font-size:16px;color:#f1c471;max-width:340px"></div><canvas id="mjCv" width="320" height="200" style="width:min(320px,88vw);image-rendering:pixelated;border:3px solid #f4efe4;border-radius:4px;background:#8fb6c8;touch-action:none;cursor:pointer"></canvas><div id="mjTxt" style="font-size:14px;color:#cfc7b6;max-width:340px;min-height:2.6em"></div><button type="button" id="mjProx" style="display:none;padding:8px 14px;border:2px solid #f1c471;border-radius:8px;background:#2a3330;color:#f6f0e4;font:700 14px system-ui,sans-serif">Próximo jogo</button>';
+ C.appendChild(box);
+ setTimeout(function(){if(document.getElementById('carregando')&&C.style.opacity!=='0')bt.style.display='block';},60000);
+ var cv,g,tit,txt,prox,jogo=0,fim=0,pts=0,raf=0,ini=0,J;
+ function texto(t){txt.textContent=t;}
+ function chao(cor){g.fillStyle=cor;g.fillRect(0,170,320,30);}
+ function sorte(a,b){return a+Math.random()*(b-a);}
+ var JOGOS=[
+ {t:'1922 · Ventania no Viaduto do Chá',d:'Pegue os chapéus antes que voem para o vale do Anhangabaú!',
+  ini:function(){this.c=[];this.p=0;},
+  passo:function(dt,tm){if(Math.random()<dt*1.6)this.c.push({x:-20,y:sorte(30,120),vx:sorte(70,130),f:sorte(0,6),k:Math.floor(sorte(0,3))});
+   g.fillStyle='#8fb6c8';g.fillRect(0,0,320,200);g.fillStyle='#6d8a5a';g.fillRect(0,150,320,50);g.fillStyle='#8a8478';g.fillRect(0,140,320,10);
+   for(var i=0;i<320;i+=20){g.fillStyle='#5e5a52';g.fillRect(i,130,3,10);}
+   g.fillStyle='#5a7f9c';g.fillRect(150,178,30,4);
+   for(var j=this.c.length-1;j>=0;j--){var h=this.c[j];h.x+=h.vx*dt;h.f+=dt*5;var y=h.y+Math.sin(h.f)*12;h.yy=y;
+    if(h.k===0){g.fillStyle='#2a2630';g.fillRect(h.x-7,y-12,14,12);g.fillRect(h.x-11,y,22,3);}
+    else if(h.k===1){g.fillStyle='#4a3a30';g.beginPath();g.arc(h.x,y,8,Math.PI,0);g.fill();g.fillRect(h.x-11,y,22,3);}
+    else{g.fillStyle='#e0c878';g.fillRect(h.x-6,y-7,12,7);g.fillRect(h.x-13,y,26,3);g.fillStyle='#8a3a30';g.fillRect(h.x-6,y-3,12,2);}
+    if(h.x>340){this.c.splice(j,1);texto(['Lá se foi a cartola do doutor!','Um chapéu-coco a menos na Rua Direita...','O chapéu de palha foi parar no riacho!'][h.k]);}}},
+  toque:function(x,y){for(var j=0;j<this.c.length;j++){var h=this.c[j];if(Math.abs(h.x-x)<20&&Math.abs(h.yy-y)<18){this.c.splice(j,1);pts++;texto(['"Obrigado, moço! Era a minha melhor cartola."','"Grazie! Comprei esse chapéu ontem na Rua Direita."','"Valeu! Sem chapéu, o sol do meio-dia não perdoa."'][h.k]);return;}}}},
+ {t:'1888 · O burro do bonde',d:'Toque para o burro puxar o bonde da Sé até a Luz. Às vezes ele para para comer capim...',
+  ini:function(){this.x=20;this.par=0;this.cap=0;},
+  passo:function(dt,tm){g.fillStyle='#c8d8b8';g.fillRect(0,0,320,200);g.fillStyle='#9a8a6a';g.fillRect(0,140,320,40);g.fillStyle='#5e5a52';g.fillRect(0,150,320,3);g.fillRect(0,165,320,3);
+   g.fillStyle='#2a3330';g.font='bold 11px sans-serif';g.textAlign='left';g.fillText('Sé',6,130);g.textAlign='right';g.fillText('Estação da Luz',314,130);
+   if(this.par>0){this.par-=dt;if(this.par<=0)texto('Pronto, ele voltou a andar. Toque, toque!');}
+   else if(Math.random()<dt*.35){this.par=sorte(1.2,2.2);texto(['O burro parou para comer capim. Paciência...','O burro resolveu olhar a paisagem.','O burro bocejou. Ele não tem pressa nenhuma.'][Math.floor(sorte(0,3))]);}
+   var x=this.x;g.fillStyle='#a8483a';g.fillRect(x-60,118,52,30);g.fillStyle='#e8d8b0';for(var i=0;i<4;i++)g.fillRect(x-56+i*12,124,8,8);g.fillStyle='#3a2a22';g.fillRect(x-62,114,56,5);g.beginPath();g.arc(x-50,152,5,0,7);g.arc(x-18,152,5,0,7);g.fill();
+   g.fillStyle='#8a7a6a';g.fillRect(x,128,24,14);g.fillRect(x+20,118,8,14);g.fillRect(x+2,142,3,10);g.fillRect(x+18,142,3,10);g.fillStyle='#5a4a3a';g.fillRect(x+22,112,3,7);g.fillRect(x+26,112,3,7);
+   if(this.par>0){g.fillStyle='#4a8a3a';g.fillRect(x+26,146,8,6);}
+   if(this.x>=290&&!this.ok){this.ok=1;pts=Math.max(1,Math.round(20-(tm)));texto('Chegou na Luz! O burro ganhou um balde de milho.');fim=performance.now();}},
+  toque:function(){if(this.ok)return;if(this.par>0){texto('Ele não liga. Está ocupado com o capim.');return;}this.x=Math.min(290,this.x+6);}},
+ {t:'1830 · A galinha fugiu do quintal',d:'Toque na galinha para levá-la de volta ao quintal. Ela é rápida!',
+  ini:function(){this.x=160;this.y=120;this.vx=60;this.vy=30;this.m=0;},
+  passo:function(dt){g.fillStyle='#b8a47a';g.fillRect(0,0,320,200);g.fillStyle='#d8c8a0';for(var i=0;i<6;i++)g.fillRect(i*56,20,40,40);g.fillStyle='#8a5a3a';g.fillRect(0,60,320,6);
+   this.m-=dt;if(this.m<=0){this.m=sorte(.4,1.1);var a=sorte(0,6.28),v=sorte(70,140);this.vx=Math.cos(a)*v;this.vy=Math.sin(a)*v;}
+   this.x+=this.vx*dt;this.y+=this.vy*dt;if(this.x<14||this.x>306)this.vx*=-1;if(this.y<80||this.y>186)this.vy*=-1;this.x=Math.max(14,Math.min(306,this.x));this.y=Math.max(80,Math.min(186,this.y));
+   var x=0,y=0,d=this.vx<0?-1:1;g.save();g.translate(this.x,this.y);g.scale(1.8,1.8);g.fillStyle='#f4efe4';g.fillRect(x-8,y-8,16,10);g.fillRect(x+d*6-3,y-14,6,7);g.fillStyle='#c83a2a';g.fillRect(x+d*6-2,y-17,4,3);g.fillStyle='#e8a030';g.fillRect(x+d*10-1,y-11,3,2);g.fillRect(x-4,y+2,2,4);g.fillRect(x+2,y+2,2,4);g.fillStyle='#2a2630';g.fillRect(x+d*7,y-12,1,1);g.restore();},
+  toque:function(x,y){if(Math.abs(x-this.x)<26&&Math.abs(y-this.y-6)<28){pts++;texto(['Có có có! Voltou para o quintal... e fugiu de novo.','A dona da casa agradece: hoje tem ovo!','Pegou! Ela fingiu que não era com ela.','A galinha olhou feio para você.'][pts%4]);this.x=sorte(30,290);this.y=sorte(90,170);}else texto('Errou! A galinha está rindo de você.');}}
+ ];
+ function abre(n){jogo=n%JOGOS.length;J=JOGOS[jogo];pts=0;fim=0;J.ok=0;J.ini();tit.textContent=J.t;texto(J.d);prox.style.display='none';ini=performance.now();cancelAnimationFrame(raf);
+  var ant=ini;(function laco(t){var dt=Math.min(.05,(t-ant)/1000);ant=t;var tm=(t-ini)/1000;
+   if(!fim&&tm>=20)fim=t;J.passo(fim?0:dt,tm);
+   g.fillStyle='rgba(20,27,27,.75)';g.fillRect(0,0,320,18);g.fillStyle='#f4efe4';g.font='bold 11px sans-serif';g.textAlign='left';g.fillText(jogo===1?'Toque para andar':'Pontos: '+pts,6,13);g.textAlign='right';g.fillText(fim?'Fim!':Math.ceil(20-tm)+' s',314,13);
+   if(fim){g.fillStyle='rgba(20,27,27,.7)';g.fillRect(40,70,240,50);g.fillStyle='#f1c471';g.font='bold 15px sans-serif';g.textAlign='center';g.fillText(jogo===1?(J.ok?'Chegou na Luz!':'O burro venceu você.'):'Você fez '+pts+' ponto'+(pts===1?'':'s')+'!',160,100);prox.style.display='inline-block';return;}
+   if(document.getElementById('carregando'))raf=requestAnimationFrame(laco);})(ini);}
+ bt.onclick=function(){bt.style.display='none';box.style.display='flex';cv=document.getElementById('mjCv');g=cv.getContext('2d');tit=document.getElementById('mjTit');txt=document.getElementById('mjTxt');prox=document.getElementById('mjProx');
+  var vs=document.getElementById('vcSabia');if(vs)vs.style.display='none';
+  cv.addEventListener('pointerdown',function(e){if(fim)return;var r=cv.getBoundingClientRect();J.toque((e.clientX-r.left)*320/r.width,(e.clientY-r.top)*200/r.height);});
+  prox.onclick=function(){abre(jogo+1);};abre(0);};
+}catch(e){console.warn('v256 minijogos',e);}})();
+</script>
 <script>window.__carrega=function(f,t){try{var b=document.getElementById('carregandoBarra');if(b)b.style.width=Math.round(f*100)+'%';if(t){var x=document.getElementById('carregandoTxt');if(x)x.textContent=t;}}catch(e){}};
 window.__carregou=function(){try{var c=document.getElementById('carregando');if(!c)return;window.__carrega(1,'Pronto!');setTimeout(function(){c.style.transition='opacity .4s';c.style.opacity='0';setTimeout(function(){c.remove();},450);},250);}catch(e){}};
 document.addEventListener('DOMContentLoaded',function(){window.__carrega(.95,'Montando a cidade...');setTimeout(window.__carregou,300);});
@@ -6373,7 +6435,12 @@ DIC[2].push(['Moita','Arbusto baixo e cheio de galhos.'],['Quarar','Deixar a rou
 /* ---------- moradores que atravessavam prédios: quem tem o caminho cortado por um prédio sai da rua ---------- */
 setTimeout(()=>{const BAD='TCWMbPOK#mjhlXLcY';
   const blocked=(w,x,y)=>{const m=SCN[w.scene]&&SCN[w.scene].map;if(!m||!m[y])return 'fora';if(BAD.includes(m[y][x]))return x+','+y+' '+m[y][x];
-    const o=objects.find(o=>(o.scene||'pira')===w.scene&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));return o?x+','+y+' '+o.id:false;};
+    const o=(Number.isInteger(x)&&Number.isInteger(y)&&x>=0&&y>=0&&x<4096)?primeiro(w.scene,x,y):objects.find(o=>(o.scene||'pira')===w.scene&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));return o?x+','+y+' '+o.id:false;};
+  /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): enquanto se confere o caminho de cada morador, nenhum objeto muda;
+     guarda-se, para cada quadradinho, o primeiro objeto da lista que está em cima dele. Mesma resposta do objects.find. */
+  const PRI=new Map();for(const o of objects){const sc=o.scene||'pira';let m=PRI.get(sc);if(!m)PRI.set(sc,m=new Map());const w=o.w||1,h=o.h||1;
+    for(let y=Math.ceil(o.y);y<o.y+h;y++)for(let x=Math.ceil(o.x);x<o.x+w;x++)if(x>=0&&y>=0&&x<4096){const k=y*4096+x;if(!m.has(k))m.set(k,o);}}
+  const primeiro=(sc,x,y)=>{const m=PRI.get(sc);return m&&m.get(y*4096+x)||undefined;};
   for(let i=walkers.length-1;i>=0;i--){const w=walkers[i];if(!w.path||!SCN[w.scene])continue;let bad=false;
     for(let k=0;k<w.path.length&&!bad;k++){let [cx,cy]=w.path[k];{const r=blocked(w,cx,cy);if(r){bad=w.id+'@'+r;break;}}
       if(k<w.path.length-1){const [tx,ty]=w.path[k+1];while(cx!==tx||cy!==ty){if(cx!==tx)cx+=Math.sign(tx-cx);else cy+=Math.sign(ty-cy);{const r=blocked(w,cx,cy);if(r){bad=w.id+'@'+r;break;}}}}}
@@ -10450,7 +10517,10 @@ setTimeout(function(){
    k_cervejaria:{o:[['caixote',1],['caixote',1],['saca',1],['saca',1]],w:[['z54_a88_mestre','Ajudante da cervejaria',["Carrego barril o dia inteiro. Com o calor de São Paulo, cerveja gelada vende muito!"]]]}};
   function alcance(rm,M2){const W=M2[0].length,H=M2.length;let ex=null;for(let y=0;y<H&&!ex;y++)for(let x=0;x<W;x++)if(M2[y][x]==='x'){ex=[x,y];break;}if(!ex)return null;
     const bloq=(x,y)=>x<0||y<0||x>=W||y>=H||SOLID.includes(M2[y][x])||objects.some(o=>o.scene===rm&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
-    const seen=new Set([ex+'']),q=[ex];while(q.length){const [a,b]=q.shift();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const k=(a+dx)+','+(b+dy);if(!seen.has(k)&&!bloq(a+dx,b+dy)){seen.add(k);q.push([a+dx,b+dy]);}}}return {seen,ex,bloq};}
+    /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): mesma conta, feita uma vez só. */
+    const OB=new Set();for(const o of objects){if(o.scene!==rm)continue;const w=o.w||1,h=o.h||1;for(let y=Math.ceil(o.y);y<o.y+h;y++)for(let x=Math.ceil(o.x);x<o.x+w;x++)if(x>=0&&y>=0&&x<W&&y<H)OB.add(y*W+x);}
+    const bloqV=(x,y)=>x<0||y<0||x>=W||y>=H||!Number.isInteger(x)||!Number.isInteger(y)?bloq(x,y):(SOLID.includes(M2[y][x])||OB.has(y*W+x));
+    const seen=new Set([ex+'']),q=[ex];let h0=0;while(h0<q.length){const [a,b]=q[h0++];for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const k=(a+dx)+','+(b+dy);if(!seen.has(k)&&!bloqV(a+dx,b+dy)){seen.add(k);q.push([a+dx,b+dy]);}}}return {seen,ex,bloq};}
   let no=0,nw=0;
   for(const rm of Object.keys(SALA)){if(!SCN[rm])continue;const M2=SCN[rm].map,W=M2[0].length,H=M2.length;const S=SALA[rm];let A0=alcance(rm,M2);if(!A0)continue;
     const alvo=()=>npcs.filter(n=>n.scene===rm).map(n=>[n.x,n.y]).concat(objects.filter(o=>o.scene===rm&&o.text&&!o.deco88).map(o=>[o.x,o.y+(o.h||1)-1]));
@@ -16007,6 +16077,8 @@ setTimeout(function(){try{
   const M=[],LV=[];for(let y=0;y<H;y++){M.push(new Array(W).fill('.'));LV.push(new Array(W).fill('1'));}
   const dSeg=(px,py,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy;let t=L2?((px-a[0])*dx+(py-a[1])*dy)/L2:0;t=Math.max(0,Math.min(1,t));return Math.hypot(px-a[0]-t*dx,py-a[1]-t*dy);};
   const dPol=(px,py,P)=>{let d=1e9;for(let i=0;i<P.length-1;i++)d=Math.min(d,dSeg(px,py,P[i],P[i+1]));return d;};
+  /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): quadradinho longe do retângulo da linha nem é medido (a distância seria maior que o limite). Mesmo mapa. */
+  const __caixa=(P,m)=>{let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const p of P){a=Math.min(a,p[0]);b=Math.max(b,p[0]);c=Math.min(c,p[1]);d=Math.max(d,p[1]);}return [a-m,b+m,c-m,d+m];};
   /* medidas do croqui (150 x 190) passadas para o mapa: a faixa de cima (Liberdade, Cambuci, Aclimação, Paraíso) fica mais alta */
   const cx=x=>x<=56?x*.75:x<=88?42+(x-56)*1.25:82+(x-88)*1.452,cy=y=>y<=30?y*1.667:y<=62?50+(y-30)*.875:y<=132?78.1+(y-62)*.93:143.2+(y-132)*.46,C=P=>P.map(p=>[cx(p[0]),cy(p[1])]);
   const spl=(P,n)=>{n=n||8;const o=[];for(let i=0;i<P.length-1;i++){const p0=P[Math.max(i-1,0)],p1=P[i],p2=P[i+1],p3=P[Math.min(i+2,P.length-1)];
@@ -16027,14 +16099,14 @@ setTimeout(function(){try{
   /* várzea do Ibirapuera (sudoeste) e beira do Tamanduateí */
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){const X=x<=42?x/.75:x<=82?56+(x-42)/1.25:88+(x-82)/1.452,Yc=y<=78?y/1.26:y<=143.2?62+(y-78.1)/.93:132+(y-143.2)/.46;
     if(Yc>128&&X<40-(Yc-128)*.2){M[y][x]=hs(x,y,2)<.5?'V':hs(x,y,3)<.5?',':'.';}}
-  const agua=(P,meia,varz)=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++){const d=dPol(x+.5,y+.5,P);
+  const agua=(P,meia,varz)=>{const bx=__caixa(P,meia+varz+6);for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(x+.5<bx[0]||x+.5>bx[1]||y+.5<bx[2]||y+.5>bx[3])continue;const d=dPol(x+.5,y+.5,P);
     if(d<=meia)M[y][x]='W';else if(d<=meia+1){if(M[y][x]!=='W')M[y][x]='B';}else if(d<=meia+1+varz){if(!'WB'.includes(M[y][x]))M[y][x]=hs(x,y,4)<.6?'V':',';}
     else if(d<=meia+4+varz){if(!'WBV'.includes(M[y][x])&&hs(x,y,5)<.16)M[y][x]=hs(x,y,6)<.7?'T':'b';}}};
   agua(TAM,2.4,4);agua(IPI,1.5,2);for(const k in RIO)agua(RIO[k],1.45,2);
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){const e=Math.hypot((x+.5-LAGO[0])/LAGO[2],(y+.5-LAGO[1])/LAGO[3]);if(e<=1)M[y][x]='W';else if(e<=1.28&&M[y][x]!=='W')M[y][x]='B';}
   /* ---------- 2) ruas ---------- */
   const rua=(x,y,ch)=>{if(x<0||y<0||x>=W||y>=H||noCanto(x,y))return;const c=M[y][x];if(c==='W'||c==='R'){M[y][x]='R';return;}if(c==='e'||(c==='D'&&ch==='d'))return;M[y][x]=ch;};
-  const via=(P,ch,lim)=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(dPol(x+.5,y+.5,P)<=(lim||.62))rua(x,y,ch||'d');};
+  const via=(P,ch,lim)=>{const bx=__caixa(P,(lim||.62)+2);for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(x+.5<bx[0]||x+.5>bx[1]||y+.5<bx[2]||y+.5>bx[3])continue;if(dPol(x+.5,y+.5,P)<=(lim||.62))rua(x,y,ch||'d');}};
   const deg=(P0,passo,par)=>{const sn=v=>par?Math.round(v):Math.floor(v)+.5,P=C(P0).map(p=>[sn(p[0]),sn(p[1])]),o=[P[0]];for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],dx=b[0]-a[0],dy=b[1]-a[1],vert=Math.abs(dy)>=Math.abs(dx),n=Math.max(1,Math.round(Math.abs(vert?dx:dy)/(passo||5)));
       let ux=a[0],uy=a[1];for(let k=1;k<=n;k++){const tx=k===n?b[0]:sn(a[0]+dx*k/n),ty=k===n?b[1]:sn(a[1]+dy*k/n);if(vert){o.push([ux,ty]);o.push([tx,ty]);}else{o.push([tx,uy]);o.push([tx,ty]);}ux=tx;uy=ty;}}return o;};
   const hr=(y,a,b,ch)=>{for(let x=a;x<=b+1;x++){rua(x,y,ch||'d');rua(x,y+1,ch||'d');}},vr=(x,a,b,ch)=>{for(let y=a;y<=b+1;y++){rua(x,y,ch||'d');rua(x+1,y,ch||'d');}};
@@ -16057,11 +16129,11 @@ setTimeout(function(){try{
   const LEST=cy(93);
   const EIXO={paulista:deg([[50,38.5],[66,38.5],[66,41]]),brigadeiro:deg([[64,38.5],[64,24],[70,24],[70,10],[75,10],[75,-1]],40),vergueiro:deg([[68,41],[82,41],[82,28],[94,28],[94,14],[104,14],[104,-1]],40),domingos:deg([[66,41],[66,62],[70,62],[70,96],[75,96],[75,140],[79,140],[79,190]],40)};
   via(EIXO.brigadeiro,'D',1.05);for(const k of ['paulista','vergueiro'])via(EIXO[k],'D',1.05);
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(dPol(x+.5,y+.5,EIXO.domingos)<=1.05)rua(x,y,y<=LEST?'D':'d');
+  {const bx=__caixa(EIXO.domingos,3.05);for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(x+.5<bx[0]||x+.5>bx[1]||y+.5<bx[2]||y+.5>bx[3])continue;if(dPol(x+.5,y+.5,EIXO.domingos)<=1.05)rua(x,y,y<=LEST?'D':'d');}}
   /* Av. Rodrigues Alves (bonde do Matadouro e de Santo Amaro) e a continuação para Santo Amaro (traçado a conferir) */
   const RALV=deg([[69,62],[61,62],[61,84],[53,84],[53,106],[46,106],[46,121]],40),SAMARO=deg([[46,121],[46,134],[38,134],[38,165],[31,165],[31,190]],40);
   via(RALV,'d',1.05);via(SAMARO,'d',1.05);
-  const trilho=P=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(dPol(x+.5,y+.5,P)<=.5&&!noCanto(x,y)&&'dD'.includes(M[y][x]))M[y][x]='e';};
+  const trilho=P=>{const bx=__caixa(P,2.5);for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(x+.5<bx[0]||x+.5>bx[1]||y+.5<bx[2]||y+.5>bx[3])continue;if(dPol(x+.5,y+.5,P)<=.5&&!noCanto(x,y)&&'dD'.includes(M[y][x]))M[y][x]='e';}};
   for(const k of ['paulista','vergueiro','domingos'])trilho(EIXO[k]);trilho(RALV);trilho(SAMARO);
   /* largos */
   const largo=(x,y,rx,ry,ch)=>{const X=Math.round(cx(x)),Y=Math.round(cy(y));for(let j=-ry;j<=ry;j++)for(let i=-rx;i<=rx;i++){const a=X+i,b=Y+j;if(a<0||b<0||a>=W||b>=H||noCanto(a,b))continue;if(!'WBRe'.includes(M[b][a]))M[b][a]=ch||'D';}};
@@ -17873,12 +17945,23 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   for(const g of R.LARGOS){const t=g.n.toUpperCase();L.push({t,w:Math.ceil(mc.measureText(t).width)+10,x:Math.round(g.x*16),y:Math.round(g.y*16),v:false,largo:true});}
   /* desliza cada plaquinha ao longo da rua até o trecho com menos gente e objetos em cima */
   const ocup=(p,d)=>{const cx=p.x+(p.v?0:d*16),cy=p.y+(p.v?d*16:0),hw=p.w/2+2,x0=(p.v?cx-7:cx-hw)/16,x1=(p.v?cx+7:cx+hw)/16,y0=(p.v?cy-hw:cy-7)/16,y1=(p.v?cy+hw:cy+7)/16;let k=0;
+    const PR=PIX&&PIX.perto(x0,x1,y0,y1);if(PR){for(const [t,q] of PR){if(t===2){if(q.x+1>x0&&q.x<x1&&q.y+1>y0&&q.y-.6<y1)k+=2;}else if(t===3){if(q.x+(q.w||1)>x0&&q.x<x1&&q.y+(q.h||1)>y0&&q.y<y1)k+=3;}else if(q.x+1>x0&&q.x<x1&&q.y+1>y0&&q.y<y1)k+=1;}}else{
     for(const n of npcs){if(n.scene!=='sp22')continue;if(n.x+1>x0&&n.x<x1&&n.y+1>y0&&n.y-.6<y1)k+=2;}
     for(const o of objects){if(o.scene!=='sp22')continue;if(o.x+(o.w||1)>x0&&o.x<x1&&o.y+(o.h||1)>y0&&o.y<y1)k+=3;}
-    for(const i of ITEMS){if(i.scene==='sp22'&&i.x+1>x0&&i.x<x1&&i.y+1>y0&&i.y<y1)k+=1;}
+    for(const i of ITEMS){if(i.scene==='sp22'&&i.x+1>x0&&i.x<x1&&i.y+1>y0&&i.y<y1)k+=1;}}
     /* não sair da rua */const M=SCN.sp22.map,tx=Math.floor(cx/16),ty=Math.floor(cy/16),e=Math.ceil(p.w/32);for(const q of [-e,e]){const X=p.v?tx:tx+q,Y=p.v?ty+q:ty;if(!M[Y]||!'dDeSp.'.includes(M[Y][X]||'#'))k+=50;}
     return k+Math.abs(d)*.2;};
-  const arruma=()=>{for(const p of L){if(p.x0==null){p.x0=p.x;p.y0=p.y;}p.x=p.x0;p.y=p.y0;let bd=0,bk=1e9;for(const d of [0,1,-1,2,-2,3,-3,4,-4,5,-5,6,-6]){const k=ocup(p,d);if(k<bk){bk=k;bd=d;}}if(p.v)p.y+=bd*16;else p.x+=bd*16;}};
+  /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): enquanto as placas deslizam, nada mais se mexe;
+     gente, objetos e itens do mapa ficam separados em pedaços de 8x8 quadradinhos para cada placa olhar só os de perto. Mesma conta. */
+  let PIX=null;const montaPIX=()=>{const B=new Map(),Z=8,poe=(t,q,ax,bx,ay,by)=>{const e=[t,q];if(![ax,bx,ay,by].every(Number.isFinite)){B.set('x'+B.size,[e]);return;}for(let cy=Math.floor(ay/Z)-1;cy<=Math.floor(by/Z)+1;cy++)for(let cx=Math.floor(ax/Z)-1;cx<=Math.floor(bx/Z)+1;cx++){const k=cy*100000+cx;let a=B.get(k);if(!a)B.set(k,a=[]);a.push(e);}};
+    const solto=[];
+    for(const n of npcs)if(n.scene==='sp22')poe(2,n,n.x,n.x+1,n.y-1,n.y+1);
+    for(const o of objects)if(o.scene==='sp22')poe(3,o,o.x,o.x+(o.w||1),o.y,o.y+(o.h||1));
+    for(const i of ITEMS)if(i.scene==='sp22')poe(1,i,i.x,i.x+1,i.y,i.y+1);
+    for(const [k,a] of B)if(typeof k==='string')solto.push(...a);
+    return {perto(x0,x1,y0,y1){if(![x0,x1,y0,y1].every(Number.isFinite))return null;const vi=new Set(),r=solto.slice();for(let cy=Math.floor(y0/Z);cy<=Math.floor(y1/Z);cy++)for(let cx=Math.floor(x0/Z);cx<=Math.floor(x1/Z);cx++){const a=B.get(cy*100000+cx);if(a)for(const e of a)if(!vi.has(e)){vi.add(e);r.push(e);}}return r;}};};
+  const arruma=()=>{PIX=montaPIX();try{arruma0();}finally{PIX=null;}};
+  const arruma0=()=>{for(const p of L){if(p.x0==null){p.x0=p.x;p.y0=p.y;}p.x=p.x0;p.y=p.y0;let bd=0,bk=1e9;for(const d of [0,1,-1,2,-2,3,-3,4,-4,5,-5,6,-6]){const k=ocup(p,d);if(k<bk){bk=k;bd=d;}}if(p.v)p.y+=bd*16;else p.x+=bd*16;}};
   arruma();setTimeout(arruma,2500);
   window.__ruas.placas=L;window.__ruas.arruma=arruma;
   function pinta(camX,camY){if(cur!=='sp22'||window.__ruasOff||window.__ruasChao)return;
@@ -18436,7 +18519,8 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
   const cobre=(x,y)=>objects.find(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
   /* parte do chão por onde dá para andar a partir da rua (para ninguém ficar preso num canto fechado) */
   const comp=new Uint8Array(C.W*C.H);const generico=q=>q&&/^p[ct]_/.test(q.id)&&!/^(Lote|Imóvel)/.test(q.name||'')&&!/^ig_|^m_/.test(q.__pc||'');
-  const rede=()=>{comp.fill(0);const st=[[60,28]];comp[28*C.W+60]=1;while(st.length){const [a,b]=st.pop();for(const [u,v] of [[1,0],[-1,0],[0,1],[0,-1]]){const x=a+u,y=b+v;if(x<0||y<0||x>=C.W||y>=C.H||comp[y*C.W+x]||!M[y]||SOLID.includes(M[y][x])||cobre(x,y))continue;comp[y*C.W+x]=1;st.push([x,y]);}}};rede();
+  /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): mesma conta, feita uma vez só. */
+  const rede=()=>{comp.fill(0);const CB=new Set();for(const o of objects){if(o.scene!==S)continue;const w=o.w||1,h=o.h||1;for(let y=Math.ceil(o.y);y<o.y+h;y++)for(let x=Math.ceil(o.x);x<o.x+w;x++)if(x>=0&&y>=0&&x<4096)CB.add(y*4096+x);}const st=[[60,28]];comp[28*C.W+60]=1;while(st.length){const [a,b]=st.pop();for(const [u,v] of [[1,0],[-1,0],[0,1],[0,-1]]){const x=a+u,y=b+v;if(x<0||y<0||x>=C.W||y>=C.H||comp[y*C.W+x]||!M[y]||SOLID.includes(M[y][x])||CB.has(y*4096+x))continue;comp[y*C.W+x]=1;st.push([x,y]);}}};rede();
   /* a frente de cada porta precisa chegar à rua: abre caminho tirando casa genérica ou telhado que estiver no meio */
   rel.portasAbertas=[];rel.portasPresas=[];
   for(const o of objects.filter(o=>o.scene===S&&(o.enter||o.room)&&o.door!=null)){const fx=o.x+o.door,fy=o.y+(o.h||1);usado.add(fy*4096+fx);usado.add((fy+1)*4096+fx);if(comp[fy*C.W+fx])continue;
@@ -18446,11 +18530,17 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
     let p=fim;while(p){const q=cobre(p[0],p[1]);if(generico(q))objects.splice(objects.indexOf(q),1);usado.add(p[1]*4096+p[0]);p=ant.get(p[1]*4096+p[0]);}
     rel.portasAbertas.push(o.id);rede();}
   const naRede=(x,y)=>x>=0&&y>=0&&x<C.W&&y<C.H&&comp[y*C.W+x]===1;
-  const ocup=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
+  /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): durante uma busca de lugar (acha1) nada muda de lugar,
+     então a lista de quadradinhos ocupados é montada uma vez por busca em vez de percorrer tudo a cada quadradinho. Mesmas respostas. */
+  let OC=null;const mapaOcup=()=>{const z=new Set(),K=(x,y)=>{if(x>=0&&y>=0&&x<4096)z.add(y*4096+x);};
+    for(const o of objects){if(o.scene!==S)continue;const w=o.w||1,h=o.h||1;for(let y=Math.ceil(o.y);y<o.y+h;y++)for(let x=Math.ceil(o.x);x<o.x+w;x++)K(x,y);}
+    for(const n of npcs)if(n.scene===S&&Number.isInteger(n.x)&&Number.isInteger(n.y))K(n.x,n.y);for(const i of ITEMS)if(i.scene===S&&Number.isInteger(i.x)&&Number.isInteger(i.y))K(i.x,i.y);return z;};
+  const ocup=(x,y)=>(OC&&x>=0&&y>=0&&x<4096&&Number.isInteger(x)&&Number.isInteger(y))?OC.has(y*4096+x):(objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y));
   const livre=(x,y)=>M[y]&&M[y][x]!==undefined&&!SOL.includes(M[y][x])&&!usado.has(y*4096+x)&&!ocup(x,y);
   const SAI=(C.saidas||[]).map(e=>e.r);const naSaida=(x,y)=>SAI.some(r=>x>=r[0]-1&&x<=r[2]+1&&y>=r[1]-1&&y<=r[3]+1);
   const acha=(x,y)=>acha1(x,y,14,6)||acha1(x,y,26,3)||acha1(x,y,40,1);
-  const acha1=(x,y,R,V)=>{const p=novoLugar(x,y),cx=Math.max(2,Math.min(C.W-3,p[0])),cy=Math.max(3,Math.min(C.H-3,p[1]));
+  const acha1=(x,y,R,V)=>{OC=mapaOcup();try{return acha1b(x,y,R,V);}finally{OC=null;}};
+  const acha1b=(x,y,R,V)=>{const p=novoLugar(x,y),cx=Math.max(2,Math.min(C.W-3,p[0])),cy=Math.max(3,Math.min(C.H-3,p[1]));
     for(let r=0;r<=R;r++)for(let b=cy-r;b<=cy+r;b++)for(let a=cx-r;a<=cx+r;a++){if(Math.max(Math.abs(a-cx),Math.abs(b-cy))!==r)continue;
       if(!livre(a,b)||naSaida(a,b)||!naRede(a,b))continue;let viz=0;for(let v=-1;v<=1;v++)for(let u=-1;u<=1;u++)if((u||v)&&livre(a+u,b+v)&&naRede(a+u,b+v))viz++;
       if(viz>=V&&(livre(a-1,b)||livre(a+1,b))&&(livre(a,b-1)||livre(a,b+1))){usado.add(b*4096+a);return [a,b];}}return null;};
@@ -19148,7 +19238,10 @@ if(!k||!ok(k))return old(c,x,y);c.imageSmoothingEnabled=false;c.drawImage(imgs[k
     ['Vendedor de doces',['Cocada, pé-de-moleque, quebra-queixo! Doce feito em casa!']],['Vendedora de doces',['Bolo de fubá e sonho! Fresquinho!']],['Vendedor de chapéus',['Chapéu de palha para o calor! Palheta, a moda do verão!']],['Vendedor de chapéus',['Chapéu-coco, chapéu de feltro... Homem de respeito não anda de cabeça descoberta.']],
     ['Jornaleiro',['Olha o jornal! A campanha do Bernardes e do Nilo esquenta!']],['Jornaleiro',['Olha A Gazeta! Notícias da Semana de Arte Moderna!']],['Senhora de chapéu',['Vou ao Mappin ver as novidades. Dizem que chegaram vestidos de Paris.']],['Senhor de terno',['Vou ao banco. Na Rua XV ficam os maiores bancos da cidade.']],['Operário a caminho da fábrica',['Pego o bonde para o Brás. O apito da fábrica não espera ninguém.']],['Senhora fazendo compras na Rua XV',['Fita de seda para o laço de cabelo da minha filha, renda valenciana para a roupa branca... e depois, chá no salão do Mappin.','Desde menina faço compras aqui: a Garraux, livraria magnífica; a Drogaria Baruel, quase na Praça da Sé; as joalherias da Rua XV, com coisas finíssimas vindas da Europa.','Quase tudo o que é fino vem de fora. Produzimos tão pouco!']],['Mãe operária olhando as vitrines',['Olhar a vitrine não custa nada. Comprar aqui, não dá: eu compro no Brás, nas lojas do bairro, e costuro a roupa das crianças em casa.','As balas da confeitaria são lindas. Mas com o salário da fábrica, bala é luxo.']],['Normalista',['Estudo na Escola Normal da Praça da República. Vou ser professora.']],['Estudante de Direito',['Saio da aula no Largo de São Francisco direto para o café.']]];
   const andantes=()=>{try{if(walkers.some(w=>w.id==='pass22_0'))return;const M=C.M;if(!M||!C.naRede)return;const W=M[0].length,H=M.length;
-      const livre=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&C.naRede(x,y)&&freeAt(S,x,y)&&'pDdeS,.'.includes(M[y][x]);
+      /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): mesma conta, feita uma vez só. */
+      const livre0=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&C.naRede(x,y)&&freeAt(S,x,y)&&'pDdeS,.'.includes(M[y][x]);
+      const LV=new Uint8Array(W*H);for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if(livre0(x,y))LV[y*W+x]=1;
+      const livre=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&LV[y*W+x]===1;
       const pts=[];for(let y=2;y<H-2;y+=3)for(let x=2;x<W-2;x+=3)if(livre(x,y))pts.push([x,y]);
       const bfs=(a,b)=>{const prev=new Int32Array(W*H).fill(-1),q=[a[0]+a[1]*W];prev[q[0]]=q[0];let h=0;while(h<q.length){const c=q[h++],x=c%W,y=(c/W)|0;if(x===b[0]&&y===b[1]){const P=[];for(let k=c;;k=prev[k]){P.push([k%W,(k/W)|0]);if(k===prev[k])break;}return P.reverse();}
         for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(!livre(nx,ny))continue;const n=nx+ny*W;if(prev[n]<0){prev[n]=c;q.push(n);}}}return null;};
@@ -21502,9 +21595,15 @@ window.__paulista82Ready=Promise.all(ready);
       rel.movidos.push('Solar da Marquesa -> ao lado do Pátio do Colégio');}}
     /* gente, bichos e objetos de pegar que ficaram debaixo dos prédios vão para a calçada */
     const preso=(x,y)=>objects.some(o=>o.scene===S&&o.__jm&&(o.w||1)>1&&x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h);
-    const livre=(x,y)=>M[y]&&'Dp.,'.includes(M[y][x])&&!preso(x,y)&&!objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&n.x===x&&n.y===y);
+    /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): durante uma busca de lugar (perto, arremate da 17ª rodada) nada muda de lugar,
+       então os quadradinhos ocupados são listados uma vez por busca. Mesmas respostas. */
+    let OC2=null;const mapa2=()=>{const z=new Set(),K=(x,y)=>{if(x>=0&&y>=0&&x<4096)z.add(y*4096+x);};
+      for(const o of objects){if(o.scene!==S)continue;const w=o.w||1,h=o.h||1;for(let y=Math.ceil(o.y);y<o.y+h;y++)for(let x=Math.ceil(o.x);x<o.x+w;x++)K(x,y);}
+      for(const n of npcs)if(n.scene===S&&Number.isInteger(n.x)&&Number.isInteger(n.y))K(n.x,n.y);return z;};
+    const livre=(x,y)=>M[y]&&'Dp.,'.includes(M[y][x])&&((OC2&&x>=0&&y>=0&&x<4096&&Number.isInteger(x)&&Number.isInteger(y))?!OC2.has(y*4096+x):(!preso(x,y)&&!objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)));
     const cabe=(x,y,w)=>{for(let i=0;i<w;i++)if(!livre(x+i,y))return false;return true;};
-    const perto=(x,y,w)=>{w=w||1;for(let r=1;r<16;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const xx=x+dx,yy=y+dy;if(xx<1||xx>C.W-2||yy<1||yy>C.H-2)continue;if(cabe(xx,yy,w))return [xx,yy];}return null;};
+    const perto=(x,y,w)=>{OC2=mapa2();try{return perto0(x,y,w);}finally{OC2=null;}};
+    const perto0=(x,y,w)=>{w=w||1;for(let r=1;r<16;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const xx=x+dx,yy=y+dy;if(xx<1||xx>C.W-2||yy<1||yy>C.H-2)continue;if(cabe(xx,yy,w))return [xx,yy];}return null;};
     /* ---- 5ª RODADA: lado oeste da Praça da Sé. O Edifício Guinle ocupa a frente toda da quadra, no tamanho cheio
        (desenho de prédio de escritórios; o prédio de Escritórios genérico sai). ---- */
     const guinle=objects.find(o=>o.scene===S&&o.id==='guinle')||nome(/Edif[íi]cio Guinle/);
@@ -22016,10 +22115,10 @@ window.__paulista82Ready=Promise.all(ready);
     /* 17ª rodada, arremate: objeto pequeno que mudou de lugar não pode formar barreira nem ficar na frente de porta */
     try{if(rel.r17&&rel.__a17){const bom=(xx,yy)=>M[yy]&&'DdS'.includes(M[yy][xx])&&livre(xx,yy)&&[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]].every(v=>M[yy+v[1]]&&'DdSeRp'.includes(M[yy+v[1]][xx+v[0]])&&livre(xx+v[0],yy+v[1]));
       const portas=new Set();for(const o of objects)if(o.scene===S&&o.door!=null&&(o.w||1)*(o.h||1)>1){portas.add((o.x+o.door)+','+(o.y+o.h));portas.add((o.x+o.door)+','+(o.y+o.h+1));}
-      for(const [q,pos] of rel.__a17){if(q.scene!==S)continue;const mudou=(q.x+','+q.y)!==pos,naPorta=portas.has(q.x+','+q.y);if(!mudou&&!naPorta)continue;const ox=q.x,oy=q.y;q.x=-9;let best=null;
+      for(const [q,pos] of rel.__a17){if(q.scene!==S)continue;const mudou=(q.x+','+q.y)!==pos,naPorta=portas.has(q.x+','+q.y);if(!mudou&&!naPorta)continue;const ox=q.x,oy=q.y;q.x=-9;let best=null;OC2=mapa2();
         for(let r=0;r<14&&!best;r++)for(let dy=-r;dy<=r&&!best;dy++)for(let dx=-r;dx<=r&&!best;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const xx=ox+dx,yy=oy+dy;if(xx<1||yy<1||xx>C.W-2||yy>C.H-2)continue;if(bom(xx,yy)&&!portas.has(xx+','+yy))best=[xx,yy];}
-        if(best){q.x=best[0];q.y=best[1];}else q.x=ox;}
-      delete rel.__a17;}}catch(e){console.warn('arremate r17',e);}
+        OC2=null;if(best){q.x=best[0];q.y=best[1];}else q.x=ox;}
+      delete rel.__a17;}}catch(e){OC2=null;console.warn('arremate r17',e);}
     try{if(window.__transito&&window.__transito.V)delete window.__transito.V[S];}catch(_){}
     try{if(typeof walkers!=='undefined')for(let i=walkers.length-1;i>=0;i--){const w=walkers[i];if(w.scene!==S||!w.path)continue;if(w.path.some(pt=>objects.some(q=>q.scene===S&&(q.w||1)*(q.h||1)>1&&pt[0]>=q.x&&pt[0]<q.x+(q.w||1)&&pt[1]>=q.y&&pt[1]<q.y+(q.h||1)))){walkers.splice(i,1);rel.pedestresFora=(rel.pedestresFora||0)+1;}}}catch(_){}
     /* ===== v168 — CENTRO DE 1922: TELHADOS COM PAREDE E VOLUME — cada telhado de cenário vira um prédio visto de frente e de cima (telhado de duas águas, beiral, parede com janelas), menos zinco, lotes separados (pedido do professor, 20/11/2026) ===== */
@@ -22340,11 +22439,16 @@ window.__paulista82Ready=Promise.all(ready);
       const ocp=(x,y)=>objects.some(o=>o.scene===S&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||npcs.some(n=>n.scene===S&&n.x===x&&n.y===y)||ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
       const porta=(x,y)=>objects.some(o=>o.scene===S&&o.enter&&Math.abs(x-(o.x+(o.door!=null?o.door:((o.w||1)>>1))))<=1&&y>=o.y+(o.h||1)&&y<=o.y+(o.h||1)+1);
       const bloq=(x,y)=>objects.some(o=>o.scene===S&&!o.enter&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1))||objects.some(o=>o.scene===S&&o.enter&&x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1));
+      /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): mesma conta, feita uma vez só. */
+      const cel=(z,x,y)=>{if(x>=0&&y>=0&&x<4096)z.add(y*4096+x);},chave=(x,y)=>Number.isInteger(x)&&Number.isInteger(y)&&x>=0&&y>=0&&x<4096;
       const perto=(re,dx)=>{const o=objects.find(q=>q.scene===S&&o0(q)&&re.test(q.name||''));if(!o)return null;const sx=o.x+(o.door!=null?o.door:((o.w||1)>>1)),sy=o.y+(o.h||1);
-        const seen=new Set([sx+','+sy]),Q=[[sx,sy,0]];let best=null;
-        while(Q.length){const [x,y,d]=Q.shift();if(d>14)break;
-          if(d>=2&&x>=2&&x<=M[0].length-3&&!ocp(x,y)&&!porta(x,y)){if(M[y][x]==='p'){if(!dx||Math.sign(x-sx)===Math.sign(dx))return [x,y];if(!best||best.ch!=='p')best=Object.assign([x,y],{ch:'p'});}else if(M[y][x]==='D'&&!best&&d>=3)best=Object.assign([x,y],{ch:'D'});}
-          for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=x+a,Y=y+b,k=X+','+Y;if(seen.has(k)||!M[Y]||!/[pDdeSR.,f]/.test(M[Y][X]||'')||bloq(X,Y))continue;seen.add(k);Q.push([X,Y,d+1]);}}
+        const OB=new Set(),OP=new Set();for(const q of objects){if(q.scene!==S)continue;const w=q.w||1,h=q.h||1;for(let y=Math.ceil(q.y);y<q.y+h;y++)for(let x=Math.ceil(q.x);x<q.x+w;x++){cel(OB,x,y);cel(OP,x,y);}}
+        for(const n of npcs)if(n.scene===S&&chave(n.x,n.y))cel(OP,n.x,n.y);for(const i of ITEMS)if(i.scene===S&&chave(i.x,i.y))cel(OP,i.x,i.y);
+        const bloqR=(x,y)=>chave(x,y)?OB.has(y*4096+x):bloq(x,y),ocpR=(x,y)=>chave(x,y)?OP.has(y*4096+x):ocp(x,y);
+        const seen=new Set([sx+','+sy]),Q=[[sx,sy,0]];let best=null;let qh=0;
+        while(qh<Q.length){const [x,y,d]=Q[qh++];if(d>14)break;
+          if(d>=2&&x>=2&&x<=M[0].length-3&&!ocpR(x,y)&&!porta(x,y)){if(M[y][x]==='p'){if(!dx||Math.sign(x-sx)===Math.sign(dx))return [x,y];if(!best||best.ch!=='p')best=Object.assign([x,y],{ch:'p'});}else if(M[y][x]==='D'&&!best&&d>=3)best=Object.assign([x,y],{ch:'D'});}
+          for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const X=x+a,Y=y+b,k=X+','+Y;if(seen.has(k)||!M[Y]||!/[pDdeSR.,f]/.test(M[Y][X]||'')||bloqR(X,Y))continue;seen.add(k);Q.push([X,Y,d+1]);}}
         return best?[best[0],best[1]]:null;};
       const o0=q=>true;
       const L=[['bola',56,/Mosteiro de S/,4,'Bola de futebol','Uma bola de couro costurado, com câmara de ar. Em 1922 o futebol enche os campos de várzea e os estádios dos clubes: Paulistano, Corinthians, Palestra Italia.'],
@@ -23473,7 +23577,10 @@ window.__paulista82Ready=Promise.all(ready);
     if(walkers.some(w=>w.id==='gn22_01'))return true;
     const C=window.__centro22||{};const M=(SCN[S]&&SCN[S].map);if(!M||!C.naRede||!(window.__jmTeste&&window.__jmTeste.r13))return false;
     const W=M[0].length,H=M.length;
-    const livre=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&freeAt(S,x,y)&&'pDdeS,.RVf'.includes(M[y][x]);
+    /* v256 — CENTRO DE 1922 ABRE MAIS RÁPIDO (pedido do professor, 22/11/2026): mesma conta, feita uma vez só. */
+    const livre0=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&freeAt(S,x,y)&&'pDdeS,.RVf'.includes(M[y][x]);
+    const LV=new Uint8Array(W*H);for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++)if(livre0(x,y))LV[y*W+x]=1;
+    const livre=(x,y)=>Number.isInteger(x)&&Number.isInteger(y)&&x>0&&y>0&&x<W-1&&y<H-1&&LV[y*W+x]===1;
     const perto=([x0,y0])=>{for(let r=0;r<10;r++)for(let y=y0-r;y<=y0+r;y++)for(let x=x0-r;x<=x0+r;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))!==r)continue;if(livre(x,y))return [x,y];}return null;};
     /* caminho de A até B; se B fica em outro pedaço da rede, vai até o ponto mais perto de B que dá para alcançar */
     const bfs=(a,b)=>{const prev=new Int32Array(W*H).fill(-1),q=[a[0]+a[1]*W];prev[q[0]]=q[0];let h=0,best=q[0],bd=1e9;
@@ -27301,6 +27408,16 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
     return true;}
   if(!monta()){let n=0;const iv=setInterval(()=>{if(monta()||++n>60)clearInterval(iv);},250);}
 }catch(e){console.warn('v254',e);}})();
+/* ===== v256 — SEM OS BALÕES "…" EM CIMA DAS PESSOAS (pedido do professor, 22/11/2026) =====
+   Os balões de "…" em cima de cada pessoa com quem ainda não se conversou ocupavam muito espaço na tela.
+   Eles saem. Continuam: o "!" das missões, a seta amarela, o balãozinho em cima do jogador quando dá para falar
+   e as bolinhas amarelas (ainda não conversou) e verdes (já conversou) no mapa pequeno. */
+(function(){try{
+  let CV=null;
+  const tira=()=>{const im=IMG&&IMG.EMO;if(!im||im===CV)return;const w=im.naturalWidth||im.width,h=im.naturalHeight||im.height;if(!w||!h||im.complete===false)return;
+    const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.drawImage(im,0,0);g.clearRect(0,0,14,h);CV=c;IMG.EMO=c;};
+  const r0=render;render=function(){try{tira();}catch(_){}return r0.apply(this,arguments);};
+}catch(e){console.warn('v256 balões',e);}})();
 
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
