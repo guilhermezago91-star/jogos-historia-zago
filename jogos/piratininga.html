@@ -371,7 +371,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cf25be29","kb":281,"m":2},{"f":"pac_e23.js?v=6db414b2","kb":428,"m":6},{"f":"pac_e234.js?v=91ca8dfe","kb":574,"m":14},{"f":"pac_e3.js?v=92d708af","kb":1620,"m":4},{"f":"pac_e34.js?v=4bc392e1","kb":1044,"m":12},{"f":"pac_e4.js?v=f8efa5b6","kb":7729,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cb3f043a","kb":344,"m":2},{"f":"pac_e23.js?v=6db414b2","kb":428,"m":6},{"f":"pac_e234.js?v=bd59bdab","kb":805,"m":14},{"f":"pac_e3.js?v=a669cf24","kb":1651,"m":4},{"f":"pac_e34.js?v=46c2dbf0","kb":1049,"m":12},{"f":"pac_e4.js?v=f8efa5b6","kb":7729,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -24614,6 +24614,382 @@ window.__DOCS22={
   setTimeout(()=>{try{gente();}catch(e){console.warn('gente 1922',e);}},5000);
   window.__gentePers22={P,POVO};
 }catch(e){console.warn('gente 1922',e);}})();
+
+/* ===== v250 — MAIS GENTE EM 1830, 1888 E 1922 (MUITOS NEGROS E NEGRAS), 8 ANIMAIS NOVOS E POVO DENTRO DAS CASAS E IGREJAS DE 1830 (pedido do professor, 21/11/2026) =====
+   Bonecos novos do Canva (N88_*): 1830 (barqueiro, pescadora, cego, alemão, indígena, sinhá, cativa, tipógrafo, estudante, Feijó), compartilhados 1830/1888/1922
+   (parteira, sineiro, pedreiro, barbeiro, bordadeira, costureira, quituteira, criança, funileiro, alfaiate, sapateiro, ferreiro, professora) e 1888
+   (cozinheira, jornaleiro, tanoeiro, alemão, português). Animais novos (BICHO_*): porco, cabra, ovelha, galinha, pato, burro de carga, vira-lata, gato rajado.
+   Gente de rua em volta dos prédios de 1830 e 1888, gente andando nos bairros de 1922 (o centro NÃO é tocado) e gente dentro das salas de 1830:
+   igrejas com a missa (mulheres de um lado, homens do outro, todos de frente para o altar, sem balão "..."). Só usa quadradinhos livres, por último,
+   e confere que a porta continua alcançável de todo lugar da sala. */
+(function(){try{
+  const tem=k=>typeof A!=='undefined'&&typeof A['N88_'+k]==='string';
+  /* ---------- animais (mesmo molde do gado: quadro de 80x64 desenhado em 40x32) ---------- */
+  const IG={};const img=k=>{if(IG[k])return IG[k];if(typeof A==='undefined'||typeof A['BICHO_'+k]!=='string')return null;const i=new Image();i.src=A['BICHO_'+k];return IG[k]=i;};
+  const ROW={down:0,right:1,up:2,left:3};
+  const dc=drawChar;drawChar=function(id,X,Y,dir,fr){if(typeof id==='string'&&id.indexOf('bicho|')===0){const i=img(id.slice(6));if(i&&i.complete&&i.naturalWidth){
+      const r=ROW[dir]??0,q=(fr||0)%4;ctx.imageSmoothingEnabled=false;ctx.fillStyle='rgba(20,27,27,.22)';ctx.fillRect(Math.round(X-4),Y+13,24,3);
+      ctx.drawImage(i,(r*4+q)*80,0,80,64,Math.round(X+8-20),Math.round(Y+16-32),40,32);}return;}
+    return dc.apply(this,arguments);};
+  const livre=(sc,x,y)=>{const S=SCN[sc],M=S&&S.map;if(!M||y<1||x<1||y>=M.length-1||x>=M[0].length-1)return false;return freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y);};
+  const caixa=(sc,x0,y0,r)=>{for(let d=0;d<12;d++)for(let y=y0-d;y<=y0+d;y++)for(let x=x0-d;x<=x0+d;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))!==d)continue;
+      if(livre(sc,x+1,y+1)&&livre(sc,x+2,y+1)&&livre(sc,x+1,y+2))return [x,y,x+r,y+r];}return null;};
+  const acha=(sc,x0,y0,R)=>{for(let d=0;d<=R;d++)for(let y=y0-d;y<=y0+d;y++)for(let x=x0-d;x<=x0+d;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))!==d)continue;if(livre(sc,x,y)&&livre(sc,x,y+1))return [x,y];}return null;};
+  const AN=" [Animal do jogo.]";
+  const BICHOS={
+   porco:['Porco',["Ronc, ronc!","Quase toda casa criava porco no quintal: ele comia as sobras e depois virava toucinho, banha e linguiça."]],
+   cabra:['Cabra',["Méééé!","A cabra dá leite e come qualquer mato. Era comum nos quintais e nas chácaras em volta da cidade."]],
+   ovelha:['Ovelha',["Bééé!","A lã das ovelhas era fiada e tecida em casa, em teares simples."]],
+   galinha:['Galinha',["Có-có-có-có!","Galinha solta ciscando no quintal: ovo fresco e caldo de galinha para quem estava doente."]],
+   pato:['Pato',["Quá, quá!","Os patos gostavam das poças e dos chafarizes. A água da cidade ainda corria a céu aberto em muitos pontos."]],
+   burro:['Burro de carga',["Hiiin-ón!","O burro leva carga nas costas ou puxa carroça. Muito do que chegava à cidade vinha em lombo de burro."]],
+   viralata:['Cachorro de rua',["Au, au!","Cachorro sem dono andava solto pela cidade, e a vizinhança dava um osso de vez em quando."]],
+   gatorajado:['Gato',["Miau.","O gato guarda a casa dos ratos. Por isso tinha lugar no armazém, na padaria e na cozinha."]]};
+  const ANI={sp:[ /* 1830 */
+    ['b23_porco30','porco',6,52,3],['b23_galinha30a','galinha',8,54,2],['b23_pato30','pato',13,45,2],['b23_cabra30','cabra',5,31,3],
+    ['b23_ovelha30','ovelha',72,53,3],['b23_cabra30b','cabra',74,50,3],['b23_burro30a','burro',43,66,4],['b23_burro30b','burro',48,64,4],
+    ['b23_viralata30','viralata',39,43,4],['b23_gato30','gatorajado',26,34,3],['b23_porco30b','porco',28,58,3],['b23_galinha30b','galinha',27,26,2]],
+   sp88:[ /* 1888 */
+    ['b23_burro88','burro',59,84,4],['b23_viralata88','viralata',60,79,4],['b23_gato88','gatorajado',43,45,3],['b23_galinha88a','galinha',101,79,3],
+    ['b23_pato88','pato',104,79,3],['b23_viralata88b','viralata',68,77,3],['b23_gato88b','gatorajado',72,64,3],['b23_porco88','porco',56,94,3],['b23_cabra88','cabra',38,44,3],['b23_ovelha88','ovelha',58,94,3]],
+   m_leste22:[['b23_galinha22a','galinha',20,20,3],['b23_viralata22a','viralata',40,30,4],['b23_gato22a','gatorajado',56,24,3]],
+   m_oeste22:[['b23_galinha22b','galinha',20,26,3],['b23_burro22','burro',44,36,4],['b23_viralata22b','viralata',60,20,4]],
+   m_sul22:[['b23_galinha22c','galinha',22,24,3],['b23_gato22b','gatorajado',50,30,3],['b23_viralata22c','viralata',36,44,4]]};
+  const poeBichos=()=>{let n=0;for(const sc in ANI){if(!SCN[sc]||!SCN[sc].map)continue;const L=[];
+      for(const [id,k,x0,y0,r] of ANI[sc]){if(walkers.some(w=>w.id===id))continue;const b=caixa(sc,x0,y0,r);if(!b)continue;const [nm,ln]=BICHOS[k];
+        L.push({id,spr:'bicho|'+k,name:nm,wander:b,speed:k==='burro'?0.9:1.0,lines:ln.concat([AN.trim()])});}
+      if(L.length)try{addWalkers(sc,L);n+=L.length;}catch(e){console.warn('bichos23',e);}}return n;};
+
+  /* ---------- gente de rua ---------- */
+  const D_NEG="Pessoas negras (escravizadas, libertas e livres) faziam a cidade funcionar: carregavam água, cozinhavam, construíam, vendiam comida e tinham ofícios.";
+  const P30=[ /* [id, boneco, x, y, nome, falas, diário, anda?] */
+   ['p23_cativa1','cativa30',33,23,'Mulher escravizada com os potes',["Estou indo ao chafariz buscar água para a casa dos meus senhores.","Quem carrega a água de todo dia, na cidade, são as escravizadas e os escravizados. Cada pote pesa que nem uma criança."],'Água em casa: em 1830 não havia encanamento. A água vinha dos chafarizes, e carregá-la era tarefa de pessoas escravizadas.'],
+   ['p23_cativa2','cativa30',47,30,'Criada do Palácio',["Trabalho na cozinha do Palácio do Governo, de sol a sol.","Quando eu era pequena, me trouxeram da África. Ainda tenho saudade da minha mãe."],'Em 1830 muitas casas importantes, inclusive a do governo, tinham pessoas escravizadas trabalhando dentro e fora.'],
+   ['p23_cuscuz1','cuscuz30',49,37,'Quituteira do tabuleiro',["Cuscuz, pamonha, bolinho e doce! Olha o tabuleiro fresquinho!","Muitas quitandeiras são negras, escravizadas \"de ganho\" ou libertas. Dividimos o lucro com a sinhá ou guardamos para comprar a nossa alforria."],'Quitandeiras: mulheres negras que vendiam comida pelas ruas. Algumas juntavam dinheiro para comprar a própria liberdade.',1],
+   ['p23_cuscuz2','cuscuz30',47,66,'Quituteira do rancho dos tropeiros',["Os tropeiros chegam cansados e famintos. Vendo angu, pamonha e café.","Eu já sou liberta. Comprei minha alforria com cinco anos de tabuleiro."],'Muitas mulheres negras conquistaram a alforria com o dinheiro do próprio trabalho.',1],
+   ['p23_parteira','parteira30',26,22,'Parteira',["Aqui quase ninguém tem médico. Quando uma criança vai nascer, chamam a parteira.","Aprendi com a minha avó, que aprendeu com a avó dela. Já ajudei a nascer metade da rua."],'Parteiras: mulheres, muitas negras, que faziam os partos em casa no tempo em que quase não havia médicos.'],
+   ['p23_sineiro1','sineiro30',41,42,'Sineiro da Sé',["Toco o sino para a missa, para a Ave-Maria e para os enterros. Cada toque quer dizer uma coisa.","O sino manda na hora da cidade. Ninguém aqui tem relógio."],'O sino da igreja marcava as horas e os acontecimentos da cidade. Era um trabalho muitas vezes feito por homens negros.'],
+   ['p23_sineiro2','sineiro30',41,8,'Ajudante do Mosteiro da Luz',["Ajudo as irmãs do Mosteiro da Luz: carrego lenha, varro o pátio e abro o portão.","As irmãs rezam o dia inteiro. Eu rezo e trabalho."],D_NEG],
+   ['p23_pedreiro1','pedreiro30',28,27,'Pedreiro de taipa',["Taipa de pilão é assim: a gente soca a terra molhada entre duas tábuas, camada por camada, até a parede subir.","Quase todas as casas daqui foram erguidas por mãos negras, escravizadas ou libertas."],'Taipa de pilão: técnica de construir paredes socando terra entre tábuas. Era feita por trabalhadores negros e indígenas.'],
+   ['p23_pedreiro2','pedreiro30',50,40,'Carregador do Carmo',["Carrego pedra e madeira para a obra do convento.","O peso é grande, mas o salário é pouco: um prato de comida e um canto para dormir."],D_NEG],
+   ['p23_barbeiro','barbeiroN',12,39,'Barbeiro negro',["Faço barba e corto cabelo. Aqui também se arrancam dentes e se fazem sangrias, que é o que o povo acha que cura tudo.","Muitos barbeiros da cidade são homens negros. Era um dos poucos ofícios em que um liberto ganhava respeito."],'Barbeiros: faziam barba, cortavam cabelo e também pequenos cuidados de saúde. Muitos eram negros libertos.'],
+   ['p23_ferreiro','ferreiroN',6,39,'Ferreiro',["Faço ferradura, enxada e dobradiça. Sem ferro não anda burro nem gira roda.","Aprendi o ofício com um mestre ferreiro. Hoje já sou eu quem ensina."],'Ferreiros produziam ferramentas e ferraduras. Muitos eram negros que dominavam o fogo e o metal.'],
+   ['p23_alfaiate','alfaiateN',5,23,'Alfaiate liberto',["Cortar o tecido é uma arte: meio centímetro errado e o casaco não veste.","Fui escravizado, mas aprendi o ofício e comprei a minha liberdade. Agora tenho a minha tenda."],'Alfaiates: muitos eram homens negros, que aprendiam o ofício e podiam comprar a alforria com o que ganhavam.'],
+   ['p23_sapateiro','sapateiroRua',2,23,'Sapateiro de rua',["Conserto sapato, bota e chinelo. Rua afora, vou onde o freguês chamar.","Em 1830 muita gente anda descalça, principalmente os escravizados: sapato era sinal de ser livre."],'Descalço ou calçado: na sociedade escravista, os escravizados andavam descalços, e o sapato marcava a liberdade.'],
+   ['p23_costureira','costureira',18,23,'Costureira',["Costuro para a casa de comissão e para as famílias ricas. Vestido, camisa, tudo à mão.","Trabalho com as minhas duas filhas. Juntas, a gente consegue pagar o aluguel."],D_NEG],
+   ['p23_bordadeira','bordadeira',28,23,'Bordadeira da casa liberta',["Bordo toalha, camisola e fronha. A renda é feita com bilro, devagarinho, ponto por ponto.","A mulher livre da cidade trabalha com a agulha. O meu dote eu bordei com as minhas mãos."],D_NEG],
+   ['p23_crianca1','criancaN',14,45,'Menino com a lata d\'água',["Levo água do Chafariz do Piques para a casa do meu patrão. É a minha tarefa de todo dia.","Eu queria era brincar de pião, mas não tem tempo."],'Crianças negras, escravizadas ou pobres, trabalhavam desde pequenas carregando água, recados e lenha.'],
+   ['p23_crianca2','criancaN',6,52,'Menina da chácara',["Eu cuido das galinhas e levo o almoço para o pessoal da roça.","Não frequento escola. Quase nenhuma criança negra frequenta."],'Em 1830 a escola era para poucos. Quase nenhuma criança negra ou pobre frequentava.'],
+   ['p23_barqueiro','barqueiro30',30,60,'Barqueiro do Tamanduateí',["Levo gente e carga de um lado para o outro do rio. O Tamanduateí enche e esvazia conforme a chuva.","Remo o dia inteiro. O dono do barco me paga um pouquinho por viagem."],'Barqueiros atravessavam pessoas e cargas pelos rios Tamanduateí e Anhangabaú, muitos eram negros livres.'],
+   ['p23_pescadora','pescadora30',27,59,'Pescadora do rio',["Pesco lambari e traíra com a peneira e o balaio. O que sobra eu vendo na rua.","Nos rios de São Paulo havia muito peixe nessa época."],'Os rios que cercavam São Paulo davam peixe. Muitas mulheres negras e indígenas pescavam e vendiam.'],
+   ['p23_cego','cego30',37,41,'Homem cego na porta da Sé',["Sou cego e peço esmola na porta da igreja. Quem ajuda, Deus ajuda.","Não existe nenhum amparo para quem não enxerga. Quem dá uma moedinha ou um pedaço de pão faz muito por mim."],'Esmola: sem políticas públicas, quem não podia trabalhar dependia de esmolas, principalmente nas portas das igrejas.'],
+   ['p23_alemao','alemao30',34,32,'Colono alemão de Santo Amaro',["Vim da Alemanha com a minha família. O governo de São Paulo nos deu terra em Santo Amaro, no começo de 1829.","A terra é dura e o clima é úmido. Mas a gente planta e vai levando."],'Em 1827-29 o governo trouxe famílias alemãs para Santo Amaro, ao sul da cidade. Foram das primeiras colônias de imigrantes em São Paulo.'],
+   ['p23_indigena','indigena30',45,66,'Indígena da aldeia de Pinheiros',["Venho da aldeia de Pinheiros. Trago lenha e cestos para vender na cidade.","Meu povo já vivia aqui antes de São Paulo existir. Muita coisa do que você usa, a mandioca, a rede, a canoa, é nossa."],'Indígenas de aldeias em volta da cidade, como Pinheiros e Barueri, vendiam lenha e cestos em São Paulo.'],
+   ['p23_sinha','sinha30',50,30,'Senhora da casa',["Sou casada com um proprietário de terras. Saio pouco de casa, só para a missa.","Mulher casada em 1830 não pode nem assinar um contrato sem o marido."],'Mulheres brancas das famílias ricas ficavam muito em casa. Sem o marido, não podiam assinar contratos.'],
+   ['p23_tipografo','tipografo30',31,30,'Tipógrafo',["Componho as letras de chumbo uma por uma, de trás para frente, para o jornal sair.","Em 1830 a tipografia é nova na cidade. Quando o jornal sai, todo mundo corre para ler."],'Tipógrafos organizavam as letras de chumbo para imprimir jornais, como "O Farol Paulistano", o primeiro de São Paulo (1827).'],
+   ['p23_estudante','estudante30',28,37,'Estudante da Academia de Direito',["Estudo na Academia de Direito do Convento de São Francisco, aberta em 1828.","Os estudantes moram em repúblicas, cantam à noite e discutem política até de madrugada."],'A Academia de Direito de São Paulo foi aberta em 1828 no Convento de São Francisco.'],
+   ['p23_feijo','feijo30',43,41,'Padre Feijó',["Sou o padre Diogo Antônio Feijó, deputado por São Paulo.","Desde março de 1830, o tráfico de africanos é proibido por um tratado com a Inglaterra. Mas ninguém fiscaliza. Eu quero que a lei seja cumprida.","Além disso, defendo que os padres possam se casar e que o Brasil tenha escolas para todos."],'Em março de 1830 o tráfico de africanos tornou-se ilegal no Brasil, mas continuou. O padre Feijó, paulista, foi deputado e depois regente do Império.']
+  ];
+  const D88="Em 1888, a abolição da escravidão (13 de maio) deixou milhares de pessoas livres, mas sem terra, sem escola e sem emprego garantido.";
+  const P88=[
+   ['p88_cozinheira1','cozinheira88',38,41,'Cozinheira do palacete',["Faço a comida de toda a família do palacete. Cozinho desde que eu era menina.","Depois da lei de 13 de maio, continuei na mesma cozinha, mas agora recebo salário."],D88],
+   ['p88_cozinheira2','cozinheira88',100,79,'Cozinheira da Hospedaria dos Imigrantes',["Eu cozinho para os imigrantes que chegam de navio. Sopa, arroz e carne de panela, para quase mil pessoas por dia.","Ninguém aqui pergunta de onde eu vim. Na panela, todo mundo quer ser servido."],'A Hospedaria dos Imigrantes (1887) acolhia os imigrantes que chegavam para trabalhar nas fazendas de café.'],
+   ['p88_jornaleiro1','jornaleiro88',72,60,'Jornaleiro d\'A Província',["Jornal! Jornal! Leia todas as notícias!","Hoje o assunto é a abolição. Todo mundo quer saber das novidades, e o jornal vende que nem pão quente."],'Jornaleiros vendiam jornais nas ruas gritando as manchetes. Muitos eram meninos pobres ou negros.',1],
+   ['p88_jornaleiro2','jornaleiro88',58,66,'Jornaleiro da Faculdade',["Vendo jornal para os doutores e os estudantes da Faculdade de Direito.","Os estudantes compram o jornal para ler a abolição. Um deles me deu um tostão a mais e me chamou de cidadão."],D88,1],
+   ['p88_tanoeiro1','tanoeiro88',44,46,'Tanoeiro do depósito',["Faço barril de madeira para a cerveja e para o vinho. Cada tábua tem de encaixar certinho.","Quando era escravizado, nunca me deixaram aprender um ofício assim. Agora, de liberto, eu aprendo."],D88],
+   ['p88_tanoeiro2','tanoeiro88',78,84,'Tanoeiro do teatro',["Conserto barris e caixas do depósito do Teatro São José.","O trabalho é duro, mas é meu: ninguém manda no meu tempo depois do expediente."],D88],
+   ['p88_alemao','alemao88',100,82,'Imigrante alemão',["Cheguei com a mulher e dois filhos. Vamos para uma fazenda de café do interior.","O contrato é de colonato: a gente cuida de um número de pés de café e recebe uma parte."],'Imigrantes europeus, entre eles alemães e italianos, substituíram aos poucos os trabalhadores escravizados nas fazendas de café.'],
+   ['p88_portugues','portugues88',61,85,'Imigrante português',["Vim de Portugal para ganhar a vida. Carrego as minhas trouxas pelas ruas procurando trabalho.","Aqui os patrícios abrem padaria, armazém e quitanda."],'Imigrantes portugueses abriram padarias, armazéns e quitandas pela cidade.'],
+   ['p88_professora','professoraN',62,80,'Professora normalista',["Sou professora de primeiras letras. Estudei na Escola Normal para ensinar crianças a ler e escrever.","Poucas moças negras chegam à Escola Normal. Eu me esforcei muito, e quero que meus alunos cheguem mais longe do que eu."],'A Escola Normal formava professoras em São Paulo. Poucas mulheres negras chegavam a se formar nessa época.'],
+   ['p88_parteira','parteira30',72,64,'Parteira do bairro',["Ajudo as mulheres do bairro a dar à luz. Algumas me chamam de comadre.","Muita gente liberta mora aqui nos fundos. A gente se ajuda: quem pode leva um caldo, quem pode cuida da criança."],'Em 1888 libertas e libertos ajudavam-se em redes de vizinhança.'],
+   ['p88_sineiro','sineiro30',71,72,'Sineiro da Sé',["O sino da Sé toca para as missas e para as horas. Hoje tocou festa: era dia de celebração da liberdade.","Quando o sino toca alegre, a cidade inteira sabe que alguma coisa boa aconteceu."],D88],
+   ['p88_pedreiro','pedreiro30',58,70,'Pedreiro das obras',["A cidade cresce tanto que não tem pedreiro que chegue. Eu levanto parede de tijolo o dia todo.","Os tijolos vêm das olarias do Brás. Muitos trabalhadores são libertos, e agora recebem por dia."],'A cidade crescia: em 1888 o tijolo substituía a taipa e a demanda por pedreiros era enorme.'],
+   ['p88_barbeiro','barbeiroN',44,69,'Barbeiro',["Barba, cabelo e bigode. Faço o melhor corte de São Paulo!","Depois de 13 de maio, mais gente liberta vem se sentar na minha cadeira: alguns querem aparecer bem na rua e ser tratados como cidadãos."],D88],
+   ['p88_ferreiro','ferreiroN',36,69,'Ferreiro',["Faço ferradura, grade e roda de carroça. O fogo é o meu amigo.","Meu avô era ferreiro na África. Aprendi com meu pai, que foi escravizado. O ofício atravessou o mar comigo."],'Muitos ferreiros no Brasil descendiam de africanos que dominavam a metalurgia.'],
+   ['p88_alfaiate','alfaiateN',36,53,'Alfaiate',["Faço terno para os doutores, os estudantes e os fazendeiros. Sou o melhor alfaiate do bairro.","Ensino o ofício para os meninos libertos. Eles precisam de ofício, porque terra eles não têm."],D88],
+   ['p88_cuscuz1','cuscuz30',70,78,'Quituteira do tabuleiro',["Cuscuz, pamonha, bolo de milho! Quentinho!","Antes era a sinhá quem ficava com o meu dinheiro. Agora o lucro é meu."],D88,1],
+   ['p88_cuscuz2','cuscuz30',71,70,'Quitandeira do Largo da Sé',["Vendo frutas e quitutes aqui no largo. Faz mais de vinte anos.","A cidade mudou muito, mas o povo continua gostando do meu cuscuz."],D88,1],
+   ['p88_bordadeira','bordadeira',40,45,'Bordadeira',["Bordo para as senhoras da sociedade. Uma toalha de mesa me toma duas semanas.","Fui ensinada por uma tia, que aprendeu com a patroa dela."],D88],
+   ['p88_costureira','costureira',57,94,'Costureira',["Costuro para a loja de tecidos. Quem tem uma máquina Singer vive melhor, mas eu só tenho agulha.","Uma costureira ganha pouco, mas é um salário."],D88],
+   ['p88_crianca','criancaN',44,75,'Menino do Chafariz do Piques',["Levo água do chafariz para as casas do bairro. Ganho um vintém por lata.","Agora que sou livre, posso ir à escola. Falta só o caderno."],D88],
+   ['p88_sapateiro','sapateiroRua',67,85,'Sapateiro de rua',["Conserto sapato por uma moeda. Com o fim da escravidão, mais gente quer calçar sapato: é sinal de dignidade.","Descalço fica quem não tem escolha."],D88],
+   ['p88_funileiro','funileiro',66,84,'Funileiro',["Conserto panela, lata e regador. Faço também lampião de querosene.","Os funileiros andam de porta em porta com a ferramenta no ombro."],'Funileiros consertavam objetos de lata e folha-de-flandres, de casa em casa.']
+  ];
+
+  /* ---------- MAIS MULHERES (ofícios femininos que faltavam). Personagens inventadas, no lugar das mulheres que faziam esse trabalho ---------- */
+  const INV=" [Personagem inventada para o jogo: representa as mulheres que faziam este trabalho.]";
+  const DM=(t)=>t+INV;
+  const M30=[
+   ['m30_rendeira','rendeiraN',43,35,'Rendeira',["Faço renda de bilro: são dezenas de fusinhos de madeira, e cada nó é um pontinho da flor.","Vendo renda para enfeitar toalha e camisola. A renda cobre o pano da casa e paga o feijão."+INV],'Rendeiras: mulheres que faziam renda de bilro, um trabalho paciente que ajudava a sustentar muitas casas.'],
+   ['m30_engomadeira','engomadeiraN',16,46,'Engomadeira',["Passo roupa com um ferro de brasa, pesado como uma pedra. A goma de mandioca deixa a camisa dura e branquinha.","Engomar a roupa dos senhores é trabalho de mulher, e quase sempre de mulher negra."+INV],'Engomadeiras: passavam a roupa a ferro com goma de mandioca. Era trabalho feminino, em geral de mulheres negras.'],
+   ['m30_benzedeira','benzedeiraN',8,53,'Benzedeira',["Benzo quebranto, mau-olhado e dor de cabeça com ramo de arruda e reza.","Num tempo em que quase não há médico, o povo corre para a benzedeira, a parteira e a mulher que conhece as ervas."+INV],'Benzedeiras: mulheres que rezavam e usavam ervas para curar. Em 1830, quase não havia médicos na cidade.'],
+   ['m30_fiandeira','fiandeiraN',70,54,'Fiandeira',["Fio algodão no fuso e na roca. Da roca sai o fio, e do fio, o pano que veste a casa.","Em muitos sítios as mulheres fiam e tecem o pano grosso da roupa de toda a família."+INV],'Fiandeiras e tecelãs: faziam o pano caseiro. Em 1830 quase toda roupa comum ainda era feita à mão.'],
+   ['m30_ama','amaN',46,29,'Ama de leite',["Estou amamentando o filho da minha senhora. O meu próprio bebê ficou com outra mulher.","Muitas amas de leite eram escravizadas. O leite delas alimentava as crianças brancas."+INV],'Amas de leite: mulheres, em geral escravizadas, que amamentavam os filhos dos senhores.'],
+   ['m30_cozinheira','beneditaRes|3',15,22,'Cozinheira da casa grande',["Fogão de lenha, panela de barro e muito feijão com toucinho. Eu cozinho para quinze pessoas.","Acordo antes do sol. A cozinha é onde eu passo a vida inteira."+INV],'Cozinheiras: mulheres, muitas escravizadas, que alimentavam as famílias grandes da cidade.'],
+   ['m30_mestra','mestraN',30,40,'Mestra de primeiras letras',["Ensino meninas a ler, escrever e bordar, na sala da minha casa. Quase não há escola para mulheres.","A lei de 1827 manda abrir escolas para meninas, mas poucas saem do papel."+INV],'Em 1827 uma lei mandou abrir escolas de primeiras letras, inclusive para meninas, mas poucas funcionavam.'],
+   ['m30_doceira','doceiraN',24,36,'Doceira do convento',["Faço doce de abóbora, de goiaba e cocada, e vendo na porta do convento.","As freiras e as senhoras dividem receitas de doce, que passam de mãe para filha."+INV],'Doceiras: faziam doces em tachos de cobre e vendiam na rua ou nos conventos.'],
+   ['m30_sitiante','colona|3',75,54,'Mulher do sitiante',["Meu marido planta milho e feijão. Eu cuido da horta, do porco e das galinhas, e levo o excedente para vender na cidade.","Muita mulher dos sítios de Pinheiros e da Penha vem à cidade vender verdura aos sábados."+INV],'Mulheres de sítios em volta da cidade, como Pinheiros e Penha, vendiam verdura e ovos em São Paulo.']
+  ];
+  P30.push(...M30);
+  const INVG=" [Personagem inventado para o jogo: representa as pessoas que viviam e trabalhavam assim.]";
+  const AQ30=[
+   ['aq30_tropeiro','tropeiroN',50,63,'Tropeiro com a trouxa nas costas',["Desci a serra com a tropa de mulas, carregada de açúcar e toucinho. Cansei os pés e a paciência.","Durmo no rancho, ao lado das mulas. Amanhã sigo para Santos."+INVG],'Tropeiros levavam e traziam mercadorias a lombo de mula. Os ranchos de beira de estrada serviam de pouso.'],
+   ['aq30_paulista','paulistaN',30,45,'Paulista de poncho',["O poncho é bom contra o frio e a garoa. São Paulo amanhece gelada, sabia?","Moro num sítio da roça. Venho à cidade só para o mercado e para a missa."+INVG],'O paulista da roça usava poncho e chapéu de aba larga contra o frio e a garoa.',1],
+   ['aq30_carreg','carregadoraN',40,50,'Carregadora com a trouxa na cabeça',["Levo a roupa lavada na cabeça, sem derrubar uma peça. Aprendi desde menina.","Ando descalça, de ponta a ponta da cidade. Quem me contrata paga pouco."+INVG],'Muitas mulheres, escravizadas ou libertas, carregavam trouxas, cestos e potes na cabeça pelas ruas.',1],
+   ['aq30_criado','criadoN',46,33,'Criado de cartola e guarda-chuva',["Acompanho o meu senhor e levo o guarda-chuva dele. Se chove, ele se molha menos do que eu.","Em 1830 a cidade tem poucas pessoas de cartola. Mas ele faz questão."+INVG],'Em 1830 os criados acompanhavam os senhores, carregando guarda-chuva e recados.',1],
+   ['aq30_oficial','oficialN',49,28,'Oficial da milícia',["Sou oficial da milícia paulista. Quando há festa ou desfile, é a gente que marcha.","Fardas azuis e pluma vermelha: o povo olha, e eu finjo que não ligo."+INVG],'Em 1830 ainda existiam as milícias, que depois deram lugar à Guarda Nacional (1831).'],
+   ['aq30_criada','criadaN',48,31,'Criada de vestido branco',["Lavo e passo o vestido branco toda semana. O lenço amarelo é o meu enfeite.","A senhora diz que sou de casa. Mas casa de verdade é a minha, que eu nunca vejo."+INVG],'Muitas criadas e mucamas usavam vestido branco e lenço na cabeça.'],
+   ['aq30_menino','meninoN',35,55,'Menino de boné vermelho',["Corro com os recados do meu pai. Cada recado vale uma bala de coco.","Quando crescer, quero ser tropeiro e ver o mar."+INVG],'Crianças pobres faziam recados e pequenos serviços para ajudar em casa.',1],
+   ['aq30_menina','meninaN',36,48,'Menina de vestido preto e fita',["Estou indo à missa com a minha mãe. Fita vermelha só em dia de festa.","Aprendi a rezar antes de aprender a ler."+INVG],'Meninas de família iam à missa de vestido escuro e fita no cabelo.',1]
+  ];
+  P30.push(...AQ30);
+  const M88=[
+   ['m88_rendeira','rendeiraN',41,45,'Rendeira',["Faço renda de bilro para as lojas da Rua Direita. Uma toalha me toma um mês.","Quem sabe fazer renda sempre tem um trocado."+INV],'Rendeiras: mulheres que faziam renda de bilro para as lojas da cidade.'],
+   ['m88_engomadeira','engomadeiraN',47,73,'Engomadeira',["Passo e engomo a roupa da freguesia, no tanque do Piques. Cada colarinho demora meia hora.","Agora que sou livre, cobro por peça. Antes, a minha senhora ficava com tudo."+INV],D88],
+   ['m88_benzedeira','benzedeiraN',60,90,'Benzedeira',["Benzo criança com mau-olhado e dou chá de erva-cidreira. A bênção é de graça.","Quando a doença é grave, aí sim se chama o médico."+INV],'Benzedeiras continuavam a cuidar da saúde do povo, num tempo em que médicos eram poucos e caros.'],
+   ['m88_mucama','beneditaRes|0',36,40,'Mucama liberta',["Fui mucama da família por vinte anos. Hoje trabalho aqui por salário, e posso ir embora se quiser.","Escolhi ficar, porque meus filhos moram na casa dos fundos. Mas a escolha agora é minha."+INV],D88],
+   ['m88_ama','amaN',55,60,'Ama-seca',["Cuido de duas crianças de uma família rica. Dou banho, conto história e faço dormir.","As crianças me chamam de mãe preta. Mas eu tenho os meus filhos, que quase não vejo."+INV],'Amas e amas-secas cuidavam das crianças das famílias ricas, e deixavam os próprios filhos em casa.'],
+   ['m88_modista','modistaN',33,52,'Modista',["Faço vestido sob medida, com figurino que chega de Paris. Cada vestido demora uma semana.","A máquina de costura Singer mudou o meu ofício: eu faço em um dia o que antes levava três."+INV],'Modistas: costureiras que faziam vestidos sob medida, seguindo as modas que chegavam da Europa.'],
+   ['m88_carvao','colona|2',46,50,'Vendedora de carvão',["Carvão e lenha para o fogão! Carrego o saco na cabeça.","A cidade cresce, e tudo ainda se cozinha com carvão."+INV],'Em 1888 o carvão e a lenha eram o combustível das cozinhas. Muitas mulheres os vendiam de porta em porta.'],
+   ['m88_piano','pianoN',45,38,'Professora de piano',["Ensino piano às moças de família. Saber tocar é um enfeite e uma garantia de casamento.","Ainda poucas mulheres trabalham fora, mas dar aula em casa é aceito."+INV],'Aulas de piano eram um sinal de distinção para moças de famílias ricas.'],
+   ['m88_tecela','tecelaFab|1',42,38,'Operária da tecelagem',["Trabalho numa fábrica de tecidos. Doze horas de tear, e o salário é metade do dos homens.","Muitas operárias são mulheres e crianças. A fábrica prefere porque paga menos."+INV],'No fim do século XIX, as fábricas de tecidos empregavam muitas mulheres e crianças, com salários baixos.'],
+   ['m88_cozfaz','cozinheira88|0',50,60,'Cozinheira da fazenda',["Cozinhei para os colonos da fazenda do meu patrão. Hoje vim buscar sal e farinha na cidade.","Na fazenda, o sino acorda a gente às quatro da manhã. A cozinha acorda antes."+INV],D88]
+  ];
+  P88.push(...M88);
+  const AQ88=[
+   ['aq88_carreg','carregadoraN',44,60,'Carregadora com a trouxa na cabeça',["Carrego a roupa lavada na cabeça. Agora ganho por trouxa, e ninguém manda em mim.","Depois do 13 de maio, continuo no mesmo serviço. Só mudou o dono do meu tempo."+INVG],D88,1],
+   ['aq88_ensacador','ensacadorN',60,70,'Ensacador de café',["Encho os sacos de café na estação. Cada saco pesa sessenta quilos, e carrego o dia inteiro.","O café que sai daqui vai para o porto de Santos e para a Europa."+INVG],'Ensacadores e carregadores trabalhavam nas estações e armazéns, levando o café para o trem e para o porto.',1],
+   ['aq88_criado','criadoN',50,50,'Criado de cartola',["Sirvo numa casa de família rica. O senhor gosta de ver o criado de cartola na porta.","A abolição foi em maio, mas na casa dele quase nada mudou."+INVG],D88,1],
+   ['aq88_criada','criadaN',55,62,'Criada de vestido branco',["Lavo, passo e sirvo à mesa. O vestido branco é farda de casa.","Agora recebo salário, mas ainda acordo antes do sol."+INVG],D88],
+   ['aq88_menino','meninoN',40,55,'Menino de boné vermelho',["Vendo jornal e levo recado. Meu pai trabalha na estrada de ferro.","Se eu juntar dinheiro, compro botas."+INVG],'Meninos jornaleiros e de recado eram comuns nas ruas da cidade.',1],
+   ['aq88_menina','meninaN',42,52,'Menina de vestido preto e fita',["Minha mãe me veste de preto para a missa. Fita vermelha é segredo meu.","Gosto de ver o trem chegar na estação."+INVG],'Meninas iam à missa de vestido escuro e fita no cabelo.',1],
+   ['aq88_tropeiro','tropeiroN',35,75,'Tropeiro com a trouxa nas costas',["Ainda venho de mula, apesar do trem. Tem carga que só a mula alcança.","A estrada de ferro está acabando com o meu ofício."+INVG],'Com a chegada da estrada de ferro (1867), muitos tropeiros perderam o ofício, mas ainda levavam cargas a lugares sem trilho.',1]
+  ];
+  P88.push(...AQ88);
+
+  const poeGente=(sc,L)=>{let falta=0;for(const [id,key,x0,y0,nome,lines,diary,anda] of L){
+      if(npcs.some(n=>n.id===id)||walkers.some(w=>w.id===id))continue;if(!tem(key.split('|')[0])){falta++;continue;}
+      const KS=key.indexOf('|')>=0?key:key+'|0';
+      if(anda){const b=caixa(sc,x0,y0,5);if(!b){falta++;continue;}try{addWalkers(sc,[{id,spr:'h22_n|'+KS,name:nome,wander:b,speed:1.2,lines}]);}catch(e){falta++;}continue;}
+      const p=acha(sc,x0,y0,10);if(!p){falta++;continue;}
+      try{npcIn(sc,id,'colono',p[0],p[1],nome,lines,diary);const n=npcs.find(n=>n.id===id);if(n)n.spr='h22_n|'+KS;}catch(e){falta++;}}return falta;};
+
+  /* ---------- 1922: gente andando nos bairros (o centro não é tocado) ---------- */
+  const P22={
+   m_leste22:[['tecelaFab|0','Tecelã do Brás',["Doze horas no tear. Saio da fábrica à noite e ainda tenho a casa para cuidar."+INV]],['parteira30|0','Parteira do Brás',["Trago ao mundo as crianças dos operários. Muitas nascem na mesma cama onde a mãe dorme."+INV]],['doceiraN|0','Doceira do Belenzinho',["Faço quindim e brigadeiro de panela... quer dizer, quindim e cocada! Vendo na porta da fábrica."+INV]],['rendeiraN|0','Rendeira da Mooca',["Faço renda e bordado em casa. Ganho por peça, enquanto cuido das crianças."+INV]],['carregadorS|1','Carregador negro do Brás',["Carrego sacas de café e de farinha dos armazéns para as carroças.","Ganho por saca. Dia de chuva, ninguém me paga."]],['pedreiro30|0','Pedreiro negro da Mooca',["Levanto casas para os operários da fábrica. Casa nova em todo lugar, mas o salário é o mesmo."]],['costureira|0','Costureira negra do Brás',["Costuro em casa para uma fábrica de roupas. Pagam por peça, e eu faço até de madrugada."]],['criancaN|0','Menino engraxate',["Engraxo sapato na porta da estação por dois tostões. Ajudo em casa."]]],
+   m_oeste22:[['engomadeiraN|0','Engomadeira da Lapa',["Engomo e passo as roupas de cama dos hotéis. Ferro de carvão no calor, o dia inteiro."+INV]],['benzedeiraN|0','Benzedeira da Barra Funda',["Benzo quebranto e dor de barriga. O povo da Barra Funda ainda confia mais em mim do que no médico."+INV]],['professoraN|0','Professora da Lapa',["Dou aula na escola da Lapa. Formei-me na Escola Normal e sustento a casa com o meu salário."+INV]],['lavadeiraNegra22|0','Lavadeira da Barra Funda',["Lavo a roupa da freguesia no tanque. Meu pai e minha mãe foram escravizados, e eu já nasci livre.","No carnaval, o Cordão Camisa Verde sai aqui na Barra Funda: é a festa do povo preto de São Paulo."]],['ferreiroN|0','Ferreiro negro da Lapa',["Trabalho numa oficina de ferrovia. Conserto trilho, roda de vagão e engate."]],['sineiro30|0','Carregador da Água Branca',["Carrego caixas na Matarazzo. Muita gente preta da Barra Funda trabalha nas fábricas e nas ferrovias."]],['barbeiroN|0','Barbeiro da Barra Funda',["Meu salão é pequeno, mas tem fila de domingo. Rapaz que vai para o baile quer bigode feito."]]],
+   m_sul22:[['rendeiraN|0','Rendeira da Liberdade',["Faço renda de bilro e crochê para as lojas do centro."+INV]],['doceiraN|0','Doceira da Liberdade',["Faço doce de abóbora e vendo na porta do cinema. É assim que ajudo no orçamento."+INV]],['parteira30|0','Parteira do Bexiga',["Ajudei a nascer metade das crianças do Bexiga, de italiano a preto. Cobro o que a família pode pagar."+INV]],['alfaiateN|0','Alfaiate negro do Bexiga',["Moro no Bexiga, onde convivem negros, italianos e brasileiros. Todo mundo aprende um pouco da língua do outro.","Faço terno para o casamento e para o enterro."]],['cuscuz30|0','Quituteira do Bexiga',["Vendo bolinho e doce na porta da cantina. Aqui o povo come de tudo, do macarrão ao angu."]],['bordadeira|0','Bordadeira da Liberdade',["Bordo toalha de mesa para uma loja japonesa. Aprendi com uma vizinha nova que veio do Japão."]],['professoraN|0','Professora da Vila Mariana',["Dou aula num grupo escolar. Meus alunos são filhos de italianos, portugueses, negros e japoneses."]]],
+   m_paulista22:[['modistaN|0','Modista da Paulista',["Faço vestido de baile para as moças da Avenida. Um vestido leva dez metros de seda."+INV]],['pianoN|0','Professora de piano',["Dou aula de piano a domicílio. A moça de família que sabe tocar vale mais no casamento."+INV]],['domesticaNegra22|0','Babá negra com as crianças',["Cuido das crianças da patroa e levo elas para tomar sol no Trianon.","Meus avós foram escravizados em fazenda de café. Hoje eu sou empregada, e meu salário é pago em dinheiro."]],['pedreiro30|0','Pedreiro negro dos palacetes',["Levanto os palacetes da Avenida Paulista. Tijolo aqui, tijolo ali: a Paulista está toda em obras."]]]
+  };
+  const gente22=()=>{let n=0;for(const sc in P22){const S=SCN[sc];if(!S||!S.map)continue;if(walkers.some(w=>w.id&&w.id.indexOf('p23w_'+sc)===0))continue;
+      const M=S.map,H=M.length,W=M[0].length,L=[];let k=0;
+      const ocup=(x,y)=>npcs.some(q=>q.scene===sc&&Math.abs(q.x-x)<3&&Math.abs(q.y-y)<3)||walkers.some(w=>w.scene===sc&&Math.abs(w.x-x)<3&&Math.abs(w.y-y)<3);
+      const lista=P22[sc];
+      for(let by=2;by<H-6&&L.length<lista.length;by+=13)for(let bx=3+((by/13|0)%2)*7;bx<W-8&&L.length<lista.length;bx+=19){
+        let p=null;for(let r=0;r<7&&!p;r++)for(let y=by+4-r;y<=by+4+r&&!p;y++)for(let x=bx+4-r;x<=bx+4+r&&!p;x++){if(Math.max(Math.abs(x-bx-4),Math.abs(y-by-4))!==r)continue;
+          if(x<2||y<2||x>W-6||y>H-6)continue;if(livre(sc,x,y)&&livre(sc,x+1,y+1)&&livre(sc,x+2,y+2)&&!ocup(x,y))p=[x,y];}
+        if(!p)continue;const [spr,nome,lines]=lista[k];if(!tem(spr.split('|')[0])){k++;continue;}k++;
+        L.push({id:'p23w_'+sc+'_'+k,spr:'h22_n|'+spr,name:nome,wander:[p[0]-1,p[1]-1,Math.min(W-2,p[0]+4),Math.min(H-2,p[1]+4)],speed:1.2,lines});}
+      try{if(L.length){addWalkers(sc,L);n+=L.length;}}catch(e){console.warn('gente22 p23',e);}}return n;};
+
+  /* ---------- dentro das salas de 1830 ---------- */
+  const SEM=[];
+  const fixo=(q,dir)=>{q.dir=dir;q.__fixo=dir;q.nextTurn=1e9;};
+  const alcanca=(k,ex,ey,extra)=>{const M=SCN[k].map,H=M.length,W=M[0].length;const bloq=new Set(npcs.filter(n=>n.scene===k).map(n=>n.x+','+n.y));if(extra)bloq.add(extra[0]+','+extra[1]);
+    const seen=new Set([ex+','+ey]),f=[[ex,ey]];while(f.length){const [x,y]=f.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const a=x+dx,b=y+dy,s=a+','+b;if(seen.has(s)||a<0||b<0||a>=W||b>=H)continue;if(!freeAt(k,a,b)||bloq.has(s))continue;seen.add(s);f.push([a,b]);}}return seen;};
+  const saida=k=>{const R=SCN[k];const ik=(R&&R.room)||k.replace(/^i_/,'');if(!INT[ik])return null;return roomExit(ik);};
+  const hash=s=>{let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h;};
+  const podeAqui=(k,x,y,ex,ey,R0)=>{if(!freeAt(k,x,y)||npcs.some(n=>n.scene===k&&Math.abs(n.x-x)<=0&&Math.abs(n.y-y)<=0))return false;
+    if(Math.abs(x-ex)<=2&&Math.abs(y-ey)<=2)return false;if(!R0.has(x+','+y))return false;
+    const R1=alcanca(k,ex,ey,[x,y]);if(R1.size!==R0.size-1)return false;
+    /* todo NPC ou objeto vizinho que era alcançável continua alcançável */return true;};
+  const IGREJAS=['i_rosario','i_ig30_carmo','i_ig30_stifigenia','i_ig30_luz','i_ig30_bras','i_ig30_santoantonio','i_ig30_misericordia','i_ig30_saogoncalo','i_ig30_boamorte','i_ig30_aflitos','i_ig30_remedios','i_ig30_capelaMooca'];
+  const MUL=['cativa30','cuscuz30','parteira30','costureira','bordadeira','pescadora30','criadaN','carregadoraN'],MULB=['sinha30','damaN','senhoraN','meninaN'],HOM=['pedreiro30','sineiro30','barqueiro30','alfaiateN','ferreiroN','sapateiroRua','ensacadorN','tropeiroN'],HOMB=['estudante30','criadoN','oficialN','paulistaN','meninoN'];
+  const REZA_M=["(reza baixinho) Ave Maria, gratia plena, Dominus tecum...","(de mãos postas) Sancta Maria, mater Dei, ora pro nobis peccatoribus...","(olha para o altar, em silêncio) Estou rezando. Depois a gente conversa."];
+  const REZA_H=["(de cabeça baixa) Pater noster, qui es in caelis, sanctificetur nomen tuum...","(reza em voz baixa) Kyrie eleison, Christe eleison...","(olha para o altar, em silêncio) Estou na missa. O padre reza em latim e eu quase não entendo, mas rezo do meu jeito."];
+  const ESP={i_rosario:["Esta é a igreja da Irmandade de Nossa Senhora do Rosário dos Homens Pretos. Aqui rezam pretos e pretas, libertos e escravizados.","A irmandade junta esmolas para pagar o enterro dos irmãos e para comprar a alforria de quem ainda é escravizado."],
+    i_ig30_aflitos:["A Capela dos Aflitos fica perto do cemitério onde são enterrados os escravizados, os pobres e os condenados à forca. Aqui se reza por quem não tem quem reze."]};
+  const igreja=k=>{const M=SCN[k]&&SCN[k].map;if(!M)return 0;const H=M.length,W=M[0].length;const ex=saida(k);if(!ex)return 0;
+    if(npcs.some(n=>/^p23i_/.test(n.id)&&n.scene===k))return 0;
+    /* padre de costas para o povo */
+    for(const q of npcs.filter(n=>n.scene===k&&!/^p23i_/.test(n.id)&&/padre|frei|irm[ãa]|clérigo/i.test(n.name||'')))fixo(q,'up');
+    const al=objects.filter(o=>o.scene===k&&/altar/i.test(o.name||o.id)).sort((a,b)=>a.y-b.y)[0];const ay=al?al.y:3;
+    const R0=alcanca(k,ex.x,ex.y);const cand=[];
+    for(let y=ay+3;y<=H-4;y++)for(let x=2;x<W-2;x++){if(!R0.has(x+','+y)||!freeAt(k,x,y))continue;if(Math.abs(x-(W-1)/2)<1.3)continue;cand.push([x,y]);}
+    const mul=cand.filter(c=>c[0]<W/2),hom=cand.filter(c=>c[0]>=W/2);
+    const rosario=k==='i_rosario';let n=0;const pega=(lst,sprs,par,genero,max)=>{const tmp=lst.slice();let nn=0,j=hash(k+genero)%7;
+      while(tmp.length&&nn<max){const c=tmp.splice((j*3+nn)%tmp.length,1)[0];
+        if(npcs.some(q=>q.scene===k&&Math.abs(q.x-c[0])<=1&&Math.abs(q.y-c[1])<=1))continue;
+        const R=alcanca(k,ex.x,ex.y);if(!podeAqui(k,c[0],c[1],ex.x,ex.y,R))continue;
+        const sp=sprs[(nn+j)%sprs.length];if(!tem(sp))continue;
+        const reza=genero==='m'?REZA_M:REZA_H;const lines=[reza[(nn+j)%reza.length]].concat(ESP[k]&&nn%2===0?ESP[k]:[]);
+        const q={id:'p23i_'+k+'_'+genero+nn,spr:'h22_n|'+sp+'|0',x:c[0],y:c[1],dir:'up',name:genero==='m'?'Fiel na missa (mulher)':'Fiel na missa (homem)',lines,diary:rosario?'Irmandades de pretos, como a do Rosário, pagavam funerais e ajudavam a comprar alforrias.':'A missa era em latim, e homens e mulheres ficavam em lados separados da igreja.'};
+        addNPCs([q],k);const nq=npcs.find(a=>a.id===q.id);fixo(nq,'up');nq.__semBalao=true;SEM.push(nq);nn++;n++;}};
+    const max=Math.max(2,Math.min(rosario?9:6,Math.floor(cand.length/6)));
+    pega(mul,rosario?MUL:MUL.concat(MULB),0,'m',max);pega(hom,rosario?HOM:HOM.concat(HOMB),0,'h',max);return n;};
+  /* [boneco, nome, falas...] por sala (gente comum, parada ou andando devagar) */
+  const SALAS={
+   i_academia:[['estudante30','Estudante da Academia',["Estou estudando para a prova de Direito Civil. As Ordenações do Reino têm mais de duzentos anos e a gente ainda decora."]],['estudante30','Estudante cansado',["Acordei às cinco para estudar. A república dos estudantes não deixa dormir."]],['alemao30','Professor visitante',["Sou estrangeiro, mas dou aula na Academia. A cidade é pequena, mas já tem muita gente querendo estudar."]]],
+   i_palacio:[['cativa30','Criada do palácio',["Limpo os vasos e as lâmpadas do palácio. Quando chega visita, não posso falar nem olhar."]],['sinha30','Dama da corte local',["Venho ao palácio para os bailes. Esta sala tem o melhor piso de São Paulo."]]],
+   i_rosario:[['sineiro30','Irmão da irmandade',["Sou tesoureiro da irmandade. Guardo o dinheiro das esmolas numa arca com três chaves."]]],
+   i_loja:[['alfaiateN','Freguês alfaiate',["Vim comprar tecido. A loja só aceita pagamento à vista ou em caderneta de fiado."]],['bordadeira','Freguesa',["Procuro linha e agulha. Aqui tem de todas as cores."]]],
+   i_tipografia:[['tipografo30','Tipógrafo aprendiz',["Estou aprendendo a ler as letras ao contrário. Demora anos."]],['tipografo30','Tipógrafo',["Cada letra é um pedacinho de chumbo. Se cair no chão, a página inteira vai ao chão."]],['criancaN','Menino da entrega',["Levo o jornal para os assinantes. Corro a cidade toda antes do almoço."]]],
+   i_casa:[['bordadeira','Moradora',["Esta é a minha casa. Bordo enquanto o dia passa."]],['criancaN','Criança da casa',["Estou ajudando a minha mãe a dobrar a roupa."]]],
+   i_camara:[['estudante30','Cidadão esperando',["Vim pedir licença para abrir um negócio. Aqui na Câmara demora, mas sai."]],['sineiro30','Porteiro da Câmara',["Abro a porta e levo os recados dos vereadores."]]],
+   i_santacasa:[['parteira30','Parteira da Santa Casa',["A Santa Casa de Misericórdia cuida dos pobres e também das parturientes que não têm casa."]],['cativa30','Enfermeira',["Troco as bandagens e levo a água. Aqui quase tudo é feito pelas irmãs e por mulheres negras."]]],
+   i_botica:[['alemao30','Boticário',["Moo ervas no pilão e misturo xaropes. Boticário também é meio médico."]],['sinha30','Freguesa',["Vim buscar chá de erva-doce para o meu filho."]]],
+   i_ferreiro:[['ferreiroN','Ferreiro',["O fogo está no ponto! Segura essa tenaz."]],['ferreiroN','Aprendiz de ferreiro',["Estou aprendendo a bater o ferro. Faz três anos que só sopro o fole."]]],
+   i_padaria:[['cuscuz30','Moça do pão',["O pão sai quente de manhã. Chego antes de todo mundo para pegar o melhor."]],['criancaN','Menino da padaria',["Levo pão em cesto para a vizinhança. Sobra um pedacinho para mim."]]],
+   i_taverna:[['barqueiro30','Barqueiro',["Depois do rio, uma pinga. É o meu único descanso."]],['pedreiro30','Pedreiro',["Venho aqui depois do trabalho. A taberna é o lugar onde a gente conversa."]],['cego30','Cantador cego',["Canto modinha e toco viola. Quem gosta, deixa um tostão."]]],
+   i_escola:[['estudante30','Aluno mais velho',["Aprendi a ler tarde. Quem não sabe ler não pode votar."]],['criancaN','Menino aluno',["A professora diz que eu aprendo rápido. Só não posso faltar, porque tenho de trabalhar."]],['criancaN','Menina aluna',["Eu queria ir à escola todos os dias, mas só vou quando a patroa deixa."]]],
+   i_solar:[['sinha30','Dona do solar',["Gosto de receber as visitas na sala grande."]],['cativa30','Mucama',["Sou mucama da sinhá. Cuido da roupa dela e da saúde dos filhos."]],['costureira','Costureira da casa',["Faço os vestidos da família. Dormo na casa, num quartinho nos fundos."]]],
+   i_correios:[['funileiro','Mensageiro',["Levo as cartas a pé de porta em porta. As cartas demoram semanas para chegar ao Rio."]]],
+   i_quartel:[['sineiro30','Soldado de ordenança',["Cuido do portão do quartel. Aqui se guarda pólvora e se faz instrução."]],['barqueiro30','Recruta',["Fui sorteado para o serviço militar. Não queria vir."]]],
+   i_sapataria:[['sapateiroRua','Sapateiro',["Faço sapato por encomenda. Cada pé é medido."]],['sapateiroRua','Aprendiz de sapateiro',["Estou aprendendo a costurar o couro. Ainda furo o dedo."]]],
+   i_alfaiataria:[['alfaiateN','Alfaiate',["Medi o doutor ontem. O casaco sai na quinta."]],['costureira','Costureira da alfaiataria',["Faço os botões e as barras. Cada ponto é meu."]]],
+   i_barbearia:[['barbeiroN','Barbeiro',["Barba e cabelo, cinco vinténs."]],['barbeiroN','Barbeiro aprendiz',["Estou aprendendo a afiar a navalha."]],['cego30','Freguês cego',["Venho aqui todo sábado fazer a barba. Aqui a conversa é boa."]]],
+   i_carpintaria:[['pedreiro30','Carpinteiro negro',["Cada tábua é serrada à mão. Faço porta, janela e caixão."]],['sineiro30','Aprendiz de carpinteiro',["Ainda não sei fazer um encaixe sem errar."]]],
+   i_acougue:[['pedreiro30','Açougueiro',["A carne é pesada na balança de pratos. Sem desperdício."]],['cativa30','Freguesa de ganho',["Compro carne para a casa onde trabalho. Levo tudo na cabeça."]]],
+   i_hospedaria:[['barqueiro30','Viajante do rio',["Estou de passagem. Venho do Tietê com um carregamento."]],['indigena30','Indígena comerciante',["Trouxe cestos e vou voltar para a aldeia amanhã cedo."]],['alemao30','Colono em viagem',["Cheguei de Santo Amaro. A viagem é longa."]]],
+   i_olaria:[['indigena30','Oleira indígena',["Moldo tijolos e telhas com a argila do rio. Meu povo já fazia cerâmica muito antes dos portugueses."]],['pedreiro30','Trabalhador da olaria',["Viro os tijolos no sol. A olaria vende telha para toda a cidade."]]],
+   i_convento:[['feijo30','Padre visitante',["Estou de passagem pelo convento. Os frades preparam os jovens para a vida religiosa."]],['sineiro30','Servente do convento',["Faço o serviço pesado do convento: lenha, água e horta."]]],
+   i_opera:[['sinha30','Dama do teatro',["Vim ver o drama de hoje. As cadeiras do teatro são desconfortáveis, mas o espetáculo vale a pena."]],['estudante30','Estudante da plateia',["Os estudantes da Academia lotam o teatro. A gente assiste de pé e vaia quando não gosta."]]],
+   i_casapobre:[['costureira','Moradora',["Moro aqui com meus filhos. O telhado pinga, mas é meu."]],['criancaN','Criança da casa',["Vou buscar água no chafariz daqui a pouco."]]],
+   i_casaliberta:[['bordadeira','Moradora liberta',["Esta é a casa de uma família que já é livre. Compramos a nossa liberdade com anos de trabalho."]],['alfaiateN','Pai da família',["Trabalho como alfaiate. Com o que ganho, ajudo a comprar a alforria de meu irmão."]],['criancaN','Criança da casa',["Eu nasci livre, mas minha avó ainda se lembra de quando era escravizada."]],['parteira30','Avó da família',["Moramos todos juntos: avó, pais e netos. Aqui ninguém passa fome."]]],
+   i_casacom:[['cuscuz30','Quituteira',["Faço o doce e vendo na rua. O dinheiro vai para a casa comercial do meu patrão."]],['funileiro','Vendedor ambulante',["Passo aqui para vender lata e panela."]]]
+  };
+  const MS={
+   i_casa:[['rendeiraN','Rendeira',["Faço renda de bilro sentada junto da janela, onde a luz é melhor."+INV]],['engomadeiraN','Engomadeira',["Hoje é dia de passar a roupa. O ferro de brasa pesa, mas o pano fica liso."+INV]]],
+   i_casapobre:[['fiandeiraN','Fiandeira',["Fio algodão na roca. O fio de hoje vira o pano de amanhã."+INV]],['benzedeiraN','Benzedeira',["Os vizinhos me chamam quando a criança está doente. Benzo e rezo, e dou chá."+INV]]],
+   i_solar:[['amaN','Ama de leite',["Estou com o bebê da sinhá no colo. Meu filho ficou com outra mulher."+INV]]],
+   i_escola:[['mestraN','Mestra de primeiras letras',["Ensino meninas a ler e a bordar. A lei diz que cada vila deve ter escola para meninas, mas quase ninguém cumpre."+INV]]],
+   i_padaria:[['doceiraN','Doceira',["Faço doce de abóbora e de goiaba no tacho. A casa toda cheira a açúcar."+INV]]],
+   i_hospedaria:[['beneditaRes|3','Cozinheira da hospedaria',["Faço o angu e o feijão dos tropeiros. Eles chegam com fome e com lama até os joelhos."+INV]]],
+   i_casacom:[['beneditaRes|2','Cozinheira da casa comercial',["Cozinho para o dono e para os caixeiros da loja. Eles comem em pé, e correndo."+INV]]]
+  };
+  for(const k in MS)SALAS[k]=(SALAS[k]||[]).concat(MS[k]);
+  const sala=k=>{const L=SALAS[k];if(!L||!SCN[k]||!SCN[k].map||npcs.some(n=>/^p23i_/.test(n.id)&&n.scene===k))return 0;const ex=saida(k);if(!ex)return 0;const M=SCN[k].map,H=M.length,W=M[0].length;
+    const R0=alcanca(k,ex.x,ex.y);const cand=[];for(let y=3;y<H-2;y++)for(let x=1;x<W-1;x++)if(R0.has(x+','+y))cand.push([x,y]);
+    if(cand.length<L.length*4)L.length=Math.max(1,Math.floor(cand.length/4));let n=0,j=hash(k);
+    L.forEach(([sp,nome,lines],i)=>{if(!tem(sp.split('|')[0]))return;for(let t=0;t<cand.length;t++){const c=cand[(j+t*13+i*29)%cand.length];
+        if(npcs.some(q=>q.scene===k&&Math.abs(q.x-c[0])<=1&&Math.abs(q.y-c[1])<=1))continue;const R=alcanca(k,ex.x,ex.y);if(!podeAqui(k,c[0],c[1],ex.x,ex.y,R))continue;
+        addNPCs([{id:'p23i_'+k+'_'+i,spr:'h22_n|'+(sp.indexOf('|')>=0?sp:sp+'|0'),x:c[0],y:c[1],dir:['down','left','right','up'][(i+j)%4],name:nome,lines,diary:D_NEG}],k);n++;break;}});return n;};
+  const dentro=()=>{let n=0;for(const k of IGREJAS)try{n+=igreja(k);}catch(e){console.warn('igreja23',k,e);}for(const k in SALAS)try{n+=sala(k);}catch(e){console.warn('sala23',k,e);}return n;};
+
+
+  /* mulheres dos bairros rurais de 1922 (Santana, Pirituba, Tremembé, Perus, Guapira), longe do centro */
+  const RUR=[['p23r_retireira','retireiraN',60,22,'Retireira',["Tiro leite às quatro da manhã, com o bezerro mamando ao lado. O leite sai de carroça para a cidade."+INV]],
+   ['p23r_queijeira','mulherPovo22|2',100,14,'Queijeira',["Faço queijo de minas no fundo do quintal. Cada queijo leva um dia para coalhar e quinze para curar."+INV]],
+   ['p23r_colhedora','colhedoraN',150,30,'Colhedora de café',["Colho café de peneira, com o pano aberto debaixo do pé. Chego a colher oitenta quilos por dia."+INV]],
+   ['p23r_lenhadora','mulherPovo22|3',30,70,'Mulher do lenhador',["Meu marido derruba lenha para a olaria. Eu levo o almoço e junto os gravetos para o fogão."+INV]],
+   ['p23r_cozinheira','lavadeiraNegra22|1',120,20,'Cozinheira da chácara',["Cozinho para a família e para os camaradas da chácara em Santana. O feijão sai do fogão de lenha."+INV]]];
+  const rural=()=>{let n=0;const fora=(x,y)=>x<50||x>140||y<56||y>124;
+    for(const [id,spr,x0,y0,nome,lines] of RUR){if(npcs.some(q=>q.id===id)||!tem(spr.split('|')[0]))continue;
+      let p=null;for(let d=0;d<16&&!p;d++)for(let y=y0-d;y<=y0+d&&!p;y++)for(let x=x0-d;x<=x0+d&&!p;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))!==d)continue;if(fora(x,y)&&livre('sp22',x,y)&&livre('sp22',x,y+1))p=[x,y];}
+      if(!p)continue;try{npcIn('sp22',id,'colono',p[0],p[1],nome,lines,'Mulheres dos bairros rurais de São Paulo (Santana, Pirituba, Tremembé) ordenhavam, faziam queijo e colhiam café.');const q=npcs.find(a=>a.id===id);if(q)q.spr='h22_n|'+spr;n++;}catch(e){}}return n;};
+
+  /* o balão "..." não aparece em quem está na missa */
+  const r0=render;render=function(){const L=SEM.filter(n=>!n.talked);for(const n of L)n.talked=true;try{return r0.apply(this,arguments);}finally{for(const n of L)n.talked=false;}};
+
+  const vai=()=>{let f=0;try{f+=poeGente('sp',P30);}catch(e){console.warn('gente30',e);f++;}
+    try{f+=poeGente('sp88',P88);}catch(e){console.warn('gente88',e);f++;}
+    try{poeBichos();}catch(e){console.warn('bichos23',e);}return f;};
+  let t=0;const tenta=()=>{let f=1;try{f=vai();}catch(e){console.warn('pessoas23',e);}
+    if(f&&++t<40)setTimeout(tenta,600);else{setTimeout(()=>{try{gente22();dentro();rural();}catch(e){console.warn('pessoas23 fim',e);}},1500);}};
+  setTimeout(tenta,4500);
+  window.__pessoas23={P30,P88,P22,SALAS,vai,gente22,dentro,igreja,sala,SEM,poeBichos};
+}catch(e){console.warn('pessoas23',e);}})();
+
+/* ===== v251 — A SÃO PAULO DE VINCENZO (VICENTE) PASTORE: MINI JOGO DE ACHAR COISAS EM 8 FOTOS DE RUA, ÁLBUM COM 14 FOTOS E BOTÃO NO TOPO EM 1922 (pedido do professor, 22/11/2026) =====
+   Fotos reduzidas em arte/pastore/fNN.webp (carregam só quando o mini jogo abre). Nada do mapa nem do centro de 1922 é tocado. */
+(function(){
+  if(window.__pastore)return;
+  const R=[["f01", "Uma calçada de rua", [["o lampião a gás", 0.585, 0.2, 0.05, "Lampiões a gás iluminavam as ruas de São Paulo desde 1872. Alguém passava para acender cada um ao anoitecer."], ["a pilha de jornais", 0.6, 0.55, 0.07, "Os jornais eram vendidos na rua, em pilhas como esta. Vendedores e meninos gritavam as manchetes."], ["a mulher de vestido branco de babados", 0.47, 0.62, 0.09, "Vestido comprido, com renda e babados: a moda das mulheres por volta de 1910."], ["o homem sentado na soleira", 0.22, 0.62, 0.1, "A soleira da porta servia de banco para quem queria descansar na rua."], ["a moça na janela", 0.395, 0.26, 0.05, "Da janela, a moça via a rua e todo mundo que passava. Era um jeito de participar da vida da cidade."]]], ["f07", "Um largo do centro", [["o bonde", 0.82, 0.77, 0.09, "O bonde elétrico chegou a São Paulo em 1900. Ele ligava os bairros ao centro por trilhos no meio da rua."], ["o relógio de rua", 0.447, 0.68, 0.04, "Relógios na rua ajudavam todo mundo a saber a hora: nem todos tinham relógio de bolso."], ["o carregador com os dois balaios", 0.43, 0.8, 0.08, "Os balaios pendurados numa vara levavam frutas, verduras e mercadorias pela rua, de ombro em ombro."], ["a mulher de chapéu de abas largas", 0.24, 0.73, 0.06, "Chapéus grandes e enfeitados eram moda entre as mulheres da cidade."], ["o poste com fios", 0.14, 0.45, 0.07, "Postes sustentavam fios de telefone e de luz elétrica: a cidade ia ficando cheia deles."]]], ["f05", "Um banco de praça", [["a menina de laço no cabelo", 0.84, 0.27, 0.07, "Laço de fita no cabelo era o enfeite das meninas."], ["a trouxa branca de roupa", 0.34, 0.56, 0.09, "Muitas mulheres carregavam trouxas de roupa lavada ou de compras, amarradas num pano."], ["o leque na mão da criança", 0.965, 0.45, 0.05, "O leque ajudava a aguentar o calor de São Paulo, mesmo para as crianças."], ["as botinas de cano alto", 0.79, 0.87, 0.07, "As botinas abotoadas ou de amarrar, de cano alto, eram o calçado de passeio das crianças."], ["o xale de franjas", 0.2, 0.5, 0.12, "O xale de lã com franjas esquentava as mulheres nos dias frios e garoentos."]]], ["f08", "A roça", [["a enxada", 0.4, 0.53, 0.1, "A enxada abria a terra com força de braço. Quase todo o trabalho da roça era feito assim."], ["o chapéu de feltro", 0.595, 0.35, 0.05, "O chapéu de feltro protegia do sol e da chuva fina de quem trabalhava na lavoura."], ["o milharal", 0.8, 0.45, 0.1, "Milho era plantado em quase todo sítio. Virava angu, pamonha e farinha, e alimentava os animais."], ["os pés descalços", 0.625, 0.88, 0.06, "Muita gente da roça trabalhava descalça, na terra mole."], ["a mulher de blusa branca", 0.39, 0.38, 0.08, "Mulheres trabalhavam lado a lado com os homens na lavoura, além de cuidar da casa."]]], ["f14", "Uma procissão na rua", [["o pálio, o dossel de tecido", 0.48, 0.52, 0.14, "O pálio é um dossel de pano carregado sobre o sacerdote nas procissões. Ele protege o que há de mais sagrado."], ["os padres de batina branca", 0.125, 0.72, 0.14, "Os padres usavam batina e sobrepeliz branca nas cerimônias."], ["o letreiro La Ville de Paris", 0.27, 0.27, 0.1, "As lojas mais elegantes usavam nomes em francês, como esta, para parecer chiques e modernas."], ["o toldo listrado", 0.12, 0.33, 0.08, "Toldos de pano davam sombra às calçadas e às vitrines."], ["as pessoas nas sacadas", 0.5, 0.21, 0.1, "As sacadas eram camarotes: quem morava no sobrado assistia à procissão lá de cima."]]], ["f13", "O vendedor de vassouras", [["as vassouras de palha", 0.68, 0.09, 0.12, "Vassouras de palha varriam casas e quintais. O vendedor ambulante levava dezenas nas costas."], ["o espanador de penas", 0.7, 0.78, 0.12, "O espanador de penas tirava o pó dos móveis, e ainda é lembrado em muita casa."], ["os cestos de vime", 0.86, 0.4, 0.09, "Cestos de vime trançado eram feitos à mão e usados para tudo."], ["os moços de chapéu de palheta ao fundo", 0.35, 0.22, 0.12, "O chapéu de palheta, de palha dura e duro de verdade, era a moda masculina de verão."]]], ["f03", "Duas mulheres conversando", [["o lenço na cabeça", 0.4, 0.31, 0.08, "O lenço de cabeça era comum entre as mulheres mais velhas, sobretudo as que trabalhavam na rua."], ["o cesto grande de vime", 0.75, 0.54, 0.11, "O cesto grande servia para carregar compras e a mercadoria que a vendedora oferecia."], ["o xale claro de lã", 0.76, 0.43, 0.1, "Xales de lã eram usados por cima da roupa para agasalhar no frio."], ["a árvore da praça", 0.9, 0.2, 0.1, "As praças da cidade ganharam árvores e bancos, e viraram lugar de encontro."]]], ["f02", "O velho de chapéu-coco", [["o chapéu-coco", 0.45, 0.18, 0.09, "O chapéu-coco, de feltro duro e copa arredondada, era usado por homens de todas as condições."], ["a bolsa de palha trançada", 0.56, 0.67, 0.13, "Bolsas e cestos de palha trançada eram feitos à mão e duravam muitos anos."], ["a barba branca", 0.46, 0.26, 0.06, "A barba branca mostra a vida longa: ele deve ter nascido antes da Abolição, em 1888."], ["a balaustrada de pedra", 0.1, 0.45, 0.1, "A balaustrada de pedra ornamentada enfeitava pontes, jardins e prédios importantes."]]]];
+  const ALB={f01:'Calçada de uma rua de pedras: uma pilha de jornais num carrinho, um lampião a gás no poste, um homem sentado na soleira e uma moça à janela.',
+   f02:'Um senhor idoso de chapéu-coco, casaco escuro e barba branca, encostado numa balaustrada de pedra, com uma bolsa de palha trançada na mão.',
+   f03:'Duas mulheres conversam numa praça: uma de lenço na cabeça e xale, a outra com xale claro e um grande cesto de vime no braço.',
+   f04:'Duas mulheres sentadas num banco de praça, de xale e saia estampada, e duas meninas de pé, uma de avental escuro e outra de vestido branco.',
+   f05:'Outra cena no banco de praça: as mulheres sentadas com uma trouxa de pano branco, e as meninas de laço de fita e de leque.',
+   f06:'Um homem de chapéu de feltro, colete e camisa branca, sentado no muro, remenda um sapato. Ao lado, um saco de pano.',
+   f07:'Um largo do centro com postes de luz e telefone, o bonde número 425, um relógio de rua, anúncios pintados nas paredes e um carregador de balaios.',
+   f08:'Um homem de chapéu e uma mulher de blusa branca capinam e plantam numa roça de milho, com enxadas.',
+   f09:'Meninos e rapazes jornaleiros sentados na guia da calçada, diante de uma arcada. Um deles lê um jornal aberto.',
+   f10:'Um recorte da foto do largo, onde se vê o carregador com os balaios e uma mulher de chapéu atravessando.',
+   f11:'Dois homens de chapéu conversam, sentados num banco com a propaganda de um calçado pintada no encosto.',
+   f12:'Um vendedor ambulante, curvado sobre cestos de vime, mexe na mercadoria que vende na calçada.',
+   f13:'Um vendedor ambulante carrega vassouras de palha, espanadores de penas e cestos de vime pendurados numa vara.',
+   f14:'Uma procissão religiosa numa rua cheia de gente: padres de sobrepeliz, um pálio de tecido e sacadas lotadas.'};
+  const css='#ovPastore{position:fixed;inset:0;z-index:99990;background:#241b13;color:#f4ead6;font-family:inherit;display:flex;flex-direction:column;overflow:auto;-webkit-overflow-scrolling:touch}'
+  +'#ovPastore[hidden]{display:none}#ovPastore .pt-w{max-width:900px;width:100%;margin:0 auto;padding:12px 14px 24px;box-sizing:border-box}'
+  +'#ovPastore h2{font-size:22px;margin:6px 0 10px;color:#ffd79a}#ovPastore p{font-size:17px;line-height:1.45;margin:8px 0}'
+  +'#ovPastore .pt-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:16px}'
+  +'#ovPastore .pt-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}'
+  +'#ovPastore .pt-chip{font-size:15px;padding:6px 10px;border:2px solid #c9a56a;border-radius:16px;background:#3a2c1e}'
+  +'#ovPastore .pt-chip.ok{background:#3c6b35;border-color:#9fd18f;text-decoration:line-through}'
+  +'#ovPastore .pt-foto{position:relative;display:block;width:fit-content;max-width:100%;margin:0 auto;line-height:0;touch-action:manipulation;cursor:crosshair;border:3px solid #c9a56a;border-radius:4px;background:#000}'
+  +'#ovPastore .pt-foto img{display:block;max-width:100%;max-height:52vh;width:auto;height:auto;user-select:none;-webkit-user-drag:none;filter:sepia(.15)}'
+  +'#ovPastore .pt-mk{position:absolute;border:4px solid #7be36b;border-radius:50%;transform:translate(-50%,-50%);aspect-ratio:1;pointer-events:none;box-shadow:0 0 0 2px #1b3d17}'
+  +'#ovPastore .pt-mk.dica{border-color:#ffd24a;animation:ptp .6s infinite alternate}@keyframes ptp{from{opacity:.3}to{opacity:1}}'
+  +'#ovPastore .pt-msg{min-height:72px;margin:10px 0;padding:10px 12px;background:#3a2c1e;border-radius:8px;font-size:17px;line-height:1.4}'
+  +'#ovPastore .pt-msg.erro{animation:pts .3s}@keyframes pts{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}'
+  +'#ovPastore button.pt-b{font:inherit;font-size:17px;padding:10px 16px;border:2px solid #2a1c10;border-radius:6px;background:#e8903a;color:#2a1c10;cursor:pointer;margin:4px 6px 4px 0}'
+  +'#ovPastore button.pt-b.alt{background:#c9a56a}'
+  +'#ovPastore .pt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:12px 0}'
+  +'#ovPastore .pt-grid img{width:100%;aspect-ratio:1;object-fit:cover;border:2px solid #c9a56a;border-radius:4px;cursor:pointer}'
+  +'#ovPastore .pt-lb{position:fixed;inset:0;background:rgba(10,6,2,.94);z-index:99995;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:10px}'
+  +'#ovPastore .pt-lb img{max-width:100%;max-height:62vh}#ovPastore .pt-lb p{max-width:700px;text-align:center}';
+  const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+  const ov=document.createElement('div');ov.id='ovPastore';ov.hidden=true;document.body.appendChild(ov);
+  const _ip=isPaused;isPaused=function(){return _ip()||!ov.hidden;};
+  const E=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const src=f=>'arte/pastore/'+f+'.webp';
+  let S=null;
+  const sair=()=>{ov.hidden=true;ov.innerHTML='';};
+  const intro=()=>{S={i:0,ach:0,tot:0,err:0,dic:0};
+    ov.innerHTML='<div class="pt-w"><div class="pt-top"><b>Mini jogo</b><button class="pt-b alt" id="ptX">Sair</button></div><h2>A São Paulo de Vincenzo Pastore</h2>'
+    +'<p>Vincenzo (em português, Vicente) Pastore (1865–1917) foi um fotógrafo italiano que registrou as ruas de São Paulo: ambulantes, lavadeiras, crianças, bondes e procissões.</p>'
+    +'<p>As fotos dele são documentos. Cada detalhe conta como as pessoas viviam por volta de 1910.</p>'
+    +'<p><b>Como jogar:</b> em cada foto, toque nas coisas da lista. Cada achado revela uma curiosidade. Se travar, use a <b>Dica</b>.</p>'
+    +'<button class="pt-b" id="ptGo">Começar</button><p style="font-size:14px;opacity:.8">Fotos de Vincenzo Pastore, reduzidas para uso educativo. Descrições escritas a partir do que se vê em cada imagem.</p></div>';
+    ov.hidden=false;ov.scrollTop=0;document.getElementById('ptX').onclick=sair;document.getElementById('ptGo').onclick=()=>rodada(0);};
+  const rodada=i=>{const [f,tit,al]=R[i];S.i=i;const ach=new Set();let miss=0;
+    ov.innerHTML='<div class="pt-w"><div class="pt-top"><b>Foto '+(i+1)+' de '+R.length+' · '+E(tit)+'</b><button class="pt-b alt" id="ptX">Sair</button></div>'
+    +'<div class="pt-chips">'+al.map((a,j)=>'<span class="pt-chip" data-j="'+j+'">'+E(a[0])+'</span>').join('')+'</div>'
+    +'<div class="pt-foto" id="ptF"><img id="ptI" alt="Foto antiga de São Paulo: '+E(tit)+'" src="'+src(f)+'"></div>'
+    +'<div class="pt-msg" id="ptM" aria-live="polite">Toque na foto para achar as coisas da lista.</div>'
+    +'<div><button class="pt-b alt" id="ptD">Dica</button><button class="pt-b" id="ptN" hidden>'+(i+1<R.length?'Próxima foto':'Ver resultado')+'</button></div></div>';
+    ov.scrollTop=0;const F=document.getElementById('ptF'),M=document.getElementById('ptM');
+    document.getElementById('ptX').onclick=sair;
+    const msg=(t,erro)=>{M.textContent=t;M.classList.remove('erro');if(erro){void M.offsetWidth;M.classList.add('erro');}};
+    const marca=(a,cls)=>{const d=document.createElement('div');d.className='pt-mk'+(cls?' '+cls:'');d.style.left=(a[1]*100)+'%';d.style.top=(a[2]*100)+'%';d.style.width=(a[3]*2*(cls?2.2:1)*100)+'%';F.appendChild(d);return d;};
+    F.addEventListener('click',e=>{if(ach.size===al.length)return;const r=F.getBoundingClientRect();const px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.width;const k=r.height/r.width;
+      let best=-1,bd=9;al.forEach((a,j)=>{if(ach.has(j))return;const d=Math.hypot(px-a[1],py-a[2]*k);if(d<=a[3]*1.25&&d<bd){bd=d;best=j;}});
+      if(best<0){miss++;S.err++;msg('Aí não tem. Olhe de novo!'+(miss>=3?' Se quiser, aperte Dica.':''),true);return;}
+      ach.add(best);S.ach++;marca(al[best]);ov.querySelector('.pt-chip[data-j="'+best+'"]').classList.add('ok');
+      if(ach.size===al.length){msg('✔ Você achou '+al[best][0]+'! '+al[best][4]+'  — Foto completa!');document.getElementById('ptN').hidden=false;document.getElementById('ptD').hidden=true;}
+      else msg('✔ Você achou '+al[best][0]+'! '+al[best][4]);});
+    document.getElementById('ptD').onclick=()=>{const j=al.findIndex((a,x)=>!ach.has(x));if(j<0)return;S.dic++;const d=marca(al[j],'dica');msg('Dica: procure por '+al[j][0]+' perto do círculo amarelo.');setTimeout(()=>d.remove(),3500);};
+    document.getElementById('ptN').onclick=()=>{S.tot+=al.length;if(i+1<R.length)rodada(i+1);else fim();};};
+  const lightbox=f=>{const d=document.createElement('div');d.className='pt-lb';d.innerHTML='<img src="'+src(f)+'" alt="">'+'<p>'+E(ALB[f])+'</p><button class="pt-b">Fechar</button>';d.onclick=()=>d.remove();ov.appendChild(d);};
+  const fim=()=>{const tot=R.reduce((a,r)=>a+r[2].length,0),p=S.ach/tot;
+    const rank=p>=.99&&S.dic===0?'Olho de fotógrafo!':p>=.6?'Bom observador!':'Continue olhando: a cidade tem muito para ver!';
+    try{addDiary('Foto','Mini jogo "A São Paulo de Vincenzo Pastore": você achou '+S.ach+' de '+tot+' coisas em '+R.length+' fotos antigas de rua.');}catch(_){}
+    ov.innerHTML='<div class="pt-w"><div class="pt-top"><b>Resultado</b><button class="pt-b alt" id="ptX">Sair</button></div><h2>'+rank+'</h2>'
+    +'<p>Você achou <b>'+S.ach+' de '+tot+'</b> coisas, com '+S.err+' toques errados e '+S.dic+' dicas.</p>'
+    +'<p>Todas as fotos de Pastore que inspiraram esta aventura estão aqui. Toque em uma para ver maior.</p><div class="pt-grid">'
+    +Object.keys(ALB).map(f=>'<img data-f="'+f+'" src="'+src(f)+'" alt="'+E(ALB[f])+'">').join('')
+    +'</div><button class="pt-b" id="ptA">Jogar de novo</button><button class="pt-b alt" id="ptX2">Voltar ao jogo</button>'
+    +'<p style="font-size:14px;opacity:.8">Fotos de Vincenzo Pastore (1865–1917), reduzidas para uso educativo.</p></div>';
+    ov.scrollTop=0;document.getElementById('ptX').onclick=sair;document.getElementById('ptX2').onclick=sair;document.getElementById('ptA').onclick=intro;
+    ov.querySelectorAll('.pt-grid img').forEach(im=>im.onclick=()=>lightbox(im.dataset.f));};
+  const abrir=()=>{if(typeof started!=='undefined'&&!started)return;intro();};
+  window.__pastore={abrir,rodada:i=>{S=S||{i:0,ach:0,tot:0,err:0,dic:0};ov.hidden=false;rodada(i);},fim:()=>{S=S||{i:0,ach:0,tot:0,err:0,dic:0};ov.hidden=false;fim();},R};
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!ov.hidden)sair();});
+  const hd=document.getElementById('btnMapa');
+  if(hd&&!document.getElementById('btnPastore')){const b=document.createElement('button');b.className='btn';b.id='btnPastore';b.type='button';b.hidden=true;b.textContent='Fotos 1910';hd.parentNode.insertBefore(b,hd);
+    b.addEventListener('click',abrir);
+    setInterval(()=>{try{b.hidden=!(era===4&&started);}catch(_){b.hidden=true;}},800);}
+})();
 
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /* ===== v203 — MENOS ESPAÇO PRETO EM TODOS OS FORMATOS E ABERTURA SEM 1554 NO FUNDO (pedido do professor, 21/11/2026) =====
