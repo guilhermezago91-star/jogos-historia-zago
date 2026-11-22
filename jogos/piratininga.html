@@ -371,7 +371,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cf25be29","kb":281,"m":2},{"f":"pac_e23.js?v=0a1eee97","kb":425,"m":6},{"f":"pac_e234.js?v=c76f0e25","kb":562,"m":14},{"f":"pac_e3.js?v=8f735edd","kb":1626,"m":4},{"f":"pac_e34.js?v=9f1d3968","kb":1038,"m":12},{"f":"pac_e4.js?v=da9bef78","kb":7523,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cf25be29","kb":281,"m":2},{"f":"pac_e23.js?v=6db414b2","kb":428,"m":6},{"f":"pac_e234.js?v=91ca8dfe","kb":574,"m":14},{"f":"pac_e3.js?v=92d708af","kb":1620,"m":4},{"f":"pac_e34.js?v=4bc392e1","kb":1044,"m":12},{"f":"pac_e4.js?v=f8efa5b6","kb":7729,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -24320,6 +24320,221 @@ window.__DOCS22={
   const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);try{troca();}catch(_){}return r;};
   window.__profissoes={P,TROCA};
 }catch(e){console.warn('profissões',e);}})();
+
+/* ===== v247 — VACA E BOI (Canva): A VACA DO LEITEIRO EM 1888, CARRO DE BOI E GADO EM 1830 E 1888 (pedido do professor, 21/11/2026) =====
+   Folhas novas GADO_vaca e GADO_boi no arte_comum.js (16 quadros de 80x64, desenhados na metade do tamanho, como os cavalos: frente, direita, costas, esquerda).
+   1888: a vaca acompanha o Leiteiro; um boi de carro perto do Mercado dos Caipiras. 1830: dois bois e uma vaca perto do rancho dos tropeiros.
+   Só bichos andando em volta de um lugar livre; não mexe em chão nem em prédio. */
+(function(){try{
+  const IG={};const img=k=>{if(IG[k])return IG[k];if(typeof A==='undefined'||typeof A['GADO_'+k]!=='string')return null;const i=new Image();i.src=A['GADO_'+k];return IG[k]=i;};
+  const ROW={down:0,right:1,up:2,left:3};
+  const dc=drawChar;drawChar=function(id,X,Y,dir,fr){if(typeof id==='string'&&id.indexOf('gado|')===0){const i=img(id.slice(5));if(i&&i.complete&&i.naturalWidth){
+      const r=ROW[dir]??0,q=(fr||0)%4;ctx.imageSmoothingEnabled=false;ctx.fillStyle='rgba(20,27,27,.22)';ctx.fillRect(Math.round(X-6),Y+13,28,3);
+      ctx.drawImage(i,(r*4+q)*80,0,80,64,Math.round(X+8-20),Math.round(Y+16-32),40,32);}return;}
+    return dc.apply(this,arguments);};
+  const livre=(sc,x,y)=>{const M=SCN[sc]&&SCN[sc].map;if(!M||y<1||x<1||y>=M.length-1||x>=M[0].length-1)return false;return freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y);};
+  const caixa=(sc,x0,y0,r)=>{for(let d=0;d<10;d++)for(let y=y0-d;y<=y0+d;y++)for(let x=x0-d;x<=x0+d;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))!==d)continue;
+      if(livre(sc,x+1,y+1)&&livre(sc,x+2,y+1))return [x,y,x+r,y+r];}return null;};
+  const poe=(sc,lista)=>{const L=[];for(const [id,k,x0,y0,r,nome,lines] of lista){if(walkers.some(w=>w.id===id))continue;const b=caixa(sc,x0,y0,r);if(!b)continue;
+      L.push({id,spr:'gado|'+k,name:nome,wander:b,speed:k==='boi'?0.9:1.0,lines:lines.concat(['[Animal do jogo.]'])});}
+    if(L.length)try{addWalkers(sc,L);}catch(e){console.warn('gado',e);}return L.length;};
+  const vai=()=>{let n=0;
+    const lt=npcs.find(n=>n.id==='pf88_leiteiro');
+    if(lt)n+=poe('sp88',[['gado88_vaca','vaca',lt.x+1,lt.y-1,2,'Vaca do leiteiro',["Muuu!","É a vaca do leiteiro. Ela vai de porta em porta com ele, e o leite é tirado na hora, na frente da freguesa."]]]);
+    const mc=objects.find(o=>o.scene==='sp88'&&o.id==='mercCaipiras');
+    if(mc)n+=poe('sp88',[['gado88_boi','boi',mc.x+mc.w+1,mc.y+1,3,'Boi de carro',["Muuu...","Os carros de boi ainda trazem verdura, lenha e farinha dos sítios em volta da cidade para o Mercado dos Caipiras.","Devagar e sempre: o carro de boi range pela rua de terra."]]]);
+    const ra=objects.find(o=>o.scene==='sp'&&/rancho|hospedaria/i.test(o.id+' '+(o.name||''))&&(o.w||1)>=3);
+    if(ra)n+=poe('sp',[
+      ['gado30_boi1','boi',ra.x+(ra.w||3)+2,ra.y+2,3,'Boi de carro',["Muuu...","Os bois puxam os carros de boi que trazem lenha, farinha e açúcar das roças para a cidade.","A roda de madeira do carro de boi canta: nheeec, nheeec!"]],
+      ['gado30_boi2','boi',ra.x-4,ra.y+4,3,'Boi',["O boi descansa depois de puxar o carro desde a roça."]],
+      ['gado30_vaca','vaca',ra.x+2,ra.y+(ra.h||2)+4,3,'Vaca',["Muuu!","Muita casa de São Paulo cria uma vaca no quintal ou perto da cidade, para ter leite todo dia."]]]);
+    return n;};
+  let t=0;const tenta=()=>{let f=0;try{vai();}catch(e){console.warn('gado',e);}
+    const falta=['gado88_vaca','gado88_boi','gado30_boi1'].some(id=>!walkers.some(w=>w.id===id));if(falta&&++t<30)setTimeout(tenta,600);};
+  setTimeout(tenta,4000);
+  window.__gado={img};
+}catch(e){console.warn('gado',e);}})();
+
+/* ===== v247 — 1922: TRABALHO, MULHERES E CRIANÇAS — 18 PROFISSÕES QUE FALTAVAM (Canva) (pedido do professor, 21/11/2026) =====
+   A partir do catálogo "Profissões e ofícios em São Paulo em 1922" que o professor mandou.
+   Gente nova: fiandeira, contramestre e menino operário (Crespi), datilógrafa, guarda-livros, bancário, ama-seca (palacete), vendedor de gelo,
+   carvoeiro, chefe da Estação da Luz, fiscal de ambulantes, servente de pedreiro, encanador, passadeira, escrivão, linotipista, baleiro.
+   Trocas: sorveteiro, fiscal da prefeitura e meninos engraxates ganham boneco próprio. Só põe gente (1 quadradinho) em lugar livre, por último. */
+(function(){try{
+  const tem=k=>typeof A!=='undefined'&&typeof A['N88_'+k]==='string';
+  const TROCA={sorveteiro:'sorveteiro22|0',fiscal22:'fiscal22|0',engraxate22:'engraxate2|1',engraxate22b:'engraxate|0',engraxateRP:'engraxate|2',pass22_7:'engraxate2|3'};
+  const P=[
+   ['pt22_fiandeira','m_leste22',[48,160],'fiandeira22|0','Fiandeira do Crespi',
+    ["Fio o algodão nas máquinas de fiar. Tenho 15 anos e trabalho aqui desde os 13.","Na greve de 1917 a gente pediu oito horas de trabalho. Até hoje, muita fábrica faz a gente trabalhar dez horas ou mais.","O barulho das máquinas é tanto que, quando saio, ainda escuto o zumbido no ouvido."],
+    'Fiandeiras: moças e meninas eram grande parte dos operários têxteis de São Paulo; a jornada passava muitas vezes de dez horas.'],
+   ['pt22_contramestre','m_leste22',[53,160],'contramestre22|0','Contramestre',
+    ["Sou o contramestre: vigio as máquinas e as operárias da seção.","Quem chega atrasado, conversa ou estraga o fio leva multa. Está tudo aqui no meu caderninho.","O patrão quer produção. Se a máquina para, a culpa cai em mim."],
+    'Contramestre: chefe de seção na fábrica; aplicava multas e era alvo de muitas queixas das operárias.'],
+   ['pt22_menino','m_leste22',[44,161],'meninoFabrica22|0','Menino operário',
+    ["Tenho 11 anos. Carrego as bobinas de um lado para o outro da fábrica.","Dizem que a lei não deixa criança da minha idade trabalhar em fábrica. Mas ninguém vem fiscalizar.","O dinheiro ajuda em casa. Escola? Só se fosse de noite, e de noite eu durmo em pé."],
+    'Trabalho infantil: em 1922 muitas crianças trabalhavam nas fábricas paulistas, apesar das leis que tentavam proibir.'],
+   ['pt22_datilografa','m_centro22',[78,50],'datilografa22|0','Datilógrafa',
+    ["Aprendi datilografia num curso à noite. Agora trabalho num escritório de exportação de café.","Tem gente que acha estranho moça trabalhar em escritório. Mas está ficando comum: datilógrafa e telefonista são empregos novos para nós."],
+    'Datilógrafas: nos anos 1920, escritórios, bancos e companhias abriam vagas para moças que sabiam datilografar.'],
+   ['pt22_guardalivros','m_centro22',[82,52],'guardalivros22|0','Guarda-livros',
+    ["Sou guarda-livros: anoto no livro-caixa tudo o que entra e tudo o que sai da firma.","Um erro de um tostão e eu não durmo! A conta tem de fechar até o último réis."],
+    'Guarda-livros: o contador das firmas; registrava à mão, em grandes livros, as contas do comércio.'],
+   ['pt22_bancario','m_centro22',[90,44],'bancario22|0','Empregado de banco',
+    ["Trabalho no banco, aqui no Triângulo. O dinheiro do café entra aqui e sai emprestado para fábricas, casas e lojas.","Quando o preço do café cai lá fora, a cidade inteira sente. O banco também."],
+    'Bancos: o dinheiro do café financiava a indústria e as construções de São Paulo.'],
+   ['pt22_amaseca','sp22',[67,66],'amaSeca22|0','Ama-seca',
+    ["Cuido do filho da patroa desde que ele nasceu. Dou banho, comida, faço dormir.","Os meus filhos ficam com a minha mãe, no Bexiga. Eu saio cedo e volto tarde; folga, só um domingo por mês."],
+    'Amas-secas: mulheres, muitas delas negras, cuidavam dos filhos das famílias ricas, longe dos próprios filhos.'],
+   ['pt22_gelo','m_centro22',[128,56],'geleiro22|0','Vendedor de gelo',
+    ["Olha o gelo! Quem não tem geladeira elétrica compra gelo para guardar a comida.","Corto a barra na carroça e entrego de casa em casa. Tem que correr, senão derrete no caminho!"],
+    'Gelo: em 1922 quase ninguém tinha geladeira elétrica; o gelo era vendido em barras e guardado em caixas de madeira.'],
+   ['pt22_carvoeiro','m_leste22',[38,128],'carvoeiro22|0','Carvoeiro',
+    ["Carvão para o fogão! Quase toda casa daqui cozinha a lenha ou a carvão.","Por isso eu vivo coberto de pó. Nem a chuva tira!"],
+    'Carvão e lenha: o fogão a gás ainda era raro; a maioria das casas cozinhava a lenha ou a carvão.'],
+   ['pt22_chefeest','sp22',[104,59],'chefeEstacao22|0','Chefe da Estação da Luz',
+    ["Sou o chefe da Estação da Luz. Os trens da São Paulo Railway saem no horário: os ingleses não perdoam atraso!","Daqui desce o café para o porto de Santos. E do porto sobem os imigrantes."],
+    'Estação da Luz: da São Paulo Railway, ligava a cidade ao porto de Santos; por ela passavam o café e os imigrantes.'],
+   ['pt22_fiscal','m_centro22',[136,64],'fiscal22|2','Fiscal de ambulantes',
+    ["Ambulante precisa de licença da prefeitura. Quem vende sem licença perde a mercadoria!","Os mascates dizem que a licença é cara demais e que eu persigo os pobres. Eu só cumpro a ordem."],
+    'Fiscais e ambulantes: a prefeitura cobrava licenças e apreendia mercadorias; os vendedores de rua reclamavam da perseguição.'],
+   ['pt22_servente','m_leste22',[16,167],'servente22|0','Servente de pedreiro',
+    ["Carrego tijolo e massa para o pedreiro o dia inteiro. A cidade não para de construir!","Ganho menos que o pedreiro. Mas presto atenção: um dia eu aprendo o ofício."],
+    'Construção: São Paulo crescia depressa e empregava muitos serventes, quase sempre mal pagos.'],
+   ['pt22_encanador','m_sul22',[102,20],'encanador22|0','Encanador',
+    ["Instalo cano de água e de esgoto nas casas novas da Vila Mariana.","Água encanada e esgoto ainda são luxo em muitos bairros. Nos cortiços, é um tanque para todo mundo."],
+    'Água e esgoto: em 1922 a rede chegava aos bairros ricos e novos; muitos bairros pobres ainda não tinham.'],
+   ['pt22_passadeira','sp22',[73,112],'passadeira22|0','Passadeira',
+    ["Passo roupa para fora com ferro de brasa: encho de carvão e espero esquentar.","Camisa de colarinho engomado dá um trabalhão! E se queimar, eu pago."],
+    'Passadeiras e engomadeiras: mulheres que lavavam e passavam roupa para as famílias, muitas vezes em casa.'],
+   ['pt22_escrivao','m_centro22',[75,41],'escrivao22|0','Escrivão do cartório',
+    ["Sou escrivão do cartório: registro nascimento, casamento, compra e venda de casa.","Tudo à mão, com pena e tinta, em livros que vão durar mais de cem anos."],
+    'Cartórios: registravam nascimentos, casamentos e propriedades; esses livros hoje são fontes para os historiadores.'],
+   ['pt22_linotipista','m_centro22',[124,81],'linotipista22|0','Linotipista',
+    ["Trabalho na linotipo, uma máquina que funde as linhas do jornal em chumbo quente.","Nós, gráficos, estamos entre os operários mais organizados da cidade. Sabemos ler, e lemos de tudo!"],
+    'Gráficos: tipógrafos e linotipistas, operários que sabiam ler, tiveram papel importante nos sindicatos e greves de São Paulo.'],
+   ['pt22_baleiro','m_centro22',[116,65],'baleiro22|0','Baleiro',
+    ["Bala de coco, bala de mel! Fico na porta do cinema e da escola.","Começo a vender depois do almoço e só paro quando acaba o tabuleiro."],
+    'Baleiros: meninos e rapazes vendiam balas nas portas de cinemas e escolas.']];
+  const poe=()=>{for(const [id,sc,[x0,y0],spr,nome,lines,diary] of P){if(npcs.find(n=>n.id===id))continue;if(!tem(spr.split('|')[0]))continue;const S=SCN[sc];if(!S||!S.map)continue;
+      const M=S.map,H=M.length,W=M[0].length;const ok=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y);
+      let p=null;for(let r=0;r<8&&!p;r++)for(let y=y0-r;y<=y0+r&&!p;y++)for(let x=x0-r;x<=x0+r&&!p;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))===r&&ok(x,y))p=[x,y];}
+      if(!p)continue;try{npcIn(sc,id,'colono',p[0],p[1],nome,lines,diary);}catch(e){continue;}const n=npcs.find(n=>n.id===id);if(n)n.spr='h22_n|'+spr;}};
+  const troca=()=>{for(const [id,s] of Object.entries(TROCA)){if(!tem(s.split('|')[0]))continue;const n=npcs.find(n=>n.id===id)||walkers.find(w=>w.id===id);if(n&&n.spr!=='h22_n|'+s)n.spr='h22_n|'+s;}};
+  let tent=0;const tenta=()=>{try{poe();troca();}catch(e){console.warn('profissões 2',e);}if((P.some(p=>tem(p[3].split('|')[0])&&!npcs.find(n=>n.id===p[0]))||tent<6)&&++tent<40)setTimeout(tenta,500);};
+  setTimeout(tenta,0);
+  const ss=setScene;setScene=function(){const r=ss.apply(this,arguments);try{troca();}catch(_){}return r;};
+  window.__profissoes2={P,TROCA};
+}catch(e){console.warn('profissões 2',e);}})();
+
+/* ===== v247 — 1922: PERSONAGENS HISTÓRICOS, MULHERES E GENTE NAS RUAS DOS BAIRROS (pedido do professor, 21/11/2026) =====
+   Lista do professor: futebol (Charles Miller, Neco, Amílcar, Arnaldo Silveira, Rubens Salles, Palestra e torcida), anarquistas e socialistas
+   (Leuenroth, Florentino de Carvalho, João Penteado, Everardo Dias, Piccarolo, Adelino de Pinho), médicos e cientistas (Vital Brazil, Emílio Ribas,
+   Franco da Rocha, Oscar Freire, Paula Souza, Durval Marcondes), educadores (Sampaio Dória, Sud Mennucci, João Köpke, João Arruda), arquitetos e artistas
+   (Ramos de Azevedo, Ricardo Severo, Domiziano Rossi, Benedito Calixto, Antonieta Rudge, Tarsila), imprensa e letras (Cásper Líbero, Plínio Salgado,
+   Monteiro Lobato, Guilherme de Almeida, Vicente de Carvalho, Martins Fontes), indústria e café (Matarazzo, Matarazzo Jr., Jorge Street, Simonsen, Paulo Prado),
+   Igreja e religiões (Dom Duarte, rabino da sinagoga), justiça (juiz, advogado), Taunay no Museu Paulista, engenheiro medindo o Tietê,
+   mulheres (Anésia Pinheiro Machado, Pérola Byington, torcedora, Colombina, professora normalista).
+   Bonecos novos do Canva no arte_1922.js; os outros usam bonecos HD que já existiam.
+   E gente andando nas quadras vazias do Leste, do Oeste, do Sul e da Paulista. Só põe gente (1 quadradinho) em lugar livre, por último. */
+(function(){try{
+  const tem=k=>typeof A!=='undefined'&&typeof A['N88_'+k]==='string';
+  const P=[
+   /* MULHERES */
+   ['gh_anesia','sp22',[120,24],'anesia22|0','Anésia Pinheiro Machado, aviadora',["Sou Anésia Pinheiro Machado. Tenho 18 anos e piloto aviões!","Para o Centenário da Independência, vou voar de São Paulo até o Rio de Janeiro.","Dizem que avião não é coisa de moça. Eu digo que o céu é de quem tem coragem."],'Anésia Pinheiro Machado: uma das primeiras aviadoras do Brasil; em 1922, no Centenário da Independência, voou de São Paulo ao Rio de Janeiro.'],
+   ['gh_tarsila','m_centro22',[38,51],'tarsila22|0','Tarsila do Amaral, pintora',["Cheguei de Paris em junho e perdi a Semana de Arte Moderna!","Mas já me juntei à Anita, ao Mário, ao Oswald e ao Menotti. Eles nos chamam de Grupo dos Cinco.","Quero pintar o Brasil com as cores do Brasil: o rosa, o azul caipira, o verde das matas."],'Tarsila do Amaral: pintora; voltou de Paris em 1922 e formou com Anita, Mário, Oswald e Menotti o Grupo dos Cinco.'],
+   ['gh_antonieta','m_centro22',[34,40],'antonieta22|0','Antonieta Rudge, pianista',["Sou pianista. Toco nos salões e no Theatro Municipal.","Os músicos mais jovens daqui, como o pianista Souza Lima e o compositor Francisco Mignone, foram estudar na Europa.","São Paulo quer ter música de cidade grande. E tem!"],'Antonieta Rudge: pianista paulista muito admirada; Souza Lima e Francisco Mignone, também paulistanos, estudavam na Europa em 1922.'],
+   ['gh_perola','sp22',[40,90],'perola22|0','Pérola Byington',["Ajudo mães pobres e crianças doentes. Aqui, muitos bebês morrem antes de completar um ano.","Nasci em Santa Bárbara, numa família de americanos que vieram depois da Guerra Civil dos Estados Unidos.","Leite limpo, vacina e médico perto de casa: é disso que as crianças precisam."],'Pérola Byington: filantropa; em 1930 fundou a Cruzada Pró-Infância, para cuidar de mães e crianças pobres.'],
+   ['gh_torcedora','m_oeste22',[130,89],'torcedora22|0','Torcedora do Palestra',["Vim ver o Palestra! Moça também gosta de futebol, ora!","Na arquibancada tem chapéu de palha, tem bandeira, tem gritaria. Ninguém ouve ninguém!"],'Futebol em 1922: os jogos enchiam os campos de homens e mulheres; o futebol virava paixão da cidade.'],
+   ['gh_colombina','sp22',[21,94],'colombina22|0','Moça fantasiada de Colombina',["No Carnaval eu saio de Colombina! Saia de cetim, pompom no cabelo.","Os ricos fazem o corso de automóvel na Avenida Paulista. Aqui na Barra Funda o povo sai a pé, atrás do cordão do seu Dionísio!"],'Carnaval de 1922: os ricos desfilavam de automóvel no corso; na Barra Funda, o povo negro saía no cordão de Dionísio Barbosa.'],
+   ['gh_normalista','m_centro22',[29,63],'normalista|3','Professora normalista',["Me formei na Escola Normal e agora dou aula num grupo escolar do Brás.","Tenho cinquenta alunos numa sala só. Metade é filho de italiano e fala italiano em casa!"],'Professoras normalistas: formadas pela Escola Normal, ensinavam nos grupos escolares; muitas salas eram cheias de filhos de imigrantes.'],
+   /* FUTEBOL */
+   ['gh_neco','sp22',[115,23],'corinthians22|0','Neco, do Corinthians',["Sou o Neco, do Corinthians. O clube nasceu em 1910, fundado por operários do Bom Retiro.","Joguei na seleção que ganhou o Campeonato Sul-Americano de 1919.","E este ano o Corinthians é o campeão paulista do Centenário!"],'Neco (Manoel Nunes): ídolo do Corinthians, clube fundado em 1910 por trabalhadores do Bom Retiro.'],
+   ['gh_amilcar','sp22',[118,23],'corinthians22|2','Amílcar Barbuy, do Corinthians',["Sou o Amílcar, filho de italianos. Jogo no Corinthians desde menino.","Futebol aqui começou como esporte de inglês rico. Agora é dos operários também."],'Amílcar Barbuy: craque corinthiano dos anos 1910 e 1920, filho de imigrantes italianos.'],
+   ['gh_palestra','m_oeste22',[128,89],'palestra22|0','Jogador do Palestra Itália',["Jogo no Palestra Itália, o clube que a colônia italiana fundou em 1914.","Aqui no Parque Antarctica a torcida grita em italiano e em português!"],'Palestra Itália: clube fundado em 1914 por imigrantes italianos; anos depois passou a se chamar Palmeiras.'],
+   ['gh_miller','sp22',[110,64],'miller22|0','Charles Miller',["Charles Miller. Nasci aqui no Brás, filho de escocês, e fui estudar na Inglaterra.","Em 1894 voltei com duas bolas de futebol na mala e um livro de regras.","Trabalhei na companhia inglesa de trens. E hoje a cidade inteira chuta bola, até na várzea!"],'Charles Miller: trouxe da Inglaterra, em 1894, bolas e regras do futebol para São Paulo.'],
+   ['gh_rubens','m_sul22',[13,99],'rapazTerno22|1','Rubens Salles',["Sou Rubens Salles, do Paulistano. Joguei muitos anos e hoje ajudo a treinar o time.","O Paulistano é o clube das famílias ricas do Jardim América. Mas o melhor jogador daqui é o Friedenreich, filho de uma mulher negra."],'Rubens Salles: jogador e técnico do Paulistano, clube da elite paulistana.'],
+   ['gh_arnaldo','m_sul22',[16,99],'rapazTerno22|3','Arnaldo Silveira',["Fui um dos primeiros grandes atacantes do futebol paulista, no tempo dos campos de terra.","Naquele tempo ninguém ganhava dinheiro jogando. Era tudo amador, por amor à camisa."],'Arnaldo Silveira: atacante dos primeiros tempos do futebol paulista, ainda amador.'],
+   /* ANARQUISTAS E SOCIALISTAS */
+   ['gh_leuenroth','m_leste22',[44,105],'leuenroth22|0','Edgard Leuenroth',["Sou Edgard Leuenroth, tipógrafo e jornalista. Faço A Plebe, um jornal anarquista.","Na Greve Geral de 1917 fui preso, acusado de ser um dos chefes.","Para nós, anarquistas, ninguém deve mandar em ninguém: nem patrão, nem governo, nem polícia."],'Edgard Leuenroth: tipógrafo e jornalista anarquista, editor de A Plebe; foi preso após a Greve Geral de 1917.'],
+   ['gh_anarq','m_leste22',[47,106],'anarquista22|0','Operário anarquista',["Pegue um panfleto, companheiro! Oito horas de trabalho, oito de descanso, oito de estudo.","O patrão diz que a fábrica é dele. Mas quem faz o tecido somos nós."],'Anarquismo: muitos operários imigrantes defendiam sindicatos livres, greves e escolas próprias.'],
+   ['gh_florentino','m_leste22',[41,108],'redator|2','Florentino de Carvalho',["Sou militante libertário. Escrevo, faço palestras, ensino.","Sem educação o operário não se liberta. Por isso lutamos por escolas nossas."],'Florentino de Carvalho: militante e educador anarquista em São Paulo.'],
+   ['gh_penteado','m_leste22',[150,60],'seg_bacharel|2','João Penteado, educador',["Dirigi a Escola Moderna aqui no Belém: uma escola livre, sem castigo e sem catecismo.","Em 1919 a polícia fechou a escola. Disseram que ensinávamos ideias perigosas."],'Escolas Modernas: escolas anarquistas do Belém e do Brás, fechadas pela polícia em 1919.'],
+   ['gh_adelino','m_leste22',[60,110],'seg_bacharel|4','Adelino de Pinho, educador',["Também dirigi uma Escola Moderna, aqui no Brás. A criança aprendia lendo o mundo, não decorando.","Fecharam as escolas, mas não fecham as ideias."],'Adelino de Pinho: educador anarquista, de uma das Escolas Modernas de São Paulo.'],
+   ['gh_everardo','m_leste22',[38,102],'operarios|3','Everardo Dias',["Sou gráfico e militante operário. Já fui preso mais de uma vez por causa das minhas ideias.","Mas quem defende os trabalhadores não se cala."],'Everardo Dias: gráfico e militante operário, preso várias vezes por sua militância.'],
+   ['gh_piccarolo','m_centro22',[57,40],'redator|4','Antônio Piccarolo',["Sou socialista. Diferente dos anarquistas, acredito em partido, sindicato e eleição.","Escrevo nos jornais italianos daqui. A colônia italiana discute política como se estivesse em Milão!"],'Antônio Piccarolo: intelectual socialista italiano que viveu em São Paulo.'],
+   /* CIÊNCIA E MEDICINA */
+   ['gh_vital','m_oeste22',[80,196],'vital22|0','Vital Brazil, cientista',["Sou Vital Brazil. Ajudei a criar este instituto em 1901, quando a peste bubônica chegou ao porto de Santos.","Descobri que cada tipo de cobra precisa do seu próprio soro.","Hoje tenho um instituto meu em Niterói, mas o Butantan é a minha casa."],'Vital Brazil: cientista; no Instituto Butantan criou soros contra veneno de cobra, específicos para cada tipo de serpente.'],
+   ['gh_cientista','m_oeste22',[73,197],'vital22|2','Cientista do Butantan',["Os sitiantes mandam cobras para cá pelo trem, em caixas. Em troca recebem soro de graça.","Tirar veneno de cobra é perigoso. Um descuido e... melhor nem pensar!"],'Butantan: o instituto trocava cobras enviadas por sitiantes por ampolas de soro.'],
+   ['gh_cientista2','m_butanta',[20,12],'vital22|3','Cientista do Butantan',["Bem-vindo ao Instituto Butantan! Aqui se faz soro contra veneno de cobra e vacinas.","Cuidado com o serpentário: lá dentro tem jararaca, cascavel e coral."],'Instituto Butantan: criado em 1901 para produzir soro contra a peste e, depois, contra veneno de cobras.'],
+   ['gh_ribas','sp22',[97,38],'ribas22|0','Emílio Ribas, médico',["Fui diretor do Serviço Sanitário por quase vinte anos.","Para provar que a febre amarela vem do mosquito, deixei o mosquito me picar! Era preciso convencer a cidade.","Limpar a água parada salvou mais gente do que muitos remédios."],'Emílio Ribas: sanitarista; combateu a febre amarela em São Paulo e provou, em si mesmo, que o mosquito transmitia a doença.'],
+   ['gh_francorocha','sp22',[87,47],'seg_homem|2','Franco da Rocha, psiquiatra',["Fundei o Hospício do Juquery, fora da cidade.","Defendo que quem sofre da mente seja tratado como doente, e não trancado como criminoso."],'Franco da Rocha: psiquiatra, fundador do Hospital do Juquery.'],
+   ['gh_oscarfreire','sp22',[92,47],'seg_bacharel|1','Oscar Freire, médico-legista',["Ensino Medicina Legal na Faculdade de Medicina.","É a ciência que ajuda a Justiça: examinar, medir, provar. A verdade está nos detalhes."],'Oscar Freire: médico-legista, professor da Faculdade de Medicina de São Paulo.'],
+   ['gh_paulasouza','sp22',[95,47],'rapazTerno22|2','Geraldo de Paula Souza, sanitarista',["Estudei saúde pública nos Estados Unidos.","Quero centros de saúde nos bairros, que ensinem higiene ao povo antes de a doença chegar."],'Geraldo de Paula Souza: sanitarista; defendeu centros de saúde e a educação sanitária.'],
+   ['gh_durval','sp22',[90,49],'seg_estudante|1','Durval Marcondes, estudante de Medicina',["Sou estudante de Medicina. Ando lendo um médico de Viena, o doutor Freud, que estuda os sonhos.","Meus professores acham estranho. Eu acho fascinante!"],'Durval Marcondes: médico paulista, pioneiro da psicanálise no Brasil.'],
+   /* EDUCAÇÃO E DIREITO */
+   ['gh_doria','m_centro22',[22,60],'seg_bacharel|3','Sampaio Dória, educador',["Em 1920 fiz uma reforma do ensino paulista. Meu objetivo: que toda criança aprenda a ler.","Metade do povo não sabe ler. Assim, como votar? Como ler um contrato?"],'Sampaio Dória: educador; a Reforma de 1920 tentou levar a alfabetização a todas as crianças paulistas.'],
+   ['gh_sud','m_centro22',[19,62],'professora|5','Sud Mennucci, educador',["Sou professor e defendo a escola rural.","O Brasil é um país de roça. A escola tem de ir até o campo, e não só ficar na cidade."],'Sud Mennucci: educador, defensor do ensino rural.'],
+   ['gh_kopke','m_centro22',[25,64],'quintino|2','João Köpke, educador',["Escrevi livros de leitura para crianças.","Ensinar a ler é ensinar a pensar."],'João Köpke: educador e autor de livros de leitura.'],
+   ['gh_arruda','m_centro22',[74,61],'seg_bacharel|0','João Arruda, professor de Direito',["Sou professor da Faculdade de Direito do Largo de São Francisco.","Daqui saíram muitos presidentes, governadores e ministros. Mas quase nenhum operário."],'Faculdade de Direito do Largo de São Francisco: formava a elite política e jurídica do país.'],
+   ['gh_juiz','m_centro22',[27,90],'juiz22|0','Juiz de direito',["Sou juiz de direito. Julgo brigas, roubos, heranças, dívidas.","A lei vale para todos. Pelo menos, é o que está escrito."],'Juízes: julgavam os processos da cidade; para os pobres, ter um advogado era difícil.'],
+   ['gh_advogado','m_centro22',[30,91],'seg_bacharel|5','Advogado',["Sou advogado. Defendo comerciantes, fazendeiros... e às vezes um operário, de graça.","Doutor, aqui, é quem estudou Direito. Todo mundo me chama de doutor!"],'Advogados: formados no Largo de São Francisco, eram chamados de doutores.'],
+   /* ARQUITETURA, ARTE, IMPRENSA E LETRAS */
+   ['gh_ramos','sp22',[104,50],'engenheiro|1','Ramos de Azevedo, arquiteto',["Meu escritório projetou o Theatro Municipal, o Liceu de Artes e Ofícios, o Palácio da Justiça...","No Liceu, filhos de operários aprendem a ser marceneiros, serralheiros, desenhistas."],'Ramos de Azevedo: arquiteto e engenheiro; seu escritório projetou muitos edifícios de São Paulo.'],
+   ['gh_rossi','m_centro22',[36,38],'engViaduto|1','Domiziano Rossi, arquiteto',["Desenhei boa parte do Theatro Municipal, no escritório do Ramos de Azevedo.","Olhe as escadas, os vitrais, o salão: tudo pensado para parecer a Ópera de Paris."],'Domiziano Rossi: arquiteto italiano que desenhou o Theatro Municipal com Ramos de Azevedo.'],
+   ['gh_severo','m_centro22',[44,40],'engenheiro|3','Ricardo Severo, arquiteto',["Sou português e arquiteto. Defendo o estilo neocolonial.","Em vez de copiar a Europa, vamos nos inspirar nas igrejas e casarões do tempo da colônia!"],'Ricardo Severo: arquiteto que defendeu o estilo neocolonial nos anos 1910 e 1920.'],
+   ['gh_taunay','sp22',[156,193],'taunay22|0','Afonso de Taunay, historiador',["Sou Afonso de Taunay, diretor do Museu Paulista.","Estou preparando o museu para o Centenário da Independência. Encomendei quadros sobre os bandeirantes e a história de São Paulo.","Um historiador trabalha com documentos: cartas, inventários, mapas. Sem eles, não há história."],'Afonso de Taunay: historiador, diretor do Museu Paulista; preparou o museu para o Centenário de 1922.'],
+   ['gh_calixto','sp22',[160,193],'fotografo|2','Benedito Calixto, pintor',["Sou pintor. Pinto a São Paulo de antigamente e o litoral de Santos e São Vicente.","Muitos quadros meus contam a história da cidade. Mas lembre: pintura de história também é uma interpretação."],'Benedito Calixto: pintor de cenas históricas e paisagens do litoral paulista.'],
+   ['gh_casper','m_centro22',[118,80],'redator|1','Cásper Líbero, jornalista',["Sou dono do jornal A Gazeta desde 1918.","Quero um jornal moderno, rápido, cheio de notícias da cidade e de esporte."],'Cásper Líbero: empresário de imprensa, dono de A Gazeta.'],
+   ['gh_plinio','m_centro22',[121,82],'rapazTerno22|4','Plínio Salgado, jornalista',["Sou jornalista do Correio Paulistano.","Leio nos telegramas que na Itália um tal Mussolini promete ordem, disciplina e uma nação forte, com seus camisas-negras.","Muita gente aqui acha isso bonito. Outros dizem que é o fim da liberdade. E você, o que acha?"],'Plínio Salgado: jornalista; em 1932 fundou a Ação Integralista Brasileira, inspirada no fascismo italiano de Mussolini.'],
+   ['gh_lobato','m_centro22',[44,48],'lobato22|0','Monteiro Lobato, editor',["Sou Monteiro Lobato. Faço livros e a Revista do Brasil.","Em 1920 publiquei A Menina do Narizinho Arrebitado, com uma boneca de pano chamada Emília.","Em 1917 falei mal da pintura da Anita Malfatti no jornal. Os modernistas nunca me perdoaram!"],'Monteiro Lobato: escritor e editor; publicou Narizinho em 1920 e criticou a exposição de Anita Malfatti em 1917.'],
+   ['gh_guilherme','m_centro22',[38,42],'rapazTerno22|0','Guilherme de Almeida, poeta',["Sou poeta. Participei da Semana de Arte Moderna, no Theatro Municipal.","Poesia nova para uma cidade nova: bonde, fábrica, arranha-céu!"],'Guilherme de Almeida: poeta, participante da Semana de Arte Moderna de 1922.'],
+   ['gh_vicente','m_santos22',[20,16],'conservador|2','Vicente de Carvalho, poeta',["Sou poeta e juiz aqui em Santos.","Meus versos falam do mar. Quem nasce em Santos carrega o mar no peito."],'Vicente de Carvalho: poeta santista, conhecido como o poeta do mar.'],
+   ['gh_martins','m_santos22',[26,18],'seg_homem|1','Martins Fontes, médico e poeta',["Sou médico e poeta, aqui em Santos.","De dia cuido dos doentes do porto; de noite, escrevo versos."],'Martins Fontes: médico e poeta santista.'],
+   /* INDÚSTRIA E CAFÉ */
+   ['gh_matarazzo','m_oeste22',[130,70],'matarazzo22|0','Conde Francesco Matarazzo',["Sou Francesco Matarazzo. Cheguei da Itália em 1881 com quase nada.","Hoje as Indústrias Reunidas Francisco Matarazzo fazem farinha, tecido, óleo, sabão e muito mais.","Dizem que sou o homem mais rico do Brasil. Meus operários dizem que o salário é pouco."],'Francesco Matarazzo: imigrante italiano que criou o maior grupo industrial do Brasil.'],
+   ['gh_chiquinho','m_paulista22',[90,17],'rapazTerno22|5','Francisco Matarazzo Júnior',["Sou o Chiquinho, filho do Conde Matarazzo.","Meu irmão Ermelino morreu num acidente de automóvel na Itália, em 1920. Um dia eu vou cuidar das fábricas."],'Francisco Matarazzo Júnior: filho do Conde; seu irmão Ermelino morreu em 1920.'],
+   ['gh_street','m_leste22',[152,36],'street22|0','Jorge Street, industrial',["Construí a Vila Maria Zélia para os operários da minha fábrica de juta: casas, escola, igreja, armazém.","Defendo algumas leis para proteger o operário. Muitos industriais acham que estou louco.","Mas o operário que mora na vila também mora sob os olhos do patrão."],'Jorge Street: industrial; criou a Vila Maria Zélia (1917) e defendeu algumas leis de proteção ao trabalho.'],
+   ['gh_simonsen','m_santos22',[30,20],'engenheiro|2','Roberto Simonsen, engenheiro',["Sou engenheiro e empresário. Minha companhia constrói em Santos e em São Paulo.","O Brasil precisa de indústria, e não só de café."],'Roberto Simonsen: engenheiro e empresário, defensor da industrialização.'],
+   ['gh_pauloprado','m_centro22',[28,41],'banqueiro|2','Paulo Prado',["Sou Paulo Prado. Minha família fez fortuna com o café.","Ajudei a pagar a Semana de Arte Moderna. Os moços modernistas precisam de quem acredite neles!"],'Paulo Prado: cafeicultor e mecenas; apoiou a Semana de Arte Moderna.'],
+   /* RELIGIÃO, RIO E OBRAS */
+   ['gh_duarte','m_centro22',[108,66],'arcebispo22|0','Dom Duarte Leopoldo e Silva, arcebispo',["Sou Dom Duarte Leopoldo e Silva, arcebispo de São Paulo.","Estamos construindo a nova Catedral da Sé. A obra começou em 1913 e ainda vai levar muitos anos.","A cidade cresce depressa. A Igreja quer crescer junto."],'Dom Duarte Leopoldo e Silva: arcebispo de São Paulo; iniciou a construção da nova Catedral da Sé, que levou décadas.'],
+   ['gh_rabino','sp22',[91,35],'rabino22|0','Rabino da sinagoga',["Esta é a sinagoga Kehilat Israel, aqui no Bom Retiro.","Muitos judeus chegaram da Rússia, da Polônia, da Bessarábia. Trabalham como mascates, alfaiates, marceneiros.","Aqui rezamos, estudamos e nos ajudamos. A comunidade é a nossa família."],'Bom Retiro: bairro de imigrantes judeus, com a sinagoga Kehilat Israel.'],
+   ['gh_engtiete','sp22',[100,25],'engenheiro|4','Engenheiro medindo o Tietê',["Meço a altura do Tietê todo dia. Nas cheias, o rio inunda a várzea inteira.","Muita gente quer retificar o rio: deixar ele reto, com margens de pedra. Será que é boa ideia mexer tanto num rio?"],'Tietê: nos anos 1920 começaram os estudos para retificar o rio; as várzeas eram usadas por clubes, lavadeiras e areeiros.']];
+  const poe=()=>{let falta=0;for(const [id,sc,[x0,y0],spr,nome,lines,diary] of P){if(npcs.find(n=>n.id===id))continue;if(!tem(spr.split('|')[0])){falta++;continue;}const S=SCN[sc];if(!S||!S.map){falta++;continue;}
+      const M=S.map,H=M.length,W=M[0].length;const ok=(x,y)=>x>0&&y>0&&x<W-1&&y<H-1&&freeAt(sc,x,y)&&!npcs.some(n=>n.scene===sc&&n.x===x&&n.y===y);
+      let p=null;for(let r=0;r<9&&!p;r++)for(let y=y0-r;y<=y0+r&&!p;y++)for(let x=x0-r;x<=x0+r&&!p;x++){if(Math.max(Math.abs(x-x0),Math.abs(y-y0))===r&&ok(x,y))p=[x,y];}
+      if(!p)continue;try{npcIn(sc,id,'colono',p[0],p[1],nome,lines,diary);}catch(e){continue;}const n=npcs.find(n=>n.id===id);if(n)n.spr='h22_n|'+spr;}return falta;};
+
+  /* gente andando nas quadras vazias dos bairros */
+  const POVO={
+   m_leste22:{spr:['operaria|0','operaria|2','tecelaFab|3','operarios|1','operarios|4','mulherPovo22|1','mulherPovo22|4','pop_05|1','pop_06|2','pop_10|3','pop_13|0','pop_19|2','pop_24|4','pop_27|1','italiana2|2','italianaB|1','seg_crianca|3','meninaPobre22|1','portugues|2','espanhola|1','lavadeiraNegra22|2','carregadorS|1'],
+     falas:[['Operária a caminho da fábrica',["Corre, que o apito vai tocar!","Chegar atrasada é multa no fim da semana."]],['Operário saindo do turno',["Dez horas de máquina. Agora é chegar em casa e cair na cama."]],['Mãe com a sacola da feira',["Pão, macarrão, um pedaço de toucinho. O dinheiro não dá para mais."]],['Menino do bairro',["Vou levar a marmita do meu pai na fábrica!"]],['Vizinha do cortiço',["Lá no cortiço é um tanque para oito famílias. Tem que acordar cedo para lavar."]],['Italiano do Brás',["Qui al Brás parliamo tutti italiano! Aqui no Brás todo mundo fala italiano!"]],['Espanhola da Mooca',["Vim de Andaluzia com a família toda. Trabalhamos todos na fábrica, até o caçula."]],['Carregador do bairro',["Saco de farinha, fardo de algodão: tudo passa nas minhas costas."]]],max:110},
+   m_oeste22:{spr:['operarios|2','operaria|3','pop_02|1','pop_09|2','pop_14|3','pop_22|0','pop_28|2','mulherPovo22|3','seg_crianca|1','ferroviario|1','carregaArm2|2','lavadeiraNegra22|1','domesticaNegra22|2'],
+     falas:[['Operário da Matarazzo',["Trabalho na Matarazzo, na Água Branca. Lá dentro tem de tudo: moinho, tecelagem, fábrica de pregos."]],['Ferroviário da Lapa',["As oficinas de trem da Lapa empregam muita gente aqui no bairro."]],['Lavadeira da Barra Funda',["Lavo roupa para as famílias de Higienópolis e trago de volta na cabeça."]],['Moradora da Barra Funda',["Domingo tem samba no terreiro e futebol na várzea."]],['Menino da várzea',["Vou jogar bola na várzea do Tietê! Bola de meia, mas é bola!"]]],max:40},
+   m_sul22:{spr:['japonesTrab22|1','japonesCom22|2','pop_11|2','pop_16|1','pop_20|3','pop_23|2','mulherPovo22|2','seg_crianca|2','italiana2|1','pop_29|0'],
+     falas:[['Imigrante japonês da Liberdade',["Cheguei do Japão para trabalhar no café. Agora moro aqui na Rua Conde de Sarzedas."]],['Moradora da Vila Mariana',["O bonde chega até aqui. A Vila Mariana cresce a cada mês."]],['Chacareiro',["Planto verdura aqui perto e vendo no mercado da cidade."]],['Menina da Liberdade',["Na minha rua tem japonês, italiano, negro e português. Todo mundo brinca junto."]]],max:28},
+   m_paulista22:{spr:['senhoraRica22|1','senhoraRica22|3','meninaRica22|2','rapazTerno22|1','domesticaNegra22|0','amaSeca22|1','taxista22|2','pop_32|1'],
+     falas:[['Senhora passeando na Avenida',["A Paulista é o lugar mais elegante da cidade. Aqui moram os barões do café e os grandes industriais."]],['Babá com as crianças',["Levo as crianças da patroa para tomar sol no Trianon."]],['Rapaz de terno',["Domingo é dia de passear de automóvel pela Avenida!"]],['Motorista particular',["Sou chauffeur da família. Lavo o carro, levo a patroa às compras, espero horas na porta."]]],max:14,solto:true}};
+  const gente=()=>{for(const [sc,cfg] of Object.entries(POVO)){const S=SCN[sc];if(!S||!S.map)continue;if(walkers.some(w=>w.id&&w.id.indexOf('ghw_'+sc)===0))continue;
+      const M=S.map,H=M.length,W=M[0].length,B=16;const L=[];let k=0;
+      const ocup=(x,y)=>npcs.some(n=>n.scene===sc&&Math.abs(n.x-x)<3&&Math.abs(n.y-y)<3)||walkers.some(w=>w.scene===sc&&Math.abs(w.x-x)<3&&Math.abs(w.y-y)<3);
+      for(let by=0;by<H&&L.length<cfg.max;by+=B)for(let bx=0;bx<W&&L.length<cfg.max;bx+=B){
+        const pr=objects.filter(o=>o.scene===sc&&o.x>=bx&&o.x<bx+B&&o.y>=by&&o.y<by+B&&(o.w||1)>=2).length;if(pr<(cfg.solto?1:3))continue;
+        const tem=!cfg.solto&&(npcs.some(n=>n.scene===sc&&n.x>=bx&&n.x<bx+B&&n.y>=by&&n.y<by+B)||walkers.some(w=>w.scene===sc&&w.x>=bx&&w.x<bx+B&&w.y>=by&&w.y<by+B));if(tem)continue;
+        let quantos=pr>=8?2:1;
+        for(let t=0;t<quantos;t++){let p=null;const cx=bx+(t?11:5),cy=by+(t?10:6);
+          for(let r=0;r<8&&!p;r++)for(let y=cy-r;y<=cy+r&&!p;y++)for(let x=cx-r;x<=cx+r&&!p;x++){if(x<2||y<2||x>W-3||y>H-3)continue;if(Math.max(Math.abs(x-cx),Math.abs(y-cy))!==r)continue;
+            if(freeAt(sc,x,y)&&freeAt(sc,x+1,y+1)&&!ocup(x,y))p=[x,y];}
+          if(!p)continue;const f=cfg.falas[k%cfg.falas.length],s=cfg.spr[(k*7+3)%cfg.spr.length];k++;
+          if(!tem_(s))continue;
+          L.push({id:'ghw_'+sc+'_'+k,spr:'h22_n|'+s,name:f[0],wander:[p[0]-1,p[1]-1,Math.min(W-2,p[0]+4),Math.min(H-2,p[1]+4)],speed:1.2,lines:f[1]});}}
+      try{if(L.length)addWalkers(sc,L);}catch(e){console.warn('gente 1922',e);}}};
+  const tem_=s=>tem(s.split('|')[0]);
+  let tent=0;const tenta=()=>{let f=0;try{f=poe();}catch(e){console.warn('gente 1922',e);}if((f||P.some(p=>tem(p[3].split('|')[0])&&!npcs.find(n=>n.id===p[0])))&&++tent<40)setTimeout(tenta,600);};
+  setTimeout(tenta,0);
+  setTimeout(()=>{try{gente();}catch(e){console.warn('gente 1922',e);}},5000);
+  window.__gentePers22={P,POVO};
+}catch(e){console.warn('gente 1922',e);}})();
 
 Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=>{buildStatic();buildOcc();updHUD();$('loading').hidden=true;requestAnimationFrame(loop);});
 /* ===== v203 — MENOS ESPAÇO PRETO EM TODOS OS FORMATOS E ABERTURA SEM 1554 NO FUNDO (pedido do professor, 21/11/2026) =====
