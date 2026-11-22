@@ -27143,6 +27143,39 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   }catch(e){console.warn('mm vigia',e);}},500);
 }catch(e){console.warn('modo missão',e);}})();
 
+/* ===== v254 — PRIMEIRA TELA SÓ COM MODO LIVRE E MODO MISSÃO; DEPOIS AS PARTES DA VIAGEM (pedido do professor, 22/11/2026) =====
+   Ao abrir a tela inicial, aparece só a escolha do modo (título + dois botões grandes).
+   Depois de escolher, aparece a tela de sempre (Continuar, as 4 partes, Tenho um código), com um botão "Trocar modo" no alto. */
+;(function(){try{
+  const st=document.createElement('style');st.textContent=`
+  #ovStart .card.mmPasso1>*:not(.kicker):not(h1):not(#modoBox){display:none!important}
+  #ovStart .card.mmPasso1 #modoBox .lab{font-size:clamp(18px,4.8vw,22px);margin:10px 0 10px}
+  #ovStart .card.mmPasso1 #modoBox .mr{flex-direction:column;gap:12px}
+  #ovStart .card.mmPasso1 #modoBox button{flex:none;width:100%;font-size:clamp(20px,5.4vw,26px);padding:16px 14px;outline:none}
+  #ovStart .card.mmPasso1 #modoBox button small{font-size:clamp(14px,3.8vw,17px);margin-top:4px}
+  #ovStart .card:not(.mmPasso1) #modoBox .mr{display:none}
+  #ovStart .card:not(.mmPasso1) #modoBox .lab{display:none}
+  #modoBox .mmEsc{display:none;align-items:center;gap:8px;flex-wrap:wrap;font:600 15px/1.3 Inter,system-ui,sans-serif;margin:2px 0 6px}
+  #ovStart .card:not(.mmPasso1) #modoBox .mmEsc{display:flex}
+  #modoBox .mmEsc .btn{font-size:14px;padding:4px 10px}`;document.head.appendChild(st);
+  const nomeModo=()=>{let m='missao';try{m=localStorage.getItem('pira_modo')||'missao';}catch(_){}return m==='livre'?'🗺️ Modo livre':'🎯 Modo Missão';};
+  function monta(){const ov=document.getElementById('ovStart'),mb=document.getElementById('modoBox');if(!ov||!mb)return false;const card=ov.querySelector('.card');if(!card)return false;
+    if(mb.dataset.passos)return true;mb.dataset.passos='1';
+    mb.querySelector('.lab').textContent='Como você quer jogar?';
+    const esc=document.createElement('div');esc.className='mmEsc';const tx=document.createElement('span');
+    const tr=document.createElement('button');tr.type='button';tr.className='btn alt';tr.textContent='Trocar modo';
+    tr.onclick=()=>{card.classList.add('mmPasso1');ov.scrollTop=0;};esc.append(tx,tr);mb.appendChild(esc);
+    mb.querySelectorAll('.mr button').forEach(b=>b.addEventListener('click',()=>{setTimeout(()=>{tx.textContent='Modo escolhido: '+nomeModo();card.classList.remove('mmPasso1');ov.scrollTop=0;},0);}));
+    /* tira o modo de onde estava e põe logo abaixo do título */
+    const h1=card.querySelector('h1');if(h1&&h1.nextSibling!==mb)h1.after(mb);
+    const passo1=()=>{card.classList.add('mmPasso1');tx.textContent='Modo escolhido: '+nomeModo();ov.scrollTop=0;};
+    if(!ov.hidden)passo1();
+    new MutationObserver(()=>{if(!ov.hidden&&!ov.dataset.mmAberto){ov.dataset.mmAberto='1';passo1();}if(ov.hidden)delete ov.dataset.mmAberto;}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+    if(!ov.hidden)ov.dataset.mmAberto='1';
+    return true;}
+  if(!monta()){let n=0;const iv=setInterval(()=>{if(monta()||++n>60)clearInterval(iv);},250);}
+}catch(e){console.warn('v254',e);}})();
+
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
