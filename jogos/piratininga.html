@@ -433,7 +433,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cb3f043a","kb":344,"m":2},{"f":"pac_e23.js?v=6db414b2","kb":428,"m":6},{"f":"pac_e234.js?v=d425da45","kb":824,"m":14},{"f":"pac_e3.js?v=a669cf24","kb":1651,"m":4},{"f":"pac_e34.js?v=46c2dbf0","kb":1049,"m":12},{"f":"pac_e4.js?v=f8efa5b6","kb":7729,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cb3f043a","kb":344,"m":2},{"f":"pac_e23.js?v=6db414b2","kb":428,"m":6},{"f":"pac_e234.js?v=d425da45","kb":824,"m":14},{"f":"pac_e3.js?v=a669cf24","kb":1651,"m":4},{"f":"pac_e34.js?v=46c2dbf0","kb":1049,"m":12},{"f":"pac_e4.js?v=6d4251e0","kb":7836,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -27988,6 +27988,43 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
     const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.drawImage(im,0,0);g.clearRect(0,0,14,h);CV=c;IMG.EMO=c;};
   const r0=render;render=function(){try{tira();}catch(_){}return r0.apply(this,arguments);};
 }catch(e){console.warn('v256 balões',e);}})();
+/* ===== v260 — FÁBRICAS DA LESTE E CAMPOS DE FUTEBOL DE 1922 REDESENHADOS (pedido do professor, 22/11/2026) =====
+   No estilo aprovado da Mariângela (arcos entre pilastras, dentes de serra baixos, chaminé alta e clara, telhado baixo,
+   contorno escuro): cada fábrica grande da Leste industrial ganha desenho próprio, todas diferentes, no alto do pátio
+   murado e virada para o pátio. Os galpões dos pátios e os campos de futebol (várzea, Corinthians, Paulistano,
+   Palestra) também. Só muda desenho e lugar do prédio DENTRO do pátio da Leste (m_leste22) e o desenho dos campos;
+   nada muda no chão, nos nomes ou nos lugares do mapa dos bairros (sp22) nem no centro. Matarazzo e Maria Zélia ficam
+   como estão. Imagens: FAB22_* e CAMPO22_* no arte_1922.js (32 px por quadradinho, desenhadas pela metade). */
+(function(){try{
+  if(typeof A==='undefined'||typeof objects==='undefined')return;
+  const MED={"crespi": [864, 416, 472], "tecBelenzinho": [704, 256, 248], "mariangela": [576, 352, 280], "alpargatas": [512, 352, 184], "labor": [416, 352, 152], "aniagens": [384, 256, 120], "moinho": [256, 416, 56], "bavaria": [960, 288, 518]};
+  const IM={};const img=k=>IM[k]||(IM[k]=(()=>{const i=new Image();i.src=A[k]||'';return i;})());
+  const desenha=(k,o,antes)=>function(c,X,Y){const im=img(k);
+    if(!(im.complete&&im.naturalWidth)){if(antes)antes.call(this,c,X,Y);return;}
+    const dw=im.naturalWidth/2,dh=im.naturalHeight/2,base=Y+o.h*16,sx=Math.round(X+(o.w*16-dw)/2);
+    c.fillStyle='rgba(20,14,8,.22)';c.fillRect(sx+4,base-1,dw-8,3);c.drawImage(im,sx,Math.round(base-dh),dw,dh);};
+  const dentro=(q,x,y,w,h)=>q.x<x+w&&q.x+(q.w||1)>x&&q.y<y+h&&q.y+(q.h||1)>y;
+  let fezLeste=false;const camposFeitos=new Set();
+  function leste(){const S='m_leste22',L=window.__leste22;if(fezLeste||!L||!L.mudou)return;fezLeste=true;const R=(window.__fab22v260={fab:[],gal:0,fora:[]});
+    for(const id of Object.keys(MED)){const o=objects.find(q=>q.scene===S&&q.id===id);const k='FAB22_'+id;if(!o||!A[k])continue;
+      const mu=objects.filter(q=>q.scene===S&&/^lsMuro_/.test(q.id)&&q.name==='Muro: '+o.name);if(mu.length<4){R.fora.push(id);continue;}
+      const x0=Math.min(...mu.map(q=>q.x)),x1=Math.max(...mu.map(q=>q.x)),y0=Math.min(...mu.map(q=>q.y)),y1=Math.max(...mu.map(q=>q.y));
+      const bw=x1-x0+1,[pw,ph,pp]=MED[id],tw=Math.round(pw/32),nw=Math.min(tw,bw-2),nh=o.h;
+      const gal=objects.some(q=>q.scene===S&&q.id.indexOf('lsGal_'+id)===0);
+      const ny=Math.max(y0+1,(gal?y1-7:y1-3)-nh+1),nx=x0+((bw-nw)>>1);
+      const bate=objects.filter(q=>q!==o&&q.scene===S&&!/^lsMuro_|^lsGal_|^lsCham_|^chamine\d|^chamFerro/.test(q.id)&&dentro(q,nx,ny,nw,nh));
+      if(bate.length){R.fora.push(id+':'+bate.map(q=>q.id).join('+'));continue;}
+      /* a chaminé solta do pátio sai: o desenho novo já traz a sua */
+      for(let i=objects.length-1;i>=0;i--){const q=objects[i];if(q.scene===S&&(q.id==='lsCham_'+id||(/^chamine\d|^chamFerro/.test(q.id)&&q.x>=x0&&q.x<=x1&&q.y>=y0&&q.y<=y1)))objects.splice(i,1);}
+      const antes=o.draw;o.x=nx;o.y=ny;o.w=nw;o.door=Math.max(0,Math.min(nw-1,Math.floor(pp/32)-((tw-nw)>>1)));o.draw=desenha(k,o,antes);
+      const tira=n=>{if(n.scene===S&&n.x>=nx&&n.x<nx+nw&&n.y>=ny&&n.y<ny+nh){const p=findFree(S,nx+o.door,ny+nh+1,8);if(p){n.x=p[0];n.y=p[1];if(n.px!==undefined){n.px=n.x*16;n.py=n.y*16;}}}};
+      npcs.forEach(tira);if(typeof ITEMS!=='undefined')ITEMS.forEach(tira);
+      R.fab.push(id);}
+    if(A.FAB22_galpao8)for(const q of objects)if(q.scene===S&&/^lsGal_/.test(q.id)&&q.w===8){q.draw=desenha('FAB22_galpao8',q,q.draw);R.gal++;}}
+  function campos(){for(const id of ['campoCorinthians','campoPaulistano','campoVarzea','zoCampoPalestra','zoCampoVarzea']){if(camposFeitos.has(id))continue;
+      const o=objects.find(q=>q.id===id);const k='CAMPO22_'+id;if(!o||!A[k])continue;o.draw=desenha(k,o,o.draw);camposFeitos.add(id);}}
+  let n=0;const t=setInterval(()=>{try{leste();campos();}catch(e){console.warn('v260 fábricas',e);}if((fezLeste&&camposFeitos.size===5)||++n>200)clearInterval(t);},300);
+}catch(e){console.warn('v260 fábricas',e);}})();
 
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
