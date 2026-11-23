@@ -30314,6 +30314,31 @@ setTimeout(function(){try{
   window.__portalLorena30=o;
 }catch(e){console.warn('v267 portalzinho Lorena',e);}},0);
 
+/* ===== v271 — 1830: DESENHO DE CADA MISSÃO (cartão ao começar a missão) (pedido do professor, 23/11/2026) ===== */
+;(function(){try{
+  const TEM={mula:1,agua:1,virado:1,jornal:1,ferradura:1,roupa:1,aula:1,lampioes:1,escola:1,carta30:1,santos:1,convento:1,procissao:1,chacara:1,comparar:1,trabalho:1,olaria:1,memoria:1,remedio:1,receita:'remedio',romaria:1,ipiranga:1,tinteiro:1,ganho:1,tebas30:1,chaguinhas30:1,quitanda30:1,tropa30:1,lorena30:1};
+  const arq=k=>{const v=TEM[k];return v?'arte/missoes1830/'+(v===1?k:v)+'.webp':null;};
+  const css=document.createElement('style');
+  css.textContent='#ovMis{z-index:31}#ovMis .card{max-width:340px;text-align:center}#ovMis .row{justify-content:center}#ovMis img{width:min(100%,260px,32vh);aspect-ratio:1;height:auto;display:block;margin:6px auto 8px;border:3px solid var(--ink);border-radius:4px;background:#2a2420}#ovMis h2{margin:2px 0 4px}#ovMis p{margin:0 0 8px}';
+  document.head.appendChild(css);
+  const ov=document.createElement('div');ov.className='ov';ov.id='ovMis';ov.hidden=true;
+  ov.innerHTML='<div class="card"><div class="kicker" id="misK">Nova missão</div><img id="misImg" alt=""><h2 id="misT"></h2><p id="misW"></p><div class="row"><button class="btn" type="button" id="misOk">Vamos!</button></div></div>';
+  ovQuiz.parentElement.appendChild(ov);
+  const fecha=()=>{ov.hidden=true;};
+  $('misOk').onclick=fecha;
+  const velhoP=isPaused;isPaused=()=>velhoP()||!ov.hidden;
+  const outraTela=()=>[...document.querySelectorAll('.ov')].some(e=>e!==ov&&!e.hidden)||(typeof dialog!=='undefined'&&!!dialog);
+  let fila=null;
+  function mostra(k,novo){const q=Q[k],src=arq(k);if(!q||!src)return;
+    $('misImg').src=src;$('misImg').alt=q.title;$('misK').textContent=novo?'Nova missão':'Missão em andamento';
+    $('misT').textContent=q.title;$('misW').textContent=(q.step!=null&&!q.done&&typeof qText==='function')?qText(k):(q.where||'');
+    ov.hidden=false;setTimeout(()=>{try{$('misOk').focus({preventScroll:true});}catch(_){}},30);}
+  setInterval(()=>{if(fila&&!outraTela()){const k=fila;fila=null;mostra(k,true);}},300);
+  const velhoQ=qStart;
+  qStart=function(k){velhoQ.apply(this,arguments);try{if((Q[k].era||1)===2&&arq(k)){const im=new Image();im.src=arq(k);fila=k;}}catch(_){}};
+  window.__misDesenho=mostra;
+}catch(e){console.warn('desenho missão',e);}})();
+
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
