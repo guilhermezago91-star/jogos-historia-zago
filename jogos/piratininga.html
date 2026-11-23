@@ -30617,6 +30617,101 @@ setTimeout(function(){try{
 /* ===== v273 — 1554 E 1888: DESENHO DE CADA MISSÃO (mesmo cartão da v271 ao começar a missão) (pedido do professor, 23/11/2026) ===== */
 ;(function(){window.__MISDES=Object.assign(window.__MISDES||{},{acucar:'arte/missoes1554/acucar.webp',farinha:'arte/missoes1554/farinha.webp',carta:'arte/missoes1554/carta.webp',pesca:'arte/missoes1554/pesca.webp',ceramica:'arte/missoes1554/ceramica.webp',escambo:'arte/missoes1554/escambo.webp',potes:'arte/missoes1554/potes.webp',viagemAcucar:'arte/missoes1554/viagemAcucar.webp',noticia:'arte/missoes1888/noticia.webp',imigrantes:'arte/missoes1888/imigrantes.webp',bonde:'arte/missoes1888/bonde.webp',gas:'arte/missoes1888/gas.webp',moradia:'arte/missoes1888/moradia.webp',fotos:'arte/missoes1888/fotos.webp',manchete:'arte/missoes1888/manchete.webp',cafe:'arte/missoes1888/cafe.webp',agua88:'arte/missoes1888/agua88.webp',colheita:'arte/missoes1888/colheita.webp',porto:'arte/missoes1888/porto.webp',liberdade:'arte/missoes1888/liberdade.webp',viaduto:'arte/missoes1888/viaduto.webp',ipiranga88:'arte/missoes1888/ipiranga88.webp',tijolo:'arte/missoes1888/tijolo.webp',fabrica:'arte/missoes1888/fabrica.webp',incendio:'arte/missoes1888/incendio.webp',republica:'arte/missoes1888/republica.webp',imperio:'arte/missoes1888/imperio.webp',jornal88:'arte/missoes1888/jornal88.webp',chocolate:'arte/missoes1888/chocolate.webp',abolicaoBan:'arte/missoes1888/abolicaoBan.webp',gama88:'arte/missoes1888/gama88.webp',remedios88:'arte/missoes1888/remedios88.webp',peticao88:'arte/missoes1888/peticao88.webp',aflitos88:'arte/missoes1888/aflitos88.webp',atibaia88:'arte/missoes1888/atibaia88.webp',tramway88:'arte/missoes1888/tramway88.webp',cafeTrem88:'arte/missoes1888/cafeTrem88.webp',fotoRua88:'arte/missoes1888/fotoRua88.webp',arcadas88:'arte/missoes1888/arcadas88.webp',dia13:'arte/missoes1888/dia13.webp'});})();
 
+/* ===== v274 — CONSERTOS DE 1554, 1830 E 1888: PORTAS LIVRES, CASAS ALCANÇÁVEIS E SALAS SEM GENTE PRESA (pedido do professor, 23/11/2026) ===== */
+/* Só mexe em 1554, 1830 e 1888 (nada de 1922). Não apaga desenho: muda gente de lugar, abre passagem em 5 pontos do chão de 1888,
+   sobe a Estação do Norte um quadradinho (a porta caía em cima do trilho), tira 2 varais em cima de igrejas e,
+   dentro das salas, tira só as camas e catres "de enchimento" que fecham o caminho até alguém ou até um objeto. */
+setTimeout(function(){try{
+  const SOLIDO='TCWMbPOK#mjhlXLcY';
+  const ERA_OK=k=>{try{return !!SCN[k]&&!!SCN[k].map&&eraOf(k)<=3;}catch(_){return false;}};
+  const SALA=k=>!!(SCN[k]&&SCN[k].room);
+  const cena=o=>o.scene||'pira';
+  const ocup=k=>{const s=new Map();for(const o of objects)if(cena(o)===k&&o.x!=null)for(let a=0;a<(o.w||1);a++)for(let b=0;b<(o.h||1);b++)s.set((o.x+a)+','+(o.y+b),o);return s;};
+  const livreT=(M,x,y)=>y>=0&&y<M.length&&x>=0&&x<M[0].length&&!SOLIDO.includes(M[y][x]);
+  const alcance=(M,occ,sx,sy)=>{const v=new Set();if(!livreT(M,sx,sy)||occ.has(sx+','+sy))return v;const q=[[sx,sy]];v.add(sx+','+sy);
+    while(q.length){const [x,y]=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const a=x+dx,b=y+dy,kk=a+','+b;if(v.has(kk)||!livreT(M,a,b)||occ.has(kk))continue;v.add(kk);q.push([a,b]);}}return v;};
+  const poe=(M,x,y,c)=>{const r=M[y];if(Array.isArray(r))r[x]=c;else M[y]=r.slice(0,x)+c+r.slice(x+1);};
+  const R=window.__v274={chao:0,estacao:0,gente:0,placas:0,varais:0,moveis:0};
+
+  /* 1) chão de 1888: abre passagem até 5 portas que estavam num cantinho fechado (só se o chão ainda for o esperado) */
+  const CHAO={sp88:[[62,129,'b','.'],[1,79,'b','.'],[1,81,'T','.'],[13,80,'P',','],[93,128,'T','.'],[48,127,'T','.']]};
+  function chao(k){const L=CHAO[k];if(!L)return false;const M=SCN[k].map;let mudou=false;
+    for(const [x,y,de,para] of L){if(M[y]&&M[y][x]===de){poe(M,x,y,para);if(typeof mapSp88!=='undefined'&&mapSp88!==M&&mapSp88[y]&&mapSp88[y][x]===de)poe(mapSp88,x,y,para);mudou=true;R.chao++;}}
+    return mudou;}
+
+  /* 1b) porta num cantinho fechado (as casas de 1888 mudam um pouco de lugar a cada abertura): abre passagem tirando no máximo 3 arbustos ou árvores */
+  function abreCaminho(k){const M=SCN[k].map,H=M.length,W=M[0].length;const occ=ocup(k);let mudou=false;
+    const comp=new Map();let maior=null,tam=0;
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){const kk=x+','+y;if(comp.has(kk)||!livreT(M,x,y)||occ.has(kk))continue;const v=alcance(M,occ,x,y);for(const q of v)comp.set(q,v);if(v.size>tam){tam=v.size;maior=v;}}
+    if(!maior)return false;
+    for(const o of objects){if(cena(o)!==k||!(o.enter||o.room)||o.door==null||o.x==null)continue;const dx=o.x+o.door,dy=o.y+o.h,k0=dx+','+dy;
+      if(!livreT(M,dx,dy)||occ.has(k0)||maior.has(k0))continue;
+      const dist=new Map([[k0,0]]),de=new Map(),fila=[[dx,dy]];let fim=null;
+      while(fila.length&&!fim){const [x,y]=fila.shift();const d=dist.get(x+','+y);
+        for(const [a,b] of [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]){const kk=a+','+b;if(a<0||b<0||a>=W||b>=H||dist.has(kk)||occ.has(kk))continue;const c=M[b][a];
+          let custo;if(!SOLIDO.includes(c))custo=0;else if(c==='T'||c==='b')custo=1;else continue;const nd=d+custo;if(nd>3)continue;
+          dist.set(kk,nd);de.set(kk,x+','+y);if(custo===0)fila.unshift([a,b]);else fila.push([a,b]);if(maior.has(kk)){fim=kk;break;}}}
+      if(!fim)continue;let p=fim;while(p&&p!==k0){const [a,b]=p.split(',').map(Number);if(M[b][a]==='T'||M[b][a]==='b'){poe(M,a,b,'.');R.chao++;mudou=true;}p=de.get(p);}
+      if(mudou)for(const q of alcance(M,ocup(k),dx,dy))maior.add(q);}
+    return mudou;}
+
+  /* 2) porta em cima de trilho ou parede: sobe o prédio um quadradinho, se couber */
+  function portaTampada(k){const M=SCN[k].map;let mudou=false;
+    for(const o of objects){if(cena(o)!==k||!(o.enter||o.room)||o.door==null||o.x==null)continue;
+      const dx=o.x+o.door,dy=o.y+o.h;if(livreT(M,dx,dy))continue;
+      const occ=ocup(k);let cabe=livreT(M,dx,dy-1);
+      for(let a=0;a<o.w&&cabe;a++){const x=o.x+a,y=o.y-1;if(!livreT(M,x,y)||(occ.has(x+','+y)&&occ.get(x+','+y)!==o))cabe=false;}
+      if(cabe){o.y-=1;mudou=true;if(o.id==='estnorte')R.estacao++;}}
+    return mudou;}
+
+  /* 3) gente parada na frente da porta: anda para o lado */
+  function gentePorta(k){const M=SCN[k].map,occ=ocup(k);let mudou=false;
+    const portas=new Set();for(const o of objects)if(cena(o)===k&&(o.enter||o.room)&&o.door!=null&&o.x!=null)portas.add((o.x+o.door)+','+(o.y+o.h));
+    const tem=(x,y)=>npcs.some(n=>(n.scene||'pira')===k&&Math.round(n.x)===x&&Math.round(n.y)===y)||ITEMS.some(i=>(i.scene||'pira')===k&&!i.got&&i.x===x&&i.y===y);
+    for(const n of npcs){if((n.scene||'pira')!==k||n.path||n.walker)continue;const nx=Math.round(n.x),ny=Math.round(n.y);if(!portas.has(nx+','+ny))continue;
+      let alvo=null;for(let r=1;r<=4&&!alvo;r++)for(let dy=-r;dy<=r&&!alvo;dy++)for(let dx=-r;dx<=r&&!alvo;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=nx+dx,y=ny+dy;
+        if(livreT(M,x,y)&&!occ.has(x+','+y)&&!portas.has(x+','+y)&&!tem(x,y))alvo=[x,y];}
+      if(alvo){const ddx=alvo[0]-nx,ddy=alvo[1]-ny;n.x=alvo[0];n.y=alvo[1];if(n.px!==undefined){n.px=n.x*16;n.py=n.y*16;}
+        if(Array.isArray(n.wander))n.wander=[n.wander[0]+ddx,n.wander[1]+ddy,n.wander[2]+ddx,n.wander[3]+ddy];mudou=true;R.gente++;}}
+    return mudou;}
+
+  /* 4) desenhos em cima de outros: varal em cima de igreja sai; a placa da planta sai de cima do ponto do bonde */
+  function sobrepostos(k){const M=SCN[k].map;let mudou=false;
+    for(let i=objects.length-1;i>=0;i--){const o=objects[i];if(cena(o)!==k||!/^varal88_/.test(o.id||''))continue;
+      const bate=objects.some(q=>q!==o&&cena(q)===k&&q.x!=null&&q.name&&!/^varal/.test(q.id||'')&&o.x<q.x+(q.w||1)&&o.x+(o.w||1)>q.x&&o.y<q.y+(q.h||1)&&o.y+(o.h||1)>q.y);
+      if(bate){objects.splice(i,1);mudou=true;R.varais++;}}
+    for(const o of objects){if(cena(o)!==k||o.id!=='placaPlanta')continue; /* só a placa da planta, que caiu no ponto do bonde da Luz; a placa de memória do Luís Gama fica na fachada de propósito */
+      const outro=objects.find(q=>q!==o&&cena(q)===k&&q.x!=null&&o.x>=q.x&&o.x<q.x+(q.w||1)&&o.y>=q.y&&o.y<q.y+(q.h||1));if(!outro)continue;
+      if(/^ponto_/.test(o.id)&&/^placa/.test(outro.id||''))continue; /* o ponto do bonde fica; a placa é que anda */
+      const occ=ocup(k);const portas=new Set();for(const q of objects)if(cena(q)===k&&(q.enter||q.room)&&q.door!=null)portas.add((q.x+q.door)+','+(q.y+q.h));
+      let alvo=null;for(const [dx,dy] of [[0,1],[1,0],[-1,0],[1,1],[-1,1],[0,2],[2,0],[-2,0]]){const x=o.x+dx,y=o.y+dy;if(livreT(M,x,y)&&!occ.has(x+','+y)&&!portas.has(x+','+y)&&!npcs.some(n=>(n.scene||'pira')===k&&Math.round(n.x)===x&&Math.round(n.y)===y)){alvo=[x,y];break;}}
+      if(alvo){o.x=alvo[0];o.y=alvo[1];mudou=true;R.placas++;}}
+    return mudou;}
+
+  /* 5) salas por dentro: a cama ou o catre "de enchimento" que fecha o caminho até alguém ou até um objeto sai */
+  function sala(k){const M=SCN[k].map,H=M.length;const lin=M[H-1];if(!lin)return false;let sx=-1;for(let x=0;x<lin.length;x++)if(lin[x]==='x'){sx=x;break;}if(sx<0)return false;const sy=H-2;
+    const alvos=()=>npcs.filter(n=>(n.scene||'pira')===k).map(n=>[Math.round(n.x),Math.round(n.y)]).concat(ITEMS.filter(i=>(i.scene||'pira')===k&&!i.got).map(i=>[i.x,i.y]));
+    const conta=occ=>{const v=alcance(M,occ,sx,sy);let c=0;for(const [x,y] of alvos())if([[0,0],[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>v.has((x+a)+','+(y+b))))c++;return c;};
+    const total=alvos().length;let occ=ocup(k);let agora=conta(occ);if(agora>=total)return false;let mudou=false;
+    for(let volta=0;volta<6&&agora<total;volta++){let melhor=null,mv=agora;
+      for(const o of objects){if(cena(o)!==k||!/^cheio_/.test(o.id||''))continue;const o2=new Map(occ);for(const [kk,v] of occ)if(v===o)o2.delete(kk);const c=conta(o2);if(c>mv){mv=c;melhor=o;}}
+      if(!melhor)break;objects.splice(objects.indexOf(melhor),1);R.moveis++;mudou=true;occ=ocup(k);agora=mv;}
+    return mudou;}
+
+  function conserta(k){if(!ERA_OK(k))return;let m1=false,m2=false;
+    try{m1=chao(k);}catch(e){console.warn('v274 chao',e);}
+    try{if(!SALA(k))m1=abreCaminho(k)||m1;}catch(e){console.warn('abreCaminho',e);}
+    try{if(SALA(k))m2=sala(k)||m2;else{m2=portaTampada(k)||m2;m2=sobrepostos(k)||m2;m2=gentePorta(k)||m2;}}catch(e){console.warn('v274',k,e);}
+    if(cur===k){try{if(m1){buildStatic();mmDirty=true;}if(m1||m2)buildOcc();}catch(_){}}}
+  window.__v274conserta=conserta;
+
+  const ss=setScene;setScene=function(to){const r=ss.apply(this,arguments);
+    try{if(ERA_OK(to)){conserta(to);for(const ms of [0,700,2500])setTimeout(()=>{try{if(cur===to)conserta(to);}catch(_){}},ms);}}catch(_){}return r;};
+  /* os mapas de rua já ficam certos antes de a pessoa chegar (outros blocos arrumam coisas até uns 19 s depois de abrir) */
+  for(const ms of [300,5000,20000])setTimeout(()=>{for(const k of ['pira','sv','serra','lisboa54','antuerpia54','sp','arr','sp88','faz','santos','k_bananal'])if(SCN[k]&&!SALA(k))conserta(k);
+    try{if(ERA_OK(cur))conserta(cur);}catch(_){}},ms);
+}catch(e){console.warn('v274 consertos 1554-1888',e);}},0);
+
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
