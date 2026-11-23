@@ -33,7 +33,7 @@ Seguir a skill `publicar-piratininga-v2`. O essencial:
 4. Número da versão só na hora do push: o maior do GitHub + 1.
 5. Antes do `git add`: `python3 jogos/ferramentas/abertura_rapida.py`.
 6. Testar com o navegador de verdade (Playwright): computador, celular em pé e deitado; as 4 épocas abrem sem erro.
-7. Teste obrigatório do centro de 1922: abrir com `#teste`, ir para `m_centro22`, esperar ~7 s e conferir que `Object.keys(window.__jmTeste).filter(k=>/^r\d/.test(k))` traz todas as rodadas (r13, r14, r15a, r15b, r16a, r16b, r16c, r17, r18, r19, r20, r21, r22, r23…). Se faltar alguma, não subir.
+7. Teste obrigatório do centro de 1922 (mapa fixo): abrir com `#teste`, entrar em 1922 e conferir que `window.__c22fixo` existe, que `window.__centro22.fixo` é `true` e que `window.__c22fixo.extras` está vazio depois de ~80 s. Se não estiver, não subir.
 
 ## Gastar pouco (a conta é da Nova Escola)
 
@@ -46,9 +46,13 @@ O professor usa o plano da Nova Escola e não quer gerar custo à toa. Seguir a 
 - **Não abrir o jogo várias vezes à toa** nem repetir o mesmo teste sem ter mudado nada.
 - **Uma conversa por parte do jogo.** Evitar duas conversas fazendo o mesmo trabalho.
 
-## O centro de 1922 é frágil
+## O centro de 1922 é um mapa fixo (desde a v276, 23/11/2026)
 
-O centro (`m_centro22`) é montado a partir de um retângulo do mapa dos bairros (`sp22`, colunas 58 a 132, linhas 64 a 116). Mudar chão, prédio grande ou nome de prédio ali dentro embaralha o centro inteiro, sem erro no console. Não mexer nesse retângulo sem avisar o professor.
+- O centro (`m_centro22`) não é mais montado na hora a partir do mapa dos bairros. Ele vem pronto das imagens `C22F_*` do `arte/arte_1922.js`: `C22F_dados` (mapa, prédios, pessoas, itens, placas e nomes de rua), `C22F_chao` (o chão já desenhado) e `C22F_a0` (os desenhos dos prédios).
+- Para mudar o centro, mexer direto nesses dados, sem remendo por cima. Os blocos antigos do centro (sorteio de lotes, rodadas r13…r23, blocos que esperavam 6 a 10 s) continuam no arquivo, mas só rodam com a chave de segurança.
+- Chave de segurança: `window.__centroAntigo=true` (ou `#centroantigo` no endereço) volta ao jeito antigo.
+- Ferramentas para tirar a "foto" do centro, montar os dados e comparar antes e depois: `jogos/ferramentas/centro22/` (ver o LEIA-ME de lá).
+- A regra antiga do "retângulo frágil" (colunas 58 a 132, linhas 64 a 116 de `sp22`) deixou de valer para o centro. Continua valendo o cuidado comum: quem mexe no mapa dos bairros testa o centro antes de subir.
 
 ## Visual: um modelo só (decisão de 21/11/2026)
 
