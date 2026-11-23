@@ -29564,6 +29564,32 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   let n=0;const t=setInterval(()=>{try{leste();campos();}catch(e){console.warn('v260 fábricas',e);}if((fezLeste&&camposFeitos.size===5)||++n>200)clearInterval(t);},300);
 }catch(e){console.warn('v260 fábricas',e);}})();
 
+/* ===== v267 — 1830: PORTALZINHO DA DESCIDA DA SERRA PELO CAMINHO DO LORENA (pedido do professor, 22/11/2026) =====
+   Um portalzinho brilhando ao lado da placa "Caminho do Mar", no sul da cidade de 1830. Tocar nele abre o minijogo
+   da mula Teimosa (o mesmo que o Tropeiro oferece depois das missões dele), para o estudante achar a descida sem depender do Tropeiro.
+   Um "!" pisca em cima até a primeira descida. Ao chegar perto, aparece um aviso. */
+setTimeout(function(){try{
+  const S='sp';if(!SCN[S]||typeof window.__lorena30!=='function')return;
+  /* fora da rua, na grama ao lado (para não fechar o caminho) */
+  const M=SCN[S].map;let p=null,bd=1e9;for(let y=56;y<=68;y++)for(let x=34;x<=50;x++){if(!M[y]||!'.,V'.includes(M[y][x]))continue;let livre=true;try{livre=freeAt(S,x,y);}catch(_){}
+    if(!livre)continue;const perto=[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>M[y+dy]&&'Dd'.includes(M[y+dy][x+dx]));if(!perto)continue;const d=Math.abs(x-42)+Math.abs(y-62);if(d<bd){bd=d;p=[x,y];}}
+  if(!p)p=findFree(S,42,62,5);if(!p)return;
+  const viu=()=>{try{return !!localStorage.getItem('pira_portalLorena30');}catch(_){return false;}};
+  const o={id:'portalLorena30',scene:S,x:p[0],y:p[1],w:1,h:1,name:'Portal da serra',text:['Um portalzinho brilhando no começo do Caminho do Mar.'],
+    draw:function(cx,X,Y){const t=performance.now()/1000;for(let k=3;k>=0;k--){cx.strokeStyle=['#3a8a4a','#30a0e0','#f1c471','#c8783a'][(k+Math.floor(t*4))%4];cx.lineWidth=2;cx.beginPath();cx.ellipse(X+8,Y+8,3+k*1.6+Math.sin(t*3)*.6,5+k*2,0,0,7);cx.stroke();}
+      cx.fillStyle='rgba(255,240,200,'+(.5+.4*Math.sin(t*5))+')';cx.fillRect(X+7,Y+6,2,4);
+      if(!viu()){const b=Math.sin(t*4)>0?1:0;cx.fillStyle='#1c1620';cx.fillRect(X+6,Y-12-b,4,8);cx.fillStyle='#f8d030';cx.fillRect(X+7,Y-11-b,2,4);cx.fillRect(X+7,Y-6-b,2,1);}}};
+  objects.push(o);try{if(cur===S)buildOcc();}catch(_){}
+  const _it=interact;
+  interact=function(fx,fy){
+    try{if(cur===S&&fx===o.x&&fy===o.y){
+      say('Portal da serra',['Um portalzinho brilha no começo do Caminho do Mar. Por aqui as tropas descem a Serra do Mar até Cubatão, pela Calçada do Lorena.','Quer descer a serra guiando a mula Teimosa, com 8 sacos de açúcar?'],()=>askChoice('Caminho do Lorena','Descer a Serra do Mar com a mula Teimosa?',['Bora descer!','Agora não'],i=>{if(i===0){try{localStorage.setItem('pira_portalLorena30','1');}catch(_){}window.__lorena30();}}));return;}}catch(_){}
+    return _it(fx,fy);
+  };
+  let avisou=false;setInterval(()=>{try{if(avisou||!started||cur!==S||isPaused()||dialog)return;if(Math.abs(player.x-o.x)+Math.abs(player.y-o.y)<=7){avisou=true;toast('Um portalzinho brilha no começo do Caminho do Mar...');}}catch(_){}},600);
+  window.__portalLorena30=o;
+}catch(e){console.warn('v267 portalzinho Lorena',e);}},0);
+
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
