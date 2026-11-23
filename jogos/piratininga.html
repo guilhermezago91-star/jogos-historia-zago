@@ -30592,7 +30592,7 @@ setTimeout(function(){try{
 /* ===== v271 — 1830: DESENHO DE CADA MISSÃO (cartão ao começar a missão) (pedido do professor, 23/11/2026) ===== */
 ;(function(){try{
   const TEM={mula:1,agua:1,virado:1,jornal:1,ferradura:1,roupa:1,aula:1,lampioes:1,escola:1,carta30:1,santos:1,convento:1,procissao:1,chacara:1,comparar:1,trabalho:1,olaria:1,memoria:1,remedio:1,receita:'remedio',romaria:1,ipiranga:1,tinteiro:1,ganho:1,tebas30:1,chaguinhas30:1,quitanda30:1,tropa30:1,lorena30:1};
-  const arq=k=>{const v=TEM[k];return v?'arte/missoes1830/'+(v===1?k:v)+'.webp':null;};
+  const arq=k=>{const x=(window.__MISDES||{})[k];if(x)return x;const v=TEM[k];return v?'arte/missoes1830/'+(v===1?k:v)+'.webp':null;};
   const css=document.createElement('style');
   css.textContent='#ovMis{z-index:31}#ovMis .card{max-width:340px;text-align:center}#ovMis .row{justify-content:center}#ovMis img{width:min(100%,260px,32vh);aspect-ratio:1;height:auto;display:block;margin:6px auto 8px;border:3px solid var(--ink);border-radius:4px;background:#2a2420}#ovMis h2{margin:2px 0 4px}#ovMis p{margin:0 0 8px}';
   document.head.appendChild(css);
@@ -30610,9 +30610,12 @@ setTimeout(function(){try{
     ov.hidden=false;setTimeout(()=>{try{$('misOk').focus({preventScroll:true});}catch(_){}},30);}
   setInterval(()=>{if(fila&&!outraTela()){const k=fila;fila=null;mostra(k,true);}},300);
   const velhoQ=qStart;
-  qStart=function(k){velhoQ.apply(this,arguments);try{if((Q[k].era||1)===2&&arq(k)){const im=new Image();im.src=arq(k);fila=k;}}catch(_){}};
+  qStart=function(k){velhoQ.apply(this,arguments);try{if(arq(k)){const im=new Image();im.src=arq(k);fila=k;}}catch(_){}};
   window.__misDesenho=mostra;
 }catch(e){console.warn('desenho missão',e);}})();
+
+/* ===== v273 — 1554 E 1888: DESENHO DE CADA MISSÃO (mesmo cartão da v271 ao começar a missão) (pedido do professor, 23/11/2026) ===== */
+;(function(){window.__MISDES=Object.assign(window.__MISDES||{},{acucar:'arte/missoes1554/acucar.webp',farinha:'arte/missoes1554/farinha.webp',carta:'arte/missoes1554/carta.webp',pesca:'arte/missoes1554/pesca.webp',ceramica:'arte/missoes1554/ceramica.webp',escambo:'arte/missoes1554/escambo.webp',potes:'arte/missoes1554/potes.webp',viagemAcucar:'arte/missoes1554/viagemAcucar.webp',noticia:'arte/missoes1888/noticia.webp',imigrantes:'arte/missoes1888/imigrantes.webp',bonde:'arte/missoes1888/bonde.webp',gas:'arte/missoes1888/gas.webp',moradia:'arte/missoes1888/moradia.webp',fotos:'arte/missoes1888/fotos.webp',manchete:'arte/missoes1888/manchete.webp',cafe:'arte/missoes1888/cafe.webp',agua88:'arte/missoes1888/agua88.webp',colheita:'arte/missoes1888/colheita.webp',porto:'arte/missoes1888/porto.webp',liberdade:'arte/missoes1888/liberdade.webp',viaduto:'arte/missoes1888/viaduto.webp',ipiranga88:'arte/missoes1888/ipiranga88.webp',tijolo:'arte/missoes1888/tijolo.webp',fabrica:'arte/missoes1888/fabrica.webp',incendio:'arte/missoes1888/incendio.webp',republica:'arte/missoes1888/republica.webp',imperio:'arte/missoes1888/imperio.webp',jornal88:'arte/missoes1888/jornal88.webp',chocolate:'arte/missoes1888/chocolate.webp',abolicaoBan:'arte/missoes1888/abolicaoBan.webp',gama88:'arte/missoes1888/gama88.webp',remedios88:'arte/missoes1888/remedios88.webp',peticao88:'arte/missoes1888/peticao88.webp',aflitos88:'arte/missoes1888/aflitos88.webp',atibaia88:'arte/missoes1888/atibaia88.webp',tramway88:'arte/missoes1888/tramway88.webp',cafeTrem88:'arte/missoes1888/cafeTrem88.webp',fotoRua88:'arte/missoes1888/fotoRua88.webp',arcadas88:'arte/missoes1888/arcadas88.webp',dia13:'arte/missoes1888/dia13.webp'});})();
 
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
