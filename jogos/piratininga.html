@@ -19788,6 +19788,67 @@ setTimeout(function(){try{
   }catch(e){console.warn('coveiro Sé',e);}},3600);
 }catch(e){console.warn('enterros Sé',e);}})();
 
+/* ===== v270 — 1830: DE QUEM ERA CADA IGREJA — na primeira vez que entra numa igreja de 1830, um card "Adivinhe: de quem era esta igreja?" com 3 respostas, explicação simples e uma curiosidade; nas outras vezes, um aviso curto (pedido do professor, 23/11/2026) ===== */
+(function(){try{
+  const IG={
+    i_se:{n:'Igreja da Sé',ops:['Do bispo: a igreja principal, para todos','Só dos frades, que moravam ao lado','Dos negros, que a ergueram sozinhos'],
+      ex:'É a igreja matriz, a principal da cidade, onde fica o bispo. Todo mundo vinha, mas cada um no seu lugar: os ricos lá na frente, perto do altar.',cur:'Até 1858, os mortos eram enterrados aqui mesmo, no chão da igreja!',curto:'a igreja do bispo, para todos'},
+    i_rosario:{n:'Igreja do Rosário',ops:['Dos negros, escravizados e libertos','Dos fazendeiros ricos do açúcar','Das freiras, que viviam fechadas lá'],
+      ex:'Era da Irmandade de Nossa Senhora do Rosário dos Homens Pretos. Negros escravizados e libertos juntavam esmolas, ergueram a igreja e cuidavam uns dos outros: ajudavam os doentes e pagavam os enterros dos irmãos.',cur:'Aqui eles elegiam um Rei e uma Rainha do Congo para a festa!',curto:'a igreja dos negros, escravizados e libertos'},
+    i_ig30_carmo:{n:'Convento do Carmo',ops:['Dos frades carmelitas e dos ricos da Ordem Terceira','Dos pardos, filhos de brancos e negros','Dos tropeiros que passavam pela cidade'],
+      ex:'No convento moravam os frades carmelitas. Grudada nele fica a igreja da Ordem Terceira do Carmo, dos leigos ricos: comerciantes e fazendeiros brancos.',cur:'A igreja da Ordem Terceira está de pé até hoje, no centro de São Paulo!',curto:'dos frades carmelitas e da Ordem Terceira, dos ricos'},
+    i_ig30_luz:{n:'Mosteiro da Luz',ops:['Das freiras, que viviam fechadas no mosteiro','Dos soldados do quartel da cidade','Dos negros da Irmandade do Rosário'],
+      ex:'É um recolhimento de mulheres fundado por Frei Galvão em 1774. As freiras viviam fechadas, rezando, e quase nunca saíam.',cur:'Frei Galvão virou o primeiro santo nascido no Brasil, em 2007. Hoje o mosteiro guarda o Museu de Arte Sacra.',curto:'das freiras do recolhimento de Frei Galvão'},
+    i_ig30_misericordia:{n:'Igreja da Misericórdia',ops:['Dos irmãos que cuidavam de doentes e órfãos','Dos estudantes da Academia de Direito','Das famílias que moravam na roça'],
+      ex:'É da Irmandade da Santa Casa de Misericórdia: homens importantes que davam dinheiro para cuidar de doentes pobres, presos e órfãos.',cur:'Em 1825 a Santa Casa abriu a roda dos expostos, onde se deixavam bebês sem família.',curto:'da Santa Casa, que cuidava de doentes e órfãos'},
+    i_ig30_saogoncalo:{n:'Igreja de São Gonçalo',ops:['Dos devotos de um santo pardo','Dos frades que vieram de Portugal','Das moças que queriam casar logo'],
+      ex:'É a igreja de São Gonçalo Garcia, um santo pardo, filho de português com indiana. Por isso ele era muito querido pelos pardos da cidade.',cur:'São Gonçalo Garcia morreu no Japão, em 1597, por causa da sua fé.',curto:'de São Gonçalo Garcia, o santo pardo'},
+    i_ig30_boamorte:{n:'Igreja da Boa Morte',ops:['Dos pardos, mas aceitava gente de toda cor','Só do bispo e dos padres da Sé','Dos estrangeiros que moravam aqui'],
+      ex:'Foi erguida pela Irmandade dos Homens Pardos de Nossa Senhora da Boa Morte e ficou pronta em 1810. Uma raridade para a época: aceitava gente de todas as cores.',cur:'Dizem que o sino daqui foi o primeiro a tocar na Independência, em 1822.',curto:'da irmandade dos pardos, aberta a todas as cores'},
+    i_ig30_stifigenia:{n:'Igreja de Santa Ifigênia',ops:['Dos negros devotos de santos africanos','Dos comerciantes portugueses ricos','Dos estudantes da Academia de Direito'],
+      ex:'Era de uma irmandade de negros devotos de Santa Ifigênia e Santo Elesbão, dois santos africanos.',cur:'Ver um santo negro no altar era motivo de orgulho para os irmãos.',curto:'dos negros devotos de santos africanos'},
+    i_ig30_santoantonio:{n:'Igreja de Santo Antônio',ops:['De todo o povo, e das moças atrás de marido','Só dos condenados à forca','Das freiras do Mosteiro da Luz'],
+      ex:'É uma das igrejas mais antigas da cidade. Santo Antônio é o santo casamenteiro: moças vinham pedir um bom marido.',cur:'Tem moça que deixa a imagem do santo de cabeça para baixo até o noivo aparecer!',curto:'do santo casamenteiro, uma das mais antigas'},
+    i_ig30_remedios:{n:'Igreja dos Remédios',ops:['Dos devotos que pediam cura de doenças','Dos frades carmelitas do convento','Dos tropeiros que iam para Santos'],
+      ex:'É da irmandade de Nossa Senhora dos Remédios, a quem o povo pedia cura para as doenças. Sem médico por perto, rezar era o "remédio" de muita gente.',cur:'Anos depois, por volta de 1880, esta igreja vai ser ponto de encontro de quem lutava pelo fim da escravidão.',curto:'de quem pedia cura para as doenças'},
+    i_ig30_aflitos:{n:'Capela dos Aflitos',ops:['Do cemitério dos pobres e escravizados','Dos ricos que pagavam a irmandade','Das freiras que cuidavam de órfãos'],
+      ex:'É a capela do Cemitério dos Aflitos, o cemitério dos pobres, dos escravizados e dos condenados à forca.',cur:'Em 1821, a corda arrebentou na forca do soldado Chaguinhas. O povo gritou "milagre!", mas ele foi executado assim mesmo. Tem gente que acende vela para ele aqui.',curto:'do cemitério dos pobres e escravizados'},
+    i_ig30_bras:{n:'Igreja do Bom Jesus do Brás',ops:['Dos moradores das chácaras do Brás','Dos frades do Convento do Carmo','Dos estudantes da Academia'],
+      ex:'É a capela do Brás, um bairro de chácaras do outro lado da várzea do Carmo. Quem rezava aqui era gente da roça, que chegava a pé ou a cavalo.',cur:'O nome do bairro vem de José Brás, o homem que construiu a primeira capela.',curto:'da gente das chácaras do Brás'},
+    i_ig30_capelaMooca:{n:'Capela da Mooca',ops:['Das famílias das chácaras da Mooca','Dos padres e do bispo da Sé','Dos negros da Irmandade do Rosário'],
+      ex:'É a capela das chácaras da Mooca, do outro lado do rio Tamanduateí. Vinham poucas famílias: gente da roça e quem trabalhava nas chácaras.',cur:'Mooca é palavra tupi! Muita gente diz que quer dizer "fazer casa".',curto:'das famílias das chácaras da Mooca'}
+  };
+  const marca=k=>'Igreja: '+IG[k].n+' — ';
+  const visto=k=>{try{return diary.some(d=>d.kind==='Fonte'&&String(d.text).startsWith(marca(k)));}catch(_){return false;}};
+  const livre=()=>{try{const oc=document.getElementById('ovCap'),oq=document.getElementById('ovQuiz');return !mcqOpen&&!(typeof dialog!=='undefined'&&dialog)&&(!oc||oc.hidden)&&(!oq||oq.hidden)&&!document.getElementById('ovLorena');}catch(_){return false;}};
+  function card(k){const d=IG[k];try{
+    mcqOpen=true;ovQuiz.hidden=false;const box=$('quizBox');box.innerHTML='';
+    const kk=document.createElement('div');kk.className='kicker';kk.textContent='Quem rezava aqui?';
+    const h=document.createElement('h2');h.textContent=d.n;
+    const p=document.createElement('p');p.textContent='Adivinhe: em 1830, de quem era esta igreja?';
+    const lista=document.createElement('div');lista.style.cssText='display:flex;flex-direction:column;gap:8px;margin:8px 0';
+    const ordem=[0,1,2].sort((a,b)=>((a*7+k.length)%5)-((b*7+k.length)%5));
+    const res=document.createElement('div');res.hidden=true;res.style.cssText='display:flex;flex-direction:column;gap:8px';
+    for(const i of ordem){const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=d.ops[i];b.style.cssText='text-align:left;white-space:normal;line-height:1.3';
+      b.onclick=()=>{for(const x of lista.children){x.disabled=true;x.style.opacity=x===b||x.dataset.c?'1':'.45';}
+        b.style.outline='3px solid '+(i===0?'#3f7d3a':'#b8520f');const certo=[...lista.children].find(x=>x.dataset.c);certo.style.outline='3px solid #3f7d3a';
+        const t=document.createElement('p');t.style.cssText='font-weight:700;margin:0';t.textContent=i===0?'Isso mesmo!':'Quase! Era '+d.ops[0].charAt(0).toLowerCase()+d.ops[0].slice(1)+'.';
+        const e=document.createElement('p');e.style.margin='0';e.textContent=d.ex;
+        const c=document.createElement('p');c.className='small';c.style.cssText='margin:0;padding:8px 10px;border-radius:6px;background:rgba(184,82,15,.12);border-left:4px solid #b8520f';c.textContent='Curiosidade: '+d.cur;
+        const f=document.createElement('button');f.type='button';f.className='btn';f.textContent='Continuar';
+        f.onclick=()=>{ovQuiz.hidden=true;mcqOpen=false;try{if(!visto(k))addDiary('Fonte',marca(k)+d.ex);save();}catch(_){}};
+        const row=document.createElement('div');row.className='row';row.appendChild(f);
+        res.append(t,e,c,row);res.hidden=false;setTimeout(()=>f.focus(),30);};
+      if(i===0)b.dataset.c='1';lista.appendChild(b);}
+    box.append(kk,h,p,lista,res);setTimeout(()=>lista.firstChild&&lista.firstChild.focus(),30);
+  }catch(e){console.warn('card igreja',e);mcqOpen=false;}}
+  function chegou(k){if(!IG[k])return;
+    if(visto(k)){setTimeout(()=>{try{if(cur===k)toast(IG[k].n+': '+IG[k].curto+'.');}catch(_){}},600);return;}
+    let n=0;const tenta=()=>{if(cur!==k||n++>40)return;if(livre())card(k);else setTimeout(tenta,500);};setTimeout(tenta,800);}
+  const s0=setScene;setScene=function(to){const r=s0.apply(this,arguments);try{chegou(to);}catch(_){}return r;};
+  window.__igreja30=card;
+}catch(e){console.warn('igrejas 1830',e);}})();
+
 /* v124: tropa é muita mula junta. Pouso dos tropeiros com mulas descansando em volta do rancho. */
 setTimeout(function(){try{const S='sp';const r=objects.find(o=>o.scene===S&&/rancho|hospedaria/i.test(o.id+' '+(o.name||''))&&(o.w||1)>=3);if(!r||!window.__mula30)return;
   const M=SCN[S].map;const livre=(x,y)=>M[y]&&!'DdRWBCSXT'.includes(M[y][x])&&!objects.some(o=>(o.scene||'pira')===S&&x>=o.x-1&&x<o.x+(o.w||1)+1&&y>=o.y&&y<o.y+(o.h||1))&&!npcs.some(n=>n.scene===S&&Math.abs(n.x-x)<=1&&n.y===y)&&!ITEMS.some(i=>i.scene===S&&i.x===x&&i.y===y);
