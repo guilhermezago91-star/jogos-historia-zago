@@ -183,6 +183,15 @@ canvas#cv{display:block;width:100%;height:100%;image-rendering:crisp-edges;image
   .btns{grid-column:3;grid-row:2;align-self:center;flex-direction:column-reverse;align-items:center;gap:14px}
   .card{max-height:100%}.mapcard{max-width:92vw}
 }
+/* ===== v278 — NOME DO LUGAR MAIOR E SEMPRE VISÍVEL (pedido do professor, 23/11/2026) ===== */
+.hud .where .place{font-size:17px;font-weight:700;color:var(--cream);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+@media (hover:none) and (pointer:coarse){
+  .hud .where{flex-direction:row;align-items:center;gap:6px;max-width:100%}
+  .hud .where .place{display:block;font-size:14px;max-width:62vw}
+}
+@media (orientation:landscape) and (max-height:520px){
+  .hud .where .place{display:block;font-size:13px;max-width:38vw}
+}
 </style>
 
 <div id="carregando" aria-live="polite" style="position:fixed;inset:0;z-index:99999;background:#141b1b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;font:600 16px system-ui,-apple-system,Roboto,Arial,sans-serif;color:#f4efe4;text-align:center;padding:16px">
@@ -3348,6 +3357,8 @@ $('btnDiario').addEventListener('click',openDiario);
 $('btnFechar').addEventListener('click',closeDiario);
 
 function checkPortal(){
+  /* ===== v278 — MODO MISSÃO: PORTAL COMUM FECHADO (pedido do professor, 23/11/2026) ===== */
+  if(window.__MMligado&&window.__MMligado()&&!(window.__MM&&window.__MM()&&window.__MM().allow))return false;
   if(portal&&portal.era===era)return true;
   if(talkedE()>=needE()&&foundE()>=anaE().length&&(typeof needItemsE!=='function'||gotE()>=needItemsE())){
     if(era===1){portal={era:1,scene:'pira',x:19,y:13};sfx('portal');flashT=.5;say('',["Um zumbido forte ecoa pela colina...","Um portal de luz se abriu em frente ao colégio! Entre nele para viajar no tempo."]);}
@@ -3365,6 +3376,7 @@ function talkTo(n){
   say(n.name,pages,()=>{
     if(first){n.talked=true;talkCount++;addDiary('Conversa',n.diary);updHUD();save();}
     if(q&&q.after)q.after();
+    if(window.__mmFimConversa)window.__mmFimConversa(n);
     if(first&&!dialog&&!hold&&!checkPortal()&&talkedE()>=needE()&&false){const f=anaE().length-foundE();if(f>0)say('',[`Você já conversou com todo mundo! Agora encontre ${f===1?'a última coisa':'as '+f+' coisas'} fora do tempo.`]);}
   },n.spr||n.id);
 }
@@ -6859,7 +6871,8 @@ function tapGo(tx,ty,retry){
 /* =========================================================
    MISSÃO DO PORTAL: para passar de época, além de conversar, é preciso encontrar objetos
    ========================================================= */
-function needItemsE(){return Math.min(8,Math.ceil(itemsE().length/2));}
+/* ===== v278 — PORTAL SÓ ABRE COM TODOS OS OBJETOS DA ÉPOCA (pedido do professor, 23/11/2026) ===== */
+function needItemsE(){return itemsE().length;}
 for(const e of [1,2,3,4])Q['portal'+e]={era:e,title:'Objetos para o portal',where:'Encontre objetos desta época: eles brilham no chão.',steps:['Encontre objetos desta época para abrir o portal'],step:0,count:0,done:false};
 {const qtx=qText;qText=function(k){if(/^portal[1-4]$/.test(k)&&Q[k].step===0)return `Encontre objetos para abrir o portal (${gotE()}/${needItemsE()})`;return qtx(k);};}
 {let avisou={};
@@ -6871,7 +6884,7 @@ for(const e of [1,2,3,4])Q['portal'+e]={era:e,title:'Objetos para o portal',wher
      const L=itemsE().filter(i=>!i.got);const here=L.filter(i=>(i.scene||'pira')===cur);const pool=here.length?here:L;
      let best=null,bd=1e9;for(const i of pool){const d=Math.abs(i.x-player.x)+Math.abs(i.y-player.y);if(d<bd){bd=d;best=i;}}
      QT[k]=best?{giver:null,steps:['p:'+(best.scene||'pira')+'/'+best.x+','+best.y]}:null;
-     if(!avisou[era]&&talkedE()>=needE()&&!dialog&&!hold){avisou[era]=true;const f=needItemsE()-gotE();say('Portal',[`Você já conversou com bastante gente! Para o portal abrir, encontre mais ${f} objeto${f>1?'s':''} desta época.`,'Os objetos brilham no chão. A seta amarela mostra o mais perto.']);}}
+     if(!avisou[era]&&!(window.__MMligado&&window.__MMligado())&&talkedE()>=needE()&&!dialog&&!hold){avisou[era]=true;const f=needItemsE()-gotE();say('Portal',[`Você já conversou com bastante gente! Para o portal abrir, encontre mais ${f} objeto${f>1?'s':''} desta época.`,'Os objetos brilham no chão. A seta amarela mostra o mais perto.']);}}
    if(!dialog&&!hold&&!(portal&&portal.era===era)&&q.done&&talkedE()>=needE()&&foundE()>=anaE().length)checkPortal();
    updQuest();},1500);}
 /* =========================================================
@@ -30185,6 +30198,8 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   const grava=()=>{try{if(MM)localStorage.setItem(KEY,JSON.stringify(MM));}catch(_){}};
   const ligado=()=>!!(MM&&MM.on&&modo==='missao');
   window.__MM=()=>MM;window.__MMligado=ligado;
+  /* ===== v278 — MODO MISSÃO: CONVERSA SÓ CONTA NO FIM DO DIÁLOGO (pedido do professor, 23/11/2026) ===== */
+  window.__mmFimConversa=(n)=>{try{if(MM&&n&&n.id){MM.falou[n.id]=1;grava();}}catch(_){}};
 
   const pai=s=>{let x=s||'pira';for(let i=0;i<5;i++){const S=SCN[x];if(S&&S.parent&&S.parent!==x)x=S.parent;else break;}return x;};
   const naTela=(T,s)=>{s=s||'pira';return T.sc.includes(s)||T.sc.includes(pai(s));};
@@ -30329,7 +30344,7 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   /* ---------- conversas: anota quem já falou; a pessoa da prova abre a prova ---------- */
   {const tt=talkTo;talkTo=function(n){
     try{if(ligado()&&n&&!MM.zerou){const m=missao();if(m&&m.t==='prova'&&n.id===m.n){convidaProva(n);return;}}}catch(e){console.warn('mm prova',e);}
-    const r=tt.apply(this,arguments);try{if(MM&&n&&n.id){MM.falou[n.id]=1;grava();}}catch(_){}return r;};}
+    return tt.apply(this,arguments);};}
 
   /* ---------- o portal comum fica fechado no Modo Missão ---------- */
   const fechado=()=>say('Portal',['No Modo Missão, o portal só abre quando você passa na prova da última tela desta época.','Toque na caixa de missão, lá em cima, para ver o que falta.'],null,'player');
@@ -30377,9 +30392,15 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
     if(out.length<10){for(const n of npcs){if(eraOf(n.scene||'pira')!==T.e||n.piada)continue;const C=typeof CHECK!=='undefined'&&CHECK[n.id];if(C&&(MM.falou[n.id]||n.talked))add(C[0],C[1],C[2],'',0);}}
     return out;}
   if(location.hash==='#teste')window.__MMbanco=i=>{if(!MM)MM=novo(0);return banco(TELAS[i]).map(b=>b.pri+'|'+b.q);};
-  function sorteia(T){const B=banco(T);B.forEach(b=>b.r=b.pri*10+Math.random()*12);B.sort((x,y)=>y.r-x.r);return B.slice(0,10).sort(()=>Math.random()-.5);}
+  /* ===== v278 — MODO MISSÃO: SORTEIO JUSTO DAS PERGUNTAS (Fisher–Yates) (pedido do professor, 23/11/2026) ===== */
+  function embaralha(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  function sorteia(T){const B=banco(T);B.forEach(b=>b.r=b.pri*10+Math.random()*12);B.sort((x,y)=>y.r-x.r);return embaralha(B.slice(0,10));}
 
   function convidaProva(n){const T=tela();
+    /* ===== v278 — MODO MISSÃO: PROVA DA ÚLTIMA TELA EXIGE TODOS OS OBJETOS (pedido do professor, 23/11/2026) ===== */
+    try{const ult=!TELAS[T.i+1]||TELAS[T.i+1].e!==T.e;
+      if(ult){const todos=ITEMS.filter(it=>eraOf(it.scene||'pira')===T.e);const f=todos.filter(it=>!it.got).length;
+        if(f>0){say(n.name,[`Antes da prova, falta uma coisa: o portal só abre quando você encontrar todos os objetos desta época.`,`Faltam ${f} objeto${f>1?'s':''}. Eles brilham no chão. Procure e volte aqui.`],null,n.id);return;}}}catch(e){console.warn('mm objetos',e);}
     say(n.name,[`Você cumpriu todas as missões da tela “${T.nome}”. Agora é a prova!`,`São 10 perguntas sobre o que você viu e ouviu aqui. Para passar, não pode errar nenhuma. Você tem ${SEG} segundos para cada uma.`,'Se errar, não tem problema: é só tentar de novo. As perguntas mudam de lugar.'],
       ()=>askChoice('A prova de '+T.nome,'Pronto para as 10 perguntas?',['Começar a prova','Ainda não: quero conversar mais'],i=>{if(i===0)prova();}),n.id);}
 
@@ -30390,7 +30411,7 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
       const pts=el('div','pontos');for(let k=0;k<tot;k++)pts.appendChild(el('span',k<i?'f':k===i?'a':''));
       const bar=el('div','bar');const bi=el('i');bar.appendChild(bi);const seg=el('div','topo');const sTx=el('span',null,'');seg.append(el('span',null,'Cronômetro'),sTx);
       const h=el('div','pq',q.q);const ops=el('div','ops');
-      const ord=q.o.map((t,j)=>[t,j]).sort(()=>Math.random()-.5);let resp=false;const t0=performance.now();if(location.hash==='#teste')window.__mmResp=q.o[q.a];
+      const ord=embaralha(q.o.map((t,j)=>[t,j]));let resp=false;const t0=performance.now();if(location.hash==='#teste')window.__mmResp=q.o[q.a];
       const fim=(ok,btn)=>{if(resp)return;resp=true;clearInterval(timer);[...ops.children].forEach((c,n)=>{c.disabled=true;if(ord[n][1]===q.a)c.classList.add('certa');});if(btn&&!ok)btn.classList.add('errada');
         try{sfx(ok?'blip':'bump');}catch(_){}
         setTimeout(()=>{if(ok){i++;if(i>=tot)passou();else tela1();}else errou(q,btn?'':'O tempo acabou!');},ok?650:1200);};
