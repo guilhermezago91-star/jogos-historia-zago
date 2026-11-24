@@ -9954,6 +9954,34 @@ window.CENARIO54_ANTIGO=true;
   {const s0=setScene;setScene=function(to){const r=s0.apply(this,arguments);setTimeout(acerta,0);return r;};}
   setTimeout(acerta,600);setTimeout(acerta,2500);
 }catch(e){console.warn('1554 antigo',e);}})();
+/* ===== v282 — 1554: NÃO DÁ MAIS PARA ANDAR "ATRÁS" DA OCA COM SÓ A CABEÇA DE FORA (pedido do professor, 24/11/2026) =====
+   O desenho da oca tem 4 quadradinhos de altura, mas o chão dela só tinha 2: os 2 de cima eram telhado em que dava para
+   pisar, e quem entrava ali ficava escondido atrás do próprio telhado (só a cabeça aparecia). Agora a oca ocupa os 4
+   quadradinhos (a porta continua na mesma linha de baixo; na oca 2 só a linha de cima do telhado fica livre, porque é por ali que se chega à porta da oca 1) e o que estava em cima do telhado (Pilão, Farinha de mandioca,
+   gente) vai para o chão livre mais perto. */
+(function(){try{
+  if(!window.CENARIO54_ANTIGO)return;
+  const ocas=objects.filter(o=>(o.scene||'pira')==='pira'&&(o.id==='oca1'||o.id==='oca2')&&o.draw===drawOca&&o.h===2&&!o.__v282);
+  if(!ocas.length)return;
+  /* oca 1: ocupa os 4 quadradinhos. Oca 2: fica livre só a linha de cima do telhado (é o quadradinho da frente da porta
+     da oca 1); essa linha é desenhada atrás de quem passa, e o resto da oca 2 fica no chão dela. */
+  for(const o of ocas){const d=o.draw;
+    if(o.id==='oca1'){o.y-=2;o.h=4;o.draw=(c,X,Y)=>d(c,X,Y+2*T);}
+    else{o.y-=1;o.h=3;o.topH=1;o.drawTop=(c,X,Y)=>S(c,'Z',21,6,X,Y-T,3,1);o.draw=(c,X,Y)=>S(c,'Z',21,7,X,Y,3,3);}
+    o.__v282=1;}
+  try{buildOcc();}catch(_){}
+  const dentro=(x,y)=>ocas.some(o=>x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h);
+  const frente=(x,y)=>ocas.some(o=>o.door!=null&&y===o.y+o.h&&x>=o.x&&x<=o.x+o.w);   /* a linha em frente à porta (e o passo até ela) fica vazia, para dar para chegar na porta */
+  const livre=(x,y)=>!dentro(x,y)&&!frente(x,y)&&freeAt('pira',x,y);
+  const move=a=>{if((a.scene||'pira')!=='pira'||!(dentro(a.x,a.y)||frente(a.x,a.y)))return;
+    const sx=a.x,sy=a.y;let p=null;
+    for(let r=1;r<=12&&!p;r++)for(let y=sy-r;y<=sy+r&&!p;y++)for(let x=sx-r;x<=sx+r&&!p;x++){if(Math.max(Math.abs(x-sx),Math.abs(y-sy))!==r)continue;
+      if(livre(x,y)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([u,v])=>livre(x+u,y+v)))p=[x,y];}
+    if(p){a.x=p[0];a.y=p[1];if(a.px!=null){a.px=a.x*T;a.py=a.y*T;}}};
+  /* alguns objetos da aldeia (Pilão, Cesto de mandioca...) só viram "coisas de pegar" mais tarde no arquivo: confere de novo depois */
+  const ajusta=()=>{try{ITEMS.forEach(move);npcs.forEach(move);buildOcc();}catch(_){}};
+  ajusta();setTimeout(ajusta,1500);setTimeout(ajusta,5000);
+}catch(e){console.warn('v282 oca',e);}})();
 /* ---- fontes: o Pátio do Colégio hoje, o desenho da colina e o mapa do Triângulo ---- */
 (function(){
   if(typeof A==='undefined'||typeof FONTES==='undefined')return;
@@ -21608,7 +21636,7 @@ function render(){
     else if(ch==='P'){list.push({z:(y+1)*T-1,f:()=>S(ctx,'H',10,4,X,Y)});}
     else if(ch==='K'){list.push({z:(y+1)*T-1,f:()=>S(ctx,'N',11,9,X,Y)});}
   }
-  for(const o of objects.filter(here)){const X=o.x*T-camX,Y=o.y*T-camY;if(X>VW+16||Y>VH+80||X+o.w*T<-24||Y+o.h*T<-24)continue;list.push({z:(o.y+o.h)*T-1,f:()=>o.draw(ctx,X,Y)});}
+  for(const o of objects.filter(here)){const X=o.x*T-camX,Y=o.y*T-camY;if(X>VW+16||Y>VH+80||X+o.w*T<-24||Y+o.h*T<-24)continue;if(o.drawTop)list.push({z:o.y*T-(o.topH||1)*T-1,f:()=>o.drawTop(ctx,X,Y)});list.push({z:(o.y+o.h)*T-1,f:()=>o.draw(ctx,X,Y)});}
   for(const n of npcs.filter(here)){const X=n.x*T-camX,Y=n.y*T-camY;if(X>VW+16||Y>VH+24||X<-24||Y<-24)continue;list.push({z:(n.y+1)*T,f:()=>drawChar(n.spr||n.id,X+(n.__ox||0),Y+(n.__oy||0),n.__dir||n.dir,n.__fr||0)});}
   {const pp=PORTALS[era];if(pp.scene===cur){const open=portal&&portal.era===era,X=pp.x*T-camX,Y=pp.y*T-camY;list.push({z:pp.y*T+1,f:()=>open?drawPortal(ctx,X,Y):drawPortalClosed(ctx,X,Y)});}}
   for(const it of ITEMS.filter(here)){if(it.got)continue;const X=it.x*T-camX,Y=it.y*T-camY;if(X<-16||Y<-16||X>VW||Y>VH)continue;
