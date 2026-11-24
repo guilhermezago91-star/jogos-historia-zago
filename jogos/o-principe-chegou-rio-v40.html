@@ -515,7 +515,9 @@ let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
 const canvas=$('c');
 let renderer;
 try{renderer=new THREE.WebGLRenderer({canvas,antialias:true});}catch(e){$('intro').innerHTML='<p id="err">Este navegador não conseguiu abrir a cena 3D (WebGL). Tente outro navegador ou outro computador.</p>';return;}
-renderer.setPixelRatio(Math.min(innerWidth<=600?1.25:2,window.devicePixelRatio||1));
+// Limites de desenho para celulares e tablets, inclusive na horizontal.
+const rioMobile=matchMedia("(pointer: coarse)").matches || Math.min(innerWidth,innerHeight)<=600;
+renderer.setPixelRatio(Math.min(rioMobile?1.25:2,window.devicePixelRatio||1));
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.86;renderer.outputEncoding=THREE.sRGBEncoding;
 const scene=new THREE.Scene();
@@ -532,7 +534,7 @@ scene.background=new THREE.Color(0xb1c8cc); // cor de segurança se uma GPU não
 { const cv=document.createElement('canvas');cv.width=256;cv.height=128;const ctx=cv.getContext('2d');for(const [x,y,r] of [[52,74,36],[87,59,43],[128,45,42],[167,66,40],[202,79,28]]){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,'rgba(255,255,250,.87)');g.addColorStop(.48,'rgba(255,255,250,.45)');g.addColorStop(1,'rgba(255,255,250,0)');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);}const tex=new THREE.CanvasTexture(cv),m=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false,fog:false,opacity:.8});for(let i=0;i<16;i++){const a=i*2.39996,r=285+(i%3)*24,cl=new THREE.Sprite(m);cl.position.set(Math.cos(a)*r,75+(i%5)*17,Math.sin(a)*r);cl.scale.set(100+(i%4)*21,35+(i%3)*9,1);scene.add(cl);}}
 const hemi=new THREE.HemisphereLight(0xa9c8e6,0x5e4a36,.4);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xffe2b0,1.75);
-sun.castShadow=true;sun.shadow.mapSize.set(innerWidth<=600?1024:3072,innerWidth<=600?1024:3072);
+sun.castShadow=true;sun.shadow.mapSize.set(rioMobile?1024:3072,rioMobile?1024:3072);
 Object.assign(sun.shadow.camera,{left:-60,right:60,top:60,bottom:-60,near:1,far:300});
 sun.shadow.bias=-.0005;sun.shadow.normalBias=.03;scene.add(sun,sun.target);
 let dusk=0,duskT=0;
@@ -3877,7 +3879,7 @@ const puddles=[];for(const [x,z] of [[-49,-36],[-42,-36],[-34,-36],[31,-78],[29,
 const gnatGeom=new THREE.BufferGeometry(),gnatPos=new Float32Array(75*3);gnatGeom.setAttribute('position',new THREE.BufferAttribute(gnatPos,3));const gnats=new THREE.Points(gnatGeom,new THREE.PointsMaterial({color:0x302d27,size:.045,transparent:true,opacity:.75}));gnats.frustumCulled=false;gnats.visible=false;scene.add(gnats);
 const rainBtn=document.createElement('button');rainBtn.textContent='Clima: tempo seco';rainBtn.onclick=()=>{weatherOn=!weatherOn;rain.visible=weatherOn;puddles.forEach(m=>m.visible=weatherOn);rainBtn.textContent=weatherOn?'Clima: chuva':'Clima: tempo seco';};$('toolbar').appendChild(rainBtn);
 // Add explicit graphics presets. Auto adapts; high never silently lowers quality.
-window.__rioQuality='auto';const quality=document.createElement('button');quality.textContent='Gráficos: automático';quality.onclick=()=>{const modes=['auto','high','medium','low'];const k=(modes.indexOf(window.__rioQuality)+1)%4;window.__rioQuality=modes[k];quality.textContent=['Gráficos: automático','Gráficos: detalhado','Gráficos: equilibrado','Gráficos: econômico'][k];PERF.level=0;PERF.acc=0;PERF.n=0;renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,k===1?2:k===3?1:1.5));renderer.shadowMap.enabled=k!==3;sun.castShadow=k!==3;V18_BLOB.mat.visible=k!==3;CULL=k===3?60:110;scene.fog.near=k===3?90:140;scene.fog.far=k===3?320:560;camera.far=k===3?520:1400;camera.updateProjectionMatrix();scene.traverse(o=>{if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.needsUpdate=true);});resize();};$('toolbar').appendChild(quality);
+window.__rioQuality='auto';const quality=document.createElement('button');quality.textContent='Gráficos: automático';quality.onclick=()=>{const modes=['auto','high','medium','low'];const k=(modes.indexOf(window.__rioQuality)+1)%4;window.__rioQuality=modes[k];quality.textContent=['Gráficos: automático','Gráficos: detalhado','Gráficos: equilibrado','Gráficos: econômico'][k];PERF.level=0;PERF.acc=0;PERF.n=0;renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,k===3?1:rioMobile?1.25:k===1?2:1.5));renderer.shadowMap.enabled=k!==3;sun.castShadow=k!==3;V18_BLOB.mat.visible=k!==3;CULL=k===3?60:110;scene.fog.near=k===3?90:140;scene.fog.far=k===3?320:560;camera.far=k===3?520:1400;camera.updateProjectionMatrix();scene.traverse(o=>{if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.needsUpdate=true);});resize();};$('toolbar').appendChild(quality);
 // More distinct outdoor roles and small motions.
 const v7Wash=[];for(let i=0;i<3;i++){const x=-53.5-i*3,z=44.1+i*.72,f=placeFig(makeFigure({skin:SKIN[i+1],dress:[0x776a57,0x50666e,0x925b48][i],body:0xe6d7ba,hat:'turban',barefoot:true}),x,z,0);f.carry=true;v7Wash.push(f);}
 histWalker(-29,-36,-18,-36,{skin:SKIN[4],body:0xbcab83,legs:0x594934,hat:'straw'});{const f=HIST_MOVERS[HIST_MOVERS.length-1].f;box(.56,.38,.43,M.wood,0,1.17,.35,f.g);f.carry=true;f.arms.forEach(a=>a.rotation.x=-1.05);}
