@@ -479,7 +479,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=815958d9","kb":1057,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cb3f043a","kb":344,"m":2},{"f":"pac_e23.js?v=6db414b2","kb":428,"m":6},{"f":"pac_e234.js?v=d425da45","kb":824,"m":14},{"f":"pac_e3.js?v=a669cf24","kb":1651,"m":4},{"f":"pac_e34.js?v=46c2dbf0","kb":1049,"m":12},{"f":"pac_e4.js?v=93ef6bb2","kb":11672,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=61b33279","kb":1060,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cb3f043a","kb":344,"m":2},{"f":"pac_e23.js?v=6db414b2","kb":428,"m":6},{"f":"pac_e234.js?v=d425da45","kb":824,"m":14},{"f":"pac_e3.js?v=a669cf24","kb":1651,"m":4},{"f":"pac_e34.js?v=46c2dbf0","kb":1049,"m":12},{"f":"pac_e4.js?v=93ef6bb2","kb":11672,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -30128,7 +30128,7 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
      'prova' conversar com n e passar na prova (sempre a última) */
   const TELAS=[
    {e:1,nome:'Piratininga',code:'TIBIRICA-54',sc:['pira'],ini:null,ms:[
-     {t:'falar',n:'tibirica',tit:'O chefe da aldeia',txt:'Ache Tibiriçá, o chefe da aldeia, e converse com ele.'},
+     {t:'falar',n:'tibirica',tit:'O chefe da aldeia',txt:matchMedia('(hover:none) and (pointer:coarse)').matches?'Ache Tibiriçá.':'Ache Tibiriçá, o chefe da aldeia, e converse com ele.'},
      {t:'q',k:'pesca',tit:'Pesca no rio'},
      {t:'q',k:'farinha',tit:'Farinha de mandioca'},
      {t:'q',k:'escambo',tit:'A troca',txt0:'Em 1554 não se usa dinheiro aqui: troca-se. Fale com o colono de São Vicente, em Piratininga.'},
@@ -31267,6 +31267,171 @@ setTimeout(function(){try{
     a.__v283=1;}catch(e){console.warn('v283 ícones',e);}};
   ocas();aplica();[1500,5000,12000,30000].forEach(ms=>setTimeout(()=>{ocas();aplica();},ms));icones(0);
 }catch(e){console.warn('v283 novos desenhos 1554',e);}})();
+/* ===== v284 — 1554: a cruz grande vai para o canto esquerdo e uma cruz pequena sobe no telhado do colégio (pedido do professor, 24/11/2026) =====
+   A cruz sai da frente do colégio e fica à esquerda dele (quadradinho 13,11, chão livre). Só muda a posição e a frase de apresentação;
+   id, tamanho (colisão), conversa e missões ficam iguais. A cruz ganhou madeira mais escura, contorno menos preto, pé enterrado na terra e uma sombra no chão (P54N_cruzSombra, só desenho). A cruz pequena (P54N_cruzTeto, 9x14) é só enfeite desenhado no telhado
+   do colégio, sem colisão. Só 1554. Para desligar: window.NOVOS54_DESLIGADOS=true. */
+(function(){try{
+  if(window.NOVOS54_DESLIGADOS)return;
+  const pronta=k=>{const i=IMG[k];return !!(i&&i.complete&&i.naturalWidth);};
+  const faz=()=>{try{
+    const cr=objects.find(o=>o.id==='cruz'&&(o.scene||'pira')==='pira');
+    if(cr&&!cr.__v284){cr.__v284=1;cr.x=13;cr.y=11;cr.text=["Uma cruz de madeira, plantada ao lado do colégio. Para os jesuítas, ela marca a chegada do cristianismo a este lugar."];
+      try{buildOcc();if(cur==='pira')buildStatic();}catch(_){}}
+    if(cr&&cr.__v283&&!cr.__v284s){cr.__v284s=1;const w=cr.draw;   /* sombra projetada no chão, para a direita, sob a cruz */
+      cr.draw=(c,X,Y)=>{if(pronta('P54N_cruzSombra')){const i=IMG.P54N_cruzSombra,g=c.globalAlpha;c.globalAlpha=0.38;c.drawImage(i,Math.round(X+T/2-4),Y+T-4);c.globalAlpha=g;}w(c,X,Y);};}
+    const co=objects.find(o=>o.id==='colegio'&&(o.scene||'pira')==='pira');
+    if(co&&co.__v283&&!co.__v284){co.__v284=1;const w=co.draw;
+      co.draw=(c,X,Y)=>{w(c,X,Y);if(pronta('P54N_cruzTeto')){const i=IMG.P54N_cruzTeto;c.drawImage(i,Math.round(X+(co.w*T-i.naturalWidth)/2),Y);}};}
+  }catch(e){console.warn('v284 cruz',e);}};
+  faz();[1600,5200,12100,30100].forEach(ms=>setTimeout(faz,ms));
+}catch(e){console.warn('v284 cruzes 1554',e);}})();
+/* ===== v285 — 1554: MISSÕES DOS JESUÍTAS, seis objetos em cadeia (pedido do professor, 24/11/2026) =====
+   Uma cadeia de seis missões com o padre Manuel de Paiva (Piratininga, 1554): flauta, Bíblia, rosário, crucifixo, carta e cálice.
+   Só vale no Modo Missão e só em 1554 (o Modo livre e as outras épocas ficam como estavam). Uma missão por vez:
+   1) o objeto só aparece depois que a conversa do pedido TERMINA; 2) ao pegar, abre a janela "Novo objeto encontrado!" (imagem,
+   nome e explicação) e o jogo fica parado até apertar Continuar; 3) o jogador volta ao padre, ouve a fala de entrega e a missão
+   termina com mensagem de parabéns e um som curto; 4) a próxima missão só libera o objeto depois de novo pedido.
+   Flauta e rosário já existiam como objetos de 1554: continuam contando nos objetos da época (e no portal), mas ficam escondidos até
+   a missão deles (ficam "guardados" na cena do baú, fora do mapa, como os objetos dos baús). Bíblia, crucifixo, carta e cálice são
+   novos e NÃO entram na conta de objetos do portal. O estado da cadeia fica dentro do próprio Modo Missão (mesmo registro 'pira_missao_v1'),
+   então "começar de novo" volta a 0/6. Para desligar tudo: window.JESUITAS54_DESLIGADO=true antes de carregar. */
+(function(){try{
+  if(window.JESUITAS54_DESLIGADO)return;
+  const KMM='pira_missao_v1',NPC_ID='paiva',SC='__jes',TOTAL=6;
+  const M=[
+    {k:'flauta',tit:'A música da catequese',obj:'Flauta',item:'flauta',ic:9,x:19,y:15,
+     pedido:'Utilizamos a música e o canto para ensinar orações. Você poderia encontrar uma flauta para mim?',
+     coleta:'A flauta é um instrumento de sopro. Em Piratininga, os jesuítas utilizavam cantos e orações no ensino religioso.',
+     entrega:'Muito bem! O canto nos ajuda a ensinar orações.',fim:'Parabéns! Você concluiu: A música da catequese!'},
+    {k:'biblia',tit:'O livro sagrado',obj:'Bíblia',x:23,y:11,
+     pedido:'Precisamos de uma Bíblia para nossas atividades religiosas. Você poderia encontrá-la?',
+     coleta:'A Bíblia é o livro sagrado do cristianismo. No século XVI, a Igreja Católica utilizava a Vulgata, uma versão em latim.',
+     entrega:'Obrigado! A Bíblia é importante para nossos ensinamentos.',fim:'Parabéns! Você concluiu: O livro sagrado!'},
+    {k:'rosario',tit:'As contas da oração',obj:'Rosário',item:'rosario',ic:8,x:12,y:12,
+     pedido:'Precisamos de um rosário para nossas orações. Ajude-me a encontrá-lo.',
+     coleta:'O rosário é formado por contas que ajudam os católicos a acompanhar uma sequência de orações.',
+     entrega:'Muito bem! O rosário nos ajuda a acompanhar as orações.',fim:'Parabéns! Você concluiu: As contas da oração!'},
+    {k:'crucifixo',tit:'O símbolo da fé',obj:'Crucifixo',x:19,y:7,
+     pedido:'Precisamos de um crucifixo para nossa capela. Você poderia trazê-lo?',
+     coleta:'O crucifixo representa Jesus Cristo na cruz. É um símbolo do cristianismo utilizado na devoção e no ensino religioso.',
+     entrega:'Obrigado! Colocaremos o crucifixo na capela.',fim:'Parabéns! Você concluiu: O símbolo da fé!'},
+    {k:'carta',tit:'Notícias de Piratininga',obj:'Carta manuscrita',x:16,y:9,
+     pedido:'Escrevemos cartas para comunicar nossas atividades a outros religiosos. Preciso que encontre uma delas.',
+     coleta:'Os jesuítas escreviam cartas relatando suas atividades e contatos com os povos indígenas. Hoje, elas são fontes históricas.',
+     entrega:'Excelente! Precisamos comunicar o que acontece aqui.',fim:'Parabéns! Você concluiu: Notícias de Piratininga!'},
+    {k:'calice',tit:'A preparação da missa',obj:'Cálice',x:22,y:8,
+     pedido:'Precisamos preparar a celebração da missa. Encontre o cálice e traga-o para mim.',
+     coleta:'O cálice é um recipiente usado pelo sacerdote para conter o vinho durante a missa católica.',
+     entrega:'Muito obrigado! Agora podemos continuar os preparativos.',fim:'Parabéns! Você concluiu: A preparação da missa!'}];
+  const D=window.__jes54={M,sons:0,modais:0,coletas:0,entregas:0,pedidos:0};
+  const mmOn=()=>{try{return !!(window.__MMligado&&window.__MMligado());}catch(_){return false;}};
+  const jogo=()=>mmOn()&&era===1&&SKEY==='piratininga1554_v2';
+  const est=()=>{try{const m=window.__MM&&window.__MM();if(!m)return null;if(!m.jes||typeof m.jes.i!=='number')m.jes={i:0,s:'disp',inv:[],reg:[]};return m.jes;}catch(_){return null;}};
+  Object.defineProperty(D,'est',{get:est});
+  const grava=()=>{try{const m=window.__MM&&window.__MM();if(m)localStorage.setItem(KMM,JSON.stringify(m));}catch(_){}};
+  const pad=()=>npcs.find(n=>n.id===NPC_ID);
+
+  /* ---------- os seis objetos no mapa (só o da missão ativa fica na cena 'pira'; os outros ficam guardados fora do mapa) ---------- */
+  const icone=(c,m,X,Y)=>{if(m.ic!=null){try{c.drawImage(IMG.IT,m.ic*16,0,16,16,X,Y,16,16);}catch(_){}return;}
+    const i=IMG['P54M_'+m.k+'16'];if(i&&i.complete&&i.naturalWidth)c.drawImage(i,X,Y);};
+  const objs=M.map((m,k)=>({id:'jes54_'+k,scene:SC,x:m.x,y:m.y,w:1,h:0,jes:true,name:m.obj,text:[m.coleta],
+    draw:(c,X,Y)=>{const b=Math.round(Math.sin(t*3+k)*1.5);c.fillStyle='rgba(20,27,27,.3)';c.fillRect(X+4,Y+12,8,2);icone(c,m,X,Y-2+b);if((t*1.2+k*.37)%2<.25)star(X+12,Y+1+b);}}));
+  objs.forEach(o=>objects.push(o));D.objs=objs;
+  const sincObj=()=>{const E=est(),on=!!(E&&jogo());objs.forEach((o,k)=>{const alvo=(on&&E.s==='ativa'&&E.i===k)?'pira':SC;if(o.scene!==alvo)o.scene=alvo;});};
+  /* o lugar escolhido tem de estar livre; se alguém ou algo estiver nele, vai para o chão livre mais perto */
+  const livre=(x,y,o)=>{try{return freeAt('pira',x,y)&&!npcs.some(n=>(n.scene||'pira')==='pira'&&Math.round(n.x)===x&&Math.round(n.y)===y)&&!ITEMS.some(i=>(i.scene||'pira')==='pira'&&!i.got&&i.x===x&&i.y===y)&&!objects.some(q=>q!==o&&(q.scene||'pira')==='pira'&&q.h>0&&x>=q.x&&x<q.x+(q.w||1)&&y>=q.y&&y<q.y+q.h);}catch(_){return true;}};
+  const lugar=k=>{const o=objs[k],m=M[k];if(livre(m.x,m.y,o)){o.x=m.x;o.y=m.y;return;}
+    for(let r=1;r<=5;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;if(livre(m.x+dx,m.y+dy,o)){o.x=m.x+dx;o.y=m.y+dy;return;}}};
+
+  /* ---------- flauta e rosário: já existem em 1554; ficam guardados até a missão deles ---------- */
+  const guarda={};
+  const sincItens=()=>{const on=mmOn();for(const m of M){if(!m.item)continue;const it=guarda['_'+m.item]||(guarda['_'+m.item]=ITEMS.find(i=>i.id===m.item));if(!it)continue;
+    if(on){if(it.scene!=='bau54'){guarda[m.item]={x:it.x,y:it.y,s:it.scene};it.scene='bau54';it.x=-99;it.y=-99;}}
+    else if(guarda[m.item]&&it.scene==='bau54'){const g=guarda[m.item];if(g.s===undefined)delete it.scene;else it.scene=g.s;it.x=g.x;it.y=g.y;delete guarda[m.item];}}};
+
+  /* ---------- janela "Novo objeto encontrado!" ---------- */
+  let modal=null,aberto=false,desde=0,bloqAte=0,cK=null;
+  const scr=document.querySelector('.screen');
+  const cria=()=>{if(modal||!scr)return;
+    const st=document.createElement('style');st.textContent='#ovMissao{z-index:50;position:fixed;inset:0;overflow:auto}#ovMissao .card{max-height:calc(100dvh - 20px);overflow:auto;box-sizing:border-box;margin:auto}#ovMissao[hidden]{display:none}#ovMissao .card{max-width:440px;align-items:center;text-align:center}#ovMissao .kicker{font-weight:700}#ovMissao canvas{width:clamp(88px,26vmin,144px);height:clamp(88px,26vmin,144px);image-rendering:pixelated;background:#2a3536;border:2px solid var(--ink);border-radius:6px}#ovMissao h2{margin:0}#ovMissao p{margin:0;line-height:1.35}#ovMissao .btn{min-width:160px}@media (max-height:430px){#ovMissao .card{padding:8px 12px;gap:5px}#ovMissao canvas{width:64px;height:64px}#ovMissao p{font-size:.92em;line-height:1.25}}'+
+      '#jesQ{position:absolute;right:6px;top:6px;max-width:min(60%,420px);box-sizing:border-box;background:rgba(242,234,241,.94);color:var(--ink);border:2px solid var(--ink);border-radius:4px;padding:4px 8px;font-size:clamp(12px,2.9cqw,20px);line-height:1.28;pointer-events:none}#jesQ[hidden]{display:none}#jesQ .k{display:block;font-size:.72em;font-weight:700;color:#7a3a1e;letter-spacing:.02em}#jesQ .t{display:block;font-weight:700}#jesQ .o{display:block}#jesQ .s{display:block;font-size:.72em;opacity:.8;margin-top:2px}@media (max-height:430px){#jesQ .s{display:none}}@media (hover:none) and (pointer:coarse){#jesQ .t,#jesQ .s{display:none}}';
+    document.head.appendChild(st);
+    modal=document.createElement('div');modal.className='ov';modal.id='ovMissao';modal.hidden=true;
+    modal.innerHTML='<div class="card" role="dialog" aria-modal="true" aria-labelledby="jesNome"><div class="kicker">Novo objeto encontrado!</div><canvas id="jesImg" width="32" height="32"></canvas><h2 id="jesNome"></h2><p id="jesTxt"></p><button type="button" class="btn" id="jesOk">Continuar</button></div>';
+    scr.appendChild(modal);
+    modal.querySelector('#jesOk').addEventListener('click',()=>{if(performance.now()-desde>250)fecha();});};
+  const abre=k=>{cria();if(!modal)return;const m=M[k];const cv=modal.querySelector('#jesImg'),x=cv.getContext('2d');x.imageSmoothingEnabled=false;x.clearRect(0,0,32,32);
+    try{if(m.ic!=null)x.drawImage(IMG.IT,m.ic*16,0,16,16,0,0,32,32);else x.drawImage(IMG['P54M_'+m.k],0,0,32,32);}catch(_){}
+    modal.querySelector('#jesNome').textContent=m.obj;modal.querySelector('#jesTxt').textContent=m.coleta;
+    try{keyStack.length=0;padDir=null;}catch(_){}
+    modal.hidden=false;aberto=true;desde=performance.now();D.modais++;cK=k;
+    setTimeout(()=>{try{modal.querySelector('#jesOk').focus({preventScroll:true});}catch(_){}},30);
+    try{if(typeof speakTxt==='function')speakTxt('Novo objeto encontrado! '+m.obj+'. '+m.coleta);}catch(_){}};
+  const fecha=()=>{if(!aberto)return;modal.hidden=true;aberto=false;bloqAte=performance.now()+250;try{keyStack.length=0;padDir=null;}catch(_){}
+    try{if(typeof speakTxt==='function')speakTxt(null);}catch(_){}
+    hud();const m=M[cK];if(m)toast(`Entregue ao jesuíta: ${m.obj}.`);}
+  {const ip=isPaused;isPaused=()=>aberto||ip();}
+  addEventListener('keydown',e=>{const ac=e.key===' '||e.key==='Enter'||e.key==='z'||e.key==='Z'||e.key==='e'||e.key==='E';
+    if(aberto){e.stopImmediatePropagation();e.preventDefault();if(!e.repeat&&performance.now()-desde>350&&(ac||e.key==='Escape'))fecha();return;}
+    if(ac&&performance.now()<bloqAte){e.stopImmediatePropagation();e.preventDefault();}},true);
+
+  /* ---------- caixa de missão na tela (fica logo abaixo da caixa do Modo Missão) ---------- */
+  const q=document.getElementById('quest');let hudEl=null;
+  const objetivo=E=>E.i>=TOTAL?'Parabéns! Você concluiu as seis missões dos jesuítas!':E.s==='disp'?'Converse com o jesuíta.':E.s==='ativa'?(matchMedia('(hover:none) and (pointer:coarse)').matches?`Encontre ${({Bíblia:'a',Flauta:'a','Carta manuscrita':'a',Rosário:'o',Crucifixo:'o',Cálice:'o'})[M[E.i].obj]||'o'} ${M[E.i].obj.toLowerCase()}`:`Encontre: ${M[E.i].obj}.`):`Entregue ao jesuíta: ${M[E.i].obj}.`;
+  function hud(){try{if(!scr)return;if(!hudEl){hudEl=document.createElement('div');hudEl.id='jesQ';hudEl.hidden=true;hudEl.innerHTML='<span class="k"></span><span class="t"></span><span class="o"></span><span class="s"></span>';(q||scr.firstChild).after(hudEl);cria();}
+    const E=est(),on=!!(E&&started&&jogo());if(!on){hudEl.hidden=true;return;}
+    const fim=E.i>=TOTAL,n=pad();
+    hudEl.querySelector('.k').textContent=(matchMedia('(hover:none) and (pointer:coarse)').matches?'Jesuítas · ':'Missão dos jesuítas · ')+E.i+'/'+TOTAL;
+    hudEl.querySelector('.t').textContent=fim?'As seis missões':M[E.i].tit;
+    hudEl.querySelector('.o').textContent=objetivo(E);
+    hudEl.querySelector('.s').textContent=(!fim&&(E.s==='disp'||E.s==='col'))?(n?n.name:'Pe. Manuel de Paiva')+', perto do colégio.':'';
+    hudEl.hidden=false;hudEl.style.top=((q&&!q.hidden)?(q.offsetTop+q.offsetHeight+4):6)+'px';}catch(e){console.warn('v285 caixa',e);}}
+  {const uq=updQuest;updQuest=function(){const r=uq.apply(this,arguments);hud();return r;};}
+  setInterval(hud,600);
+
+  /* ---------- conversa com o padre: pedido, "ainda preciso" e entrega ---------- */
+  const ativa=()=>{const E=est();if(!E||E.s!=='disp'||E.i>=TOTAL)return;const k=E.i;lugar(k);E.s='ativa';D.pedidos++;grava();sincObj();hud();toast('Nova missão: '+M[k].tit);};
+  function fanfarra(){D.sons++;if(!soundOn)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;fanfarra.c=fanfarra.c||new AC();const a=fanfarra.c,t0=a.currentTime+.02;
+    [[523.25,0,.16],[659.25,.13,.16],[783.99,.26,.16],[1046.5,.4,.6]].forEach(([f,d,l])=>{const o=a.createOscillator(),g=a.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(.0001,t0+d);g.gain.exponentialRampToValueAtTime(.1,t0+d+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+d+l);o.connect(g).connect(a.destination);o.start(t0+d);o.stop(t0+d+l+.05);});}catch(_){}}
+  const entrega=()=>{const E=est();if(!E||E.s!=='col'||aberto||E.i>=TOTAL)return;const k=E.i,m=M[k],j=E.inv.indexOf(k);if(j<0)return;
+    E.inv.splice(j,1);E.i++;E.s=E.i>=TOTAL?'fim':'disp';D.entregas++;grava();try{save();}catch(_){}hud();fanfarra();
+    const pg=[m.fim,E.i>=TOTAL?'Parabéns! Você concluiu as seis missões dos jesuítas!':`Missões cumpridas: ${E.i} de ${TOTAL}. Converse de novo com o jesuíta para ouvir o próximo pedido.`];
+    try{addDiary('Missão',`${m.tit}: missão cumprida (${m.obj}).`);}catch(_){}
+    say('Missão cumprida!',pg);};
+  {const q0=questHook;questHook=function(n){
+    try{if(n&&n.id===NPC_ID&&(n.scene||'pira')==='pira'&&jogo()){const E=est();if(E){
+      if(E.i>=TOTAL)return{pages:['Você já me ajudou com todas as tarefas. Muito obrigado!'],only:true};
+      const m=M[E.i];
+      if(E.s==='disp')return{pages:[m.pedido],only:true,after:ativa};
+      if(E.s==='ativa')return{pages:['Ainda preciso desse objeto.'],only:true};
+      if(E.s==='col'&&!aberto)return{pages:[m.entrega],only:true,after:entrega};}}}catch(e){console.warn('v285 conversa',e);}
+    return q0.apply(this,arguments);};}
+
+  /* ---------- pegar o objeto ao pisar nele ---------- */
+  const pega=k=>{const E=est(),m=M[k];E.s='col';E.inv.push(k);if(E.reg.indexOf(k)<0)E.reg.push(k);D.coletas++;
+    if(m.item){const it=ITEMS.find(i=>i.id===m.item);if(it&&!it.got){it.got=true;itemCount++;}}
+    sincObj();sfx('portal');try{updHUD();}catch(_){}
+    try{addDiary('Objeto',`${m.obj}: ${m.coleta}`);}catch(_){}
+    grava();try{save();}catch(_){}hud();abre(k);};
+  const tick=(ax,ay)=>{sincItens();sincObj();if(!jogo())return;const E=est();if(!E||E.s!=='ativa'||E.i>=TOTAL)return;
+    if(cur!=='pira'||dialog||hold||fading||sceneFade||aberto||isPaused())return;
+    const o=objs[E.i];if(player.x!==o.x||player.y!==o.y)return;
+    const chegou=player.x!==ax||player.y!==ay;if(!chegou&&player.moving)return;
+    player.moving=false;pega(E.i);};
+  {const up=update;update=function(dt){const ax=player.x,ay=player.y;const r=up.apply(this,arguments);try{tick(ax,ay);}catch(e){console.warn('v285 tick',e);}return r;};}
+
+  /* ---------- mochila: o que a cadeia já deu e o que você está levando ---------- */
+  {const om=openMochila;openMochila=function(){const r=om.apply(this,arguments);
+    try{const E=est();if(!E||!jogo()||ovQuiz.hidden||!E.reg.length)return r;const list=$('quizBox').querySelector('div[style*="flex-direction"]');if(!list)return r;
+      const h=document.createElement('div');h.style.cssText='font:700 clamp(16px,4.2vw,19px)/1.25 system-ui,sans-serif;margin:10px 0 2px;color:#b0553a';h.textContent=`Missões dos jesuítas: ${Math.min(E.i,TOTAL)} de ${TOTAL} entregues`;list.appendChild(h);
+      for(const k of E.reg){const m=M[k],row=document.createElement('div');row.style.cssText='display:flex;gap:10px;align-items:center;border-bottom:1px solid rgba(0,0,0,.15);padding-bottom:6px';
+        const cv=document.createElement('canvas');cv.width=32;cv.height=32;cv.style.cssText='width:40px;height:40px;flex:none;image-rendering:pixelated;background:#2a3536;border-radius:4px';const x=cv.getContext('2d');x.imageSmoothingEnabled=false;
+        try{if(m.ic!=null)x.drawImage(IMG.IT,m.ic*16,0,16,16,0,0,32,32);else x.drawImage(IMG['P54M_'+m.k],0,0,32,32);}catch(_){}
+        const tx=document.createElement('div');tx.style.cssText='flex:1;min-width:0';const b=document.createElement('b');b.textContent=m.obj;const d=document.createElement('div');d.style.cssText='font-size:clamp(15px,3.9vw,17px);line-height:1.4';d.textContent=E.inv.indexOf(k)>=0?'Você está levando este objeto para o jesuíta.':'Entregue ao jesuíta.';tx.append(b,d);row.append(cv,tx);list.appendChild(row);}
+    }catch(e){console.warn('v285 mochila',e);}return r;};}
+  hud();
+}catch(e){console.warn('v285 missões dos jesuítas',e);}})();
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
