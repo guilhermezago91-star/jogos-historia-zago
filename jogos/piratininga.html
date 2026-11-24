@@ -8244,7 +8244,7 @@ function nauRide(kind,dest){sfx('portal');ovMapa.hidden=true;ride={t:0,dur:12,de
   return true;};}
 {const rr=rideRender;rideRender=function(){if(!ride||!/^mar54/.test(ride.kind))return rr();{const q=$('quest');q.style.visibility='hidden';q.dataset.rideHid='1';}
   const c=ctx,r=ride,k=r.t/r.dur,H=VH,fadeA=Math.max(0,1-r.t/.6,1-(r.dur-r.t)/.6),kd=r.kind;
-  let fase=kd==='mar54a'?(k<.3?0:k<.65?1:2):kd==='mar54b'?3:(k<.5?4:0);
+  let fase=kd==='mar54a'?(k<.3?0:k<.65?1:2):kd==='mar54b'?3:4;
   const hor=Math.round(H*.45),calma=fase===1;
   const sky=c.createLinearGradient(0,0,0,hor);sky.addColorStop(0,calma?'#9cc8e8':'#5fa8e0');sky.addColorStop(1,calma?'#f2ead0':'#d8eef8');c.fillStyle=sky;c.fillRect(0,0,VW,hor+1);
   if(fase===0||fase===4){c.fillStyle='#4e7a54';c.beginPath();c.moveTo(0,hor);for(let x=0;x<=VW;x+=6)c.lineTo(x,hor-14-Math.abs(Math.sin((x+r.t*8)*.03))*22);c.lineTo(VW,hor);c.fill();}
