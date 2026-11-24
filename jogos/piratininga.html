@@ -21428,6 +21428,59 @@ const bUp=()=>{running=correrFixo;btnB.classList.remove('on');};
   /* tela cheia: desenha a caixa da missão de novo, para ela não ficar escondida */
   document.addEventListener('fullscreenchange',()=>{setTimeout(()=>{try{updQuest();}catch(_){}},300);});
 }catch(e){console.warn('v280 atalhos',e);}})();
+/* ===== v281 — AVISO DE COMO CONVERSAR: balão "ESPAÇO: conversar" sobre a pessoa à frente, reforço na caixa da missão e dica na primeira vez (pedido do professor, 24/11/2026) ===== */
+(function(){try{
+  const scr=document.querySelector('.screen');if(!scr)return;
+  const toque=()=>matchMedia('(hover:none) and (pointer:coarse)').matches;
+  const tecla=()=>toque()?'toque em A':'aperte ESPAÇO';
+  const st=document.createElement('style');st.textContent=
+   '#balaoFala{position:absolute;z-index:4;transform:translate(-50%,-100%);pointer-events:none;background:#fff8e6;color:#3a2410;border:2px solid #7a3a1e;border-radius:6px;padding:2px 7px;font-weight:700;font-size:clamp(11px,1.6vh,15px);white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.25)}'+
+   '#balaoFala::after{content:"";position:absolute;left:50%;bottom:-7px;margin-left:-5px;border:5px solid transparent;border-top-color:#7a3a1e;border-bottom:0}'+
+   '#dicaFala{position:absolute;z-index:6;left:50%;top:38%;transform:translate(-50%,-50%);background:#fff8e6;color:#3a2410;border:3px solid #b0412e;border-radius:8px;padding:10px 16px;font-weight:700;font-size:clamp(15px,2.6vh,22px);text-align:center;box-shadow:0 4px 0 rgba(0,0,0,.3);pointer-events:auto;cursor:pointer;max-width:80%}'+
+   '#dicaFala small{display:block;font-weight:400;font-size:.7em;margin-top:4px;opacity:.8}';
+  document.head.appendChild(st);
+  const bal=document.createElement('div');bal.id='balaoFala';bal.hidden=true;scr.appendChild(bal);
+  const livre=()=>{try{return started&&!dialog&&!isPaused()&&!hold&&!fading&&!sceneFade&&!(typeof ride!=='undefined'&&ride);}catch(_){return false;}};
+  /* 1) balão: só a pessoa no quadradinho à frente do boneco (a mesma que o ESPAÇO chama) */
+  function frente(){if(!livre()||player.moving)return null;const [dx,dy]=DIRS[player.dir],fx=player.x+dx,fy=player.y+dy;
+    let n=null;try{n=npcAt(fx,fy);}catch(_){}if(!n){try{const w=walkerAt(fx,fy);if(w)return {x:fx,y:fy};}catch(_){}return null;}return {x:fx,y:fy};}
+  function balao(){try{const f=frente();if(!f){bal.hidden=true;return;}
+    const cwid=MW*T,chei=MH*T;
+    const camX=cwid<=VW?Math.round((cwid-VW)/2):Math.round(Math.max(0,Math.min(cwid-VW,player.px+8-VW/2)));
+    const camY=chei<=VH?Math.round((chei-VH)/2):Math.round(Math.max(0,Math.min(chei-VH,player.py+8-VH*(cur==='m_centro22'?.7:.5))));
+    const X=f.x*T+8-camX,Y=f.y*T-18-camY;if(X<0||X>VW||Y<0||Y>VH){bal.hidden=true;return;}
+    const t=(toque()?'A':'ESPAÇO')+': conversar';if(bal.textContent!==t)bal.textContent=t;
+    bal.style.left=(X/VW*100)+'%';bal.style.top=(Y/VH*100)+'%';bal.hidden=false;}catch(_){bal.hidden=true;}}
+  const r0=render;render=function(){const r=r0.apply(this,arguments);balao();return r;};
+  /* 2) caixa da missão: quando a seta aponta para uma pessoa, lembra como conversar */
+  const pessoaAlvo=()=>{try{if(!(window.__MMligado&&window.__MMligado()))return false;const a=activeTarget();if(!a)return false;return !!npcs.find(n=>(n.scene||'pira')===a.scene&&n.x===a.x&&n.y===a.y);}catch(_){return false;}};
+  setInterval(()=>{try{const q=document.getElementById('quest');if(!q||q.hidden||!q.classList.contains('mm'))return;
+    const tem=q.querySelector('.mmFala');const quer=pessoaAlvo();
+    if(quer&&!tem){const e=document.createElement('span');e.className='mmFala';e.style.cssText='display:block;font-weight:700;color:#b0412e;font-size:.85em;margin-top:2px';
+      e.textContent='Fique de frente para a pessoa e '+tecla()+'.';const s=q.querySelector('.mmS');q.insertBefore(e,s||null);}
+    else if(!quer&&tem)tem.remove();}catch(_){}},500);
+  /* 3) dica na primeira vez: grande, no meio da tela, uma vez só */
+  const KEY='pira_dica_espaco';let viu=false;try{viu=!!localStorage.getItem(KEY);}catch(_){}
+  if(!viu){const iv=setInterval(()=>{try{if(!livre()||!pessoaAlvo())return;clearInterval(iv);try{localStorage.setItem(KEY,'1');}catch(_){}
+      const d=document.createElement('div');d.id='dicaFala';
+      d.innerHTML=(toque()?'Para conversar: chegue perto da pessoa e <u>toque em A</u>.':'Para conversar: chegue perto da pessoa e aperte a <u>BARRA DE ESPAÇO</u>.')+'<small>A seta amarela mostra quem procurar. Toque aqui para fechar.</small>';
+      const fecha=()=>{d.remove();removeEventListener('keydown',fk,true);};const fk=()=>fecha();
+      d.addEventListener('click',fecha);scr.appendChild(d);setTimeout(()=>addEventListener('keydown',fk,true),400);setTimeout(fecha,9000);}catch(_){}},700);}
+}catch(e){console.warn('v281 aviso conversar',e);}})();
+/* ===== v281 — TELA CHEIA: JANELAS DO JOGO (MISSÕES, CAPÍTULOS, AVISOS) APARECEM (pedido do professor, 24/11/2026) =====
+   Na tela cheia o navegador só mostra a parte do jogo. Janelas criadas fora dela (painel de missões e outras) ficavam invisíveis.
+   Enquanto está em tela cheia, essas janelas vão para dentro do jogo; ao sair, voltam para o lugar de antes. */
+(function(){try{
+  const app=document.querySelector('.app');if(!app)return;
+  const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
+  const movidos=new Set();
+  const flutua=e=>{try{if(e.nodeType!==1||e===app||/^(SCRIPT|STYLE|LINK|TEMPLATE)$/.test(e.tagName))return false;const p=getComputedStyle(e).position;return p==='fixed';}catch(_){return false;}};
+  const puxa=()=>{if(fsEl()!==app)return;for(const e of [...document.body.children])if(flutua(e)){movidos.add(e);app.appendChild(e);}};
+  const devolve=()=>{for(const e of movidos)if(e.parentNode===app)document.body.appendChild(e);movidos.clear();};
+  const muda=()=>{if(fsEl()===app)puxa();else devolve();};
+  document.addEventListener('fullscreenchange',muda);document.addEventListener('webkitfullscreenchange',muda);
+  new MutationObserver(()=>{if(fsEl()===app)puxa();}).observe(document.body,{childList:true});
+}catch(e){console.warn('v281 tela cheia janelas',e);}})();
 btnA.addEventListener('pointerup',aUp);btnA.addEventListener('pointercancel',aUp);btnA.addEventListener('pointerleave',aUp);
 dlg.addEventListener('pointerdown',e=>{e.preventDefault();if(dialog)advance();});
 [cv,dp,btnA].forEach(el=>el.addEventListener('contextmenu',e=>e.preventDefault()));
