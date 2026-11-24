@@ -479,7 +479,7 @@ requestAnimationFrame(draw);})();
 </div>
 
 <script>/*ABERTURA_RAPIDA*/(function(){
-var P=[{"f":"pac_e1.js?v=6fe82ef3","kb":1020,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cb3f043a","kb":344,"m":2},{"f":"pac_e23.js?v=6db414b2","kb":428,"m":6},{"f":"pac_e234.js?v=d425da45","kb":824,"m":14},{"f":"pac_e3.js?v=a669cf24","kb":1651,"m":4},{"f":"pac_e34.js?v=46c2dbf0","kb":1049,"m":12},{"f":"pac_e4.js?v=93ef6bb2","kb":11672,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
+var P=[{"f":"pac_e1.js?v=815958d9","kb":1057,"m":1},{"f":"pac_e1234.js?v=08d43af2","kb":2139,"m":15},{"f":"pac_e134.js?v=11968ba1","kb":92,"m":13},{"f":"pac_e14.js?v=a2b7a21b","kb":261,"m":9},{"f":"pac_e2.js?v=cb3f043a","kb":344,"m":2},{"f":"pac_e23.js?v=6db414b2","kb":428,"m":6},{"f":"pac_e234.js?v=d425da45","kb":824,"m":14},{"f":"pac_e3.js?v=a669cf24","kb":1651,"m":4},{"f":"pac_e34.js?v=46c2dbf0","kb":1049,"m":12},{"f":"pac_e4.js?v=93ef6bb2","kb":11672,"m":8},{"f":"pac_depois_a.js?v=225f2baa","kb":1028,"m":0,"d":1},{"f":"pac_depois_b.js?v=d537d118","kb":1556,"m":0,"d":1}];
 function eraDe(sc){sc=String(sc);return (sc==='sp22'||sc.indexOf('m_')===0)?4:(sc==='sp88'||sc==='faz'||sc==='santos'||sc.indexOf('k_')===0)?3:(sc==='sp'||sc==='arr'||sc.indexOf('i_')===0)?2:1;}
 var era=1,tudo=false,pend=null;
 try{pend=JSON.parse(sessionStorage.getItem('pira_boot')||'null');sessionStorage.removeItem('pira_boot');}catch(e){}
@@ -31205,6 +31205,68 @@ setTimeout(function(){try{
   const envolve=()=>{if(buildStatic.__c22f)return;const bs=buildStatic;const f=function(){if(cur===S&&window.__c22fixo){F.chao();return;}return bs.apply(this,arguments);};f.__c22f=1;buildStatic=f;};
   envolve();setTimeout(envolve,0);setTimeout(envolve,5000);setTimeout(envolve,30000);
 }catch(e){console.warn('centro fixo: chão',e);}})();
+/* ===== v283 — 1554: NOVOS DESENHOS (placas, objetos, cruz, fogueira, paliçada, colégio e ocas) (pedido do professor, 24/11/2026) =====
+   Só troca o DESENHO. Posição, tamanho no mapa (colisão), portas, falas, missões e objetos para pegar ficam como estavam.
+   Os desenhos novos vêm do arte_1554.js (chaves P54N_*) e são desenhados sem suavização, com a base no centro de baixo do
+   retângulo do objeto. Se a imagem nova ainda não carregou, vale o desenho antigo (nada some).
+   Tamanhos: desenhos feitos em grade de 32 px entram na metade (placa, cruz, objetos); a oca entra em tamanho natural; o colégio cabe nos 5 quadradinhos
+   dele; a fogueira e a paliçada entram no tamanho natural (é o espaço que os antigos já ocupavam).
+   Só 1554: as outras épocas não são tocadas. Para voltar ao desenho antigo: window.NOVOS54_DESLIGADOS=true antes de carregar. */
+(function(){try{
+  if(window.NOVOS54_DESLIGADOS)return;
+  const ES54=new Set(['pira','sv','serra','lisboa54','antuerpia54','banquete54','j_x1oca','j_x1colegio','j_x1engenho','j_x1igrejaSV','j_x1camaraSV','j_x1casaSV1','j_x1casaSV2','j_x1casaSV3','j_x1casaSV4','j_x1casaSV5','j_x1casaSV6']);
+  const pronta=k=>{const i=IMG[k];return !!(i&&i.complete&&i.naturalWidth);};
+  const base=(k,o,old)=>(c,X,Y)=>{if(!pronta(k))return old(c,X,Y);const i=IMG[k];c.drawImage(i,Math.round(X+(o.w*T-i.naturalWidth)/2),Math.round(Y+o.h*T-i.naturalHeight));};
+  const SINAL=/S\(c,'Z',15,11,X,Y\)/;   /* a placa amarela antiga: um quadradinho da folha de desenhos */
+  const aplica=()=>{try{
+    for(const o of objects){if(o.__v283)continue;const sc=o.scene||'pira';if(!ES54.has(sc))continue;const old=o.draw;if(typeof old!=='function')continue;let nd=null;
+      if(SINAL.test(String(old)))nd=(c,X,Y)=>{if(!pronta('P54N_placa'))return old(c,X,Y);c.drawImage(IMG.P54N_placa,X,Y);};
+      else if(sc==='pira'){
+        if(o.id==='colegio')nd=base('P54N_colegio',o,old);
+        else if(o.id==='oca1'||o.id==='oca2'){nd=(c,X,Y)=>{if(!pronta('P54N_oca'))return old(c,X,Y);const i=IMG.P54N_oca;c.drawImage(i,Math.round(X+(o.door||0)*T+8-i.naturalWidth/2),Math.round(Y+o.h*T-i.naturalHeight));};if(o.drawTop)delete o.drawTop;}   /* porta do desenho = quadradinho da porta; a fileira de telhado de cima (v282) era do desenho antigo */
+        else if(o.id==='cruz')nd=base('P54N_cruz',o,old);
+        else if(o.id==='forte54')nd=base('P54N_palicada',o,old);
+        else if(o.id==='fogo')nd=(c,X,Y)=>{if(!pronta('P54N_fogueira'))return old(c,X,Y);c.drawImage(IMG.P54N_fogueira,X-8,Y-12);};   /* mesmo canto do desenho antigo (32x32) */
+        else if(/^ob54_varal_pira_/.test(o.id||''))nd=base('P54N_varalPeixes',o,old);
+      }
+      if(nd){o.draw=nd;o.__v283=1;}}
+  }catch(e){console.warn('v283 desenhos',e);}};
+  /* ocas maiores (pedido do professor, 24/11/2026): o desenho novo entra em tamanho natural (128x64), com a porta do desenho em
+     cima da porta do jogo. A oca de cima cresce para o lado (tira os arbustos do caminho dela). A oca de baixo, que ficava de
+     costas para o penhasco (porta sem chão em frente), vai para o espaço livre ao norte, ao lado do colégio, com chão de verdade
+     em frente à porta. As duas entram na mesma sala (j_x1oca), que devolve a pessoa à porta por onde entrou. Gente, objetos e a
+     fogueira que estavam no lugar das ocas saem para o chão livre mais perto. */
+  const ocas=()=>{try{const o1=objects.find(o=>o.id==='oca1'&&(o.scene||'pira')==='pira'),o2=objects.find(o=>o.id==='oca2'&&(o.scene||'pira')==='pira');
+    if(!o1||!o2||o1.__v283b||!o1.__v282||!o2.__v282)return;
+    const M=SCN.pira.map;
+    Object.assign(o1,{x:11,y:16,w:7,h:4,door:2,enter:'x1oca',room:'j_x1oca'});
+    Object.assign(o2,{x:11,y:4,w:7,h:4,door:3,enter:'x1oca',room:'j_x1oca'});delete o2.topH;delete o2.drawTop;
+    o1.__v283b=o2.__v283b=1;
+    for(const o of [o1,o2])for(let y=o.y;y<o.y+o.h;y++)for(let x=o.x;x<o.x+o.w;x++)if(M[y]&&(M[y][x]==='b'||M[y][x]==='T'))M[y][x]=',';   /* tira arbusto/árvore do chão das ocas */
+    try{buildOcc();}catch(_){}
+    const dentro=(x,y)=>[o1,o2].some(o=>x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h);
+    const frente=(x,y)=>[o1,o2].some(o=>y===o.y+o.h&&x>=o.x&&x<=o.x+o.w);
+    const livre=(x,y)=>!dentro(x,y)&&!frente(x,y)&&freeAt('pira',x,y);
+    const perto=(sx,sy)=>{for(let r=0;r<=12;r++)for(let y=sy-r;y<=sy+r;y++)for(let x=sx-r;x<=sx+r;x++){if(Math.max(Math.abs(x-sx),Math.abs(y-sy))!==r)continue;
+      if(livre(x,y)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([u,v])=>livre(x+u,y+v)))return [x,y];}return null;};
+    const move=a=>{if((a.scene||'pira')!=='pira'||!(dentro(a.x,a.y)||frente(a.x,a.y)))return;const p=perto(a.x,a.y);if(p){a.x=p[0];a.y=p[1];if(a.px!=null){a.px=a.x*T;a.py=a.y*T;}}};
+    const fogo=objects.find(o=>o.id==='fogo'&&(o.scene||'pira')==='pira');
+    if(fogo){const p=livre(16,21)?[16,21]:perto(fogo.x,fogo.y);if(p){fogo.x=p[0];fogo.y=p[1];}}   /* a fogueira fica na frente das ocas */
+    try{buildOcc();}catch(_){}
+    for(const o of objects)if((o.scene||'pira')==='pira'&&o!==o1&&o!==o2&&o!==fogo&&o.w===1&&o.h===1)move(o);
+    try{ITEMS.forEach(move);npcs.forEach(move);buildOcc();}catch(_){}
+    try{if(cur==='pira')buildStatic();}catch(_){}
+  }catch(e){console.warn('v283 ocas',e);}};
+  /* objetos de pegar da aldeia (cestos, pote, lenha, pilão): o ícone deles fica na folha de ícones montada na v233 */
+  const ORD=['milho','mandioca','pote','lenha','cestoPeixe','pilao'];
+  const NOVO={milho:'P54N_cestoTrancado',mandioca:'P54N_cestoMandioca',pote:'P54N_pote',lenha:'P54N_lenha',cestoPeixe:'P54N_cestoTrancado',pilao:'P54N_pilao'};
+  const icones=n=>{try{const a=IMG.IT;
+    if(!a||!a.__ic54||!ORD.every(k=>pronta(NOVO[k]))){if((n||0)<300)setTimeout(()=>icones((n||0)+1),300);return;}
+    if(a.__v283)return;const b0=Math.round(a.width/16)-ORD.length,x=a.getContext('2d');x.imageSmoothingEnabled=false;
+    ORD.forEach((k,j)=>{const i=IMG[NOVO[k]],cx=(b0+j)*16;x.clearRect(cx,0,16,16);x.drawImage(i,cx+Math.floor((16-i.naturalWidth)/2),16-i.naturalHeight);});
+    a.__v283=1;}catch(e){console.warn('v283 ícones',e);}};
+  ocas();aplica();[1500,5000,12000,30000].forEach(ms=>setTimeout(()=>{ocas();aplica();},ms));icones(0);
+}catch(e){console.warn('v283 novos desenhos 1554',e);}})();
 /*ABERTURA_RAPIDA_FIM*/;(function(){
 if(!window.__PAC)return;const PAC=window.__PAC,P=PAC.lista,ANO={1:1554,2:1830,3:1888,4:1922};
 const bit=e=>1<<(e-1);
