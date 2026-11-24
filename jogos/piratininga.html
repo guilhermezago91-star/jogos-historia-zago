@@ -30132,6 +30132,7 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
      {t:'q',k:'pesca',tit:'Pesca no rio'},
      {t:'q',k:'farinha',tit:'Farinha de mandioca'},
      {t:'q',k:'escambo',tit:'A troca',txt0:'Em 1554 não se usa dinheiro aqui: troca-se. Fale com o colono de São Vicente, em Piratininga.'},
+     {t:'jes',tit:'Os jesuítas',txt:'Converse com o padre Manuel de Paiva, perto do colégio.'},/* v286 */
      {t:'obj',n:5,tit:'Objetos da colina',txt:'Encontre 5 objetos de Piratininga. Eles brilham no chão.'},
      {t:'prova',n:'anchieta',tit:'A prova de Piratininga',txt:'Fale com o irmão Anchieta e faça a prova.'}],
     extra:[]},
@@ -30337,7 +30338,7 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   let modo='missao';try{modo=localStorage.getItem(KMODO)||'missao';}catch(_){}
   const grava=()=>{try{if(MM)localStorage.setItem(KEY,JSON.stringify(MM));}catch(_){}};
   const ligado=()=>!!(MM&&MM.on&&modo==='missao');
-  window.__MM=()=>MM;window.__MMligado=ligado;
+  window.__MM=()=>MM;window.__MMligado=ligado;window.__MMmissao=()=>{try{return missao();}catch(_){return null;}};/* v286 */
   /* ===== v278 — MODO MISSÃO: CONVERSA SÓ CONTA NO FIM DO DIÁLOGO (pedido do professor, 23/11/2026) ===== */
   window.__mmFimConversa=(n)=>{try{if(MM&&n&&n.id){MM.falou[n.id]=1;grava();}}catch(_){}};
 
@@ -30362,6 +30363,7 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
     if(m.t==='obj'){const tem=itensTela(T).filter(i=>i.got).length,tot=itensTela(T).length;return m.rel?(tem-(MM.base?MM.base.obj:0))>=Math.min(m.n,Math.max(1,tot-(MM.base?MM.base.obj:0))):tem>=Math.min(m.n,tot);}
     if(m.t==='conv')return conversasTela(T)-(MM.base?MM.base.conv:0)>=m.n;
     if(m.t==='prova')return !!MM.provas[MM.f];
+    if(m.t==='jes')return !!(window.__jesFim&&window.__jesFim());/* v286 */
     return false;}
   function progresso(m){const T=tela();
     if(m.t==='obj'){const tem=itensTela(T).filter(i=>i.got).length,tot=itensTela(T).length;if(m.rel){const b=MM.base?MM.base.obj:0;return ` (${Math.max(0,tem-b)}/${Math.min(m.n,Math.max(1,tot-b))})`;}return ` (${Math.min(tem,m.n)}/${Math.min(m.n,tot)})`;}
@@ -30370,6 +30372,7 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
   function texto(m){
     if(m.t==='q'||m.t==='qs'){const q=Q[m.k];if(!q)return m.txt||m.tit;
       if(q.done)return m.tit+' ✓';      if(q.step===null&&!q.done)return m.txt0||m.txt||q.where||'';if(m.t==='qs'&&m.txt)return m.txt;try{return qText(m.k);}catch(_){return q.where||'';}}
+    if(m.t==='jes'&&window.__jesTexto)return window.__jesTexto()||m.txt;/* v286 */
     return (m.txt||m.tit)+progresso(m);}
 
   /* ---------- caixa de cima ---------- */
@@ -30478,6 +30481,7 @@ Promise.all([loadImages(),window.__paulista82Ready||Promise.resolve()]).then(()=
       if(m.t==='q'||m.t==='qs'){const q=Q[m.k],qt=QT[m.k];if(q&&qt){if(q.step===null&&!q.done)tg=qt.giver;else if(q.step!==null&&qt.steps)tg=qt.steps[q.step];}}
       else if(m.t==='falar'||m.t==='prova')tg='n:'+m.n;
       else if(m.t==='ir')tg=m.alvo||null;
+      else if(m.t==='jes')tg=(window.__jesAlvo&&window.__jesAlvo())||null;/* v286 */
       if(!tg)return null;try{return resolveTarget(tg);}catch(_){return null;}}
     return at.apply(this,arguments);};}
 
@@ -31379,14 +31383,8 @@ setTimeout(function(){try{
   /* ---------- caixa de missão na tela (fica logo abaixo da caixa do Modo Missão) ---------- */
   const q=document.getElementById('quest');let hudEl=null;
   const objetivo=E=>E.i>=TOTAL?'Parabéns! Você concluiu as seis missões dos jesuítas!':E.s==='disp'?'Converse com o jesuíta.':E.s==='ativa'?(matchMedia('(hover:none) and (pointer:coarse)').matches?`Encontre ${({Bíblia:'a',Flauta:'a','Carta manuscrita':'a',Rosário:'o',Crucifixo:'o',Cálice:'o'})[M[E.i].obj]||'o'} ${M[E.i].obj.toLowerCase()}`:`Encontre: ${M[E.i].obj}.`):`Entregue ao jesuíta: ${M[E.i].obj}.`;
-  function hud(){try{if(!scr)return;if(!hudEl){hudEl=document.createElement('div');hudEl.id='jesQ';hudEl.hidden=true;hudEl.innerHTML='<span class="k"></span><span class="t"></span><span class="o"></span><span class="s"></span>';(q||scr.firstChild).after(hudEl);cria();}
-    const E=est(),on=!!(E&&started&&jogo());if(!on){hudEl.hidden=true;return;}
-    const fim=E.i>=TOTAL,n=pad();
-    hudEl.querySelector('.k').textContent=(matchMedia('(hover:none) and (pointer:coarse)').matches?'Jesuítas · ':'Missão dos jesuítas · ')+E.i+'/'+TOTAL;
-    hudEl.querySelector('.t').textContent=fim?'As seis missões':M[E.i].tit;
-    hudEl.querySelector('.o').textContent=objetivo(E);
-    hudEl.querySelector('.s').textContent=(!fim&&(E.s==='disp'||E.s==='col'))?(n?n.name:'Pe. Manuel de Paiva')+', perto do colégio.':'';
-    hudEl.hidden=false;hudEl.style.top=((q&&!q.hidden)?(q.offsetTop+q.offsetHeight+4):6)+'px';}catch(e){console.warn('v285 caixa',e);}}
+  let sig='';
+  function hud(){try{if(hudEl){hudEl.hidden=true;}const E=est();const n=E?E.i+'|'+E.s+'|'+(mmOn()?1:0):'';if(n!==sig){sig=n;try{updQuest();}catch(_){}}}catch(e){console.warn('v286 caixa',e);}}/* v286: o aviso separado saiu; a caixa da missão mostra tudo */
   {const uq=updQuest;updQuest=function(){const r=uq.apply(this,arguments);hud();return r;};}
   setInterval(hud,600);
 
@@ -31394,6 +31392,15 @@ setTimeout(function(){try{
   const ativa=()=>{const E=est();if(!E||E.s!=='disp'||E.i>=TOTAL)return;const k=E.i;lugar(k);E.s='ativa';D.pedidos++;grava();sincObj();hud();toast('Nova missão: '+M[k].tit);};
   function fanfarra(){D.sons++;if(!soundOn)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;fanfarra.c=fanfarra.c||new AC();const a=fanfarra.c,t0=a.currentTime+.02;
     [[523.25,0,.16],[659.25,.13,.16],[783.99,.26,.16],[1046.5,.4,.6]].forEach(([f,d,l])=>{const o=a.createOscillator(),g=a.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(.0001,t0+d);g.gain.exponentialRampToValueAtTime(.1,t0+d+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+d+l);o.connect(g).connect(a.destination);o.start(t0+d);o.stop(t0+d+l+.05);});}catch(_){}}
+  /* ===== v286 — 1554: os jesuítas viram um passo da lista de missões, uma caixa só (pedido do professor, 24/11/2026) ===== */
+  const vez=()=>{try{const m=window.__MMmissao&&window.__MMmissao();return !!(m&&m.t==='jes');}catch(_){return false;}};
+  window.__jesFim=()=>{const E=est();return !!(E&&E.i>=TOTAL);};
+  window.__jesAlvo=()=>{const E=est();return E&&E.s!=='ativa'&&E.i<TOTAL?'n:'+NPC_ID:null;};
+  window.__jesTexto=()=>{const E=est();if(!E)return '';if(E.i>=TOTAL)return 'Missões dos jesuítas concluídas!';
+    const fone=matchMedia('(hover:none) and (pointer:coarse)').matches;const art=({Bíblia:'a',Flauta:'a','Carta manuscrita':'a'})[M[E.i].obj]||'o';const ob=M[E.i].obj.toLowerCase();
+    const cab=(fone?'Jesuítas ':'Missão dos jesuítas ')+E.i+'/'+TOTAL;
+    const acao=E.s==='ativa'?`Encontre ${art} ${ob}.`:E.s==='col'?`Entregue ${art} ${ob} ao padre Paiva.`:'Converse com o padre Paiva, perto do colégio.';
+    return cab+' · '+acao;};
   const entrega=()=>{const E=est();if(!E||E.s!=='col'||aberto||E.i>=TOTAL)return;const k=E.i,m=M[k],j=E.inv.indexOf(k);if(j<0)return;
     E.inv.splice(j,1);E.i++;E.s=E.i>=TOTAL?'fim':'disp';D.entregas++;grava();try{save();}catch(_){}hud();fanfarra();
     const pg=[m.fim,E.i>=TOTAL?'Parabéns! Você concluiu as seis missões dos jesuítas!':`Missões cumpridas: ${E.i} de ${TOTAL}. Converse de novo com o jesuíta para ouvir o próximo pedido.`];
@@ -31403,7 +31410,7 @@ setTimeout(function(){try{
     try{if(n&&n.id===NPC_ID&&(n.scene||'pira')==='pira'&&jogo()){const E=est();if(E){
       if(E.i>=TOTAL)return{pages:['Você já me ajudou com todas as tarefas. Muito obrigado!'],only:true};
       const m=M[E.i];
-      if(E.s==='disp')return{pages:[m.pedido],only:true,after:ativa};
+      if(E.s==='disp'){if(!vez())return q0.apply(this,arguments);return{pages:[m.pedido],only:true,after:ativa};}/* v286: o pedido só vem na vez dele */
       if(E.s==='ativa')return{pages:['Ainda preciso desse objeto.'],only:true};
       if(E.s==='col'&&!aberto)return{pages:[m.entrega],only:true,after:entrega};}}}catch(e){console.warn('v285 conversa',e);}
     return q0.apply(this,arguments);};}
