@@ -1126,7 +1126,7 @@ window.ATENAS_ASSETS={
 <script>
 (()=>{
 const $=id=>document.getElementById(id);
-const GUIDE_MODE=false;
+let GUIDE_MODE=new URLSearchParams(location.search).get('modo')==='guiado';
 const canvas=$('c');
 function showGraphicsError(){
   const start=$('start'),intro=$('intro');
@@ -3138,7 +3138,7 @@ const INTRO=[
 let ip=0;
 function renderIntro(){
   const last=ip===INTRO.length-1;
-  const nav='<div class="mode-choice"><a href="https://atenas-415-nikos.vercel.app/" class="'+(!GUIDE_MODE?'active':'')+'">🧭 Exploração livre</a><a href="https://atenas-415-nikos.vercel.app/guiado.html" class="'+(GUIDE_MODE?'active':'')+'">🗺️ Roteiro guiado</a></div>';
+  const nav='<div class="mode-choice"><a href="./?modo=livre" class="'+(!GUIDE_MODE?'active':'')+'">🧭 Exploração livre</a><a href="./?modo=guiado" class="'+(GUIDE_MODE?'active':'')+'">🗺️ Roteiro guiado</a></div>';
   $('intro').innerHTML=nav+INTRO[ip]+`${window.SAVE&&SAVE.has()?'<div class="row"><button id="bLoad">⟳ Continuar de onde parei</button><button id="bWipe" class="ghost">Começar do zero</button></div>':''}<div class="row">${ip>0?'<button class="ghost" id="iBack">◂ Voltar</button>':''}
    ${last?(GUIDE_MODE?'<button id="bStart">Começar roteiro guiado ▸</button>':'<button id="bStart">Explorar Atenas livremente ▸</button><button id="bSkip" class="ghost">Ir direto para a assembleia</button>'):'<button id="iNext">Continuar ▸</button>'}
    <span class="dots">${ip+1} de ${INTRO.length}</span></div>`;
@@ -5418,7 +5418,7 @@ EXTRA_TICKS.push(()=>{if(!MIS.on){
   if(d<st.r)st.run();
 });
 // ---------- começar e continuar ----------
-function misStart(load){const d=load?MSAVE.read():null;
+function misStart(load){GUIDE_MODE=false;const d=load?MSAVE.read():null;
   MIS.on=true;MIS.s=0;MIS.got=[];MIS.right=0;MIS.total=0;
   begin(false);MNPC.forEach(f=>{f.hide=false;if(!colliders.includes(f.col))colliders.push(f.col);});btnBook.hidden=false;$('misRow').hidden=false;$('guideContinue').hidden=true;
   if(d){MIS.s=Math.min(d.s|0,STEPS.length);MIS.got=d.got||[];MIS.right=d.right|0;MIS.total=d.total|0;}
